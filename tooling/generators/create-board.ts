@@ -42,7 +42,39 @@ const args = yargs
   })
   .parseSync(); // creates typed result
 
+const DIR_OUTPUT_MODEL: string = path.normalize("assets/Models");
 const DIR_OUTPUT_TEMPLATE: string = path.normalize("assets/Templates");
+
+const DATA_UNIT_COLLIDER: string = `v 0.5 0.5 0.5
+v 0.5 0.5 -0.5
+v -0.5 0.5 -0.5
+v -0.5 0.5 0.5
+v 0.5 -0.5 0.5
+v 0.5 -0.5 -0.5
+v -0.5 -0.5 -0.5
+v -0.5 -0.5 0.5
+
+# Top (only top has UVs)
+f 1 2 3
+f 1 3 4
+
+# Bottom
+f 5 7 6
+f 5 8 7 
+
+# Sides
+f 1 5 2
+f 5 6 2
+
+f 2 6 3
+f 6 7 3
+
+f 3 7 4
+f 7 8 4
+
+f 4 8 5
+f 1 4 5
+`;
 
 const DATA_MERGED_CUBES_TEMPLATE = {
   Type: "Generic",
@@ -73,7 +105,27 @@ const DATA_MERGED_CUBES_TEMPLATE = {
   ScriptName: "",
   Blueprint: "",
   Models: ["$REPLACE THIS"],
-  Collision: [],
+  Collision: [
+    {
+      Model: "utility/unit-cube.obj",
+      Offset: {
+        X: 0,
+        Y: 0,
+        Z: 0,
+      },
+      Scale: {
+        X: 1,
+        Y: 1,
+        Z: 1,
+      },
+      Rotation: {
+        X: 0,
+        Y: 0,
+        Z: 0,
+      },
+      Type: "Convex",
+    },
+  ],
   Lights: [],
   SnapPointsGlobal: false,
   SnapPoints: [{}],
@@ -113,14 +165,6 @@ const DATA_CUBE_MODEL_TEMPLATE = {
   UseOverrides: true,
   SurfaceType: "Cardboard",
 };
-
-interface Chunk {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-  dstFileRelativeToTextureDir: string;
-}
 
 async function main() {
   // ------------------------------------
@@ -187,6 +231,18 @@ async function main() {
   const imageChunks: ImageSplitChunk[] = await splitter.cleanOutFiles().split();
 
   // ------------------------------------
+  console.log("\n----- CREATE OUTPUT COLLIDER -----\n");
+
+  const colFile: string = path.join(
+    DIR_OUTPUT_MODEL,
+    "utility",
+    "unit-cube.obj"
+  );
+  console.log(`creating "${colFile}"`);
+  fs.mkdirSync(path.dirname(colFile), { recursive: true });
+  fs.writeFileSync(colFile, DATA_UNIT_COLLIDER);
+
+  // ------------------------------------
   console.log("\n----- CREATE OUTPUT TEMPLATE -----\n");
 
   const dstFile: string = path.join(
@@ -240,6 +296,11 @@ async function main() {
 
     template.Models.push(cubeTemplate);
   }
+
+  // Size collider (default appears to be one per model).
+  template.Collision[0].Scale.X = config.height;
+  template.Collision[0].Scale.Y = config.width;
+  template.Collision[0].Scale.Z = config.depth;
 
   console.log(`creating "${dstFile}"`);
   fs.mkdirSync(path.dirname(dstFile), { recursive: true });
