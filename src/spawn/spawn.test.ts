@@ -18,6 +18,12 @@ it("spawn", () => {
   mockWorld._reset();
 });
 
+it("spawnOrThrow", () => {
+  expect(() => {
+    Spawn.spawnOrThrow("no-such-nsid", [0, 0, 0]);
+  }).toThrow();
+});
+
 it("validate", () => {
   const nsid = "my-nsid";
   const templateId = "my-template-id";

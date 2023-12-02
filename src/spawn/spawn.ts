@@ -12,9 +12,20 @@ export abstract class Spawn {
   ): GameObject | undefined {
     const templateId = Spawn._nsidToTemplateId[nsid];
     if (!templateId) {
-      throw new Error(`spawn nsid "${nsid}" has no templateId`);
+      return undefined;
     }
     const obj = world.createObjectFromTemplate(templateId, position);
+    return obj;
+  }
+
+  static spawnOrThrow(
+    nsid: string,
+    position: Vector | [x: number, y: number, z: number]
+  ): GameObject {
+    const obj: GameObject | undefined = Spawn.spawn(nsid, position);
+    if (!obj) {
+      throw new Error(`spawnOrThrow failed for "${nsid}"`);
+    }
     return obj;
   }
 

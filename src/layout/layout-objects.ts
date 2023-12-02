@@ -22,6 +22,8 @@ export class LayoutObjects {
   private _overrideHeight: number = 0;
   private _overrideWidth: number = 0;
 
+  private _layoutCenter: Vector = new Vector(0, 0, 0);
+
   constructor() {}
 
   setChildDistanace(value: number): this {
@@ -96,7 +98,8 @@ export class LayoutObjects {
 
     // Apply each child.
     for (const child of this._children) {
-      const childSize: LayoutObjectsSize = this._calculateChildSize(child);
+      const childSize: LayoutObjectsSize =
+        LayoutObjects._calculateChildSize(child);
       if (this._isVertical) {
         size.w = Math.max(size.w, childSize.w);
         size.h += childSize.h;
@@ -109,7 +112,9 @@ export class LayoutObjects {
     return size;
   }
 
-  _calculateChildSize(child: StaticObject | LayoutObjects): LayoutObjectsSize {
+  static _calculateChildSize(
+    child: StaticObject | LayoutObjects
+  ): LayoutObjectsSize {
     let childSize: LayoutObjectsSize;
     if (child instanceof StaticObject) {
       const currentRotation = true;
@@ -123,6 +128,8 @@ export class LayoutObjects {
   }
 
   doLayoutAtPoint(center: Vector, yaw: number): this {
+    this._layoutCenter = center;
+
     const size = this.calculateSize();
     const childrenSize = this.calculateChildrenSize();
 
@@ -148,7 +155,8 @@ export class LayoutObjects {
     let top = -size.h / 2 + padTop;
 
     for (const child of this._children) {
-      const childSize: LayoutObjectsSize = this._calculateChildSize(child);
+      const childSize: LayoutObjectsSize =
+        LayoutObjects._calculateChildSize(child);
 
       // Calculate child center (world).
       const childCenter = new Vector(
@@ -175,6 +183,50 @@ export class LayoutObjects {
       }
     }
 
+    return this;
+  }
+
+  getCenter(): Vector {
+    return this._layoutCenter;
+  }
+
+  layoutLeftOf(peer: StaticObject, gap: number): this {
+    const peerSize = LayoutObjects._calculateChildSize(peer);
+    const size = this.calculateSize();
+    const center = peer
+      .getPosition()
+      .subtract([(peerSize.w + size.w) / 2 + gap, 0, 0]);
+    this.doLayoutAtPoint(center, 0);
+    return this;
+  }
+
+  layoutRightOf(peer: StaticObject, gap: number): this {
+    const peerSize = LayoutObjects._calculateChildSize(peer);
+    const size = this.calculateSize();
+    const center = peer
+      .getPosition()
+      .add([(peerSize.w + size.w) / 2 + gap, 0, 0]);
+    this.doLayoutAtPoint(center, 0);
+    return this;
+  }
+
+  layoutAbove(peer: StaticObject, gap: number): this {
+    const peerSize = LayoutObjects._calculateChildSize(peer);
+    const size = this.calculateSize();
+    const center = peer
+      .getPosition()
+      .add([0, (peerSize.h + size.w) / 2 + gap, 0]);
+    this.doLayoutAtPoint(center, 0);
+    return this;
+  }
+
+  layoutBelow(peer: StaticObject, gap: number): this {
+    const peerSize = LayoutObjects._calculateChildSize(peer);
+    const size = this.calculateSize();
+    const center = peer
+      .getPosition()
+      .subtract([0, (peerSize.h + size.w) / 2 + gap, 0]);
+    this.doLayoutAtPoint(center, 0);
     return this;
   }
 }
