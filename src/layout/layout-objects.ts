@@ -5,6 +5,7 @@ import {
   Vector,
   VerticalAlignment,
 } from "@tabletop-playground/api";
+import { TriggerableMulticastDelegate } from "../triggerable-multicast-delegate/triggerable-multicast-delegate";
 
 export type LayoutObjectsSize = {
   w: number;
@@ -23,6 +24,8 @@ export class LayoutObjects {
   private _overrideWidth: number = 0;
 
   private _layoutCenter: Vector = new Vector(0, 0, 0);
+
+  public readonly afterLayout = new TriggerableMulticastDelegate();
 
   constructor() {}
 
@@ -60,6 +63,37 @@ export class LayoutObjects {
 
   add(item: StaticObject | LayoutObjects): this {
     this._children.push(item);
+    return this;
+  }
+
+  flip(flipH: boolean, flipV: boolean): this {
+    // Children.
+    if ((flipH && !this._isVertical) || (flipV && this._isVertical)) {
+      this._children.reverse();
+    }
+
+    // Layout.
+    if (flipH) {
+      if (this._horizontalAlignment === HorizontalAlignment.Left) {
+        this._horizontalAlignment = HorizontalAlignment.Right;
+      } else if (this._horizontalAlignment === HorizontalAlignment.Right) {
+        this._horizontalAlignment = HorizontalAlignment.Left;
+      }
+    }
+    if (flipV) {
+      if (this._verticalAlignment === VerticalAlignment.Top) {
+        this._verticalAlignment = VerticalAlignment.Bottom;
+      } else if (this._verticalAlignment === VerticalAlignment.Bottom) {
+        this._verticalAlignment = VerticalAlignment.Top;
+      }
+    }
+
+    // Recurse.
+    for (const child of this._children) {
+      if (child instanceof LayoutObjects) {
+        child.flip(flipH, flipV);
+      }
+    }
     return this;
   }
 
@@ -130,38 +164,59 @@ export class LayoutObjects {
   doLayoutAtPoint(center: Vector, yaw: number): this {
     this._layoutCenter = center;
 
-    const size = this.calculateSize();
+    const overrideSize = this.calculateSize();
     const childrenSize = this.calculateChildrenSize();
 
+    // Position accounting for override size.
     let padLeft: number;
+    let padTop: number;
     if (this._horizontalAlignment === HorizontalAlignment.Left) {
       padLeft = 0;
     } else if (this._horizontalAlignment === HorizontalAlignment.Right) {
-      padLeft = size.w - childrenSize.w;
+      padLeft = overrideSize.w - childrenSize.w;
     } else {
-      padLeft = (size.w - childrenSize.w) / 2; // center (even if "Fill")
+      padLeft = (overrideSize.w - childrenSize.w) / 2; // center (even if "Fill")
     }
-
-    let padTop: number;
     if (this._verticalAlignment === VerticalAlignment.Top) {
       padTop = 0;
     } else if (this._verticalAlignment === VerticalAlignment.Bottom) {
-      padTop = size.w - childrenSize.w;
+      padTop = overrideSize.h - childrenSize.h;
     } else {
-      padTop = (size.w - childrenSize.w) / 2; // center (even if "Fill")
+      padTop = (overrideSize.h - childrenSize.h) / 2; // center (even if "Fill")
     }
 
-    let left = -size.w / 2 + padLeft;
-    let top = -size.h / 2 + padTop;
+    let left = -overrideSize.w / 2 + padLeft;
+    let top = overrideSize.h / 2 - padTop;
 
     for (const child of this._children) {
       const childSize: LayoutObjectsSize =
         LayoutObjects._calculateChildSize(child);
 
+      // Apply layout in row/col.
+      padLeft = 0;
+      padTop = 0;
+      if (this._isVertical) {
+        if (this._horizontalAlignment === HorizontalAlignment.Left) {
+          padLeft = 0;
+        } else if (this._horizontalAlignment === HorizontalAlignment.Right) {
+          padLeft = childrenSize.w - childSize.w;
+        } else {
+          padLeft = (childrenSize.w - childSize.w) / 2; // center (even if "Fill")
+        }
+      } else {
+        if (this._verticalAlignment === VerticalAlignment.Top) {
+          padTop = 0;
+        } else if (this._verticalAlignment === VerticalAlignment.Bottom) {
+          padTop = childrenSize.h - childSize.h;
+        } else {
+          padTop = (childrenSize.h - childSize.h) / 2; // center (even if "Fill")
+        }
+      }
+
       // Calculate child center (world).
       const childCenter = new Vector(
-        top + childSize.h / 2,
-        left + childSize.w / 2,
+        top - childSize.h / 2 - padTop,
+        left + childSize.w / 2 + padLeft,
         0
       )
         .rotateAngleAxis(yaw, [0, 0, 1])
@@ -177,11 +232,13 @@ export class LayoutObjects {
 
       // Move "cursor" to next open spot top-left.
       if (this._isVertical) {
-        top += childSize.h + this._childDistance;
+        top -= childSize.h + this._childDistance;
       } else {
         left += childSize.w + this._childDistance;
       }
     }
+
+    this.afterLayout.trigger();
 
     return this;
   }
