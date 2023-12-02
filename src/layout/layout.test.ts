@@ -79,7 +79,7 @@ it("layout (1x1, offset)", () => {
   const center = new MockVector(1, 2, 3);
   const yaw = 0;
   new LayoutObjects().add(obj1).doLayoutAtPoint(center, yaw);
-  const want = new MockVector(1, 2, 3);
+  const want = new MockVector(1, 2, 0); // snapto ground
   expect(obj1.getPosition().toString()).toEqual(want.toString());
 });
 
@@ -112,8 +112,8 @@ it("layout (2x1, offset)", () => {
     .add(obj2)
     .setChildDistanace(1)
     .doLayoutAtPoint(center, yaw);
-  const want1 = new MockVector(1, -3.5, 3);
-  const want2 = new MockVector(1, 7.5, 3);
+  const want1 = new MockVector(1, -3.5, 0); // snap to ground
+  const want2 = new MockVector(1, 7.5, 0);
   expect(obj1.getPosition().toString()).toEqual(want1.toString());
   expect(obj2.getPosition().toString()).toEqual(want2.toString());
 });

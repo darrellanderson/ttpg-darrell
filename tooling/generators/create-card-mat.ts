@@ -288,7 +288,7 @@ async function main() {
       // Other snap point fields.
       Z: config.depth / 2,
       Range: 3,
-      SnapRotation: 0,
+      SnapRotation: config.snapRotation ? config.snapRotation : 2, // 3 = rotate + upright
       RotationOffset: 0,
       Shape: 0,
       FlipValidity: 0,

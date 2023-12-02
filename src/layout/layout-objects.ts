@@ -1,7 +1,7 @@
 import {
+  GameObject,
   HorizontalAlignment,
   Rotator,
-  StaticObject,
   Vector,
   VerticalAlignment,
 } from "@tabletop-playground/api";
@@ -13,7 +13,7 @@ export type LayoutObjectsSize = {
 };
 
 export class LayoutObjects {
-  private _children: (StaticObject | LayoutObjects)[] = [];
+  private _children: (GameObject | LayoutObjects)[] = [];
 
   private _horizontalAlignment: number = HorizontalAlignment.Center;
   private _verticalAlignment: number = VerticalAlignment.Center;
@@ -61,7 +61,7 @@ export class LayoutObjects {
 
   // ----------------------------------
 
-  add(item: StaticObject | LayoutObjects): this {
+  add(item: GameObject | LayoutObjects): this {
     this._children.push(item);
     return this;
   }
@@ -147,10 +147,10 @@ export class LayoutObjects {
   }
 
   static _calculateChildSize(
-    child: StaticObject | LayoutObjects
+    child: GameObject | LayoutObjects
   ): LayoutObjectsSize {
     let childSize: LayoutObjectsSize;
-    if (child instanceof StaticObject) {
+    if (child instanceof GameObject) {
       const currentRotation = true;
       const includeGeometry = false;
       const extent: Vector = child.getExtent(currentRotation, includeGeometry);
@@ -223,9 +223,10 @@ export class LayoutObjects {
         .add(center);
 
       // Position child.
-      if (child instanceof StaticObject) {
+      if (child instanceof GameObject) {
         child.setPosition(childCenter);
         child.setRotation(child.getRotation().compose([0, yaw, 0]));
+        child.snapToGround();
       } else {
         child.doLayoutAtPoint(childCenter, yaw);
       }
@@ -247,7 +248,7 @@ export class LayoutObjects {
     return this._layoutCenter;
   }
 
-  layoutLeftOf(peer: StaticObject, gap: number): this {
+  layoutLeftOf(peer: GameObject, gap: number): this {
     const peerSize = LayoutObjects._calculateChildSize(peer);
     const size = this.calculateSize();
     const center = peer
@@ -257,7 +258,7 @@ export class LayoutObjects {
     return this;
   }
 
-  layoutRightOf(peer: StaticObject, gap: number): this {
+  layoutRightOf(peer: GameObject, gap: number): this {
     const peerSize = LayoutObjects._calculateChildSize(peer);
     const size = this.calculateSize();
     const center = peer
@@ -267,7 +268,7 @@ export class LayoutObjects {
     return this;
   }
 
-  layoutAbove(peer: StaticObject, gap: number): this {
+  layoutAbove(peer: GameObject, gap: number): this {
     const peerSize = LayoutObjects._calculateChildSize(peer);
     const size = this.calculateSize();
     const center = peer
@@ -277,7 +278,7 @@ export class LayoutObjects {
     return this;
   }
 
-  layoutBelow(peer: StaticObject, gap: number): this {
+  layoutBelow(peer: GameObject, gap: number): this {
     const peerSize = LayoutObjects._calculateChildSize(peer);
     const size = this.calculateSize();
     const center = peer
