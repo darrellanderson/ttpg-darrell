@@ -3,6 +3,7 @@ import {
   Button,
   Color,
   GameObject,
+  GameWorld,
   Player,
   Text,
   TextJustification,
@@ -48,8 +49,6 @@ export class PlayerNameTakeSeat {
     this._ui.useWidgetSize = true;
     this._ui.widget = this._widgetSwitcher;
 
-    this._gameObject.addUI(this._ui);
-
     this._takeSeatButton.onClicked.add((button: Button, player: Player) => {
       const thisSlot = this._gameObject.getOwningPlayerSlot();
       if (thisSlot < 0) {
@@ -75,9 +74,18 @@ export class PlayerNameTakeSeat {
       globalEvents.onPlayerSwitchedSlots.remove(eventHandler);
     });
 
-    this.setColor(gameObject.getPrimaryColor())
-      .setFontSize(PlayerNameTakeSeat.DEFAULT_FONT_SIZE)
-      ._updatePlayerStatus();
+    // Finish setup next frame, give the creator a chance to finish.
+    const finish = () => {
+      this._gameObject.addUI(this._ui);
+      this.setColor(gameObject.getPrimaryColor())
+        .setFontSize(PlayerNameTakeSeat.DEFAULT_FONT_SIZE)
+        ._updatePlayerStatus();
+    };
+    if (GameWorld.getExecutionReason() === "unittest") {
+      finish();
+    } else {
+      process.nextTick(finish);
+    }
   }
 
   public setColor(color: Color): this {
