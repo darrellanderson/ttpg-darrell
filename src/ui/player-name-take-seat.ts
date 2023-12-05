@@ -27,6 +27,9 @@ export class PlayerNameTakeSeat {
   private readonly _ui: UIElement;
 
   public constructor(gameObject: GameObject) {
+    if (!gameObject) {
+      throw new Error("missing gameObject");
+    }
     this._gameObject = gameObject;
 
     this._nameText = new Text()
@@ -40,8 +43,6 @@ export class PlayerNameTakeSeat {
     this._widgetSwitcher = new WidgetSwitcher()
       .addChild(this._takeSeatButton)
       .addChild(this._nameBorder);
-
-    this._widgetSwitcher.setActiveIndex(1);
 
     this._ui = new UIElement();
     this._ui.presentationStyle = UIPresentationStyle.ViewAligned;
@@ -74,18 +75,11 @@ export class PlayerNameTakeSeat {
       globalEvents.onPlayerSwitchedSlots.remove(eventHandler);
     });
 
-    // Finish setup next frame, give the creator a chance to finish.
-    const finish = () => {
-      this._gameObject.addUI(this._ui);
-      this.setColor(gameObject.getPrimaryColor())
-        .setFontSize(PlayerNameTakeSeat.DEFAULT_FONT_SIZE)
-        ._updatePlayerStatus();
-    };
-    if (GameWorld.getExecutionReason() === "unittest") {
-      finish();
-    } else {
-      process.nextTick(finish);
-    }
+    this._gameObject.addUI(this._ui);
+    this.setColor(gameObject.getPrimaryColor()).setFontSize(
+      PlayerNameTakeSeat.DEFAULT_FONT_SIZE
+    );
+    this._updatePlayerStatus();
   }
 
   public setColor(color: Color): this {
