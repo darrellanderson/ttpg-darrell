@@ -39,7 +39,7 @@ export abstract class Spawn {
     return Spawn._nsidToTemplateId[nsid] ? true : false;
   }
 
-  static reset() {
+  static clear() {
     Spawn._nsidToTemplateId = {};
   }
 

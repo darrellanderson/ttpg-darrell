@@ -24,9 +24,20 @@ it("spawnOrThrow", () => {
   }).toThrow();
 });
 
+it("has", () => {
+  const nsid = "my-nsid";
+  const templateId = "my-template-id";
+  Spawn.clear();
+  expect(Spawn.has(nsid)).toBeFalsy();
+  Spawn.inject({ [nsid]: templateId });
+  expect(Spawn.has(nsid)).toBeTruthy();
+  Spawn.clear();
+});
+
 it("validate", () => {
   const nsid = "my-nsid";
   const templateId = "my-template-id";
+  Spawn.clear();
   Spawn.inject({ [nsid]: templateId });
 
   // Spawn knows about the template id, but world does not.
