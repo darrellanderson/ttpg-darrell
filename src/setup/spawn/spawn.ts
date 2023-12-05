@@ -35,6 +35,14 @@ export abstract class Spawn {
     }
   }
 
+  static has(nsid: string): boolean {
+    return Spawn._nsidToTemplateId[nsid] ? true : false;
+  }
+
+  static reset() {
+    Spawn._nsidToTemplateId = {};
+  }
+
   static validate() {
     const templateIds = new Set();
     for (const pkg of world.getAllowedPackages()) {

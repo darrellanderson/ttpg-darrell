@@ -248,7 +248,7 @@ async function main() {
 
     console.log(`[${index} @ ${col}x${row}]`);
 
-    const input = await slot.img.grayscale(true).ensureAlpha(0.5).toBuffer();
+    const input = await slot.img.grayscale(true).ensureAlpha(1).toBuffer();
 
     // Card image.
     composite.push({ input, left, top });
