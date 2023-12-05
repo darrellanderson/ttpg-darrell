@@ -3,7 +3,6 @@ import {
   Button,
   Color,
   GameObject,
-  GameWorld,
   Player,
   Text,
   TextJustification,
