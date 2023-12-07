@@ -255,7 +255,7 @@ export class LayoutObjects {
     const size = this.calculateSize();
     const center = peer
       .getPosition()
-      .subtract([(peerSize.w + size.w) / 2 + gap, 0, 0]);
+      .subtract([0, (peerSize.w + size.w) / 2 + gap, 0]);
     this.doLayoutAtPoint(center, 0);
     return this;
   }
@@ -265,7 +265,7 @@ export class LayoutObjects {
     const size = this.calculateSize();
     const center = peer
       .getPosition()
-      .add([(peerSize.w + size.w) / 2 + gap, 0, 0]);
+      .add([0, (peerSize.w + size.w) / 2 + gap, 0]);
     this.doLayoutAtPoint(center, 0);
     return this;
   }
@@ -275,7 +275,7 @@ export class LayoutObjects {
     const size = this.calculateSize();
     const center = peer
       .getPosition()
-      .add([0, (peerSize.h + size.w) / 2 + gap, 0]);
+      .add([(peerSize.h + size.h) / 2 + gap, 0, 0]);
     this.doLayoutAtPoint(center, 0);
     return this;
   }
@@ -285,7 +285,7 @@ export class LayoutObjects {
     const size = this.calculateSize();
     const center = peer
       .getPosition()
-      .subtract([0, (peerSize.h + size.w) / 2 + gap, 0]);
+      .subtract([(peerSize.h + size.h) / 2 + gap, 0, 0]);
     this.doLayoutAtPoint(center, 0);
     return this;
   }
