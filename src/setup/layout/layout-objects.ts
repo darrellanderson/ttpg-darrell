@@ -4,6 +4,7 @@ import {
   Rotator,
   Vector,
   VerticalAlignment,
+  world,
 } from "@tabletop-playground/api";
 import { TriggerableMulticastDelegate } from "../../triggerable-multicast-delegate/triggerable-multicast-delegate";
 
@@ -224,9 +225,10 @@ export class LayoutObjects {
 
       // Position child.
       if (child instanceof GameObject) {
+        childCenter.z = world.getTableHeight() + 20;
         child.setPosition(childCenter);
         child.setRotation(child.getRotation().compose([0, yaw, 0]));
-        child.snapToGround();
+        child.snapToGround(); // after-layout might adjust based on this position!
       } else {
         child.doLayoutAtPoint(childCenter, yaw);
       }
