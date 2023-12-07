@@ -84,30 +84,43 @@ async function main() {
           nsid = newNsid;
         }
       } else if (cardNsids.length > 1) {
-        const prefixes = cardNsids.map((cardNsid) => {
-          const m = cardNsids[0].match("([^:]+:[^/]+)/.+");
-          return m ? m[1] : undefined;
+        const getPrefix = (items: string[]): string => {
+          const first: string = items[0];
+          const firstParts: string[] = first.split(".");
+
+          // Get longest dot-delimited matching type.
+          let matchingPartsCount = firstParts.length;
+          for (const item of items) {
+            const parts: string[] = item.split(".");
+            for (let i = 0; i < parts.length; i++) {
+              if (parts[i] !== firstParts[i]) {
+                matchingPartsCount = Math.min(matchingPartsCount, i);
+                break;
+              }
+            }
+          }
+          return firstParts.slice(0, matchingPartsCount).join(".");
+        };
+
+        // Use a common prefix (matching to a dot-delimited string).
+        const types: string[] = cardNsids.map((cardNsid) => {
+          const m = cardNsid.match("([^:]+):([^/]+)/.+");
+          return m ? m[1] : "";
         });
-        const firstPrefix: string | undefined = prefixes[0];
-        let allMatch: boolean = true;
-        for (const prefix of prefixes) {
-          if (prefix !== firstPrefix) {
-            allMatch = false;
-          }
-        }
-        if (firstPrefix && allMatch) {
-          const newNsid = `${firstPrefix}/*`;
-          if (nsid !== newNsid) {
-            console.log(
-              `REPLACING DECK "${nsid}" with "${newNsid}" (${jsonFilename})`
-            );
-            nsid = newNsid;
-          }
-        }
-        if (firstPrefix && !allMatch) {
-          console.warn(
-            `WARNING: DECK METADATA MISMATCH [${cardNsids.join(", ")}]`
+        const type = getPrefix(types);
+
+        const sources: string[] = cardNsids.map((cardNsid) => {
+          const m = cardNsid.match("([^:]+):([^/]+)/.+");
+          return m ? m[2] : "";
+        });
+        const source = getPrefix(sources);
+
+        const newNsid = `${type}:${source}/*`;
+        if (nsid !== newNsid) {
+          console.log(
+            `REPLACING DECK "${nsid}" with "${newNsid}" (${jsonFilename})`
           );
+          nsid = newNsid;
         }
       }
     }
@@ -119,6 +132,9 @@ async function main() {
     }
 
     console.log(`accepting "${jsonFilename}"`);
+    if (nsidToTemplateId[nsid]) {
+      throw new Error(`Duplicate NSID "${nsid}"`);
+    }
     nsidToTemplateId[nsid] = templateId;
   }
 

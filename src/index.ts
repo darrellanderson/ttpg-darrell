@@ -1,3 +1,5 @@
+export * from "./garbage/garbage-container";
+export * from "./garbage/simple-card-garbage-handler";
 export * from "./global/abstract-global";
 export * from "./global/content-menu/leave-seat";
 export * from "./locale/locale";
