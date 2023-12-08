@@ -1,6 +1,7 @@
 import {
   Border,
   Button,
+  CardHolder,
   Color,
   GameObject,
   Player,
@@ -55,6 +56,14 @@ export class PlayerNameTakeSeat {
         throw new Error("invalid player slot");
       }
       player.switchSlot(thisSlot);
+
+      // Make sure attached card holder follows.
+      const delayedResetCardHolder = () => {
+        if (this._gameObject instanceof CardHolder) {
+          player.setHandHolder(this._gameObject);
+        }
+      };
+      process.nextTick(delayedResetCardHolder);
     });
 
     // Listen for events (delay processing by a frame for "final" state).
