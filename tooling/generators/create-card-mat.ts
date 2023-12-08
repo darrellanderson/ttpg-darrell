@@ -11,11 +11,13 @@
  * - cardHeight : card height, in game units.
  * - depth : final obj depth, in game units.
  * - gap : padding between cards and to mat edge, in game units.
+ * - gapAfterColumn : extra padding after.
  *
  * - inputDir : path relative to prebuild.
  * - slots : array of [img, label, tags].
  * - cols : if > 0, wrap after N columns.
  * - postShrink : if > 0, shrink final image.
+ * - alpha : if < 0, fade slot images.
  *
  * - metadata : string
  * - output : create mat image and template.
@@ -243,12 +245,18 @@ async function main() {
     const col = index % cols;
     const row = Math.floor(index / cols);
 
-    const left = gapPx + col * (gapPx + cardPixels.w) + bleed.w;
+    let left = gapPx + col * (gapPx + cardPixels.w) + bleed.w;
     const top = gapPx + row * (gapPx + cardPixels.h) + bleed.h;
 
     console.log(`[${index} @ ${col}x${row}]`);
 
-    const input = await slot.img.grayscale(true).ensureAlpha(1).toBuffer();
+    const alpha = config.alpha ? config.alpha : 1;
+    const input = await slot.img.grayscale(true).ensureAlpha(alpha).toBuffer();
+
+    // Config value is 1-based.
+    if (config.gapAfterColumn && col >= config.gapAfterColumn) {
+      left += gapPx * 3;
+    }
 
     // Card image.
     composite.push({ input, left, top });
@@ -296,11 +304,19 @@ async function main() {
     if (config.snapDeltaX) {
       snapPoint.X += config.snapDeltaX;
     }
+    if (slot.snapRotation) {
+      snapPoint.SnapRotation = slot.snapRotation;
+    }
     snapPoints.push(snapPoint);
   }
 
   let width = px.w + bleed.w * 2;
   let height = px.h + bleed.h * 2;
+
+  if (config.gapAfterColumn) {
+    width += gapPx * 3;
+  }
+
   let dstImg = sharp({
     create: {
       width,

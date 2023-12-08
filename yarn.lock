@@ -2857,9 +2857,9 @@ ts-node@^10.9.1:
     yn "3.1.1"
 
 ttpg-mock@^1.0.7:
-  version "1.0.9"
-  resolved "https://registry.yarnpkg.com/ttpg-mock/-/ttpg-mock-1.0.9.tgz#178c5167d5988ebda848593fd99f3070c24cb48a"
-  integrity sha512-rf80M+EBDOyu//vK64cylTGQJ5d+xzJ0MapWFT9ablGeh5k2F7de1g5vwtKhaWieZ1NFneJpNxmbtEoFdAGcZg==
+  version "1.0.10"
+  resolved "https://registry.yarnpkg.com/ttpg-mock/-/ttpg-mock-1.0.10.tgz#792374a1b52d30fe56ac1c04b824dbc749502679"
+  integrity sha512-e+zDRTUmZtH0uNm43B8/CXnnnqgd8RGrjDARn56YdOp0sc9aOtgTRVwxgveo+aoZEkYyszTO4xFku2/uddqSMQ==
   dependencies:
     "@jest/globals" "^29.7.0"
     "@tabletop-playground/api" "^0.39.0"

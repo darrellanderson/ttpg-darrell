@@ -70,7 +70,7 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
 
     // Discard.
     if (deck) {
-      const toFront = false;
+      const toFront = true;
       const offset = 0;
       const animate = true;
       const flipped = false;
@@ -82,6 +82,16 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
       const above = snapPoint.getGlobalPosition().add([0, 0, 10]);
       const animationSpeed: number = 0;
       obj.setPosition(above, animationSpeed);
+
+      // Orient face-up if not shuffling, face down if shuffling.
+      if (obj.isFaceUp() && this._shuffleAfterDiscard) {
+        // Flip face down for a shuffled discard.
+        obj.flipOrUpright();
+      } else if (!obj.isFaceUp() && !this._shuffleAfterDiscard) {
+        // Flip face up for a standard discard.
+        obj.flipOrUpright();
+      }
+
       obj.snapToGround();
       obj.snap(); // apply snap point rotation
     }
