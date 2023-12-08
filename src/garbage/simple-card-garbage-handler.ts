@@ -83,13 +83,12 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
       const animationSpeed: number = 0;
       obj.setPosition(above, animationSpeed);
 
-      // Orient face-up if not shuffling, face down if shuffling.
-      if (obj.isFaceUp() && this._shuffleAfterDiscard) {
-        // Flip face down for a shuffled discard.
-        obj.flipOrUpright();
-      } else if (!obj.isFaceUp() && !this._shuffleAfterDiscard) {
-        // Flip face up for a standard discard.
-        obj.flipOrUpright();
+      // Orient when starting a new discard pile.
+      const wantFaceUp = this._shuffleAfterDiscard ? false : true;
+      if (obj.isFaceUp() !== wantFaceUp) {
+        // Apply instant rotation, flip method animates.
+        const rot = obj.getRotation().compose([0, 0, 180]);
+        obj.setRotation(rot);
       }
 
       obj.snapToGround();
