@@ -169,7 +169,8 @@ async function main() {
     !Array.isArray(config.faces) ||
     config.faces.length !== 6 ||
     !Array.isArray(config.tags) ||
-    typeof config.output !== "string"
+    typeof config.output !== "string" ||
+    typeof config.name !== "string"
   ) {
     throw new Error(`config error`);
   }
@@ -303,7 +304,7 @@ async function main() {
   );
 
   const template = DATA_DICE_TEMPLATE;
-  template.Name = path.basename(config.output);
+  template.Name = config.name;
   template.GUID = crypto
     .createHash("sha256")
     .update(config.output)

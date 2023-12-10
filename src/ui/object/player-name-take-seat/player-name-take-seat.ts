@@ -16,6 +16,10 @@ import {
   world,
 } from "@tabletop-playground/api";
 
+/**
+ * Display player name above-and-behind the card holder.
+ * Show a "take seat" button when no player in slot.
+ */
 export class PlayerNameTakeSeat {
   public static readonly DEFAULT_FONT_SIZE = 30;
 

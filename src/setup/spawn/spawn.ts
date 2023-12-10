@@ -15,6 +15,10 @@ export abstract class Spawn {
       return undefined;
     }
     const obj = world.createObjectFromTemplate(templateId, position);
+    if (obj) {
+      const name = world.getTemplateName(templateId);
+      obj.setName(name);
+    }
     return obj;
   }
 
