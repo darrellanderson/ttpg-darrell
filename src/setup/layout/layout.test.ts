@@ -4,7 +4,7 @@ import { LayoutObjects } from "./layout-objects";
 it("calculateSize (1x1)", () => {
   const size = new LayoutObjects()
     .setIsVertical(false)
-    .setChildDistanace(1)
+    .setChildDistance(1)
     .add(new MockGameObject({ _modelSize: [10, 10, 10] }))
     .calculateSize();
   expect(size).toEqual({ w: 10, h: 10 });
@@ -13,7 +13,7 @@ it("calculateSize (1x1)", () => {
 it("calculateSize (2x1)", () => {
   const size = new LayoutObjects()
     .setIsVertical(false)
-    .setChildDistanace(1)
+    .setChildDistance(1)
     .add(new MockGameObject({ _modelSize: [10, 10, 10] }))
     .add(new MockGameObject({ _modelSize: [10, 10, 10] }))
     .calculateSize();
@@ -23,7 +23,7 @@ it("calculateSize (2x1)", () => {
 it("calculateSize (1x2)", () => {
   const size = new LayoutObjects()
     .setIsVertical(true)
-    .setChildDistanace(1)
+    .setChildDistance(1)
     .add(new MockGameObject({ _modelSize: [10, 10, 10] }))
     .add(new MockGameObject({ _modelSize: [10, 10, 10] }))
     .calculateSize();
@@ -33,7 +33,7 @@ it("calculateSize (1x2)", () => {
 it("calculateSize (nested)", () => {
   const inner = new LayoutObjects()
     .setIsVertical(true)
-    .setChildDistanace(1)
+    .setChildDistance(1)
     .add(new MockGameObject({ _modelSize: [10, 10, 10] }))
     .add(new MockGameObject({ _modelSize: [10, 10, 10] }))
     .add(new MockGameObject({ _modelSize: [10, 10, 10] }));
@@ -42,7 +42,7 @@ it("calculateSize (nested)", () => {
 
   const outer = new LayoutObjects()
     .setIsVertical(false)
-    .setChildDistanace(1)
+    .setChildDistance(1)
     .add(new MockGameObject({ _modelSize: [10, 10, 10] }))
     .add(inner);
   const outerSize = outer.calculateSize();
@@ -92,7 +92,7 @@ it("layout (2x1, origin)", () => {
     .setIsVertical(false)
     .add(obj1)
     .add(obj2)
-    .setChildDistanace(1)
+    .setChildDistance(1)
     .doLayoutAtPoint(center, yaw);
 
   const want1 = new MockVector(0, -5.5, 0);
@@ -110,7 +110,7 @@ it("layout (2x1, offset)", () => {
     .setIsVertical(false)
     .add(obj1)
     .add(obj2)
-    .setChildDistanace(1)
+    .setChildDistance(1)
     .doLayoutAtPoint(center, yaw);
   const want1 = new MockVector(1, -3.5, 0); // snap to ground
   const want2 = new MockVector(1, 7.5, 0);
@@ -127,7 +127,7 @@ it("layout (2x1, origin, rot)", () => {
     .setIsVertical(false)
     .add(obj1)
     .add(obj2)
-    .setChildDistanace(1)
+    .setChildDistance(1)
     .doLayoutAtPoint(center, yaw);
 
   const want1 = new MockVector(5.5, 0, 0);

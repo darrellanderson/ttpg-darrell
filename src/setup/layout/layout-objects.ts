@@ -1,7 +1,6 @@
 import {
   GameObject,
   HorizontalAlignment,
-  Rotator,
   Vector,
   VerticalAlignment,
   world,
@@ -13,6 +12,9 @@ export type LayoutObjectsSize = {
   h: number;
 };
 
+/**
+ * Position objects, intended for initial table setup.
+ */
 export class LayoutObjects {
   private _children: (GameObject | LayoutObjects)[] = [];
 
@@ -30,7 +32,7 @@ export class LayoutObjects {
 
   constructor() {}
 
-  setChildDistanace(value: number): this {
+  setChildDistance(value: number): this {
     this._childDistance = value;
     return this;
   }
@@ -64,6 +66,11 @@ export class LayoutObjects {
 
   add(item: GameObject | LayoutObjects): this {
     this._children.push(item);
+    return this;
+  }
+
+  addAfterLayout(f: () => {}): this {
+    this.afterLayout.add(f);
     return this;
   }
 
