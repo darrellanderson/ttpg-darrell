@@ -138,7 +138,9 @@ async function main() {
     nsidToTemplateId[nsid] = templateId;
   }
 
-  const data = JSON.stringify(nsidToTemplateId, undefined, 4) + "\n";
+  const data =
+    JSON.stringify(nsidToTemplateId, Object.keys(nsidToTemplateId).sort(), 4) +
+    "\n";
   fs.writeFileSync(args.o, data);
 }
 
