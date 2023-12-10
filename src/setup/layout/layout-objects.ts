@@ -69,7 +69,7 @@ export class LayoutObjects {
     return this;
   }
 
-  addAfterLayout(f: () => {}): this {
+  addAfterLayout(f: () => void): this {
     this.afterLayout.add(f);
     return this;
   }
