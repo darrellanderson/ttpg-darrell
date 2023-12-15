@@ -43,7 +43,7 @@ export class SimpleToSnapPointHandler implements GarbageHandler {
       return false;
     }
 
-    obj.setPosition(snapPoint.getGlobalPosition().add([0, 0, 10]));
+    obj.setPosition(snapPoint.getGlobalPosition().add([0, 0, 10]), 1);
     obj.snapToGround(); // get in range
     obj.snap();
     return true;

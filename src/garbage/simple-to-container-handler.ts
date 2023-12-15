@@ -33,7 +33,9 @@ export class SimpleToContainerHandler implements GarbageHandler {
     if (!container) {
       return false;
     }
-    container.addObjects([obj]);
+    const index = 0;
+    const showAnimation = true;
+    container.addObjects([obj], index, showAnimation);
     return true;
   }
 
