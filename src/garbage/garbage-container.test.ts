@@ -4,6 +4,7 @@ import {
   MockCardDetails,
   MockContainer,
   MockGameObject,
+  MockPlayer,
 } from "ttpg-mock";
 import { GarbageContainer, GarbageHandler } from "./garbage-container";
 
@@ -35,7 +36,7 @@ it("_tryRecycleObj", () => {
   const container = new MockContainer({ items: [obj1, obj2] });
   const garbageContainer = new GarbageContainer(container);
 
-  garbageContainer._recycle();
+  garbageContainer._recycle(new MockPlayer());
   expect(onlyFirstRecycler.recycled).toEqual(obj1);
   expect(container.getItems()).toEqual([obj2]);
 
@@ -67,7 +68,7 @@ it("_tryRecycleDeck (all)", () => {
   expect(deck.getContainer()).toEqual(container);
   expect(deck.getStackSize()).toEqual(3);
 
-  garbageContainer._recycle();
+  garbageContainer._recycle(new MockPlayer());
   expect(deck.getStackSize()).toEqual(1); // deck still exists
   expect(deck.getContainer()).toBeUndefined();
 
@@ -104,7 +105,7 @@ it("_tryRecycleDeck (first)", () => {
   expect(deck.getContainer()).toEqual(container);
   expect(deck.getStackSize()).toEqual(3);
 
-  garbageContainer._recycle();
+  garbageContainer._recycle(new MockPlayer());
   expect(deck.getStackSize()).toEqual(2);
   expect(deck.getContainer()).toEqual(container); // failed, returned to container
 
@@ -136,9 +137,36 @@ it("_tryRecycleDeck (none)", () => {
   expect(deck.getContainer()).toEqual(container);
   expect(deck.getStackSize()).toEqual(3);
 
-  garbageContainer._recycle();
+  garbageContainer._recycle(new MockPlayer());
   expect(deck.getStackSize()).toEqual(3);
   expect(deck.getContainer()).toEqual(container); // failed, returned to container
 
   GarbageContainer.clearHandlers();
+});
+
+it("onRecycled", () => {
+  const recycled: GameObject[] = [];
+  const onRecycledHandler = (obj: GameObject) => {
+    recycled.push(obj);
+  };
+
+  class RecycleAll implements GarbageHandler {
+    public canRecycle(obj: GameObject): boolean {
+      return true;
+    }
+    public recycle(obj: GameObject): boolean {
+      return true;
+    }
+  }
+
+  GarbageContainer.clearHandlers();
+  GarbageContainer.addHandler(new RecycleAll());
+  GarbageContainer.onRecycled.add(onRecycledHandler);
+
+  const obj = new MockGameObject();
+  GarbageContainer.tryRecycle(obj, new MockPlayer());
+  expect(recycled).toEqual([obj]);
+
+  GarbageContainer.clearHandlers();
+  GarbageContainer.onRecycled.clear();
 });
