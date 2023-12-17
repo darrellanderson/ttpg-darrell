@@ -74,8 +74,18 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
 
     // Discard.
     if (deck) {
+      let offset = 0;
+
+      // "shuffle after discard" is a bit tricky because the card does not
+      // get added to the deck until after the discard animation finishes.
+      // Instead of doing it in order, shuffle now and discard to a random
+      // offset inside that shuffled deck.
+      if (this._shuffleAfterDiscard) {
+        deck.shuffle();
+        offset = Math.floor(Math.random() * deck.getStackSize());
+      }
+
       const toFront = true;
-      const offset = 0;
       const animate = true;
       const flipped = false;
       const success = deck.addCards(obj, toFront, offset, animate, flipped);
@@ -99,32 +109,12 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
       obj.snap(); // apply snap point rotation
     }
 
-    // Optionally shuffle.  Must wait for discard animation to finish!
-    if (this._shuffleAfterDiscard && deck) {
-      const finishShuffle = () => {
-        if (deck instanceof Card) {
-          deck.shuffle();
-        }
-      };
-      const delayedShuffle = () => {
-        process.nextTick(finishShuffle);
-      };
-      if (obj.isValid()) {
-        obj.onDestroyed.add(() => {
-          process.nextTick(delayedShuffle);
-        });
-      }
-    }
-
     return true;
   }
 
   private _getDiscardSnapPoint(): SnapPoint | undefined {
     // Check cache.
-    if (
-      this._discardSnapPoint &&
-      this._discardSnapPoint.getParentObject()?.isValid()
-    ) {
+    if (this._discardSnapPoint?.getParentObject()?.isValid()) {
       return this._discardSnapPoint;
     }
     this._discardSnapPoint = undefined;
@@ -133,6 +123,9 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
     let mat = undefined;
     const skipContained = true;
     for (const obj of world.getAllObjects(skipContained)) {
+      if (!obj.isValid()) {
+        continue;
+      }
       const nsid: string = NSID.get(obj);
       if (nsid === this._matNsid) {
         mat = obj;
