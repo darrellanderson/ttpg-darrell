@@ -60,7 +60,8 @@ export class TriggerableMulticastDelegate<T> {
         `ERRORS (${errors.length}):\n` +
         errors.map((e) => e.message).join("\n");
       const stack = errors
-        .map((e) => `-----\n${e.stack ? e.stack : "N/A"}`)
+        .filter((e) => e.stack)
+        .map((e) => `-----\n${e.stack}`)
         .join("\n");
 
       const error = new Error(message);

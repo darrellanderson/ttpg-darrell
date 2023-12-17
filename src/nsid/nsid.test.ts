@@ -51,10 +51,10 @@ it("parse (with extra)", () => {
   const parsed: ParsedNSID | undefined = NSID.parse(metadata);
   expect(parsed).toEqual({
     extra: "extra1.extra1more-not-split",
-    name: ["name1", "name2"],
+    nameParts: ["name1", "name2"],
     nsid: "type1.type2:source1.source2/name1.name2|extra1.extra1more-not-split",
-    source: ["source1", "source2"],
-    type: ["type1", "type2"],
+    sourceParts: ["source1", "source2"],
+    typeParts: ["type1", "type2"],
   });
 });
 
@@ -63,9 +63,15 @@ it("parse (no extra)", () => {
   const parsed: ParsedNSID | undefined = NSID.parse(metadata);
   expect(parsed).toEqual({
     extra: undefined,
-    name: ["name1", "name2"],
+    nameParts: ["name1", "name2"],
     nsid: "type1.type2:source1.source2/name1.name2",
-    source: ["source1", "source2"],
-    type: ["type1", "type2"],
+    sourceParts: ["source1", "source2"],
+    typeParts: ["type1", "type2"],
   });
+});
+
+it("parse (fail)", () => {
+  const metadata = "not-nsid";
+  const parsed: ParsedNSID | undefined = NSID.parse(metadata);
+  expect(parsed).toBeUndefined();
 });

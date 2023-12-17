@@ -11,17 +11,39 @@ it("spawn", () => {
     },
   });
 
+  // Template not (yet) registered.
+  let obj = Spawn.spawn(nsid, [0, 0, 0]);
+  expect(obj).toBeUndefined();
+
+  // Try again, but with known template.
   Spawn.inject({ [nsid]: templateId });
-  const obj = Spawn.spawn(nsid, [0, 0, 0]);
+  obj = Spawn.spawn(nsid, [0, 0, 0]);
   expect(obj?.getTemplateMetadata()).toEqual(metadata);
 
   mockWorld._reset();
 });
 
 it("spawnOrThrow", () => {
+  const nsid = "my-nsid";
+  const templateId = "my-template-id";
+  const metadata = "my-metadata";
+  mockWorld._reset({
+    _templateIdToMockGameObjectParams: {
+      [templateId]: { templateMetadata: metadata },
+    },
+  });
+
+  // Yes.
+  Spawn.inject({ [nsid]: templateId });
+  const obj = Spawn.spawnOrThrow(nsid, [0, 0, 0]);
+  expect(obj?.getTemplateMetadata()).toEqual(metadata);
+
+  // No.
   expect(() => {
     Spawn.spawnOrThrow("no-such-nsid", [0, 0, 0]);
   }).toThrow();
+
+  mockWorld._reset();
 });
 
 it("has", () => {

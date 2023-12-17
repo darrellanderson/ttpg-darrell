@@ -2,9 +2,9 @@ import { Card, CardDetails, StaticObject } from "@tabletop-playground/api";
 
 export type ParsedNSID = {
   nsid: string;
-  type: string[];
-  source: string[];
-  name: string[];
+  typeParts: string[];
+  sourceParts: string[];
+  nameParts: string[];
   extra: string | undefined;
 };
 
@@ -81,9 +81,9 @@ export abstract class NSID {
     }
     return {
       nsid: nsid,
-      type: m[1].split("."),
-      source: m[2].split("."),
-      name: m[3].split("."),
+      typeParts: m[1].split("."),
+      sourceParts: m[2].split("."),
+      nameParts: m[3].split("."),
       extra: m[4].length > 0 ? m[4] : undefined,
     };
   }
