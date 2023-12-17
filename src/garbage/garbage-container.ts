@@ -29,7 +29,7 @@ export abstract class GarbageHandler {
  */
 export class GarbageContainer {
   public static onRecycled = new TriggerableMulticastDelegate<
-    (obj: GameObject, player: Player | undefined) => void
+    (obj: GameObject) => void
   >();
   private static _garbageHandlers: GarbageHandler[] = [];
 
@@ -51,25 +51,19 @@ export class GarbageContainer {
     this._garbageHandlers = [];
   }
 
-  public static tryRecycle(
-    obj: GameObject,
-    player: Player | undefined
-  ): boolean {
+  public static tryRecycle(obj: GameObject): boolean {
     if (obj instanceof Card && obj.getStackSize() > 1) {
-      return GarbageContainer._tryRecycleDeck(obj, player);
+      return GarbageContainer._tryRecycleDeck(obj);
     } else {
-      return GarbageContainer._tryRecycleObj(obj, player);
+      return GarbageContainer._tryRecycleObj(obj);
     }
   }
 
-  private static _tryRecycleObj(
-    obj: GameObject,
-    player: Player | undefined
-  ): boolean {
+  private static _tryRecycleObj(obj: GameObject): boolean {
     for (const handler of this._garbageHandlers) {
       if (handler.canRecycle(obj)) {
         if (handler.recycle(obj)) {
-          GarbageContainer.onRecycled.trigger(obj, player);
+          GarbageContainer.onRecycled.trigger(obj);
           return true;
         }
       }
@@ -77,10 +71,7 @@ export class GarbageContainer {
     return false;
   }
 
-  private static _tryRecycleDeck(
-    deck: Card,
-    player: Player | undefined
-  ): boolean {
+  private static _tryRecycleDeck(deck: Card): boolean {
     let recycleCount = 0;
     const stackSize = deck.getStackSize();
 
@@ -102,7 +93,7 @@ export class GarbageContainer {
       }
 
       // Try to recycle, return card to same spot if fails.
-      let success = GarbageContainer._tryRecycleObj(card, player);
+      let success = GarbageContainer._tryRecycleObj(card);
       if (success) {
         recycleCount += 1;
       } else if (card !== deck) {
@@ -124,14 +115,14 @@ export class GarbageContainer {
     container.onInserted.add(
       (container: Container, insertedObjects: GameObject[], player: Player) => {
         process.nextTick(() => {
-          this._recycle(player);
+          this._recycle();
         });
       }
     );
   }
 
   // Expose for testing.
-  _recycle(player: Player | undefined) {
+  _recycle() {
     const objs: GameObject[] = this._container.getItems();
     for (const obj of objs) {
       // Verify object.
@@ -149,7 +140,7 @@ export class GarbageContainer {
       this._container.take(obj, above);
 
       // Attempt to recyle.
-      const success: boolean = GarbageContainer.tryRecycle(obj, player);
+      const success: boolean = GarbageContainer.tryRecycle(obj);
 
       // If recycle fails, return to container.
       if (!success) {
