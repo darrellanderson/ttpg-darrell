@@ -1,3 +1,4 @@
+export * from "./facing/facing";
 export * from "./garbage/garbage-container";
 export * from "./garbage/simple-card-garbage-handler";
 export * from "./garbage/simple-to-container-handler";
