@@ -1,0 +1,18 @@
+{
+    "endOfLine": "auto",
+    "tabWidth": 4,
+    "trailingComma": "es5",
+    "overrides": [
+        {
+            "files": [
+                ".github/**/*.yml",
+                ".github/**/*.yaml",
+                ".prettierrc",
+                "package.json"
+            ],
+            "options": {
+                "tabWidth": 4
+            }
+        }
+    ]
+}

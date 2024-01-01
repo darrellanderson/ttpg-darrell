@@ -26,6 +26,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "klaw-sync": "^6.0.0",
     "node": "^21.2.0",
+    "prettier": "^3.1.1",
     "sharp": "^0.32.6",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.1",

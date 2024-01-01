@@ -221,6 +221,12 @@ async function main() {
     w: config.gap * (cols + 1) + config.cardWidth * cols,
     h: config.gap * (rows + 1) + config.cardHeight * rows,
   };
+  if (config.gapAfterColumn !== undefined) {
+    world.w += config.gap * 3;
+  }
+  if (config.gapAfterRow !== undefined) {
+    world.h += config.gap * 3;
+  }
 
   // Backing image size (pixels).
   const gapPx = Math.floor((config.gap * cardPixels.h) / config.cardHeight);
@@ -246,7 +252,7 @@ async function main() {
     const row = Math.floor(index / cols);
 
     let left = gapPx + col * (gapPx + cardPixels.w) + bleed.w;
-    const top = gapPx + row * (gapPx + cardPixels.h) + bleed.h;
+    let top = gapPx + row * (gapPx + cardPixels.h) + bleed.h;
 
     console.log(`[${index} @ ${col}x${row}]`);
 
@@ -254,8 +260,11 @@ async function main() {
     const input = await slot.img.grayscale(true).ensureAlpha(alpha).toBuffer();
 
     // Config value is 1-based.
-    if (config.gapAfterColumn && col >= config.gapAfterColumn) {
+    if (config.gapAfterColumn !== undefined && col >= config.gapAfterColumn) {
       left += gapPx * 3;
+    }
+    if (config.gapAfterRow !== undefined && row >= config.gapAfterRow) {
+      top += gapPx * 3;
     }
 
     // Card image.
@@ -286,11 +295,20 @@ async function main() {
     }
 
     // Slot snap point (TTPG flips XY).
+    let x =
+      world.h / 2 - (config.gap * (row + 1) + config.cardHeight * (row + 0.5));
+    let y =
+      config.gap * (col + 1) + config.cardWidth * (col + 0.5) - world.w / 2;
+    if (config.gapAfterColumn && col >= config.gapAfterColumn) {
+      y += config.gap * 3;
+    }
+    if (config.gapAfterRow && row >= config.gapAfterRow) {
+      x -= config.gap * 3;
+    }
+
     const snapPoint = {
-      Y: config.gap * (col + 1) + config.cardWidth * (col + 0.5) - world.w / 2,
-      X:
-        world.h / 2 -
-        (config.gap * (row + 1) + config.cardHeight * (row + 0.5)),
+      Y: y,
+      X: x,
       Tags: slot.tags,
 
       // Other snap point fields.
@@ -315,6 +333,9 @@ async function main() {
 
   if (config.gapAfterColumn) {
     width += gapPx * 3;
+  }
+  if (config.gapAfterRow) {
+    height += gapPx * 3;
   }
 
   let dstImg = sharp({

@@ -7,34 +7,36 @@ import { AbstractGlobal } from "../abstract-global";
  * clicking any "take seat" buttons.
  */
 export class LeaveSeat implements AbstractGlobal {
-  public init(): void {
-    const actionName: string = "*Leave seat";
-    const tooltip: string = "Switch to non-seat player slot";
-    world.addCustomAction(actionName, tooltip);
+    public init(): void {
+        const actionName: string = "*Leave seat";
+        const tooltip: string = "Switch to non-seat player slot";
+        world.addCustomAction(actionName, tooltip);
 
-    globalEvents.onCustomAction.add((player: Player, identifier: string) => {
-      if (identifier === actionName) {
-        LeaveSeat.leaveSeat(player);
-      }
-    });
-  }
-
-  static leaveSeat(clickingPlayer: Player) {
-    const busy = new Set();
-    for (const player of world.getAllPlayers()) {
-      busy.add(player.getSlot());
-    }
-    for (const obj of world.getAllObjects()) {
-      busy.add(obj.getOwningPlayerSlot());
-    }
-    for (let i = 0; i < 20; i++) {
-      if (!busy.has(i)) {
-        console.log(
-          `LeaveSeat: moving "${clickingPlayer.getName()}" to open slot ${i}`
+        globalEvents.onCustomAction.add(
+            (player: Player, identifier: string) => {
+                if (identifier === actionName) {
+                    LeaveSeat.leaveSeat(player);
+                }
+            }
         );
-        clickingPlayer.switchSlot(i);
-        break;
-      }
     }
-  }
+
+    static leaveSeat(clickingPlayer: Player) {
+        const busy = new Set();
+        for (const player of world.getAllPlayers()) {
+            busy.add(player.getSlot());
+        }
+        for (const obj of world.getAllObjects()) {
+            busy.add(obj.getOwningPlayerSlot());
+        }
+        for (let i = 0; i < 20; i++) {
+            if (!busy.has(i)) {
+                console.log(
+                    `LeaveSeat: moving "${clickingPlayer.getName()}" to open slot ${i}`
+                );
+                clickingPlayer.switchSlot(i);
+                break;
+            }
+        }
+    }
 }

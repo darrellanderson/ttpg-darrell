@@ -1,17 +1,17 @@
 export class Vault {
-  private readonly _uid: string;
+    private readonly _uid: string;
 
-  constructor(uid: string) {
-    this._uid = uid;
-  }
+    constructor(uid: string) {
+        this._uid = uid;
+    }
 
-  clear(): void {}
+    clear(): void {}
 
-  delete(key: string): void {}
+    delete(key: string): void {}
 
-  put(key: string, value: string): void {}
+    put(key: string, value: string): void {}
 
-  get(key: string): string | undefined {
-    return undefined;
-  }
+    get(key: string): string | undefined {
+        return undefined;
+    }
 }

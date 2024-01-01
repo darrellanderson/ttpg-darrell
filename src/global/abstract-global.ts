@@ -1,3 +1,3 @@
 export abstract class AbstractGlobal {
-  abstract init(): void;
+    abstract init(): void;
 }
