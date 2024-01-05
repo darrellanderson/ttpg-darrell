@@ -1,16 +1,17 @@
 {
-  "compilerOptions": {
-    "target": "ES6",
-    "strict": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "outDir": "build/module_type_should_override_this",
+    "compilerOptions": {
+        "target": "ES6",
+        "strict": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "outDir": "build/module_type_should_override_this",
 
-    "moduleResolution": "Node",
-    "types": ["@types/jest", "@types/node", "@tabletop-playground/api"],
-    "skipLibCheck": true,
-    "declaration": true
-  },
-  "include": ["./src/**/*.ts"],
-  "exclude": ["./src/**/*.test.ts"]
+        "moduleResolution": "Node",
+        "types": ["@types/jest", "@types/node", "@tabletop-playground/api"],
+        "skipLibCheck": true,
+        "declaration": true,
+        "sourceMap": true
+    },
+    "include": ["./src/**/*.ts"],
+    "exclude": ["./src/**/*.test.ts"]
 }
