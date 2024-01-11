@@ -1,4 +1,5 @@
 export * from "./error-handler/error-handler";
+export * from "./event/on-card-became-singleton-or-deck";
 export * from "./facing/facing";
 export * from "./garbage/garbage-container";
 export * from "./garbage/simple-card-garbage-handler";

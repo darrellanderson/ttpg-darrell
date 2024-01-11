@@ -5,5 +5,3 @@ it("init and reset", () => {
     onCardBecameSingletonOrDeck.init();
     onCardBecameSingletonOrDeck._reset();
 });
-
-it("trigger onSingletonCardMadeDeck", () => {});
