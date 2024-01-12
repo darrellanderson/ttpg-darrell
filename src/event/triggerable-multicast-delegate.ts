@@ -1,3 +1,5 @@
+import { ErrorBatcher } from "../error-handler/error-batcher";
+
 /**
  * Lookalike for TTPG's MulticastDelegate, but with a trigger method.
  */
@@ -41,32 +43,12 @@ export class TriggerableMulticastDelegate<T extends (...args: any) => any> {
      * @param args
      */
     trigger(...args: Parameters<T>): void {
-        const errors: Error[] = [];
+        const runnables: ((x: void) => any)[] = [];
         for (const fn of this._listeners) {
-            try {
-                if (typeof fn === "function") {
-                    fn.apply(null, args);
-                }
-            } catch (e: unknown) {
-                if (e instanceof Error) {
-                    errors.push(e);
-                }
-            }
+            runnables.push(() => {
+                fn.apply(null, args);
+            });
         }
-        if (errors.length === 1) {
-            throw errors[0];
-        } else if (errors.length > 1) {
-            const message =
-                `ERRORS (${errors.length}):\n` +
-                errors.map((e) => e.message).join("\n");
-            const stack = errors
-                .filter((e) => e.stack)
-                .map((e) => `-----\n${e.stack}`)
-                .join("\n");
-
-            const error = new Error(message);
-            error.stack = stack;
-            throw error;
-        }
+        ErrorBatcher.runMaybeThrowAtEnd(runnables);
     }
 }

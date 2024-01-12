@@ -1,3 +1,5 @@
+import { ErrorBatcher } from "../error-handler/error-batcher";
+
 export abstract class AbstractGlobal {
     abstract init(): void;
 
@@ -7,31 +9,13 @@ export abstract class AbstractGlobal {
      *
      * @param abstractGlobals
      */
-    static runAbstractGlobalInit(abstractGlobals: AbstractGlobal[]) {
-        const errors: Error[] = [];
+    public static runAbstractGlobalInit(abstractGlobals: AbstractGlobal[]) {
+        const runnables: ((x: void) => any)[] = [];
         for (const abstractGlobal of abstractGlobals) {
-            try {
+            runnables.push(() => {
                 abstractGlobal.init();
-            } catch (e: unknown) {
-                if (e instanceof Error) {
-                    errors.push(e);
-                }
-            }
+            });
         }
-        if (errors.length === 1) {
-            throw errors[0];
-        } else if (errors.length > 1) {
-            const message =
-                `ERRORS (${errors.length}):\n` +
-                errors.map((e) => e.message).join("\n");
-            const stack = errors
-                .filter((e) => e.stack)
-                .map((e) => `-----\n${e.stack}`)
-                .join("\n");
-
-            const error = new Error(message);
-            error.stack = stack;
-            throw error;
-        }
+        ErrorBatcher.runMaybeThrowAtEnd(runnables);
     }
 }

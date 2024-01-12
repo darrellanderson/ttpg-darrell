@@ -42,27 +42,36 @@ export class ErrorHandler extends AbstractGlobal {
 
     init() {
         console.log("ErrorHandler.init");
+        // Arg is a string which inludes the stack trace.
         globalThis.$uncaughtException = (error: string) => {
             this.reportError(error);
         };
     }
 
     reportError(error: string) {
-        const errorLocations = this.parseErrorLocations(error);
         const msg: string[] = [];
         msg.push("----------");
-        msg.push("METHOD (FILE.js:js# <= ts#)");
-        for (const errorLocation of errorLocations) {
-            let line: string = `[${errorLocation.jsLine}]`;
-            if (errorLocation.tsLine !== undefined) {
-                line = `${errorLocation.jsLine} <= .ts:${errorLocation.tsLine}`;
-            }
-            msg.push(
-                `${errorLocation.method ?? "-"} (${errorLocation.file}:${line})`
-            );
-        }
+        msg.push(this.rewriteError(error));
         msg.push("----------");
         console.log(msg.join("\n"));
+    }
+
+    rewriteError(error: string): string {
+        const rewrite: string[] = [];
+        for (const errorLine of error.split("\n")) {
+            const errorLocation = this.parseErrorLocation(errorLine);
+            if (errorLocation) {
+                // Report JavaScript line number, and TypeScript if mapping exists.
+                let line: string = `  at ${errorLocation.method} ${errorLocation.file}:${errorLocation.jsLine}`;
+                if (errorLocation.tsLine !== undefined) {
+                    line += ` <= .ts:${errorLocation.tsLine}`;
+                }
+                rewrite.push(line);
+            } else {
+                rewrite.push(errorLine);
+            }
+        }
+        return rewrite.join("\n");
     }
 
     /**
@@ -89,16 +98,16 @@ export class ErrorHandler extends AbstractGlobal {
                 jsLine: Number.parseInt(m[2]),
                 jsColumn: Number.parseInt(m[3]),
             };
-        }
-
-        m = errorLocation ? null : stackTraceLine.match(re2);
-        if (m) {
-            errorLocation = {
-                method: m[1],
-                file: m[2],
-                jsLine: Number.parseInt(m[3]),
-                jsColumn: Number.parseInt(m[4]),
-            };
+        } else {
+            m = stackTraceLine.match(re2);
+            if (m) {
+                errorLocation = {
+                    method: m[1],
+                    file: m[2],
+                    jsLine: Number.parseInt(m[3]),
+                    jsColumn: Number.parseInt(m[4]),
+                };
+            }
         }
 
         if (errorLocation) {
@@ -112,23 +121,6 @@ export class ErrorHandler extends AbstractGlobal {
         }
 
         return errorLocation;
-    }
-
-    /**
-     * Parse error locations from a stack trace.
-     *
-     * @param stack
-     * @returns error locations
-     */
-    parseErrorLocations(stack: string): ErrorLocation[] {
-        const errorLocations: ErrorLocation[] = [];
-        for (const stackTraceLine of stack.split("\n")) {
-            const errorLocation = this.parseErrorLocation(stackTraceLine);
-            if (errorLocation) {
-                errorLocations.push(errorLocation);
-            }
-        }
-        return errorLocations;
     }
 
     /**

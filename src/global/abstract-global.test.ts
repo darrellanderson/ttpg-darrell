@@ -18,5 +18,5 @@ it("batch errors", () => {
     }
 
     expect(error).toBeDefined();
-    expect(error?.message.startsWith("ERRORS (2):")).toBeTruthy();
+    expect(error?.toString()).toEqual("Error: ErrorBatcher (2):");
 });

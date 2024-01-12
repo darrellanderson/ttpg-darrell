@@ -1,10 +1,10 @@
 import { Player, globalEvents, world } from "@tabletop-playground/api";
-import { AbstractGlobal } from "../abstract-global";
+import { AbstractGlobal } from "../global/abstract-global";
 
 /**
- * Content menu item to leave seat.  Move to an unused slot, NOT the
- * spectator slot.  Spectators cannot interact, preventing them from
- * clicking any "take seat" buttons.
+ * Global content menu item to leave seat.  Move to an unused slot, NOT the
+ * spectator slot (spectators cannot interact, preventing them from clicking
+ * any "take seat" buttons).
  */
 export class LeaveSeat implements AbstractGlobal {
     public init(): void {
@@ -21,12 +21,19 @@ export class LeaveSeat implements AbstractGlobal {
         );
     }
 
+    /**
+     * Move player to an "unused" slot, meaning no existing player NOR any
+     * object's owning player slot.
+     *
+     * @param clickingPlayer
+     */
     static leaveSeat(clickingPlayer: Player) {
         const busy = new Set();
         for (const player of world.getAllPlayers()) {
             busy.add(player.getSlot());
         }
-        for (const obj of world.getAllObjects()) {
+        const skipContained = false;
+        for (const obj of world.getAllObjects(skipContained)) {
             busy.add(obj.getOwningPlayerSlot());
         }
         for (let i = 0; i < 20; i++) {
@@ -35,8 +42,9 @@ export class LeaveSeat implements AbstractGlobal {
                     `LeaveSeat: moving "${clickingPlayer.getName()}" to open slot ${i}`
                 );
                 clickingPlayer.switchSlot(i);
-                break;
+                return;
             }
         }
+        console.log("LeaveSeat: no available player slot");
     }
 }

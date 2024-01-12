@@ -4,6 +4,8 @@ import { NSID } from "../nsid/nsid";
 
 /**
  * Recycle an object to a specific snap point with the matching tag.
+ * Requires snap point not already occupied.
+ * Expects snap point is unique; does not look beyond first match.
  */
 export class SimpleToSnapPointHandler implements GarbageHandler {
     private readonly _recycleObjectNsids: Set<string> = new Set<string>();
@@ -25,6 +27,8 @@ export class SimpleToSnapPointHandler implements GarbageHandler {
         this._snapPointTag = tag;
         return this;
     }
+
+    // --------------------------------
 
     public canRecycle(obj: GameObject): boolean {
         const nsid = NSID.get(obj);

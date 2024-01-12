@@ -4,7 +4,8 @@ import { NSID } from "../nsid/nsid";
 
 /**
  * Recycle cards to a specific snap point on a mat.
- * Optionally shuffle any existing deck after discard.
+ * Add to any deck already there, or start a new deck.
+ * Optionally shuffle after discard.
  */
 export class SimpleCardGarbageHandler implements GarbageHandler {
     private _matNsid: string = "";
@@ -33,6 +34,8 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
         this._shuffleAfterDiscard = shuffle;
         return this;
     }
+
+    // --------------------------------
 
     public canRecycle(obj: GameObject): boolean {
         if (!(obj instanceof Card)) {

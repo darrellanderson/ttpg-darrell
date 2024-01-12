@@ -24,18 +24,21 @@ it("parseErrorLocation (with method)", () => {
     expect(errorLocation?.jsColumn).toBe(15);
 });
 
-it("parse stack trace", () => {
+it("rewrite stack trace", () => {
     const stack: string = [
         "Error: err!",
         "  at a (file://.../Scripts/global/error-handler/error-handler.js:31:19)",
         "  at b (file://.../Scripts/global/error-handler/error-handler.js:34:13)",
     ].join("\n");
 
-    const errorLocations: ErrorLocation[] =
-        new ErrorHandler().parseErrorLocations(stack);
-    expect(errorLocations).toBeDefined();
-    expect(errorLocations[0].method).toEqual("a");
-    expect(errorLocations[1].method).toEqual("b");
+    const rewrite: string = new ErrorHandler().rewriteError(stack);
+    expect(rewrite).toEqual(
+        [
+            "Error: err!",
+            "  at a global/error-handler/error-handler.js:31",
+            "  at b global/error-handler/error-handler.js:34",
+        ].join("\n")
+    );
 });
 
 it("parseSourceMappings", () => {

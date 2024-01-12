@@ -2,6 +2,9 @@ import { Container, GameObject, world } from "@tabletop-playground/api";
 import { GarbageHandler } from "./garbage-container";
 import { NSID } from "../nsid/nsid";
 
+/**
+ * Recycle object(s) to a container, optionally matching owning slot.
+ */
 export class SimpleToContainerHandler implements GarbageHandler {
     private readonly _playerSlotToContainer: { [key: number]: Container } = {};
     private readonly _recycleObjectNsids: Set<string> = new Set<string>();
@@ -22,6 +25,8 @@ export class SimpleToContainerHandler implements GarbageHandler {
         this._requirePlayerSlot = value;
         return this;
     }
+
+    // --------------------------------
 
     public canRecycle(obj: GameObject): boolean {
         const nsid = NSID.get(obj);

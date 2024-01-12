@@ -7,7 +7,7 @@ export * from "./garbage/simple-card-garbage-handler";
 export * from "./garbage/simple-to-container-handler";
 export * from "./garbage/simple-to-snap-point-handler";
 export * from "./global/abstract-global";
-export * from "./global/context-menu/leave-seat";
+export * from "./context-menu/leave-seat";
 export * from "./locale/locale";
 export * from "./nsid/nsid";
 export * from "./setup/abstract-setup";

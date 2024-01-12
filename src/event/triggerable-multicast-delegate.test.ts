@@ -70,7 +70,7 @@ it("error (single)", () => {
     } catch (e) {
         error = e as Error;
     }
-    expect(error?.toString()).toEqual("Error: err!");
+    expect(error?.toString()).toEqual("Error: ErrorBatcher (1):");
 });
 
 it("error (double)", () => {
@@ -90,5 +90,5 @@ it("error (double)", () => {
     } catch (e) {
         error = e as Error;
     }
-    expect(error?.message.split("\n")).toEqual(["ERRORS (2):", "err!", "err!"]);
+    expect(error?.toString()).toEqual("Error: ErrorBatcher (2):");
 });
