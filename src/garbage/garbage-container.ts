@@ -5,7 +5,7 @@ import {
     Player,
     Vector,
 } from "@tabletop-playground/api";
-import { TriggerableMulticastDelegate } from "../triggerable-multicast-delegate/triggerable-multicast-delegate";
+import { TriggerableMulticastDelegate } from "../event/triggerable-multicast-delegate";
 
 export abstract class GarbageHandler {
     /**

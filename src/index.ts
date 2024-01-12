@@ -1,5 +1,6 @@
 export * from "./error-handler/error-handler";
 export * from "./event/on-card-became-singleton-or-deck";
+export * from "./event/triggerable-multicast-delegate";
 export * from "./facing/facing";
 export * from "./garbage/garbage-container";
 export * from "./garbage/simple-card-garbage-handler";
@@ -13,6 +14,5 @@ export * from "./setup/abstract-setup";
 export * from "./setup/layout/layout-objects";
 export * from "./setup/spawn/spawn";
 export * from "./shuffle/shuffle";
-export * from "./triggerable-multicast-delegate/triggerable-multicast-delegate";
 export * from "./ui/object/player-name-take-seat/player-name-take-seat";
 export * from "./ui/widget/d6widget/d6widget";
