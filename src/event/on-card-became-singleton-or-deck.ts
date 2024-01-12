@@ -21,7 +21,7 @@ import {
     globalEvents,
     world,
 } from "@tabletop-playground/api";
-import { TriggerableMulticastDelegate } from "../triggerable-multicast-delegate/triggerable-multicast-delegate";
+import { TriggerableMulticastDelegate } from "./triggerable-multicast-delegate";
 import { AbstractGlobal } from "../global/abstract-global";
 import { NSID } from "../nsid/nsid";
 
@@ -111,8 +111,10 @@ export class OnCardBecameSingletonOrDeck implements AbstractGlobal {
                 obj.onRemoved.add(
                     OnCardBecameSingletonOrDeck._onRemovedHandler
                 );
+                const oldNsid: string = NSID.getDeck(obj)[0];
                 OnCardBecameSingletonOrDeck.onSingletonCardMadeDeck.trigger(
-                    obj
+                    obj,
+                    oldNsid
                 );
             } else if (obj.getStackSize() === 1) {
                 // singleton card

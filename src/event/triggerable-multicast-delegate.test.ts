@@ -1,7 +1,7 @@
 import { TriggerableMulticastDelegate } from "./triggerable-multicast-delegate";
 
 it("constructor", () => {
-    new TriggerableMulticastDelegate<number>();
+    new TriggerableMulticastDelegate<() => void>();
 });
 
 it("trigger", () => {

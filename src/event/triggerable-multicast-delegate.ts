@@ -1,7 +1,7 @@
 /**
  * Lookalike for TTPG's MulticastDelegate, but with a trigger method.
  */
-export class TriggerableMulticastDelegate<T> {
+export class TriggerableMulticastDelegate<T extends (...args: any) => any> {
     private readonly _listeners: T[] = [];
 
     /**
@@ -40,12 +40,12 @@ export class TriggerableMulticastDelegate<T> {
      *
      * @param args
      */
-    trigger(...args: any): void {
+    trigger(...args: Parameters<T>): void {
         const errors: Error[] = [];
         for (const fn of this._listeners) {
             try {
                 if (typeof fn === "function") {
-                    fn(...args);
+                    fn.apply(null, args);
                 }
             } catch (e: unknown) {
                 if (e instanceof Error) {
