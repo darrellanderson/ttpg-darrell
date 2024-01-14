@@ -151,7 +151,7 @@ export class ErrorHandler extends AbstractGlobal {
         }
 
         // Check cache.
-        let lineMapping: number[] = this._fileToLineMapping[jsFile];
+        let lineMapping: number[] | undefined = this._fileToLineMapping[jsFile];
         if (lineMapping) {
             if (lineMapping.length === 0) {
                 return undefined; // NACK entry
@@ -164,7 +164,7 @@ export class ErrorHandler extends AbstractGlobal {
 
         const json: string | undefined = this.getMap(jsFile);
         if (!json) {
-            return; // no map file
+            return; // no map file (need to enable source mapping in tsConfig)
         }
 
         let map;
@@ -172,14 +172,14 @@ export class ErrorHandler extends AbstractGlobal {
             map = JSON.parse(json);
         } catch (e) {
             console.log(
-                `ErrorHandler.addSourceMapping: JSON.parse failed for "${jsFile}"`
+                `ErrorHandler.getLineMapping: JSON.parse failed for "${jsFile}"`
             );
             return; // bad map file
         }
 
         if (typeof map.mappings !== "string") {
             console.log(
-                `ErrorHandler.addSourceMapping: bad mappings entry for "${jsFile}"`
+                `ErrorHandler.getLineMapping: bad mappings entry for "${jsFile}"`
             );
             return; // bad mappings entry
         }

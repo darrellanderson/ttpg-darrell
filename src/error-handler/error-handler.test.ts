@@ -1,4 +1,5 @@
 import { ErrorHandler, ErrorLocation } from "./error-handler";
+import { MockPackage, mockWorld } from "ttpg-mock";
 
 it("parseErrorLocation (no method)", () => {
     const line: string =
@@ -22,6 +23,16 @@ it("parseErrorLocation (with method)", () => {
     expect(errorLocation?.file).toEqual("obj/unit/r-to-tip-over.js");
     expect(errorLocation?.jsLine).toBe(24);
     expect(errorLocation?.jsColumn).toBe(15);
+});
+
+it("report error", () => {
+    let output: string = "";
+    jest.spyOn(console, "log").mockImplementation((message?: any) => {
+        output = message;
+    });
+    new ErrorHandler().reportError("test");
+    jest.restoreAllMocks();
+    expect(output).toEqual("----------\ntest\n----------");
 });
 
 it("rewrite stack trace", () => {
@@ -70,4 +81,59 @@ it("parseSourceMappingSegment", () => {
 
     decoded = errorHandler.parseSourceMappingSegment("IAM5C");
     expect(decoded).toEqual([4, 0, 6, -44]);
+});
+
+it("getMap", () => {
+    const jsFile: string = "my-file.js";
+    const mapFile: string = jsFile + ".map";
+    const mapData: string = "my-data";
+    mockWorld._reset({
+        packages: [new MockPackage({ scriptFiles: [jsFile, mapFile] })],
+        _scriptFileToData: { [mapFile]: mapData },
+    });
+    const text: string | undefined = new ErrorHandler().getMap(jsFile);
+    expect(text).toEqual(mapData);
+});
+
+it("getLineMapping (empty file)", () => {
+    const lineMapping: number[] | undefined = new ErrorHandler().getLineMapping(
+        ""
+    );
+    expect(lineMapping).toBeUndefined();
+});
+
+it("getLineMapping (js file, but no map file)", () => {
+    const jsFile: string = "my-file.js";
+    mockWorld._reset({
+        packages: [new MockPackage({ scriptFiles: [jsFile] })],
+    });
+
+    const errorHandler = new ErrorHandler(); // same instance for cache
+    let lineMapping: number[] | undefined = errorHandler.getLineMapping(jsFile);
+    expect(lineMapping).toBeUndefined();
+
+    // Read it a second time (nack cache).
+    lineMapping = new ErrorHandler().getLineMapping(jsFile);
+    expect(lineMapping).toBeUndefined();
+});
+
+it("getLineMapping (map file)", () => {
+    const jsFile: string = "my-file.js";
+    const mapFile: string = jsFile + ".map";
+    const mapData: string = JSON.stringify({
+        mappings:
+            ";;;AAAA,kDAAiD;AACjD,+CAA8C;AAgB9C,MAAa,YAAa,SAAQ,6BAAc;IAM5C;;;;",
+    });
+    mockWorld._reset({
+        packages: [new MockPackage({ scriptFiles: [jsFile, mapFile] })],
+        _scriptFileToData: { [mapFile]: mapData },
+    });
+
+    const errorHandler = new ErrorHandler(); // same instance for cache
+    let lineMapping: number[] | undefined = errorHandler.getLineMapping(jsFile);
+    expect(lineMapping).toEqual([-1, -1, -1, 0, 1, 17, 23, -1, -1, -1, -1]);
+
+    // Read it a second time (fetched from cache).
+    lineMapping = errorHandler.getLineMapping(jsFile);
+    expect(lineMapping).toEqual([-1, -1, -1, 0, 1, 17, 23, -1, -1, -1, -1]);
 });
