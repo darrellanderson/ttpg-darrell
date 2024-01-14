@@ -1,5 +1,6 @@
 import { world } from "@tabletop-playground/api";
 import { AbstractGlobal } from "../global/abstract-global";
+import { TriggerableMulticastDelegate } from "../event/triggerable-multicast-delegate";
 
 // This probably belongs in @TabletopPlayground.api?
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -25,6 +26,11 @@ export type ErrorLocation = {
  * Install the error handler via `new ErrorHandler().init()`.
  */
 export class ErrorHandler extends AbstractGlobal {
+    // Event that sends the rewritten error (line mapping).
+    public static readonly onError: TriggerableMulticastDelegate<
+        (error: string) => void
+    > = new TriggerableMulticastDelegate<(error: string) => void>();
+
     private readonly _reverseBase64Alphabet: Map<string, number>;
     private readonly _fileToLineMapping: {
         [key: string]: number[]; // jsFile line number indexed to tsFile line number
@@ -44,14 +50,16 @@ export class ErrorHandler extends AbstractGlobal {
         console.log("ErrorHandler.init");
         // Arg is a string which inludes the stack trace.
         globalThis.$uncaughtException = (error: string) => {
-            this.reportError(error);
+            const rewrittenError = this.rewriteError(error);
+            this.reportError(rewrittenError);
+            ErrorHandler.onError.trigger(rewrittenError);
         };
     }
 
     reportError(error: string) {
         const msg: string[] = [];
         msg.push("----------");
-        msg.push(this.rewriteError(error));
+        msg.push(error);
         msg.push("----------");
         console.log(msg.join("\n"));
     }

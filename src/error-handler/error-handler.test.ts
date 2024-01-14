@@ -137,3 +137,56 @@ it("getLineMapping (map file)", () => {
     lineMapping = errorHandler.getLineMapping(jsFile);
     expect(lineMapping).toEqual([-1, -1, -1, 0, 1, 17, 23, -1, -1, -1, -1]);
 });
+
+it("getLineMapping (corrupt map file)", () => {
+    const jsFile: string = "my-file.js";
+    const mapFile: string = jsFile + ".map";
+    const mapData: string = "not json";
+    mockWorld._reset({
+        packages: [new MockPackage({ scriptFiles: [jsFile, mapFile] })],
+        _scriptFileToData: { [mapFile]: mapData },
+    });
+
+    jest.spyOn(console, "log").mockImplementation(() => {});
+    const lineMapping: number[] | undefined = new ErrorHandler().getLineMapping(
+        jsFile
+    );
+    jest.restoreAllMocks();
+    expect(lineMapping).toBeUndefined();
+});
+
+it("getLineMapping (json field wrong type)", () => {
+    const jsFile: string = "my-file.js";
+    const mapFile: string = jsFile + ".map";
+    const mapData: string = JSON.stringify({
+        mappings: 7,
+    });
+    mockWorld._reset({
+        packages: [new MockPackage({ scriptFiles: [jsFile, mapFile] })],
+        _scriptFileToData: { [mapFile]: mapData },
+    });
+
+    jest.spyOn(console, "log").mockImplementation(() => {});
+    const lineMapping: number[] | undefined = new ErrorHandler().getLineMapping(
+        jsFile
+    );
+    jest.restoreAllMocks();
+    expect(lineMapping).toBeUndefined();
+});
+
+it("rewriteError (with mapping)", () => {
+    const jsFile: string = "my-file.js";
+    const mapFile: string = jsFile + ".map";
+    const mapData: string = JSON.stringify({
+        mappings:
+            ";;;AAAA,kDAAiD;AACjD,+CAA8C;AAgB9C,MAAa,YAAa,SAAQ,6BAAc;IAM5C;;;;",
+    });
+    mockWorld._reset({
+        packages: [new MockPackage({ scriptFiles: [jsFile, mapFile] })],
+        _scriptFileToData: { [mapFile]: mapData },
+    });
+
+    const error: string = "at file://Scripts/my-file.js:6:0";
+    const rewritten: string = new ErrorHandler().rewriteError(error);
+    expect(rewritten).toEqual("  at undefined my-file.js:6 <= .ts:23");
+});
