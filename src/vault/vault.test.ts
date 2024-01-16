@@ -60,3 +60,21 @@ it("fill store", () => {
     }
     expect(world.getAllObjects().length).toEqual(1);
 });
+
+it("same key finds existing store", () => {
+    const dataId = "my-data-id";
+    const data = "my test data";
+
+    let dataStore = new DataStore("test");
+    dataStore.set(dataId, data);
+    let output = dataStore.get(dataId);
+    expect(output).toBe(data);
+
+    dataStore = new DataStore("test");
+    output = dataStore.get(dataId);
+    expect(output).toBe(data);
+
+    dataStore = new DataStore("not-test");
+    output = dataStore.get(dataId);
+    expect(output).toBeUndefined();
+});

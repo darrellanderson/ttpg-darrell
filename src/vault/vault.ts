@@ -1,8 +1,3 @@
-/**
- * Store arbitrarily large opaque data.
- * Data may overflow object size limit.
- */
-
 import {
     Container,
     GameObject,
@@ -44,6 +39,11 @@ type DataBlock = {
 export class DataStore {
     private readonly _root: Container;
 
+    /**
+     * constructor
+     *
+     * @param dataStoreId - each store MUST have a different id
+     */
     constructor(dataStoreId: string) {
         let rootObj: GameObject | undefined;
 
@@ -61,6 +61,7 @@ export class DataStore {
             if (rootObj) {
                 rootObj.setObjectType(ObjectType.NonInteractive);
                 rootObj.setSavedData("[]", KEY_FREELIST);
+                world.setSavedData(rootObj.getId(), globalKey);
             }
         }
 
@@ -72,6 +73,12 @@ export class DataStore {
         this._root = rootObj;
     }
 
+    /**
+     * Remove data.
+     *
+     * @param dataId
+     * @returns
+     */
     delete(dataId: string): void {
         const firstBlockLocation: DataBlockLocation | undefined =
             this._getRootEntry(dataId);
@@ -88,6 +95,13 @@ export class DataStore {
         this._root.setSavedData("", dataId);
     }
 
+    /**
+     * Add or replace data.
+     *
+     * @param dataId
+     * @param data
+     * @returns
+     */
     set(dataId: string, data: string): void {
         this.delete(dataId);
 
@@ -150,6 +164,12 @@ export class DataStore {
         this._root.setSavedData(JSON.stringify(rootEnc), dataId);
     }
 
+    /**
+     * Get data.
+     *
+     * @param dataId
+     * @returns
+     */
     get(dataId: string): string | undefined {
         const firstBlockLocation: DataBlockLocation | undefined =
             this._getRootEntry(dataId);
