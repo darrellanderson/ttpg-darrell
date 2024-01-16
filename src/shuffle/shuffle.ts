@@ -1,3 +1,6 @@
+/**
+ * Shuffle an array of objects.
+ */
 export class Shuffle {
     static shuffle<T>(items: T[]): T[] {
         // Fisher-Yates
