@@ -5,8 +5,12 @@ import {
     world,
 } from "@tabletop-playground/api";
 
-const BLOCK_SIZE = 900; // setSavedData limit 1023 (vault metadata is extra!)
-const BLOCKS_PER_OBJ = Math.floor((65536 - 2000) / (BLOCK_SIZE + 30)); // object size limit 64 KB
+const BLOCK_SIZE = 512; // setSavedData limit 1023 (json trimmings, metadata is extra!)
+const BLOCK_METADATA_SIZE = 32; // be conservative
+const OBJ_SIZE = 65536 - 2000; // 64 KB max, leave room for other object data
+const BLOCKS_PER_OBJ = Math.floor(
+    OBJ_SIZE / (BLOCK_SIZE + BLOCK_METADATA_SIZE)
+);
 
 const KEY_FREELIST = "f";
 const KEY_NEXT_OBJECT_ID = "o";

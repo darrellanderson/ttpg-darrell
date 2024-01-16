@@ -40,7 +40,7 @@ it("long data", () => {
     expect(world.getAllObjects().length).toEqual(1);
 });
 
-it("fill store", () => {
+it("overflow single store", () => {
     const dataStore = new DataStore("test");
     expect(world.getAllObjects().length).toEqual(1);
 
@@ -52,8 +52,8 @@ it("fill store", () => {
         const data = dataStore.get("id" + i);
         expect(data).toEqual("data" + i);
     }
-    // ceil(n / BLOCKS_PER_OBJ)
-    expect(world.getAllObjects().length).toEqual(7);
+    // Too much to fit in single store.
+    expect(world.getAllObjects().length).toEqual(5);
 
     for (let i = 0; i < n; i++) {
         dataStore.delete("id" + i);
