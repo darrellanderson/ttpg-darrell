@@ -13,21 +13,19 @@ import {
 const BLOCK_SIZE = 900; // setSavedData limit 1023 (vault metadata is extra!)
 const BLOCKS_PER_OBJ = Math.floor((65536 - 2000) / (BLOCK_SIZE + 30)); // object size limit 64 KB
 
-const KEY_VAULT_ROOT = "__VaultRoot__"; // find root container
-const KEY_FREELIST = "__VaultFreeList__";
-
+const KEY_FREELIST = "f";
 const KEY_NEXT_OBJECT_ID = "o";
 const KEY_NEXT_BLOCK_INDEX = "i";
 const KEY_BLOCK_DATA = "d";
 
-type VaultBlockLocation = {
+type DataBlockLocation = {
     obj: GameObject;
     index: number;
 };
 
-type VaultBlock = {
+type DataBlock = {
     data: string;
-    next?: VaultBlockLocation;
+    next?: DataBlockLocation;
 };
 
 /**
@@ -43,42 +41,44 @@ type VaultBlock = {
  * This does suffer from internal fragmentation; storing many very small
  * data entries wastes space.
  */
-export class Vault {
+export class DataStore {
     private readonly _root: Container;
 
-    constructor() {
-        for (const obj of world.getAllObjects()) {
-            if (!(obj instanceof Container)) {
-                continue;
-            }
-            if (obj.getSavedData(KEY_VAULT_ROOT)) {
-                this._root = obj;
-                return;
+    constructor(dataStoreId: string) {
+        let rootObj: GameObject | undefined;
+
+        // Check if this store is already registered.
+        const globalKey = `__DataStore:${dataStoreId}__`;
+        const rootObjId: string = world.getSavedData(globalKey);
+        if (rootObjId && rootObjId.length > 0) {
+            rootObj = world.getObjectById(rootObjId);
+        }
+
+        // If not, create a new root container.
+        if (!rootObj) {
+            const templateId = "A44BAA604E0ED034CD67FA9502214AA7"; // container
+            rootObj = world.createObjectFromTemplate(templateId, [0, 0, -10]);
+            if (rootObj) {
+                rootObj.setObjectType(ObjectType.NonInteractive);
+                rootObj.setSavedData("[]", KEY_FREELIST);
             }
         }
 
-        // If we get here the vault root does not exist.  Create it.
-        const templateId = "A44BAA604E0ED034CD67FA9502214AA7"; // container
-        const container = world.createObjectFromTemplate(
-            templateId,
-            [0, 0, -10]
-        );
-        if (!container || !(container instanceof Container)) {
-            throw new Error("unable to create root container");
+        if (!rootObj || !(rootObj instanceof Container)) {
+            throw new Error(
+                "DataStore unable to find or create root container"
+            );
         }
-        container.setObjectType(ObjectType.NonInteractive);
-        container.setSavedData("yes", KEY_VAULT_ROOT);
-        container.setSavedData("[]", KEY_FREELIST);
-        this._root = container;
+        this._root = rootObj;
     }
 
     delete(dataId: string): void {
-        const firstBlockLocation: VaultBlockLocation | undefined =
+        const firstBlockLocation: DataBlockLocation | undefined =
             this._getRootEntry(dataId);
         if (!firstBlockLocation) {
             return;
         }
-        const blocks: VaultBlock[] = this._getChain(firstBlockLocation);
+        const blocks: DataBlock[] = this._getChain(firstBlockLocation);
         this._releaseBlock(firstBlockLocation);
         for (const block of blocks) {
             if (block.next) {
@@ -105,15 +105,15 @@ export class Vault {
         }
 
         // Reserve block locations.
-        const blockLocations: VaultBlockLocation[] = [];
+        const blockLocations: DataBlockLocation[] = [];
         for (let i = 0; i < dataChunks.length; i++) {
             blockLocations.push(this._allocBlock());
         }
 
         // Create chained blocks.
-        const blocks: VaultBlock[] = [];
+        const blocks: DataBlock[] = [];
         for (let i = 0; i < n; i++) {
-            const block: VaultBlock = {
+            const block: DataBlock = {
                 data: dataChunks[i],
             };
             if (i < dataChunks.length - 1) {
@@ -124,8 +124,8 @@ export class Vault {
 
         // Save blocks.
         for (let i = 0; i < n; i++) {
-            const blockLocation: VaultBlockLocation = blockLocations[i];
-            const block: VaultBlock = blocks[i];
+            const blockLocation: DataBlockLocation = blockLocations[i];
+            const block: DataBlock = blocks[i];
             const blockEnc: { [key: string]: any } = {
                 [KEY_BLOCK_DATA]: block.data,
             };
@@ -151,16 +151,22 @@ export class Vault {
     }
 
     get(dataId: string): string | undefined {
-        const firstBlockLocation: VaultBlockLocation | undefined =
+        const firstBlockLocation: DataBlockLocation | undefined =
             this._getRootEntry(dataId);
         if (!firstBlockLocation) {
             return undefined;
         }
-        const blocks: VaultBlock[] = this._getChain(firstBlockLocation);
+        const blocks: DataBlock[] = this._getChain(firstBlockLocation);
         return blocks.map((block) => block.data).join("");
     }
 
-    private _getRootEntry(dataId: string): VaultBlockLocation | undefined {
+    /**
+     * Get the first data block location for the data entry.
+     *
+     * @param dataId
+     * @returns
+     */
+    private _getRootEntry(dataId: string): DataBlockLocation | undefined {
         if (dataId === KEY_FREELIST) {
             throw new Error("cannot use freelist key as data id");
         }
@@ -188,8 +194,8 @@ export class Vault {
      * @param blockLocation
      * @param processor
      */
-    private _getChain(blockLocation: VaultBlockLocation): VaultBlock[] {
-        const blocks: VaultBlock[] = [];
+    private _getChain(blockLocation: DataBlockLocation): DataBlock[] {
+        const blocks: DataBlock[] = [];
 
         do {
             const blockEncData = blockLocation.obj.getSavedData(
@@ -202,7 +208,7 @@ export class Vault {
             if (blockEnc[KEY_BLOCK_DATA] === undefined) {
                 throw new Error("missing block data");
             }
-            const block: VaultBlock = {
+            const block: DataBlock = {
                 data: blockEnc[KEY_BLOCK_DATA],
             };
             if (blockEnc[KEY_NEXT_BLOCK_INDEX]) {
@@ -232,7 +238,7 @@ export class Vault {
      *
      * @returns
      */
-    private _allocBlock(): VaultBlockLocation {
+    private _allocBlock(): DataBlockLocation {
         // Get a store with free slot(s).
         let store: GameObject | undefined = this._getStore();
         if (!store) {
@@ -256,7 +262,7 @@ export class Vault {
 
         // If that was the last block, remove from available stores.
         if (freelist.length === 0) {
-            this._removeStoreId(store.getId());
+            this._removeStoreFromAvailable(store);
         }
 
         return {
@@ -271,7 +277,7 @@ export class Vault {
      *
      * @param blockLocation
      */
-    private _releaseBlock(blockLocation: VaultBlockLocation): void {
+    private _releaseBlock(blockLocation: DataBlockLocation): void {
         const store = blockLocation.obj;
 
         // Push to the freelist.
@@ -288,7 +294,7 @@ export class Vault {
 
         // If the freelist was empty, add to available stores.
         if (freelist.length === 1) {
-            this._addStoreId(store.getId());
+            this._addStoreToAvailable(store);
         }
 
         // If the freelist is everything, delete the store.
@@ -297,7 +303,12 @@ export class Vault {
         }
     }
 
-    private _addStoreId(objId: string): void {
+    /**
+     * Add store to available with-capacity list (store has more room).
+     *
+     * @param obj
+     */
+    private _addStoreToAvailable(obj: GameObject): void {
         const rootStoreIdsData = this._root.getSavedData(KEY_FREELIST);
         if (!rootStoreIdsData || rootStoreIdsData.length === 0) {
             throw new Error("bad rootStoreData");
@@ -306,11 +317,16 @@ export class Vault {
         if (!Array.isArray(rootStoreIds)) {
             throw new Error("rootStoreData not array");
         }
-        rootStoreIds.push(objId);
+        rootStoreIds.push(obj.getId());
         this._root.setSavedData(JSON.stringify(rootStoreIds), KEY_FREELIST);
     }
 
-    private _removeStoreId(objId: string): void {
+    /**
+     * Remove store from available with-capcity list (store is full).
+     *
+     * @param obj
+     */
+    private _removeStoreFromAvailable(obj: GameObject): void {
         const rootStoreIdsData = this._root.getSavedData(KEY_FREELIST);
         if (!rootStoreIdsData || rootStoreIdsData.length === 0) {
             throw new Error("bad rootStoreData");
@@ -319,7 +335,7 @@ export class Vault {
         if (!Array.isArray(rootStoreIds)) {
             throw new Error("rootStoreData not array");
         }
-        const idx = rootStoreIds.indexOf(objId);
+        const idx = rootStoreIds.indexOf(obj.getId());
         if (idx < 0) {
             throw new Error("file not in root freelist");
         }
@@ -377,7 +393,7 @@ export class Vault {
         obj.setSavedData(JSON.stringify(freelist), KEY_FREELIST);
 
         // Add to root freelist of available stores.
-        this._addStoreId(obj.getId());
+        this._addStoreToAvailable(obj);
         return obj;
     }
 
@@ -389,7 +405,7 @@ export class Vault {
      */
     private _releaseStore(obj: GameObject) {
         // Remove from root freelist of available stores.
-        this._removeStoreId(obj.getId());
+        this._removeStoreFromAvailable(obj);
 
         // Destroy store object.
         obj.destroy();
