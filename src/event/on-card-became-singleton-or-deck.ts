@@ -17,6 +17,7 @@
 import {
     Card,
     GameObject,
+    GameWorld,
     Player,
     globalEvents,
     world,
@@ -130,6 +131,9 @@ export class OnCardBecameSingletonOrDeck implements AbstractGlobal {
     };
 
     init(): void {
+        globalEvents.onObjectCreated.remove(
+            OnCardBecameSingletonOrDeck._onCreatedHandler
+        );
         globalEvents.onObjectCreated.add(
             OnCardBecameSingletonOrDeck._onCreatedHandler
         );
@@ -139,11 +143,17 @@ export class OnCardBecameSingletonOrDeck implements AbstractGlobal {
         }
     }
 
-    _reset(): void {
+    static _reset(): void {
         globalEvents.onObjectCreated.remove(
             OnCardBecameSingletonOrDeck._onCreatedHandler
         );
+        OnCardBecameSingletonOrDeck.onSingletonCardCreated.clear();
+        OnCardBecameSingletonOrDeck.onSingletonCardMadeDeck.clear();
     }
+}
+
+if (GameWorld.getExecutionReason() === "unittest") {
+    afterEach(() => OnCardBecameSingletonOrDeck._reset());
 }
 
 /*
