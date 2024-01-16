@@ -1,4 +1,10 @@
-import { GameObject, Rotator, Vector, world } from "@tabletop-playground/api";
+import {
+    Card,
+    GameObject,
+    Rotator,
+    Vector,
+    world,
+} from "@tabletop-playground/api";
 
 /**
  * Registry for NSID to template id.
@@ -13,6 +19,7 @@ export abstract class Spawn {
     ): GameObject | undefined {
         const templateId = Spawn._nsidToTemplateId[nsid];
         if (!templateId) {
+            console.log(`Spawn.spawn: unknown nsid "${nsid}"`);
             return undefined;
         }
         if (position === undefined) {
@@ -46,6 +53,77 @@ export abstract class Spawn {
         return obj;
     }
 
+    static spawnMergeDecks(
+        nsids: string[],
+        position?: Vector | [x: number, y: number, z: number],
+        rotation?: Rotator | [pitch: number, yaw: number, roll: number]
+    ): Card | undefined {
+        if (nsids.length === 0) {
+            console.log("Spawn.spawnMergeDecks: empty nsid array");
+            return undefined;
+        }
+
+        let deck: Card | undefined;
+        for (const nsid of nsids) {
+            const obj: GameObject | undefined = Spawn.spawn(
+                nsid,
+                position,
+                rotation
+            );
+
+            // If any object fails, fail the whole spawn.
+            if (!obj) {
+                console.log(`Spawn.spawnMergeDecks: unknown nsid "${nsid}"`);
+                if (deck) {
+                    deck.destroy();
+                }
+                return undefined;
+            }
+
+            if (!(obj instanceof Card)) {
+                console.log(`Spawn.spawnMergeDecks: nsid "${nsid}" not a Card`);
+                if (deck) {
+                    deck.destroy();
+                }
+                return undefined;
+            }
+
+            if (deck) {
+                const success: boolean = deck.addCards(obj);
+                if (!success) {
+                    console.log(
+                        `Spawn.spawnMergeDecks: nsid "${nsid}" failed to merge with existing deck (wrong size?)`
+                    );
+                    if (deck) {
+                        deck.destroy();
+                    }
+                    return undefined;
+                }
+            } else {
+                deck = obj;
+            }
+        }
+        return deck;
+    }
+
+    static spawnMergeDecksOrThrow(
+        nsids: string[],
+        position?: Vector | [x: number, y: number, z: number],
+        rotation?: Rotator | [pitch: number, yaw: number, roll: number]
+    ): Card {
+        const obj: Card | undefined = Spawn.spawnMergeDecks(
+            nsids,
+            position,
+            rotation
+        );
+        if (!obj) {
+            throw new Error(
+                `spawnMergeDecksOrThrow failed for [${nsids.join(", ")}]`
+            );
+        }
+        return obj;
+    }
+
     static inject(dict: { [key: string]: string }) {
         for (const [k, v] of Object.entries(dict)) {
             Spawn._nsidToTemplateId[k] = v;
@@ -60,6 +138,13 @@ export abstract class Spawn {
         Spawn._nsidToTemplateId = {};
     }
 
+    static getAllNsids(): string[] {
+        return Object.keys(Spawn._nsidToTemplateId);
+    }
+
+    /**
+     * Make sure all registered templates exist.
+     */
     static validate() {
         const templateIds = new Set();
         for (const pkg of world.getAllowedPackages()) {
