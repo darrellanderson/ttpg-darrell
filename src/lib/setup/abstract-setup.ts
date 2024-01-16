@@ -1,5 +1,5 @@
 import { Color } from "@tabletop-playground/api";
-import { LayoutObjects } from "./layout/layout-objects";
+import { LayoutObjects } from "../layout-objects/layout-objects";
 
 export abstract class AbstractSetup {
     private _playerSlot: number = -1;
@@ -26,6 +26,4 @@ export abstract class AbstractSetup {
     getPrimaryColor(): Color {
         return this._primaryColor;
     }
-
-    abstract getLayoutObjects(): LayoutObjects;
 }

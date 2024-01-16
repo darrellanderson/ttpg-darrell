@@ -119,6 +119,12 @@ export class PlayerNameTakeSeat {
         return this;
     }
 
+    public attachToCardHolder(obj: CardHolder) {
+        if (!obj || !(obj instanceof CardHolder)) {
+            throw new Error("bad card holder");
+        }
+    }
+
     private _updatePlayerStatus(): void {
         // Calculate widget.
         let widget: Widget = this._takeSeatButton;

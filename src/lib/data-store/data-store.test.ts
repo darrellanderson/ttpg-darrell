@@ -1,5 +1,5 @@
 import { world } from "@tabletop-playground/api";
-import { DataStore } from "./vault";
+import { DataStore } from "./data-store";
 
 it("constructor", () => {
     new DataStore("test");
