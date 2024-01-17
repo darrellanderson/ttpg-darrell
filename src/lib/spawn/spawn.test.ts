@@ -145,6 +145,16 @@ it("has", () => {
     Spawn.clear();
 });
 
+it("getAllNSIDs", () => {
+    const nsid = "my-nsid";
+    const templateId = "my-template-id";
+    Spawn.clear();
+    expect(Spawn.getAllNsids()).toEqual([]);
+    Spawn.inject({ [nsid]: templateId });
+    expect(Spawn.getAllNsids()).toEqual([nsid]);
+    Spawn.clear();
+});
+
 it("validate", () => {
     const nsid = "my-nsid";
     const templateId = "my-template-id";

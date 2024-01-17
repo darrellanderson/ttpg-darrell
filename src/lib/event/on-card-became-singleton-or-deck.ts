@@ -36,11 +36,8 @@ export class OnCardBecameSingletonOrDeck implements AbstractGlobal {
 
     private static readonly _onInsertedHandler = (
         deck: Card,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         insertedCard: Card,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         position: number,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         player?: Player
     ) => {
         // This handler is only installed on singleton cards, and other card(s)
@@ -68,11 +65,8 @@ export class OnCardBecameSingletonOrDeck implements AbstractGlobal {
 
     static _onRemovedHandler = (
         deck: Card,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         removedCard: Card,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         position: number,
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         player?: Player
     ) => {
         // Called after card is removed.
