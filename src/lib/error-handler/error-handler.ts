@@ -1,4 +1,4 @@
-import { world } from "@tabletop-playground/api";
+import { GameWorld, world } from "@tabletop-playground/api";
 import { AbstractGlobal } from "../global/abstract-global";
 import { TriggerableMulticastDelegate } from "../event/triggerable-multicast-delegate";
 
@@ -271,4 +271,10 @@ export class ErrorHandler extends AbstractGlobal {
         }
         return result;
     }
+}
+
+if (GameWorld.getExecutionReason() === "unittest") {
+    afterEach(() => {
+        ErrorHandler.onError.clear();
+    });
 }
