@@ -135,6 +135,100 @@ it("spawnMergedDecksOrThrow", () => {
     }).toThrow();
 });
 
+it("spawnMergeDecks (empty list)", () => {
+    jest.spyOn(console, "log").mockImplementation(() => {});
+
+    const result: Card | undefined = Spawn.spawnMergeDecks([]);
+    expect(result).toBeUndefined();
+
+    jest.restoreAllMocks();
+});
+
+it("spawnMergeDecks (bad nsid)", () => {
+    jest.spyOn(console, "log").mockImplementation(() => {});
+
+    mockWorld._reset({
+        _templateIdToMockGameObjectParams: {
+            template1: {
+                _objType: "Card",
+                cardDetails: [
+                    new MockCardDetails({ metadata: "deck1card1" }),
+                    new MockCardDetails({ metadata: "deck1card2" }),
+                ],
+            } as MockCardParams,
+        },
+    });
+
+    Spawn.inject({ deck1: "template1" });
+
+    const result: Card | undefined = Spawn.spawnMergeDecks([
+        "deck1",
+        "unknown.nsid",
+    ]);
+    expect(result).toBeUndefined();
+
+    jest.restoreAllMocks();
+});
+
+it("spawnMergeDecks (not a card)", () => {
+    jest.spyOn(console, "log").mockImplementation(() => {});
+
+    mockWorld._reset({
+        _templateIdToMockGameObjectParams: {
+            template1: {
+                _objType: "Card",
+                cardDetails: [
+                    new MockCardDetails({ metadata: "deck1card1" }),
+                    new MockCardDetails({ metadata: "deck1card2" }),
+                ],
+            } as MockCardParams,
+            template2: {
+                _objType: "GameObject",
+            },
+        },
+    });
+
+    Spawn.inject({ deck1: "template1", obj1: "template2" });
+
+    const result: Card | undefined = Spawn.spawnMergeDecks(["deck1", "obj1"]);
+    expect(result).toBeUndefined();
+
+    jest.restoreAllMocks();
+});
+
+it("spawnMergeDecks (addCards err)", () => {
+    jest.spyOn(console, "log").mockImplementation(() => {});
+    jest.spyOn(Card.prototype, "addCards").mockImplementation(() => {
+        return false;
+    });
+
+    mockWorld._reset({
+        _templateIdToMockGameObjectParams: {
+            template1: {
+                _objType: "Card",
+                cardDetails: [
+                    new MockCardDetails({ metadata: "deck1card1" }),
+                    new MockCardDetails({ metadata: "deck1card2" }),
+                ],
+            } as MockCardParams,
+            template2: {
+                _objType: "Card",
+                cardDetails: [
+                    new MockCardDetails({ metadata: "deck2card1" }),
+                    new MockCardDetails({ metadata: "deck2card2" }),
+                ],
+            } as MockCardParams,
+        },
+    });
+
+    Spawn.inject({ deck1: "template1", deck2: "template2" });
+
+    const result: Card | undefined = Spawn.spawnMergeDecks(["deck1", "deck2"]);
+    expect(result).toBeUndefined();
+
+    jest.restoreAllMocks();
+});
+
 it("has", () => {
     const nsid = "my-nsid";
     const templateId = "my-template-id";

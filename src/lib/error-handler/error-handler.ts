@@ -47,7 +47,6 @@ export class ErrorHandler extends AbstractGlobal {
     }
 
     init() {
-        console.log("ErrorHandler.init");
         // Arg is a string which inludes the stack trace.
         globalThis.$uncaughtException = (error: string) => {
             const rewrittenError = this.rewriteError(error);
