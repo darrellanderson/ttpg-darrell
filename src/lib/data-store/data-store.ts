@@ -7,7 +7,7 @@ import {
 
 const BLOCK_SIZE = 512; // setSavedData limit 1023 (json trimmings, metadata is extra!)
 const BLOCK_METADATA_SIZE = 32; // be conservative
-const OBJ_SIZE = 65536 - 2000; // 64 KB max, leave room for other object data
+const OBJ_SIZE = 65536 - 20; // 64 KB max, leave room for json trimmings
 const BLOCKS_PER_OBJ = Math.floor(
     OBJ_SIZE / (BLOCK_SIZE + BLOCK_METADATA_SIZE)
 );
@@ -16,6 +16,8 @@ const KEY_FREELIST = "f";
 const KEY_NEXT_OBJECT_ID = "o";
 const KEY_NEXT_BLOCK_INDEX = "i";
 const KEY_BLOCK_DATA = "d";
+
+export type NamedspacedId = `@${string}/${string}`;
 
 type DataBlockLocation = {
     obj: GameObject;
@@ -48,7 +50,7 @@ export class DataStore {
      *
      * @param dataStoreId - each store MUST have a different id
      */
-    constructor(dataStoreId: string) {
+    constructor(dataStoreId: NamedspacedId) {
         let rootObj: GameObject | undefined;
 
         // Check if this store is already registered.
@@ -83,7 +85,7 @@ export class DataStore {
      * @param dataId
      * @returns
      */
-    delete(dataId: string): void {
+    delete(dataId: NamedspacedId): void {
         const firstBlockLocation: DataBlockLocation | undefined =
             this._getRootEntry(dataId);
         if (!firstBlockLocation) {
@@ -106,7 +108,7 @@ export class DataStore {
      * @param data
      * @returns
      */
-    set(dataId: string, data: string): void {
+    set(dataId: NamedspacedId, data: string): void {
         this.delete(dataId);
 
         if (data.length === 0) {
@@ -174,7 +176,7 @@ export class DataStore {
      * @param dataId
      * @returns
      */
-    get(dataId: string): string | undefined {
+    get(dataId: NamedspacedId): string | undefined {
         const firstBlockLocation: DataBlockLocation | undefined =
             this._getRootEntry(dataId);
         if (!firstBlockLocation) {
@@ -190,10 +192,9 @@ export class DataStore {
      * @param dataId
      * @returns
      */
-    private _getRootEntry(dataId: string): DataBlockLocation | undefined {
-        if (dataId === KEY_FREELIST) {
-            throw new Error("cannot use freelist key as data id");
-        }
+    private _getRootEntry(
+        dataId: NamedspacedId
+    ): DataBlockLocation | undefined {
         const blockLocationEncData = this._root.getSavedData(dataId);
         if (!blockLocationEncData || blockLocationEncData.length === 0) {
             return undefined;
