@@ -1,23 +1,24 @@
 import { Color } from "@tabletop-playground/api";
-import { LayoutObjects } from "../layout-objects/layout-objects";
 
+export type AbstractSetupParams = {
+    playerSlot?: number;
+    primaryColor?: Color;
+    secondaryColor?: Color;
+};
+
+/**
+ * Store owner information.
+ */
 export abstract class AbstractSetup {
-    private _playerSlot: number = -1;
-    private _primaryColor: Color = new Color(1, 1, 1, 1);
+    private readonly _playerSlot: number;
+    private readonly _primaryColor: Color;
+    private readonly _secondaryColor: Color;
 
-    // --------------------------------
-
-    setPlayerSlot(playerSlot: number): this {
-        this._playerSlot = playerSlot;
-        return this;
+    constructor(params?: AbstractSetupParams) {
+        this._playerSlot = params?.playerSlot ?? -1;
+        this._primaryColor = params?.primaryColor ?? new Color(1, 1, 1, 1);
+        this._secondaryColor = params?.secondaryColor ?? new Color(0, 0, 0, 1);
     }
-
-    setPrimaryColor(color: Color): this {
-        this._primaryColor = color;
-        return this;
-    }
-
-    // --------------------------------
 
     getPlayerSlot(): number {
         return this._playerSlot;
@@ -25,5 +26,9 @@ export abstract class AbstractSetup {
 
     getPrimaryColor(): Color {
         return this._primaryColor;
+    }
+
+    getSecondaryColor(): Color {
+        return this._secondaryColor;
     }
 }
