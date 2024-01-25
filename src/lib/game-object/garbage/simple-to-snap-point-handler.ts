@@ -1,6 +1,6 @@
 import { GameObject, SnapPoint, world } from "@tabletop-playground/api";
 import { GarbageHandler } from "./garbage-container";
-import { NSID } from "../nsid/nsid";
+import { NSID } from "../../nsid/nsid";
 
 /**
  * Recycle an object to a specific snap point with the matching tag.

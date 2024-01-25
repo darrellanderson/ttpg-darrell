@@ -4,7 +4,7 @@ import {
     Container,
     SnapPoint,
 } from "@tabletop-playground/api";
-import { CardUtil, SNAP_POINT_TAG_DECK } from "./card-util";
+import { CardUtil } from "./card-util";
 import {
     MockCard,
     MockCardDetails,
@@ -81,15 +81,17 @@ it("isLooseCard (holder)", () => {
 });
 
 it("isLooseCard (deck/discard)", () => {
-    const snapPoint: SnapPoint = new MockSnapPoint({
-        tags: [SNAP_POINT_TAG_DECK],
-    });
+    const snapPointTag: string = "illegal-tag";
     const card: Card = new MockCard({
         cardDetails: [new MockCardDetails()],
         isFaceUp: true,
-        snappedToPoint: snapPoint,
+        snappedToPoint: new MockSnapPoint({
+            tags: [snapPointTag],
+        }),
     });
-    const value: boolean = CardUtil.isLooseCard(card);
+    const value: boolean = CardUtil.isLooseCard(card, undefined, [
+        snapPointTag,
+    ]);
     expect(value).toEqual(false);
 });
 
@@ -194,6 +196,7 @@ it("fetchCard", () => {
     const found: Card | undefined = CardUtil.fetchCard("my-card");
     expect(found).toBe(card);
 });
+
 it("fetchCard (from deck)", () => {
     const deck = new MockCard({
         cardDetails: [

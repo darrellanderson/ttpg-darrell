@@ -19,7 +19,7 @@ import {
  * Display player name above-and-behind the card holder.
  * Show a "take seat" button when no player in slot.
  */
-export class PlayerNameTakeSeat {
+export class CardHolderPlayerName {
     public static readonly DEFAULT_FONT_SIZE = 30;
 
     private readonly _cardHolder: CardHolder;
@@ -90,7 +90,7 @@ export class PlayerNameTakeSeat {
 
         cardHolder.addUI(this._ui);
         this.setColor(cardHolder.getPrimaryColor()).setFontSize(
-            PlayerNameTakeSeat.DEFAULT_FONT_SIZE
+            CardHolderPlayerName.DEFAULT_FONT_SIZE
         );
         this._updatePlayerStatus();
     }

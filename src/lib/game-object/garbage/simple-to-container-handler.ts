@@ -1,6 +1,6 @@
 import { Container, GameObject, world } from "@tabletop-playground/api";
 import { GarbageHandler } from "./garbage-container";
-import { NSID } from "../nsid/nsid";
+import { NSID } from "../../nsid/nsid";
 
 /**
  * Recycle object(s) to a container, optionally matching owning slot.

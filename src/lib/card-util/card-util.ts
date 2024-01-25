@@ -1,30 +1,36 @@
-import { Card, CardHolder, GameObject, world } from "@tabletop-playground/api";
+import {
+    Card,
+    CardHolder,
+    GameObject,
+    Player,
+    world,
+} from "@tabletop-playground/api";
 import { NSID } from "../nsid/nsid";
 
-export const SNAP_POINT_TAG_DECK = "DECK";
-export const SNAP_POINT_TAG_DISCARD = "DECK";
-
 export abstract class CardUtil {
-    /**
-     * Is this card a singleton (not a deck), not held by a player, etc.
-     *
-     * @param obj
-     * @param allowFaceDown
-     * @returns
-     */
-    static isLooseCard(obj: GameObject, allowFaceDown?: boolean): boolean {
-        const tags: string[] = obj.getSnappedToPoint()?.getTags() ?? [];
-        return (
-            obj instanceof Card &&
-            (allowFaceDown || obj.isFaceUp()) &&
-            obj.getStackSize() === 1 &&
-            !obj.getContainer() &&
-            !obj.isHeld() &&
-            !obj.isInHolder() &&
-            !tags.includes(SNAP_POINT_TAG_DECK) &&
-            !tags.includes(SNAP_POINT_TAG_DISCARD) &&
-            obj.isValid()
-        );
+    // Is Card.deal not enough?
+    dealToHolder(card: Card, playerSlot: number): boolean {
+        const player: Player | undefined = world.getPlayerBySlot(playerSlot);
+        let holder: CardHolder | undefined = player?.getHandHolder();
+
+        if (!holder) {
+            const skipContained = true;
+            for (const obj of world.getAllObjects(skipContained)) {
+                if (!(obj instanceof CardHolder)) {
+                    continue;
+                }
+                if (obj.getOwningPlayerSlot() !== playerSlot) {
+                    continue;
+                }
+                holder = obj;
+                break;
+            }
+        }
+
+        if (holder) {
+            return holder.insert(card, holder.getNumCards());
+        }
+        return false;
     }
 
     /**
@@ -71,6 +77,37 @@ export abstract class CardUtil {
             }
         }
         return result;
+    }
+
+    /**
+     * Is this card a singleton (not a deck), not held by a player, etc.
+     *
+     * @param obj
+     * @param allowFaceDown
+     * @returns
+     */
+    static isLooseCard(
+        obj: GameObject,
+        allowFaceDown?: boolean,
+        rejectSnapPointTags?: string[]
+    ): boolean {
+        if (rejectSnapPointTags) {
+            const tags: string[] = obj.getSnappedToPoint()?.getTags() ?? [];
+            for (const tag of tags) {
+                if (rejectSnapPointTags.includes(tag)) {
+                    return false;
+                }
+            }
+        }
+        return (
+            obj instanceof Card &&
+            (allowFaceDown || obj.isFaceUp()) &&
+            obj.getStackSize() === 1 &&
+            !obj.getContainer() &&
+            !obj.isHeld() &&
+            !obj.isInHolder() &&
+            obj.isValid()
+        );
     }
 
     /**

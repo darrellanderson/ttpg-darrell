@@ -1,6 +1,6 @@
 import { GameObject, Card, SnapPoint, world } from "@tabletop-playground/api";
 import { GarbageHandler } from "./garbage-container";
-import { NSID } from "../nsid/nsid";
+import { NSID } from "../../nsid/nsid";
 
 /**
  * Recycle cards to a specific snap point on a mat.
