@@ -3,7 +3,6 @@ import {
     Container,
     GameObject,
     globalEvents,
-    refContainer,
     world,
 } from "@tabletop-playground/api";
 import { NSID } from "../../nsid/nsid";
@@ -20,10 +19,11 @@ export class DeletedItemsContainer {
     private readonly _oneTimeSkipObjIds: Set<string> = new Set<string>();
     private readonly _skipNsids: Set<string> = new Set<string>();
 
-    static ignoreWhenDestroyed(obj: GameObject) {
+    static destroyWithoutCopying(obj: GameObject) {
         const tags: string[] = obj.getTags();
         tags.push(this.IGNORE_TAG);
         obj.setTags(tags);
+        obj.destroy();
     }
 
     constructor(container: Container) {
@@ -36,6 +36,7 @@ export class DeletedItemsContainer {
         const onDestroyed: (obj: GameObject) => void = (obj) => {
             this._onObjectDestroyed(obj);
         };
+        console.log(`DeletedItemsContainer "${container.getId()}"`);
         globalEvents.onObjectDestroyed.add(onDestroyed);
         container.onDestroyed.add(() => {
             globalEvents.onObjectDestroyed.remove(onDestroyed);
@@ -94,7 +95,8 @@ export class DeletedItemsContainer {
             return; // do not keep other versions of this object
         }
 
-        console.log(`onObjectDestroyed: "${obj.getId()}"`);
+        console.log(`onObjectDestroyed:2 "${obj.getId()}"`);
+        /*
         const json: string = obj.toJSONString();
         const clone: GameObject | undefined = world.createObjectFromJSON(
             json,
@@ -103,7 +105,6 @@ export class DeletedItemsContainer {
         if (clone) {
             this._container.addObjects([clone]);
         }
+        */
     }
 }
-
-new DeletedItemsContainer(refContainer);

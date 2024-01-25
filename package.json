@@ -10,6 +10,7 @@
     "scripts": {
         "test": "jest",
         "build": "tsc -p tsconfig-esm.json && tsc -p tsconfig-cjs.json",
+        "clean": "rm -rf build",
         "prepublishOnly": "yarn run build"
     },
     "author": "Darrell",
