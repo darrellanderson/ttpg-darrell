@@ -28,11 +28,49 @@ it("recycle", () => {
 
     const stsph = new SimpleToSnapPointHandler()
         .addRecycleObjectNsid(objNsid)
-        .setSnapPointTag(snapPointTag);
+        .setSnapPointTag(snapPointTag)
+        .setPreSnapRotation([0, 0, 0]);
 
     mockWorld._reset({ gameObjects: [obj, mat] });
 
     expect(stsph.recycle(obj)).toBeTruthy();
+});
 
-    mockWorld._reset();
+it("recycle (missing snap point)", () => {
+    const objNsid = "my-obj-nsid";
+    const snapPointTag = "my-snap-point-tag";
+
+    const obj = new MockGameObject({ templateMetadata: objNsid });
+
+    const stsph = new SimpleToSnapPointHandler()
+        .addRecycleObjectNsid(objNsid)
+        .setSnapPointTag(snapPointTag)
+        .setPreSnapRotation([0, 0, 0]);
+
+    mockWorld._reset({ gameObjects: [obj] });
+
+    expect(stsph.recycle(obj)).toBeFalsy();
+});
+
+it("recycle (snap point occupied)", () => {
+    const objNsid = "my-obj-nsid";
+    const snapPointTag = "my-snap-point-tag";
+
+    const obj = new MockGameObject({ templateMetadata: objNsid });
+    const snapPoint = new MockSnapPoint({
+        tags: [snapPointTag],
+        snappedObject: new MockGameObject(),
+    });
+    const mat = new MockGameObject({
+        snapPoints: [snapPoint],
+    });
+
+    const stsph = new SimpleToSnapPointHandler()
+        .addRecycleObjectNsid(objNsid)
+        .setSnapPointTag(snapPointTag)
+        .setPreSnapRotation([0, 0, 0]);
+
+    mockWorld._reset({ gameObjects: [obj, mat] });
+
+    expect(stsph.recycle(obj)).toBeFalsy();
 });

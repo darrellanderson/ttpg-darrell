@@ -216,6 +216,8 @@ declare module globalThis {
     var $uncaughtException: (e: string) => void;
 }
 it("uncaughtException handler", () => {
+    jest.spyOn(console, "log").mockImplementation(() => {});
     new ErrorHandler().init();
     globalThis.$uncaughtException("test");
+    jest.restoreAllMocks();
 });

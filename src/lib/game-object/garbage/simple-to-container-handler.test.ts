@@ -25,13 +25,32 @@ it("recycle", () => {
 
     const stch = new SimpleToContainerHandler()
         .addRecycleObjectNsid(objNsid)
-        .setContainerNsid(containerNsid);
+        .setContainerNsid(containerNsid)
+        .setRequireOwningPlayerSlot(true);
 
     mockWorld._reset({ gameObjects: [obj, container] });
 
     expect(obj.getContainer()).toBeUndefined();
     expect(stch.recycle(obj)).toBeTruthy();
     expect(obj.getContainer()).toEqual(container);
+
+    mockWorld._reset();
+});
+
+it("recycle (missing container)", () => {
+    const objNsid = "my-obj-nsid";
+    const containerNsid = "my-container-nsid";
+
+    const obj = new MockGameObject({ templateMetadata: objNsid });
+
+    const stch = new SimpleToContainerHandler()
+        .addRecycleObjectNsid(objNsid)
+        .setContainerNsid(containerNsid);
+
+    mockWorld._reset({ gameObjects: [obj] });
+
+    expect(obj.getContainer()).toBeUndefined();
+    expect(stch.recycle(obj)).toBeFalsy();
 
     mockWorld._reset();
 });

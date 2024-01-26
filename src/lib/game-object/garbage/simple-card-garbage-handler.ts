@@ -73,12 +73,13 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
         }
 
         // Find discard deck.
-        let deck: GameObject | undefined = snapPoint?.getSnappedObject();
+        let deck: GameObject | undefined = snapPoint.getSnappedObject();
         if (deck && !(deck instanceof Card)) {
             deck = undefined;
         }
 
         // Discard.
+        let success = true;
         if (deck) {
             let offset = 0;
 
@@ -94,16 +95,7 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
             const toFront = true;
             const animate = true;
             const flipped = false;
-            const success = deck.addCards(
-                obj,
-                toFront,
-                offset,
-                animate,
-                flipped
-            );
-            if (!success) {
-                return false;
-            }
+            success = deck.addCards(obj, toFront, offset, animate, flipped);
         } else {
             const above = snapPoint.getGlobalPosition().add([0, 0, 10]);
             const animationSpeed: number = 0;
@@ -120,6 +112,6 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
             obj.snap(); // apply snap point rotation
         }
 
-        return true;
+        return success;
     }
 }

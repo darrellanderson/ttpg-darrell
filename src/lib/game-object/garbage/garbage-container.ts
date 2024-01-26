@@ -91,26 +91,24 @@ export class GarbageContainer {
                 const keep = false;
                 card = deck.takeCards(numCards, fromFront, offset, keep);
             }
-            if (!card) {
-                continue;
-            }
-
-            // Try to recycle, return card to same spot if fails.
-            let success = GarbageContainer._tryRecycleObj(card);
-            if (success) {
-                recycleCount += 1;
-            } else if (card !== deck) {
-                const toFront = false;
-                const animate = false;
-                const flipped = false;
-                deck.addCards(card, toFront, offset, animate, flipped);
+            if (card) {
+                // Try to recycle, return card to same spot if fails.
+                const success = GarbageContainer._tryRecycleObj(card);
+                if (success) {
+                    recycleCount += 1;
+                } else if (card !== deck) {
+                    const toFront = false;
+                    const animate = false;
+                    const flipped = false;
+                    deck.addCards(card, toFront, offset, animate, flipped);
+                }
             }
         }
         return recycleCount === stackSize;
     }
 
     public constructor(container: Container) {
-        if (!container) {
+        if (!container || !(container instanceof Container)) {
             throw new Error("missing container");
         }
         this._container = container;

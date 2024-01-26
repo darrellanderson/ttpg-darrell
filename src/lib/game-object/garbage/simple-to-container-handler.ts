@@ -43,12 +43,12 @@ export class SimpleToContainerHandler implements GarbageHandler {
             this._containerNsid,
             playerSlot
         );
-        if (!container) {
-            return false;
+        if (container) {
+            const index = 0;
+            const showAnimation = true;
+            container.addObjects([obj], index, showAnimation);
+            return true;
         }
-        const index = 0;
-        const showAnimation = true;
-        container.addObjects([obj], index, showAnimation);
-        return true;
+        return false;
     }
 }

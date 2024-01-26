@@ -1,9 +1,11 @@
-import { Card, Container, GameObject } from "@tabletop-playground/api";
+import { Card, Container, GameObject, Player } from "@tabletop-playground/api";
 import {
     MockCard,
     MockCardDetails,
     MockContainer,
     MockGameObject,
+    MockMulticastDelegate,
+    MockPlayer,
 } from "ttpg-mock";
 import { GarbageContainer, GarbageHandler } from "./garbage-container";
 
@@ -171,6 +173,61 @@ it("onRecycled", () => {
     const obj = new MockGameObject();
     GarbageContainer.tryRecycle(obj);
     expect(recycled).toEqual([obj]);
+
+    GarbageContainer.clearHandlers();
+    GarbageContainer.onRecycled.clear();
+});
+
+it("container onInserted", () => {
+    const recycledIds: string[] = [];
+    const onRecycledHandler = (obj: GameObject) => {
+        recycledIds.push(obj.getId());
+    };
+
+    class RecycleAll implements GarbageHandler {
+        public canRecycle(obj: GameObject): boolean {
+            return true;
+        }
+        public recycle(obj: GameObject): boolean {
+            return true;
+        }
+    }
+
+    GarbageContainer.clearHandlers();
+    GarbageContainer.addHandler(new RecycleAll());
+    GarbageContainer.onRecycled.add(onRecycledHandler);
+
+    const container: Container = new MockContainer();
+    new GarbageContainer(container);
+    const onInserted = container.onInserted as MockMulticastDelegate<
+        (
+            container: Container,
+            insertedObjects: GameObject[],
+            player: Player
+        ) => void
+    >;
+
+    const obj1 = new MockGameObject({ id: "my-obj-1" });
+    const obj2 = new MockGameObject({ id: "my-obj-2" });
+    const obj3 = new MockGameObject({ id: "my-obj-2" });
+    const player = new MockPlayer();
+
+    container.addObjects([obj1, obj2, obj3]);
+    expect(container.getItems()).toEqual([obj1, obj2, obj3]);
+    onInserted._trigger(container, [obj1, obj2, obj3], player);
+
+    // Destroy before processing.
+    obj2.destroy();
+
+    // Remove while processing other item.
+    const removeObj3 = () => {
+        container.take(obj3, [0, 0, 0]);
+        GarbageContainer.onRecycled.remove(removeObj3);
+    };
+    GarbageContainer.onRecycled.add(removeObj3);
+
+    process.flushTicks();
+    expect(recycledIds).toEqual(["my-obj-1"]);
 
     GarbageContainer.clearHandlers();
     GarbageContainer.onRecycled.clear();

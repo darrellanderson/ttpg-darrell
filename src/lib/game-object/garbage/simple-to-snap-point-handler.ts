@@ -14,7 +14,10 @@ export class SimpleToSnapPointHandler implements GarbageHandler {
     private readonly _find: Find = new Find();
 
     private _snapPointTag: string = "";
-    private _preSnapRotation: Rotator | undefined;
+    private _preSnapRotation:
+        | Rotator
+        | [pitch: number, yaw: number, roll: number]
+        | undefined;
 
     public addRecycleObjectNsid(nsid: string): this {
         this._recycleObjectNsids.add(nsid);
@@ -26,7 +29,9 @@ export class SimpleToSnapPointHandler implements GarbageHandler {
         return this;
     }
 
-    public setPreSnapRotation(rot: Rotator): this {
+    public setPreSnapRotation(
+        rot: Rotator | [pitch: number, yaw: number, roll: number]
+    ): this {
         this._preSnapRotation = rot;
         return this;
     }
