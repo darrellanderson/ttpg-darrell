@@ -20,6 +20,8 @@ export class Find {
         {};
     private readonly _snapPointTagToSnapPoint: { [key: string]: SnapPoint } =
         {};
+    private readonly _playerSlotToCardHolder: { [key: number]: CardHolder } =
+        {};
 
     findCard(
         nsid: string,
@@ -51,6 +53,30 @@ export class Find {
             throw new Error(`findCardHolder: "${nsid}" not a CardHolder`);
         }
         return card;
+    }
+
+    findCardHolderBySlot(
+        playerSlot: number,
+        skipContained: boolean = false
+    ): CardHolder | undefined {
+        // Check cache.
+        const cardHolder: CardHolder | undefined =
+            this._playerSlotToCardHolder[playerSlot];
+        if (cardHolder?.isValid()) {
+            return cardHolder;
+        }
+
+        for (const obj of world.getAllObjects(skipContained)) {
+            if (!(obj instanceof CardHolder)) {
+                continue;
+            }
+            if (obj.getOwningPlayerSlot() !== playerSlot) {
+                continue;
+            }
+            this._playerSlotToCardHolder[playerSlot] = obj;
+            return obj;
+        }
+        return undefined;
     }
 
     findContainer(

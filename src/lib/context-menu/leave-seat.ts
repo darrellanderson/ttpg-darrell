@@ -25,9 +25,9 @@ export class LeaveSeat implements AbstractGlobal {
      * Move player to an "unused" slot, meaning no existing player NOR any
      * object's owning player slot.
      *
-     * @param clickingPlayer
+     * @param player
      */
-    static leaveSeat(clickingPlayer: Player) {
+    static leaveSeat(player: Player) {
         const busy = new Set();
         for (const player of world.getAllPlayers()) {
             busy.add(player.getSlot());
@@ -39,9 +39,9 @@ export class LeaveSeat implements AbstractGlobal {
         for (let i = 0; i < 20; i++) {
             if (!busy.has(i)) {
                 console.log(
-                    `LeaveSeat: moving "${clickingPlayer.getName()}" to open slot ${i}`
+                    `LeaveSeat: moving "${player.getName()}" to open slot ${i}`
                 );
-                clickingPlayer.switchSlot(i);
+                player.switchSlot(i);
                 return;
             }
         }

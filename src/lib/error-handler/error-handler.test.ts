@@ -59,6 +59,12 @@ it("parseSourceMappings", () => {
     expect(lineMapping).toEqual([-1, -1, -1, 0, 1, 17, 23, -1, -1, -1, -1]);
 });
 
+it("parseSourceMappings (segments)", () => {
+    const encoded = "AAZgB,kBAAQ,GAAY,KAAK,CAAC";
+    const lineMapping = new ErrorHandler().parseSourceMappings(encoded);
+    expect(lineMapping).toEqual([-12]);
+});
+
 it("parseSourceMappingSegment", () => {
     const errorHandler = new ErrorHandler();
     let decoded: number[];
@@ -81,6 +87,16 @@ it("parseSourceMappingSegment", () => {
 
     decoded = errorHandler.parseSourceMappingSegment("IAM5C");
     expect(decoded).toEqual([4, 0, 6, -44]);
+
+    expect(() => {
+        // Not a base64 string.
+        errorHandler.parseSourceMappingSegment("$");
+    }).toThrow();
+
+    expect(() => {
+        // continue bit set, but no following sextet.
+        errorHandler.parseSourceMappingSegment("uDt7D0Tku");
+    }).toThrow();
 });
 
 it("getMap", () => {
@@ -189,4 +205,17 @@ it("rewriteError (with mapping)", () => {
     const error: string = "at file://Scripts/my-file.js:6:0";
     const rewritten: string = new ErrorHandler().rewriteError(error);
     expect(rewritten).toEqual("  at undefined my-file.js:6 <= .ts:23");
+});
+
+it("init", () => {
+    new ErrorHandler().init();
+});
+
+declare module globalThis {
+    // eslint-disable-next-line no-var
+    var $uncaughtException: (e: string) => void;
+}
+it("uncaughtException handler", () => {
+    new ErrorHandler().init();
+    globalThis.$uncaughtException("test");
 });

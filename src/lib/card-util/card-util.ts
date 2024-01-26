@@ -1,141 +1,38 @@
 import {
     Card,
     CardHolder,
+    Container,
     GameObject,
     Player,
+    SnapPoint,
     world,
 } from "@tabletop-playground/api";
+import { Find } from "../find/find";
 import { NSID } from "../nsid/nsid";
 
-export abstract class CardUtil {
-    // Is Card.deal not enough?
-    dealToHolder(card: Card, playerSlot: number): boolean {
-        const player: Player | undefined = world.getPlayerBySlot(playerSlot);
-        let holder: CardHolder | undefined = player?.getHandHolder();
+export class CardUtil {
+    private readonly _find: Find = new Find();
 
+    /**
+     * Deal card to the player's card holder.
+     * (Card.deal may fail if holder is not attached to player.)
+     *
+     * @param card
+     * @param playerSlot
+     * @returns
+     */
+    dealToHolder(card: Card, playerSlot: number): boolean {
+        let holder: CardHolder | undefined;
+
+        // Check if player has attached card holder, otherwise search.
+        const player: Player | undefined = world.getPlayerBySlot(playerSlot);
+        holder = player?.getHandHolder();
         if (!holder) {
             const skipContained = true;
-            for (const obj of world.getAllObjects(skipContained)) {
-                if (!(obj instanceof CardHolder)) {
-                    continue;
-                }
-                if (obj.getOwningPlayerSlot() !== playerSlot) {
-                    continue;
-                }
-                holder = obj;
-                break;
-            }
+            holder = this._find.findCardHolderBySlot(playerSlot, skipContained);
         }
 
-        if (holder) {
-            return holder.insert(card, holder.getNumCards());
-        }
-        return false;
-    }
-
-    /**
-     * Extract filter-approved cards into a new deck.  Leave any remaining
-     * cards in the old deck (may potentially become empty).
-     *
-     * @param deck
-     * @param filter
-     * @returns - new deck with filtered cards
-     */
-    static filterCards(
-        deck: Card,
-        filter: (nsid: string) => boolean
-    ): Card | undefined {
-        let result: Card | undefined;
-        const nsids = NSID.getDeck(deck);
-        for (let i = nsids.length - 1; i >= 0; i--) {
-            if (filter(nsids[i])) {
-                // Remove card from deck.
-                let card: Card | undefined;
-                if (deck.getStackSize() === 1) {
-                    card = deck;
-                } else {
-                    const numCards = 1;
-                    const fromFront = true;
-                    const offset = i;
-                    const keep = false;
-                    card = deck.takeCards(numCards, fromFront, offset, keep);
-                    if (!card) {
-                        throw new Error("takeCards failed");
-                    }
-                }
-
-                // Add card to result.
-                if (result) {
-                    const toFront = true;
-                    const offset = 0;
-                    const animate = false;
-                    const flipped = false;
-                    result.addCards(card, toFront, offset, animate, flipped);
-                } else {
-                    result = card;
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Is this card a singleton (not a deck), not held by a player, etc.
-     *
-     * @param obj
-     * @param allowFaceDown
-     * @returns
-     */
-    static isLooseCard(
-        obj: GameObject,
-        allowFaceDown?: boolean,
-        rejectSnapPointTags?: string[]
-    ): boolean {
-        if (rejectSnapPointTags) {
-            const tags: string[] = obj.getSnappedToPoint()?.getTags() ?? [];
-            for (const tag of tags) {
-                if (rejectSnapPointTags.includes(tag)) {
-                    return false;
-                }
-            }
-        }
-        return (
-            obj instanceof Card &&
-            (allowFaceDown || obj.isFaceUp()) &&
-            obj.getStackSize() === 1 &&
-            !obj.getContainer() &&
-            !obj.isHeld() &&
-            !obj.isInHolder() &&
-            obj.isValid()
-        );
-    }
-
-    /**
-     * Split a deck into an array of single-card objects.
-     *
-     * @param deck
-     * @returns
-     */
-    static separateDeck(deck: Card): Card[] {
-        const cards: Card[] = [];
-        while (deck.getStackSize() > 1) {
-            const numCards = 1;
-            const fromFront = true;
-            const offset = 0;
-            const keep = false;
-            const card: Card | undefined = deck.takeCards(
-                numCards,
-                fromFront,
-                offset,
-                keep
-            );
-            if (!card) {
-                throw new Error("takeCards failed");
-            }
-            cards.push(card);
-        }
-        cards.push(deck); // one card remains
-        return cards;
+        return holder?.insert(card, holder.getNumCards()) ?? false;
     }
 
     /**
@@ -145,7 +42,7 @@ export abstract class CardUtil {
      * @param nsid
      * @returns
      */
-    static fetchCard(nsid: string): Card | undefined {
+    fetchCard(nsid: string): Card | undefined {
         // Find card.
         let card: Card | undefined;
         const skipContained = false;
@@ -171,28 +68,24 @@ export abstract class CardUtil {
             const fromFront = true;
             const keep = false;
             card = obj.takeCards(number, fromFront, offset, keep);
-            if (!card) {
-                throw new Error("takeCards failed");
+            if (card) {
+                break;
             }
-            break;
         }
 
         // Remove from container.
-        if (card?.getContainer()) {
-            card.getContainer()?.remove(card);
+        const container: Container | undefined = card?.getContainer();
+        if (card && container) {
+            container.remove(card);
         }
 
         // If found, remove from holder.
-        if (card?.isInHolder()) {
-            const cardHolder: CardHolder | undefined = card.getHolder();
-            if (!cardHolder) {
-                throw new Error("isInHolder true but getHolder undefined");
-            }
+        const cardHolder: CardHolder | undefined = card?.getHolder();
+        if (card && cardHolder) {
             const index = cardHolder.getCards().indexOf(card);
-            if (index < 0) {
-                throw new Error("isInHolder true but not in getCards");
+            if (index >= 0) {
+                cardHolder.removeAt(index);
             }
-            cardHolder.removeAt(index);
         }
 
         // If held, release.
@@ -201,5 +94,117 @@ export abstract class CardUtil {
         }
 
         return card;
+    }
+
+    /**
+     * Extract filter-approved cards into a new deck.  Leave any remaining
+     * cards in the old deck (may potentially become empty).
+     *
+     * @param deck
+     * @param filter
+     * @returns - new deck with filtered cards
+     */
+    filterCards(
+        deck: Card,
+        filter: (nsid: string) => boolean
+    ): Card | undefined {
+        let result: Card | undefined;
+        const nsids = NSID.getDeck(deck);
+        for (let i = nsids.length - 1; i >= 0; i--) {
+            if (filter(nsids[i])) {
+                // Remove card from deck.
+                let card: Card | undefined;
+                if (deck.getStackSize() === 1) {
+                    card = deck;
+                } else {
+                    const numCards = 1;
+                    const fromFront = true;
+                    const offset = i;
+                    const keep = false;
+                    card = deck.takeCards(numCards, fromFront, offset, keep);
+                }
+
+                // Add card to result.
+                if (card) {
+                    if (result) {
+                        const toFront = true;
+                        const offset = 0;
+                        const animate = false;
+                        const flipped = false;
+                        result.addCards(
+                            card,
+                            toFront,
+                            offset,
+                            animate,
+                            flipped
+                        );
+                    } else {
+                        result = card;
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Is this card a singleton (not a deck), not held by a player, etc.
+     *
+     * @param obj
+     * @param allowFaceDown
+     * @returns
+     */
+    isLooseCard(
+        obj: GameObject,
+        allowFaceDown?: boolean,
+        rejectSnapPointTags?: string[]
+    ): boolean {
+        if (rejectSnapPointTags) {
+            const snapPoint: SnapPoint | undefined = obj.getSnappedToPoint();
+            if (snapPoint) {
+                const tags: string[] = snapPoint.getTags();
+                for (const tag of tags) {
+                    if (rejectSnapPointTags.includes(tag)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return (
+            obj instanceof Card &&
+            (allowFaceDown || obj.isFaceUp()) &&
+            obj.getStackSize() === 1 &&
+            !obj.getContainer() &&
+            !obj.isHeld() &&
+            !obj.isInHolder() &&
+            obj.isValid()
+        );
+    }
+
+    /**
+     * Split a deck into an array of single-card objects.
+     *
+     * @param deck
+     * @returns
+     */
+    separateDeck(deck: Card): Card[] {
+        const cards: Card[] = [];
+        while (deck.getStackSize() > 1) {
+            const numCards = 1;
+            const fromFront = true;
+            const offset = 0;
+            const keep = false;
+            const card: Card | undefined = deck.takeCards(
+                numCards,
+                fromFront,
+                offset,
+                keep
+            );
+            if (card) {
+                cards.push(card);
+            }
+        }
+        cards.push(deck); // one card remains
+        return cards;
     }
 }

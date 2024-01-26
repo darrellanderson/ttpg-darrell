@@ -1,4 +1,4 @@
-import { FetchResponse, fetch } from "@tabletop-playground/api";
+import { FetchOptions, FetchResponse, fetch } from "@tabletop-playground/api";
 import { AbstractGlobal } from "../global/abstract-global";
 import { ErrorHandler } from "./error-handler";
 
@@ -36,11 +36,11 @@ export class BugSplatRemoteReporter extends AbstractGlobal {
         this.sendError(error).then(onSuccess, onError);
     }
 
-    sendError(error: string): Promise<FetchResponse> {
-        //const url: string = "https://postman-echo.com/post";
-        const url: string =
-            "https://" + this._database + ".bugsplat.com/post/js/";
+    createURL(): string {
+        return "https://" + this._database + ".bugsplat.com/post/js/";
+    }
 
+    createFetchOptions(error: string): FetchOptions {
         const form: { [key: string]: string } = {
             database: this._database,
             appName: this._appName,
@@ -48,7 +48,7 @@ export class BugSplatRemoteReporter extends AbstractGlobal {
             callstack: error,
         };
 
-        const boundary: string = "boundary";
+        const boundary: string = "~~boundary~~";
         const headers: Record<string, string> = {
             "Content-Type": `multipart/form-data;boundary="${boundary}"`,
         };
@@ -63,6 +63,13 @@ export class BugSplatRemoteReporter extends AbstractGlobal {
         bodyLines.push(`--${boundary}--`);
         const body: string = bodyLines.join("\r\n");
 
-        return fetch(url, { body, headers, method: "POST" });
+        return { body, headers, method: "POST" };
+    }
+
+    sendError(error: string): Promise<FetchResponse> {
+        //const url: string = "https://postman-echo.com/post";
+        const url: string = this.createURL();
+        const options: FetchOptions = this.createFetchOptions(error);
+        return fetch(url, options);
     }
 }

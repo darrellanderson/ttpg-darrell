@@ -69,6 +69,34 @@ it("findCardHolder (not a card holder)", () => {
     }).toThrow();
 });
 
+it("findCardHolderBySlot", () => {
+    const playerSlot = 7;
+    const holder = new MockCardHolder({ owningPlayerSlot: playerSlot });
+    mockWorld._reset({
+        gameObjects: [new MockGameObject(), new MockCardHolder(), holder],
+    });
+
+    const find = new Find();
+    let found: CardHolder | undefined;
+
+    found = find.findCardHolderBySlot(playerSlot);
+    expect(found).toEqual(holder);
+
+    // Cached.
+    found = find.findCardHolderBySlot(playerSlot);
+    expect(found).toEqual(holder);
+});
+
+it("findCardHolderBySlot (missing)", () => {
+    const playerSlot = 7;
+
+    const find = new Find();
+    let found: CardHolder | undefined;
+
+    found = find.findCardHolderBySlot(playerSlot);
+    expect(found).toBeUndefined();
+});
+
 it("findContainer", () => {
     const nsid = "my-nsid";
     const container = new MockContainer({ templateMetadata: nsid });

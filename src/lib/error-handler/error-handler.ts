@@ -203,7 +203,7 @@ export class ErrorHandler extends AbstractGlobal {
         const mappings: string[] = mappingsEncoded.split(";"); // one entry per line
         for (const mapping of mappings) {
             const segments: string[] = mapping.split(",");
-            const firstSegment: string = segments.length > 0 ? segments[0] : "";
+            const firstSegment: string = segments[0];
             const fields = this.parseSourceMappingSegment(firstSegment);
             // [delta-js-col, src-index, delta-ts-line, delta-ts-col, names-index]
             let tsLine: number = fields[2] ?? -1;

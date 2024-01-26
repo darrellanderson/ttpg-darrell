@@ -1,4 +1,4 @@
-import { FetchResponse } from "@tabletop-playground/api";
+import { FetchOptions, FetchResponse } from "@tabletop-playground/api";
 import { BugSplatRemoteReporter } from "./bugsplat-remote-reporter";
 
 it("init", () => {
@@ -7,6 +7,49 @@ it("init", () => {
         appName: "unittest",
         appVersion: "1",
     }).init();
+});
+
+it("createURL", () => {
+    const reporter = new BugSplatRemoteReporter({
+        database: "<your db name here>",
+        appName: "unittest",
+        appVersion: "1",
+    });
+    const url: string = reporter.createURL();
+    expect(url).toEqual("https://<your db name here>.bugsplat.com/post/js/");
+});
+
+it("createFetchOptions", () => {
+    const reporter = new BugSplatRemoteReporter({
+        database: "<your db name here>",
+        appName: "unittest",
+        appVersion: "1",
+    });
+    const options: FetchOptions = reporter.createFetchOptions("my-error");
+    expect(options.method).toEqual("POST");
+    expect(options.headers).toEqual({
+        "Content-Type": 'multipart/form-data;boundary="~~boundary~~"',
+    });
+    expect(options.body?.split("\r\n")).toEqual([
+        "",
+        "--~~boundary~~",
+        'Content-Disposition: form-data; name="database"',
+        "",
+        "<your db name here>",
+        "--~~boundary~~",
+        'Content-Disposition: form-data; name="appName"',
+        "",
+        "unittest",
+        "--~~boundary~~",
+        'Content-Disposition: form-data; name="appVersion"',
+        "",
+        "1",
+        "--~~boundary~~",
+        'Content-Disposition: form-data; name="callstack"',
+        "",
+        "my-error",
+        "--~~boundary~~--",
+    ]);
 });
 
 /*// This test sends an actual crash report, remove from general use!!
