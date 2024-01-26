@@ -4,6 +4,7 @@ import {
     ObjectType,
     world,
 } from "@tabletop-playground/api";
+import { NamedspacedId } from "../namespace-id/namespace-id";
 
 const BLOCK_SIZE = 512; // setSavedData limit 1023 (json trimmings, metadata is extra!)
 const BLOCK_METADATA_SIZE = 32; // be conservative
@@ -16,8 +17,6 @@ const KEY_FREELIST = "f";
 const KEY_NEXT_OBJECT_ID = "o";
 const KEY_NEXT_BLOCK_INDEX = "i";
 const KEY_BLOCK_DATA = "d";
-
-export type NamedspacedId = `@${string}/${string}`;
 
 type DataBlockLocation = {
     obj: GameObject;

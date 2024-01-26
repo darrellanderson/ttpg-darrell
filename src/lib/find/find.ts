@@ -10,6 +10,10 @@ import {
 } from "@tabletop-playground/api";
 import { NSID } from "../nsid/nsid";
 
+/**
+ * Find things in the game world.  Generally speaking finds the first matching
+ * candidate; expecting objects to be unique.
+ */
 export class Find {
     private readonly _nsidAndSlotToGameObject: { [key: string]: GameObject } =
         {};
@@ -64,6 +68,47 @@ export class Find {
         return container;
     }
 
+    findDeckOrDiscard(
+        deckSnapPointTag: string,
+        discardSnapPointTag?: string,
+        shuffleDiscard?: boolean
+    ): Card | undefined {
+        // Look for deck.
+        const deckSnapPoint = this.findSnapPointByTag(deckSnapPointTag);
+        if (!deckSnapPoint) {
+            return undefined;
+        }
+        const deck = deckSnapPoint.getSnappedObject();
+        if (deck && deck instanceof Card && deck.isValid()) {
+            return deck;
+        }
+
+        // No deck, look for discard.
+        if (!discardSnapPointTag) {
+            return undefined;
+        }
+        const discardSnapPoint = this.findSnapPointByTag(discardSnapPointTag);
+        if (!discardSnapPoint) {
+            return undefined;
+        }
+        const discard = discardSnapPoint.getSnappedObject();
+        if (!discard || !(discard instanceof Card) || !discard.isValid()) {
+            return undefined;
+        }
+
+        // Shuffle?
+        if (shuffleDiscard) {
+            discard.shuffle();
+        }
+
+        // Move discard to snap point.
+        const above = deckSnapPoint.getGlobalPosition().add([0, 0, 10]);
+        discard.setPosition(above);
+        discard.setRotation([0, 0, 0]); // let snap handle the yaw
+        discard.snapToGround();
+        discard.snap();
+    }
+
     findDice(
         nsid: string,
         playerSlot?: number,
@@ -90,16 +135,28 @@ export class Find {
         // Check cache.
         const gameObject: GameObject | undefined =
             this._nsidAndSlotToGameObject[key];
-        if (gameObject && gameObject.isValid()) {
+        if (
+            gameObject &&
+            gameObject.isValid() &&
+            (playerSlot === undefined ||
+                gameObject.getOwningPlayerSlot() === playerSlot)
+        ) {
             return gameObject;
         }
 
         // Search (update cache if found).
         for (const obj of world.getAllObjects(skipContained)) {
-            if (NSID.get(obj) === nsid) {
-                this._nsidAndSlotToGameObject[key] = obj;
-                return obj;
+            if (NSID.get(obj) !== nsid) {
+                continue;
             }
+            if (
+                playerSlot !== undefined &&
+                obj.getOwningPlayerSlot() !== playerSlot
+            ) {
+                continue;
+            }
+            this._nsidAndSlotToGameObject[key] = obj;
+            return obj;
         }
     }
 

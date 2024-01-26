@@ -1,8 +1,8 @@
 import { world } from "@tabletop-playground/api";
+import { NamedspacedId } from "../namespace-id/namespace-id";
 import { TriggerableMulticastDelegate } from "../event/triggerable-multicast-delegate";
 import { z } from "zod";
 
-export type NamedspacedId = `@${string}/${string}`;
 export type Direction = "forward" | "reverse" | "snake";
 export type PlayerSlot = number;
 

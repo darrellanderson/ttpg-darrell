@@ -1,6 +1,7 @@
-import { GameObject, Card, SnapPoint, world } from "@tabletop-playground/api";
+import { GameObject, Card, SnapPoint } from "@tabletop-playground/api";
 import { GarbageHandler } from "./garbage-container";
 import { NSID } from "../../nsid/nsid";
+import { Find } from "../../find/find";
 
 /**
  * Recycle cards to a specific snap point on a mat.
@@ -8,25 +9,24 @@ import { NSID } from "../../nsid/nsid";
  * Optionally shuffle after discard.
  */
 export class SimpleCardGarbageHandler implements GarbageHandler {
-    private _matNsid: string = "";
-    private _matSnapPointTag: string = "";
+    private readonly _find: Find = new Find();
     private _cardNsidPrefix: string = "";
+    private _snapPointTag: string = "";
+    private _faceUp: boolean = false;
     private _shuffleAfterDiscard: boolean = false;
-
-    private _discardSnapPoint: SnapPoint | undefined;
-
-    public setMatNsid(matNsid: string): this {
-        this._matNsid = matNsid;
-        return this;
-    }
-
-    public setMatSnapPointTag(tag: string): this {
-        this._matSnapPointTag = tag;
-        return this;
-    }
 
     public setCardNsidPrefix(cardNsidPrefix: string): this {
         this._cardNsidPrefix = cardNsidPrefix;
+        return this;
+    }
+
+    public setSnapPointTag(tag: string): this {
+        this._snapPointTag = tag;
+        return this;
+    }
+
+    public setFaceUp(value: boolean): this {
+        this._faceUp = value;
         return this;
     }
 
@@ -65,7 +65,9 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
         }
 
         // Find mat.
-        const snapPoint: SnapPoint | undefined = this._getDiscardSnapPoint();
+        const snapPoint: SnapPoint | undefined = this._find.findSnapPointByTag(
+            this._snapPointTag
+        );
         if (!snapPoint) {
             return false;
         }
@@ -108,8 +110,7 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
             obj.setPosition(above, animationSpeed);
 
             // Orient when starting a new discard pile.
-            const wantFaceUp = this._shuffleAfterDiscard ? false : true;
-            if (obj.isFaceUp() !== wantFaceUp) {
+            if (obj.isFaceUp() !== this._faceUp) {
                 // Apply instant rotation, flip method animates.
                 const rot = obj.getRotation().compose([0, 0, 180]);
                 obj.setRotation(rot);
@@ -120,42 +121,5 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
         }
 
         return true;
-    }
-
-    private _getDiscardSnapPoint(): SnapPoint | undefined {
-        // Check cache.
-        if (this._discardSnapPoint?.getParentObject()?.isValid()) {
-            return this._discardSnapPoint;
-        }
-        this._discardSnapPoint = undefined;
-
-        // Find mat.
-        let mat = undefined;
-        const skipContained = true;
-        for (const obj of world.getAllObjects(skipContained)) {
-            if (!obj.isValid()) {
-                continue;
-            }
-            const nsid: string = NSID.get(obj);
-            if (nsid === this._matNsid) {
-                mat = obj;
-                break;
-            }
-        }
-        if (!mat) {
-            return undefined;
-        }
-
-        // Find snap point.
-        for (const snapPoint of mat.getAllSnapPoints()) {
-            for (const tag of snapPoint.getTags()) {
-                if (tag === this._matSnapPointTag) {
-                    this._discardSnapPoint = snapPoint; // cache
-                    return snapPoint;
-                }
-            }
-        }
-
-        return undefined;
     }
 }

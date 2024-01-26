@@ -1,6 +1,8 @@
-import { GameObject, SnapPoint, world } from "@tabletop-playground/api";
+import { GameObject, SnapPoint } from "@tabletop-playground/api";
 import { GarbageHandler } from "./garbage-container";
 import { NSID } from "../../nsid/nsid";
+import { Rotator } from "ttpg-mock";
+import { Find } from "../../find/find";
 
 /**
  * Recycle an object to a specific snap point with the matching tag.
@@ -9,22 +11,23 @@ import { NSID } from "../../nsid/nsid";
  */
 export class SimpleToSnapPointHandler implements GarbageHandler {
     private readonly _recycleObjectNsids: Set<string> = new Set<string>();
-    private _matNsid: string = "";
+    private readonly _find: Find = new Find();
+
     private _snapPointTag: string = "";
-    private _cachedSnapPoint: SnapPoint | undefined;
+    private _preSnapRotation: Rotator | undefined;
 
     public addRecycleObjectNsid(nsid: string): this {
         this._recycleObjectNsids.add(nsid);
         return this;
     }
 
-    public setMatNsid(nsid: string): this {
-        this._matNsid = nsid;
+    public setSnapPointTag(tag: string): this {
+        this._snapPointTag = tag;
         return this;
     }
 
-    public setSnapPointTag(tag: string): this {
-        this._snapPointTag = tag;
+    public setPreSnapRotation(rot: Rotator): this {
+        this._preSnapRotation = rot;
         return this;
     }
 
@@ -36,7 +39,9 @@ export class SimpleToSnapPointHandler implements GarbageHandler {
     }
 
     public recycle(obj: GameObject): boolean {
-        const snapPoint = this._getSnapPoint();
+        const snapPoint: SnapPoint | undefined = this._find.findSnapPointByTag(
+            this._snapPointTag
+        );
         if (!snapPoint) {
             return false;
         }
@@ -48,34 +53,11 @@ export class SimpleToSnapPointHandler implements GarbageHandler {
         }
 
         obj.setPosition(snapPoint.getGlobalPosition().add([0, 0, 10]), 1);
+        if (this._preSnapRotation) {
+            obj.setRotation(this._preSnapRotation);
+        }
         obj.snapToGround(); // get in range
         obj.snap();
         return true;
-    }
-
-    _getSnapPoint(): SnapPoint | undefined {
-        // Use cache if valid.
-        if (
-            this._cachedSnapPoint &&
-            this._cachedSnapPoint.getParentObject()?.isValid()
-        ) {
-            return this._cachedSnapPoint;
-        }
-
-        // Search for mat.
-        const skipContained = true;
-        for (const obj of world.getAllObjects(skipContained)) {
-            const nsid = NSID.get(obj);
-            if (nsid !== this._matNsid) {
-                continue;
-            }
-            for (const snapPoint of obj.getAllSnapPoints()) {
-                if (snapPoint.getTags().includes(this._snapPointTag)) {
-                    this._cachedSnapPoint = snapPoint;
-                    return snapPoint;
-                }
-            }
-        }
-        return undefined;
     }
 }

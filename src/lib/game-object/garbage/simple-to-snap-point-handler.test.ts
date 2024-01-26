@@ -18,19 +18,16 @@ it("canRecycleObj", () => {
 
 it("recycle", () => {
     const objNsid = "my-obj-nsid";
-    const matNsid = "my-mat-nsid";
     const snapPointTag = "my-snap-point-tag";
 
     const obj = new MockGameObject({ templateMetadata: objNsid });
     const snapPoint = new MockSnapPoint({ tags: [snapPointTag] });
     const mat = new MockGameObject({
-        templateMetadata: matNsid,
         snapPoints: [snapPoint],
     });
 
     const stsph = new SimpleToSnapPointHandler()
         .addRecycleObjectNsid(objNsid)
-        .setMatNsid(matNsid)
         .setSnapPointTag(snapPointTag);
 
     mockWorld._reset({ gameObjects: [obj, mat] });

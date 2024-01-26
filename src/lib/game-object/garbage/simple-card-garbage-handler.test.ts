@@ -38,8 +38,7 @@ it("recycle (to deck)", () => {
     const cardNsidPrefix = "my-prefix";
 
     const scgh = new SimpleCardGarbageHandler()
-        .setMatNsid(matNsid)
-        .setMatSnapPointTag(snapPointTag)
+        .setSnapPointTag(snapPointTag)
         .setCardNsidPrefix(cardNsidPrefix)
         .setShuffleAfterDiscard(true);
 
@@ -73,8 +72,7 @@ it("recycle (no deck)", () => {
     const deckPos = new MockVector(100, 0, 0);
 
     const scgh = new SimpleCardGarbageHandler()
-        .setMatNsid(matNsid)
-        .setMatSnapPointTag(snapPointTag)
+        .setSnapPointTag(snapPointTag)
         .setCardNsidPrefix(cardNsidPrefix);
 
     const snapPoint = new MockSnapPoint({
@@ -115,8 +113,7 @@ it("recycle (missing mat)", () => {
     const deckPos = new MockVector(100, 0, 0);
 
     const scgh = new SimpleCardGarbageHandler()
-        .setMatNsid(matNsid)
-        .setMatSnapPointTag(snapPointTag)
+        .setSnapPointTag(snapPointTag)
         .setCardNsidPrefix(cardNsidPrefix);
 
     const card: Card = new MockCard({
@@ -135,8 +132,7 @@ it("recycle (missing snap point)", () => {
     const deckPos = new MockVector(100, 0, 0);
 
     const scgh = new SimpleCardGarbageHandler()
-        .setMatNsid(matNsid)
-        .setMatSnapPointTag(snapPointTag)
+        .setSnapPointTag(snapPointTag)
         .setCardNsidPrefix(cardNsidPrefix);
 
     const mat = new MockGameObject({
