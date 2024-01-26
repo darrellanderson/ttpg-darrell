@@ -6,6 +6,7 @@ import {
     GameObject,
     MultistateObject,
     SnapPoint,
+    StaticObject,
     world,
 } from "@tabletop-playground/api";
 import { NSID } from "../nsid/nsid";
@@ -107,6 +108,7 @@ export class Find {
         discard.setRotation([0, 0, 0]); // let snap handle the yaw
         discard.snapToGround();
         discard.snap();
+        return discard;
     }
 
     findDice(
@@ -130,7 +132,7 @@ export class Find {
         playerSlot?: number,
         skipContained: boolean = false
     ): GameObject | undefined {
-        const key = nsid + "@" + playerSlot ?? "";
+        const key = `${nsid}@${playerSlot ?? ""}`;
 
         // Check cache.
         const gameObject: GameObject | undefined =
@@ -185,11 +187,22 @@ export class Find {
         // Check cache.
         let snapPoint: SnapPoint | undefined =
             this._snapPointTagToSnapPoint[tag];
-        if (snapPoint && snapPoint.getParentObject()?.isValid()) {
+        const parent: StaticObject | undefined = snapPoint?.getParentObject();
+        if (snapPoint && (!parent || parent.isValid())) {
             return snapPoint;
         }
 
-        // Search (update cache if found).
+        // Search tables (update cache if found).
+        for (const obj of world.getAllTables()) {
+            for (const snapPoint of obj.getAllSnapPoints()) {
+                if (snapPoint.getTags().includes(tag)) {
+                    this._snapPointTagToSnapPoint[tag] = snapPoint;
+                    return snapPoint;
+                }
+            }
+        }
+
+        // Search objects (update cache if found).
         const skipContained = true;
         for (const obj of world.getAllObjects(skipContained)) {
             for (const snapPoint of obj.getAllSnapPoints()) {
