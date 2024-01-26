@@ -14,16 +14,32 @@ import { NSID } from "../../nsid/nsid";
  */
 export class DeletedItemsContainer {
     public static IGNORE_TAG = "_deleted_items_ignore_";
+    private static readonly _ignoreNSIDs: Set<string> = new Set<string>();
 
     private readonly _container: Container;
     private readonly _oneTimeSkipObjIds: Set<string> = new Set<string>();
-    private readonly _skipNsids: Set<string> = new Set<string>();
 
+    /**
+     * Destroy the object without adding to a deleted items container.
+     *
+     * @param obj
+     */
     static destroyWithoutCopying(obj: GameObject) {
         const tags: string[] = obj.getTags();
         tags.push(this.IGNORE_TAG);
         obj.setTags(tags);
         obj.destroy();
+    }
+
+    /**
+     * Never copy these deleted items.
+     *
+     * @param nsids
+     */
+    static ignoreNSIDs(nsids: string[]) {
+        for (const nsid of nsids) {
+            DeletedItemsContainer._ignoreNSIDs.add(nsid);
+        }
     }
 
     constructor(container: Container) {
@@ -36,7 +52,6 @@ export class DeletedItemsContainer {
         const onDestroyed: (obj: GameObject) => void = (obj) => {
             this._onObjectDestroyed(obj);
         };
-        console.log(`DeletedItemsContainer "${container.getId()}"`);
         globalEvents.onObjectDestroyed.add(onDestroyed);
         container.onDestroyed.add(() => {
             globalEvents.onObjectDestroyed.remove(onDestroyed);
@@ -68,13 +83,6 @@ export class DeletedItemsContainer {
         });
     }
 
-    addSkipNsids(nsids: string[]) {
-        for (const nsid of nsids) {
-            this._skipNsids.add(nsid);
-        }
-        return this;
-    }
-
     _onObjectDestroyed(obj: GameObject) {
         const id = obj.getId();
         if (this._oneTimeSkipObjIds.has(id)) {
@@ -83,7 +91,7 @@ export class DeletedItemsContainer {
         }
 
         const nsid: string = NSID.get(obj);
-        if (this._skipNsids.has(nsid)) {
+        if (DeletedItemsContainer._ignoreNSIDs.has(nsid)) {
             return; // user ignored via NSID
         }
 
@@ -95,8 +103,6 @@ export class DeletedItemsContainer {
             return; // do not keep other versions of this object
         }
 
-        console.log(`onObjectDestroyed:2 "${obj.getId()}"`);
-        /*
         const json: string = obj.toJSONString();
         const clone: GameObject | undefined = world.createObjectFromJSON(
             json,
@@ -105,6 +111,5 @@ export class DeletedItemsContainer {
         if (clone) {
             this._container.addObjects([clone]);
         }
-        */
     }
 }
