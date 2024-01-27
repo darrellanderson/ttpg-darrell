@@ -83,10 +83,10 @@ export class TurnOrder {
         this._snakeNeedsAnotherTurn = state.n === 1;
     }
 
-    nextTurn(): boolean {
+    nextTurn(): PlayerSlot {
         let cursor = this._order.indexOf(this._currentTurn);
         if (cursor < 0) {
-            return false;
+            return -1;
         }
 
         let playerSlot: PlayerSlot = -1;
@@ -97,7 +97,7 @@ export class TurnOrder {
                 this._snakeNeedsAnotherTurn = false;
                 this._direction = -this._direction;
             } else {
-                cursor += this._direction;
+                cursor = (cursor + this._direction + this._order.length) % this._order.length;
             }
 
             // If snake hit end, mark as needing another turn.
@@ -122,7 +122,7 @@ export class TurnOrder {
 
         this._saveState();
         TurnOrder.onTurnStateChanged.trigger();
-        return true;
+        return this._currentTurn;
     }
 
     getCurrentTurn(): PlayerSlot {
@@ -138,26 +138,28 @@ export class TurnOrder {
      * @param playerSlot
      * @returns
      */
-    setCurrentTurn(playerSlot: PlayerSlot): boolean {
+    setCurrentTurn(playerSlot: PlayerSlot): this {
         this._currentTurn = playerSlot;
 
         this._saveState();
         TurnOrder.onTurnStateChanged.trigger();
-        return true;
+        return this;
     }
 
     getTurnOrder(): PlayerSlot[] {
         return [...this._order]; // copy
     }
 
-    setTurnOrder(order: PlayerSlot[], direction: Direction) {
+    setTurnOrder(order: PlayerSlot[], direction: Direction, currentTurn: PlayerSlot): this {
         this._order = order;
         this._direction = direction === "reverse" ? -1 : 1;
         this._snake = direction === "snake";
         this._snakeNeedsAnotherTurn = false;
+        this._currentTurn = currentTurn;
 
         this._saveState();
         TurnOrder.onTurnStateChanged.trigger();
+        return this
     }
 
     getDirection(): Direction {
@@ -167,20 +169,21 @@ export class TurnOrder {
         return this._direction === 1 ? "forward" : "reverse";
     }
 
-    setDirection(direction: Direction) {
+    setDirection(direction: Direction): this {
         this._direction = direction === "reverse" ? -1 : 1;
         this._snake = direction === "snake";
         this._snakeNeedsAnotherTurn = false;
 
         this._saveState();
         TurnOrder.onTurnStateChanged.trigger();
+        return this
     }
 
     getEliminated(playerSlot: PlayerSlot): boolean {
         return this._eliminated.has(playerSlot);
     }
 
-    setEliminated(playerSlot: PlayerSlot, value: boolean) {
+    setEliminated(playerSlot: PlayerSlot, value: boolean): this {
         if (value) {
             this._eliminated.add(playerSlot);
         } else {
@@ -189,13 +192,14 @@ export class TurnOrder {
 
         this._saveState();
         TurnOrder.onTurnStateChanged.trigger();
+        return this
     }
 
     getPassed(playerSlot: PlayerSlot): boolean {
         return this._passed.has(playerSlot);
     }
 
-    setPassed(playerSlot: PlayerSlot, value: boolean) {
+    setPassed(playerSlot: PlayerSlot, value: boolean): this {
         if (value) {
             this._passed.add(playerSlot);
         } else {
@@ -204,5 +208,6 @@ export class TurnOrder {
 
         this._saveState();
         TurnOrder.onTurnStateChanged.trigger();
+        return this
     }
 }
