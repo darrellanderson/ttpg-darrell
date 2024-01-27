@@ -123,10 +123,6 @@ it("create singleton (deck remains)", () => {
     expect(singletonCreatedCount).toEqual(0);
     expect(madeDeckCount).toEqual(0);
 
-    const onObjectCreated =
-        globalEvents.onObjectCreated as MockMulticastDelegate<
-            (object: GameObject) => void
-        >;
     const onRemoved = deck.onRemoved as MockMulticastDelegate<
         (
             deck: MockCard, // "this" means test must name mock type
@@ -140,7 +136,6 @@ it("create singleton (deck remains)", () => {
     if (!removedCard) {
         throw new Error("takeCards");
     }
-    onObjectCreated._trigger(removedCard);
     onRemoved._trigger(deck, removedCard, 0);
     process.flushTicks();
     process.flushTicks(); // onObjectCreated triggers onSingleCardCreated, which waits
@@ -169,10 +164,6 @@ it("create singleton (card remains)", () => {
     expect(singletonCreatedCount).toEqual(0);
     expect(madeDeckCount).toEqual(0);
 
-    const onObjectCreated =
-        globalEvents.onObjectCreated as MockMulticastDelegate<
-            (object: GameObject) => void
-        >;
     const onRemoved = deck.onRemoved as MockMulticastDelegate<
         (
             deck: MockCard, // "this" means test must name mock type
@@ -186,7 +177,6 @@ it("create singleton (card remains)", () => {
     if (!removedCard) {
         throw new Error("takeCards");
     }
-    onObjectCreated._trigger(removedCard);
     onRemoved._trigger(deck, removedCard, 0);
     process.flushTicks();
     process.flushTicks(); // onObjectCreated triggers onSingleCardCreated, which waits

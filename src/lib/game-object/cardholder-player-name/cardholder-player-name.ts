@@ -95,7 +95,9 @@ export class CardHolderPlayerName {
         this._updatePlayerStatus();
     }
 
-    public setColor(color: Color | [r: number, g: number, b: number, a: number]): this {
+    public setColor(
+        color: Color | [r: number, g: number, b: number, a: number]
+    ): this {
         this._nameText.setTextColor(color);
         this._takeSeatButton.setTextColor(color);
         return this;

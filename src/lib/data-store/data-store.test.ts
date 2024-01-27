@@ -6,6 +6,7 @@ it("constructor", () => {
 });
 
 it("set/get/delete", () => {
+    expect(world.getAllObjects().length).toEqual(0);
     const dataId = "@test/my-data-id";
     const data = "my test data";
     const dataStore = new DataStore("@test/test");
@@ -24,6 +25,7 @@ it("set/get/delete", () => {
 });
 
 it("long data", () => {
+    expect(world.getAllObjects().length).toEqual(0);
     const dataId = "@test/my-data-id";
     const data = new Array(4096).fill("x").join("") + "y";
     expect(data.length).toEqual(4097);
@@ -41,6 +43,7 @@ it("long data", () => {
 });
 
 it("overflow single store", () => {
+    expect(world.getAllObjects().length).toEqual(0);
     const dataStore = new DataStore("@test/test");
     expect(world.getAllObjects().length).toEqual(1);
 
