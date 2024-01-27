@@ -8,9 +8,7 @@ import {
 import { NSID } from "../../nsid/nsid";
 
 /**
- * Add this to a container to make a copy of deleted objects.
- *
- * Watch out for cards getting deleted because they are joining a deck.
+ * Add the obj version of this to a container to make a copy of deleted objects.
  */
 export class DeletedItemsContainer {
     public static IGNORE_TAG = "_deleted_items_ignore_";
@@ -66,7 +64,8 @@ export class DeletedItemsContainer {
             // Setting a tag or object saved data is not present on the version
             // seen by onDestroyed.  Rather than adding a flag to the object,
             // keep a short memory and ignore the destroyed.
-            this._oneTimeSkipObjIds.add(insertedCard.getId());
+            const id = insertedCard.getId();
+            this._oneTimeSkipObjIds.add(id);
         };
         const onCreated = (obj: GameObject) => {
             if (obj instanceof Card) {
