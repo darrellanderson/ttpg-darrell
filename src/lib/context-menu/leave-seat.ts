@@ -7,18 +7,23 @@ import { AbstractGlobal } from "../global/abstract-global";
  * any "take seat" buttons).
  */
 export class LeaveSeat implements AbstractGlobal {
-    public init(): void {
-        const actionName: string = "*Leave seat";
-        const tooltip: string = "Switch to non-seat player slot";
-        world.addCustomAction(actionName, tooltip);
+    public static readonly CUSTOM_ACTION_NAME = "* Leave seat";
+    private static readonly _customActionHandler = (
+        player: Player,
+        identifier: string
+    ) => {
+        if (identifier === LeaveSeat.CUSTOM_ACTION_NAME) {
+            LeaveSeat.leaveSeat(player);
+        }
+    };
 
-        globalEvents.onCustomAction.add(
-            (player: Player, identifier: string) => {
-                if (identifier === actionName) {
-                    LeaveSeat.leaveSeat(player);
-                }
-            }
-        );
+    public init(): void {
+        const tooltip: string = "Switch to non-seat player slot";
+        world.removeCustomAction(LeaveSeat.CUSTOM_ACTION_NAME);
+        world.addCustomAction(LeaveSeat.CUSTOM_ACTION_NAME, tooltip);
+
+        globalEvents.onCustomAction.remove(LeaveSeat._customActionHandler);
+        globalEvents.onCustomAction.add(LeaveSeat._customActionHandler);
     }
 
     /**
@@ -27,7 +32,7 @@ export class LeaveSeat implements AbstractGlobal {
      *
      * @param player
      */
-    static leaveSeat(player: Player) {
+    static leaveSeat(player: Player): boolean {
         const busy = new Set();
         for (const player of world.getAllPlayers()) {
             busy.add(player.getSlot());
@@ -42,9 +47,10 @@ export class LeaveSeat implements AbstractGlobal {
                     `LeaveSeat: moving "${player.getName()}" to open slot ${i}`
                 );
                 player.switchSlot(i);
-                return;
+                return true;
             }
         }
         console.log("LeaveSeat: no available player slot");
+        return false;
     }
 }

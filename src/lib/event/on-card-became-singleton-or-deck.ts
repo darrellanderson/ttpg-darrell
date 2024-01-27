@@ -43,7 +43,6 @@ export class OnCardBecameSingletonOrDeck implements AbstractGlobal {
         // This handler is only installed on singleton cards, and other card(s)
         // have already been added to deck before calling this.  So remove
         // this handler, and signal the card is now a deck.
-        const oldNsid: string = NSID.get(deck);
         process.nextTick(() => {
             if (deck.isValid() && deck.getStackSize() > 1) {
                 deck.onInserted.remove(
@@ -55,6 +54,11 @@ export class OnCardBecameSingletonOrDeck implements AbstractGlobal {
                 deck.onRemoved.add(
                     OnCardBecameSingletonOrDeck._onRemovedHandler
                 );
+
+                // Tested in TTPG, with face up and down decks.
+                const nsids: string[] = NSID.getDeck(deck);
+                const oldNsid: string =
+                    nsids[position === 1 ? 0 : nsids.length - 1];
                 OnCardBecameSingletonOrDeck.onSingletonCardMadeDeck.trigger(
                     deck,
                     oldNsid
@@ -124,10 +128,10 @@ export class OnCardBecameSingletonOrDeck implements AbstractGlobal {
         });
     };
 
+    /**
+     * Remove and (re)install handlers.  Safe to call multiple times.
+     */
     init(): void {
-        globalEvents.onObjectCreated.remove(
-            OnCardBecameSingletonOrDeck._onCreatedHandler
-        );
         globalEvents.onObjectCreated.add(
             OnCardBecameSingletonOrDeck._onCreatedHandler
         );
@@ -149,17 +153,3 @@ export class OnCardBecameSingletonOrDeck implements AbstractGlobal {
 if (GameWorld.getExecutionReason() === "unittest") {
     afterEach(() => OnCardBecameSingletonOrDeck._reset());
 }
-
-/*
-
-OnCardBecameSingletonOrDeck.onSingletonCardCreated.add((card: Card) => {
-    const nsid: string = NSID.get(card);
-    console.log(`onSingletonCardCreated: [${nsid}]`);
-});
-
-OnCardBecameSingletonOrDeck.onSingletonCardMadeDeck.add((card: Card) => {
-    const nsids: string[] = NSID.getDeck(card);
-    console.log(`onSingletonCardMadeDeck: [${nsids.join(", ")}]`);
-});
-
-*/
