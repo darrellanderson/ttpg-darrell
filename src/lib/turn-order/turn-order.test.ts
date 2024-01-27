@@ -12,8 +12,7 @@ it("save/restore", () => {
     const passed = 1;
 
     let turnOrder = new TurnOrder(savedDataKey);
-    turnOrder.setTurnOrder(order, "reverse");
-    turnOrder.setCurrentTurn(current);
+    turnOrder.setTurnOrder(order, "reverse", current);
     turnOrder.setEliminated(eliminated, true);
     turnOrder.setPassed(passed, true);
 
@@ -24,3 +23,12 @@ it("save/restore", () => {
     expect(turnOrder.getEliminated(eliminated)).toBeTruthy();
     expect(turnOrder.getPassed(passed)).toBeTruthy();
 });
+
+it('nextTurn', () => {
+    const turnOrder = new TurnOrder('@test/test')
+    turnOrder.setTurnOrder([1, 2, 3], 'forward', 1)
+    expect(turnOrder.getCurrentTurn()).toEqual(1)
+    expect(turnOrder.nextTurn()).toEqual(2)
+    expect(turnOrder.nextTurn()).toEqual(3)
+    expect(turnOrder.nextTurn()).toEqual(1)
+})
