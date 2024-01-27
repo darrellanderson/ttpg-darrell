@@ -95,7 +95,7 @@ export class CardHolderPlayerName {
         this._updatePlayerStatus();
     }
 
-    public setColor(color: Color): this {
+    public setColor(color: Color | [r: number, g: number, b: number, a: number]): this {
         this._nameText.setTextColor(color);
         this._takeSeatButton.setTextColor(color);
         return this;
@@ -117,12 +117,6 @@ export class CardHolderPlayerName {
         this._ui.position = new Vector(x, 0, z);
         this._cardHolder.updateUI(this._ui);
         return this;
-    }
-
-    public attachToCardHolder(obj: CardHolder) {
-        if (!obj || !(obj instanceof CardHolder)) {
-            throw new Error("bad card holder");
-        }
     }
 
     private _updatePlayerStatus(): void {
