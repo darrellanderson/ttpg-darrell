@@ -41,10 +41,15 @@ it("setFont", () => {
     item.setFont("my-font");
 });
 
-it("setFontSize", () => {
+it("setFontSizeAndPosition", () => {
     const cardHolder: CardHolder = new MockCardHolder();
+    cardHolder.setPosition([1, 0, 0]);
+
     const item = new CardHolderPlayerName(cardHolder);
-    item.setFontSize(7);
+    item.setFontSizeAndPosition(7);
+
+    cardHolder.setPosition([-1, 0, 0]); // flips to "far" side.
+    item.setFontSizeAndPosition(7);
 });
 
 it("click to take seat", () => {

@@ -89,7 +89,7 @@ export class CardHolderPlayerName {
         });
 
         cardHolder.addUI(this._ui);
-        this.setColor(cardHolder.getPrimaryColor()).setFontSize(
+        this.setColor(cardHolder.getPrimaryColor()).setFontSizeAndPosition(
             CardHolderPlayerName.DEFAULT_FONT_SIZE
         );
         this._updatePlayerStatus();
@@ -109,12 +109,12 @@ export class CardHolderPlayerName {
         return this;
     }
 
-    public setFontSize(fontSize: number): this {
+    public setFontSizeAndPosition(fontSize: number): this {
         this._nameText.setFontSize(fontSize);
         this._takeSeatButton.setFontSize(fontSize);
 
         // UI position.
-        const x = (this._cardHolder.getPosition().x > 0 ? 1 : -1) * 15;
+        const x = (this._cardHolder.getPosition().x >= 0 ? 1 : -1) * 15;
         const z = fontSize / 5;
         this._ui.position = new Vector(x, 0, z);
         this._cardHolder.updateUI(this._ui);
