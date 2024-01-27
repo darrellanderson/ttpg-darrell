@@ -1,4 +1,5 @@
 import { Button, CardHolder, GameObject, globalEvents, Player, UIElement, WidgetSwitcher } from "@tabletop-playground/api";
+import exp from "constants";
 import { MockButton, MockCardHolder, MockGameObject, MockMulticastDelegate, MockPlayer, mockWorld } from "ttpg-mock";
 import { CardHolderPlayerName } from "./cardholder-player-name";
 
@@ -82,7 +83,6 @@ it('click to take seat (invalid slot)', () => {
 
 it('onPlayerJoined', () => {
     const cardHolder: CardHolder = new MockCardHolder({ owningPlayerSlot: 7 });
-    const player = new MockPlayer({ slot: 7 })
     new CardHolderPlayerName(cardHolder);
     const uis: UIElement[] = cardHolder.getUIs()
     expect(uis.length).toEqual(1)
@@ -91,10 +91,18 @@ it('onPlayerJoined', () => {
     if (!(switcher instanceof WidgetSwitcher)) {
         throw new Error('not WidgetSwitcher')
     }
-    const onPlayerJoined = globalEvents.onPlayerJoined as MockMulticastDelegate<(player: Player) => void>
 
     expect(switcher.getActiveIndex()).toEqual(0)
-    onPlayerJoined._trigger(player)
+
+    let onPlayerJoinedCount = 0
+    expect(globalEvents).toBeDefined()
+    globalEvents.onPlayerJoined.add((player: Player) => {
+        expect(player.getSlot()).toEqual(7)
+        onPlayerJoinedCount++
+    })
+
+    new MockPlayer({ slot: 7 }) // triggers onPlayerJoined
+    expect(onPlayerJoinedCount).toEqual(1)
     process.flushTicks()
     expect(switcher.getActiveIndex()).toEqual(1)
 })
