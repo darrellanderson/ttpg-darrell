@@ -28,10 +28,10 @@ export type TurnOrderWidgetParams = {
 
     // Where should the player name appear?  Defaults to full entry.
     nameBox?: {
-        left: number;
-        top: number;
-        width: number;
-        height: number;
+        left?: number;
+        top?: number;
+        width?: number; // suggest 150
+        height?: number; // suggest 25
     };
 
     // Attach additional items to the turn entry (e.g. score, faction, etc).
@@ -79,20 +79,21 @@ export class TurnEntryWidget {
     private readonly _nameText: Text;
     private readonly _passedText: Text;
     private readonly _warts: TurnEntryWart[] = [];
+    private readonly _nameW: number;
+
+    static computeFontSize(boxHeight: number) {
+        return Math.ceil(boxHeight * 0.5);
+    }
+
+    static truncateLongText(boxWidth: number, text: string): string {
+        const maxLength = Math.floor(boxWidth / 12);
+        if (text.length > maxLength) {
+            return text.substring(0, maxLength);
+        }
+        return text;
+    }
 
     constructor(params: TurnOrderWidgetParams) {
-        this._bgBorder = new Border();
-
-        const fontSize = Math.floor(params.entryHeight * 0.5);
-        this._nameText = new Text()
-            .setBold(true)
-            .setJustification(TextJustification.Center)
-            .setFontSize(fontSize);
-        this._passedText = new Text()
-            .setBold(true)
-            .setJustification(TextJustification.Center)
-            .setFontSize(fontSize);
-
         // Margin aliases.
         const m = {
             l: params.margins?.left ?? 0,
@@ -112,8 +113,21 @@ export class TurnEntryWidget {
             w: params.nameBox?.width ?? params.entryWidth,
             h: params.nameBox?.height ?? params.entryHeight,
         };
-        const d = Math.floor(name.h * 0.05); // tweak to center text vertically
+        const d = Math.floor(name.h * 0.06); // tweak to center text vertically
         name.t += d;
+        this._nameW = name.w;
+
+        this._bgBorder = new Border();
+
+        const fontSize = TurnEntryWidget.computeFontSize(name.h);
+        this._nameText = new Text()
+            .setBold(true)
+            .setJustification(TextJustification.Center)
+            .setFontSize(fontSize);
+        this._passedText = new Text()
+            .setBold(true)
+            .setJustification(TextJustification.Center)
+            .setFontSize(fontSize);
 
         // Wrap the primary canvas in a layout box to enforce size.
         this._canvas = new Canvas()
@@ -129,14 +143,6 @@ export class TurnEntryWidget {
         // canvas positioned to keep margin amounts of content button border.
         const borderSize = 4;
         this._contentButton = new ContentButton().setChild(innerCanvasBox);
-        console.log(
-            [
-                m.l - borderSize,
-                m.t - borderSize,
-                params.entryWidth + (borderSize * 2 - (m.l + m.r)),
-                params.entryHeight + (borderSize * 2 - (m.t + m.b)),
-            ].join(", ")
-        );
         const paddedCanvas = new Canvas().addChild(
             this._contentButton,
             m.l - borderSize,
@@ -193,7 +199,10 @@ export class TurnEntryWidget {
 
         // Name.
         const player: Player | undefined = world.getPlayerBySlot(playerSlot);
-        const playerName = player?.getName() ?? "<>";
+        const playerName = TurnEntryWidget.truncateLongText(
+            this._nameW,
+            player?.getName() ?? "< - >"
+        );
         this._nameText.setText(playerName).setTextColor(fgColor);
 
         // Passed or eliminated?
