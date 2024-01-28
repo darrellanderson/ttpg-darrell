@@ -12,19 +12,65 @@ import {
     world,
 } from "@tabletop-playground/api";
 import { TurnOrder } from "../../turn-order/turn-order";
-import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate";
 
 export type TurnOrderWidgetParams = {
+    // Per-turn entry size, stacked vertically.
     entryWidth: number;
     entryHeight: number;
+
+    // Consume pixels at edges to highlight for mouseover (max useful is 4).
+    margins?: {
+        left?: number;
+        top?: number;
+        right?: number;
+        bottom?: number;
+    };
+
+    // Where should the player name appear?  Defaults to full entry.
     nameBox?: {
         left: number;
         top: number;
         width: number;
         height: number;
     };
+
+    // Attach additional items to the turn entry (e.g. score, faction, etc).
+    wartGenerators?: ((
+        turnEntryWidget: TurnEntryWidget,
+        params: TurnOrderWidgetParams
+    ) => TurnEntryWart)[];
 };
 
+/**
+ * Augment a TurnEntryWidget.  May update its own widgets independently of
+ * changes to turn order (e.g. change score value when score changes).
+ */
+export abstract class TurnEntryWart {
+    protected readonly _turnEntryWidget: TurnEntryWidget;
+    protected readonly _params: TurnOrderWidgetParams;
+
+    constructor(
+        turnEntryWidget: TurnEntryWidget,
+        params: TurnOrderWidgetParams
+    ) {
+        this._turnEntryWidget = turnEntryWidget;
+        this._params = params;
+    }
+
+    /**
+     * TurnEntryWidget retired, remove any event handlers, etc.
+     */
+    abstract destroy(): void;
+
+    /**
+     * Update the turn entry widget.
+     */
+    abstract update(playerSlot: number): void;
+}
+
+/**
+ * A single widget in the TurnOrderWidget's vertical stack.
+ */
 export class TurnEntryWidget {
     private readonly _widget: LayoutBox;
     private readonly _contentButton: ContentButton;
@@ -32,6 +78,7 @@ export class TurnEntryWidget {
     private readonly _bgBorder: Border;
     private readonly _nameText: Text;
     private readonly _passedText: Text;
+    private readonly _warts: TurnEntryWart[] = [];
 
     constructor(params: TurnOrderWidgetParams) {
         this._bgBorder = new Border();
@@ -46,53 +93,76 @@ export class TurnEntryWidget {
             .setJustification(TextJustification.Center)
             .setFontSize(fontSize);
 
-        const nameLeft = params.nameBox?.left ?? 0;
-        let nameTop = params.nameBox?.top ?? 0;
-        const nameWidth = params.nameBox?.width ?? params.entryWidth;
-        let nameHeight = params.nameBox?.height ?? params.entryHeight;
+        // Margin aliases.
+        const m = {
+            l: params.margins?.left ?? 0,
+            t: params.margins?.top ?? 0,
+            r: params.margins?.right ?? 0,
+            b: params.margins?.bottom ?? 0,
+            w: 0, // remaining width
+            h: 0, // remaining height
+        };
+        m.w = params.entryWidth - (m.l + m.r) + 2; // dunno why off by 2
+        m.h = params.entryHeight - (m.t + m.b);
 
-        // Tweak name box to center text vertically.
-        const d = Math.floor(nameHeight * 0.05);
-        nameTop += d;
-        nameHeight -= d;
+        // Name postition.
+        const name = {
+            l: (params.nameBox?.left ?? 0) - m.l,
+            t: (params.nameBox?.top ?? 0) - m.t,
+            w: params.nameBox?.width ?? params.entryWidth,
+            h: params.nameBox?.height ?? params.entryHeight,
+        };
+        const d = Math.floor(name.h * 0.05); // tweak to center text vertically
+        name.t += d;
 
+        // Wrap the primary canvas in a layout box to enforce size.
         this._canvas = new Canvas()
-            .addChild(
-                this._bgBorder,
-                0,
-                0,
-                params.entryWidth,
-                params.entryHeight
-            )
-            .addChild(this._nameText, nameLeft, nameTop, nameWidth, nameHeight)
-            .addChild(
-                this._passedText,
-                nameLeft,
-                nameTop,
-                nameWidth,
-                nameHeight
-            );
-
-        // Strip the top and bottom from the content button border.
-        // Nest it inside a slightly shorter canvas, at negative top offset.
-        const borderSize = 4;
-        const box = new LayoutBox()
-            .setOverrideWidth(params.entryWidth - borderSize * 2)
-            .setOverrideHeight(params.entryHeight)
+            .addChild(this._bgBorder, 0, 0, m.w, m.h)
+            .addChild(this._nameText, name.l, name.t, name.w, name.h)
+            .addChild(this._passedText, name.l, name.t, name.w, name.h);
+        const innerCanvasBox = new LayoutBox()
+            .setOverrideWidth(m.w)
+            .setOverrideHeight(m.h)
             .setChild(this._canvas);
-        this._contentButton = new ContentButton().setChild(box);
+
+        // Place primary canvas in a content button, then nest that in another
+        // canvas positioned to keep margin amounts of content button border.
+        const borderSize = 4;
+        this._contentButton = new ContentButton().setChild(innerCanvasBox);
+        console.log(
+            [
+                m.l - borderSize,
+                m.t - borderSize,
+                params.entryWidth + (borderSize * 2 - (m.l + m.r)),
+                params.entryHeight + (borderSize * 2 - (m.t + m.b)),
+            ].join(", ")
+        );
         const paddedCanvas = new Canvas().addChild(
             this._contentButton,
-            0,
-            -borderSize,
-            params.entryWidth,
-            params.entryHeight + borderSize * 2
+            m.l - borderSize,
+            m.t - borderSize,
+            m.w + borderSize * 2,
+            m.h + borderSize * 2
         );
 
         this._widget = new LayoutBox()
             .setOverrideWidth(params.entryWidth)
             .setOverrideHeight(params.entryHeight)
             .setChild(paddedCanvas);
+
+        // Attach warts.
+        if (params.wartGenerators) {
+            for (const wartGenerator of params.wartGenerators) {
+                const wart: TurnEntryWart = wartGenerator(this, params);
+                this._warts.push(wart);
+            }
+        }
+    }
+
+    public destroy(): void {
+        for (const wart of this._warts) {
+            wart.destroy();
+        }
     }
 
     public getWidget(): Widget {
@@ -148,6 +218,11 @@ export class TurnEntryWidget {
                 turnOrder.setCurrentTurn(playerSlot);
             }
         );
+
+        // Warts.
+        for (const wart of this._warts) {
+            wart.update(playerSlot);
+        }
     }
 }
 
@@ -185,6 +260,9 @@ export class TurnOrderWidget {
         // Only reset turn widgets if the number of turn entries changes.
         if (this._turnEntryWidgets.length !== order.length) {
             this._widget.removeAllChildren();
+            for (const turnEnryWidget of this._turnEntryWidgets) {
+                turnEnryWidget.destroy();
+            }
             this._turnEntryWidgets = [];
             for (let i = 0; i < order.length; i++) {
                 const turnEnryWidget = new TurnEntryWidget(this._params);

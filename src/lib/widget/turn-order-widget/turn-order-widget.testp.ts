@@ -16,6 +16,12 @@ const h = 50;
 const turnOrderWidget = new TurnOrderWidget(turnOrder, {
     entryWidth: w,
     entryHeight: h,
+    margins: {
+        left: 4,
+        right: 4,
+        top: 0,
+        bottom: 0,
+    },
 });
 
 const screenUI = new ScreenUIElement();
