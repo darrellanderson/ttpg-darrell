@@ -12,6 +12,7 @@ import {
     world,
 } from "@tabletop-playground/api";
 import { TurnOrder } from "../../turn-order/turn-order";
+import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate";
 
 export type TurnOrderWidgetParams = {
     entryWidth: number;
@@ -102,19 +103,20 @@ export class TurnEntryWidget {
         return this._canvas;
     }
 
-    public update(turnOrder: TurnOrder, playerSlot: number): void {
-        const slotColor: Color = world.getSlotColor(playerSlot);
-        const blackColor: Color = new Color(0, 0, 0, 1);
-
-        let bgColor: Color | undefined;
-        let fgColor: Color | undefined;
+    public getFgBgColors(
+        turnOrder: TurnOrder,
+        playerSlot: number
+    ): { fgColor: Color; bgColor: Color } {
+        let fgColor: Color = world.getSlotColor(playerSlot);
+        let bgColor: Color = new Color(0, 0, 0, 1);
         if (turnOrder.getCurrentTurn() === playerSlot) {
-            bgColor = slotColor;
-            fgColor = blackColor;
-        } else {
-            bgColor = blackColor;
-            fgColor = slotColor;
+            [fgColor, bgColor] = [bgColor, fgColor];
         }
+        return { fgColor, bgColor };
+    }
+
+    public update(turnOrder: TurnOrder, playerSlot: number): void {
+        const { fgColor, bgColor } = this.getFgBgColors(turnOrder, playerSlot);
 
         // Background.
         this._bgBorder.setColor(bgColor);
@@ -134,6 +136,7 @@ export class TurnEntryWidget {
         }
         this._passedText.setText(passedValue).setTextColor(fgColor);
 
+        // Click behavior.
         this._contentButton.onClicked.clear();
         this._contentButton.onClicked.add(
             (button: ContentButton, player: Player) => {

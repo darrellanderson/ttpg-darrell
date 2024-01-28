@@ -1,10 +1,5 @@
 import { Card, Container, Player } from "@tabletop-playground/api";
-import {
-    MockCard,
-    MockContainer,
-    MockGameObject,
-    MockMulticastDelegate,
-} from "ttpg-mock";
+import { MockCard, MockContainer, MockGameObject, MockPlayer } from "ttpg-mock";
 import { DeletedItemsContainer } from "./deleted-items-container";
 
 it("constructor", () => {
@@ -71,20 +66,15 @@ it("ignore cards getting added to decks", () => {
     const card1 = new MockCard();
     const card2 = new MockCard();
 
-    const onInserted = card1.onInserted as MockMulticastDelegate<
-        (
-            card: MockCard,
-            insertedCard: Card,
-            position: number,
-            player?: Player
-        ) => void
-    >;
-    // onInserted should be called with the already merged deck, but it
-    // also destroys the inserted card.  We need to get the onInserted event
-    // before the onObjectDestroyed event to ignore the deleted card, so
-    // fudge it here.
-    onInserted._trigger(card1, card2, 0);
-    card1.addCards(card2); // destroys card2
+    const player = new MockPlayer();
+    card1._addCardsAsPlayer(
+        card2,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        player
+    );
     expect(card2.isValid()).toBeFalsy();
 });
 
