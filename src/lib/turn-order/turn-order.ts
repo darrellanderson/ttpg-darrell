@@ -28,7 +28,7 @@ type TurnOrderState = z.infer<typeof TURN_ORDER_STATE_SCHEMA>;
  */
 export class TurnOrder {
     public static readonly onTurnStateChanged =
-        new TriggerableMulticastDelegate<() => void>();
+        new TriggerableMulticastDelegate<(turnOrder: TurnOrder) => void>();
 
     private readonly _savedDataKey: NamedspacedId;
     private readonly _passed: Set<PlayerSlot> = new Set();
@@ -43,6 +43,10 @@ export class TurnOrder {
     constructor(savedDataKey: NamedspacedId) {
         this._savedDataKey = savedDataKey;
         this._restoreState();
+    }
+
+    getId(): NamedspacedId {
+        return this._savedDataKey;
     }
 
     _saveState() {
@@ -97,7 +101,9 @@ export class TurnOrder {
                 this._snakeNeedsAnotherTurn = false;
                 this._direction = -this._direction;
             } else {
-                cursor = (cursor + this._direction + this._order.length) % this._order.length;
+                cursor =
+                    (cursor + this._direction + this._order.length) %
+                    this._order.length;
             }
 
             // If snake hit end, mark as needing another turn.
@@ -121,7 +127,7 @@ export class TurnOrder {
         this._currentTurn = playerSlot;
 
         this._saveState();
-        TurnOrder.onTurnStateChanged.trigger();
+        TurnOrder.onTurnStateChanged.trigger(this);
         return this._currentTurn;
     }
 
@@ -142,7 +148,7 @@ export class TurnOrder {
         this._currentTurn = playerSlot;
 
         this._saveState();
-        TurnOrder.onTurnStateChanged.trigger();
+        TurnOrder.onTurnStateChanged.trigger(this);
         return this;
     }
 
@@ -150,7 +156,11 @@ export class TurnOrder {
         return [...this._order]; // copy
     }
 
-    setTurnOrder(order: PlayerSlot[], direction: Direction, currentTurn: PlayerSlot): this {
+    setTurnOrder(
+        order: PlayerSlot[],
+        direction: Direction,
+        currentTurn: PlayerSlot
+    ): this {
         this._order = order;
         this._direction = direction === "reverse" ? -1 : 1;
         this._snake = direction === "snake";
@@ -158,8 +168,8 @@ export class TurnOrder {
         this._currentTurn = currentTurn;
 
         this._saveState();
-        TurnOrder.onTurnStateChanged.trigger();
-        return this
+        TurnOrder.onTurnStateChanged.trigger(this);
+        return this;
     }
 
     getDirection(): Direction {
@@ -175,8 +185,8 @@ export class TurnOrder {
         this._snakeNeedsAnotherTurn = false;
 
         this._saveState();
-        TurnOrder.onTurnStateChanged.trigger();
-        return this
+        TurnOrder.onTurnStateChanged.trigger(this);
+        return this;
     }
 
     getEliminated(playerSlot: PlayerSlot): boolean {
@@ -191,8 +201,8 @@ export class TurnOrder {
         }
 
         this._saveState();
-        TurnOrder.onTurnStateChanged.trigger();
-        return this
+        TurnOrder.onTurnStateChanged.trigger(this);
+        return this;
     }
 
     getPassed(playerSlot: PlayerSlot): boolean {
@@ -207,7 +217,7 @@ export class TurnOrder {
         }
 
         this._saveState();
-        TurnOrder.onTurnStateChanged.trigger();
-        return this
+        TurnOrder.onTurnStateChanged.trigger(this);
+        return this;
     }
 }
