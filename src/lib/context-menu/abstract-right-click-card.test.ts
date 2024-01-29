@@ -1,11 +1,5 @@
 import { Card, GameObject, Player } from "@tabletop-playground/api";
-import {
-    MockCard,
-    MockCardDetails,
-    MockMulticastDelegate,
-    MockPlayer,
-    mockWorld,
-} from "ttpg-mock";
+import { MockCard, MockCardDetails, MockPlayer, mockWorld } from "ttpg-mock";
 import { AbstractRightClickCard } from "./abstract-right-click-card";
 import { OnCardBecameSingletonOrDeck } from "../event/on-card-became-singleton-or-deck";
 
@@ -44,21 +38,9 @@ it("singleton yes", () => {
     new MyClass(cardNsid, customActionName, customActionHandler).init();
     process.flushTicks();
 
-    const onCustomAction = card.onCustomAction as MockMulticastDelegate<
-        (object: MockCard, player: Player, identifier: string) => void
-    >;
-    const onInserted = card.onInserted as MockMulticastDelegate<
-        (
-            card: MockCard,
-            insertedCard: Card,
-            position: number,
-            player?: Player
-        ) => void
-    >;
-
     expect(customActionCount).toEqual(0);
 
-    onCustomAction._trigger(card, player, customActionName);
+    card._customActionAsPlayer(player, customActionName);
     expect(customActionCount).toEqual(1);
 
     // make deck.
@@ -69,8 +51,14 @@ it("singleton yes", () => {
     expect(card2.getStackSize()).toEqual(1);
     expect(card2.isValid()).toBeTruthy();
 
-    const addSucceeded: boolean = card.addCards(card2);
-    onInserted._trigger(card, card2, 1, player);
+    const addSucceeded: boolean = card._addCardsAsPlayer(
+        card2,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        player
+    );
     process.flushTicks();
 
     expect(addSucceeded).toBeTruthy();
@@ -78,6 +66,6 @@ it("singleton yes", () => {
     expect(card2.isValid()).toBeFalsy();
 
     // Custom event handler got removed.
-    onCustomAction._trigger(card, player, customActionName);
+    card._customActionAsPlayer(player, customActionName);
     expect(customActionCount).toEqual(1);
 });

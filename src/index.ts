@@ -26,6 +26,9 @@ export * from "./lib/spawn/spawn";
 export * from "./lib/turn-order/turn-order";
 export * from "./lib/widget/confirm-button/confirm-button";
 export * from "./lib/widget/d6widget/d6widget";
+export * from "./lib/widget/turn-order-widget/turn-clicked-widget";
+export * from "./lib/widget/turn-order-widget/turn-entry-wart";
+export * from "./lib/widget/turn-order-widget/turn-entry-widget";
 export * from "./lib/widget/turn-order-widget/turn-order-widget";
 
 import locale_data from "./locale.data";

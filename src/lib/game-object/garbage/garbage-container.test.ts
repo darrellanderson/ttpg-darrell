@@ -4,7 +4,6 @@ import {
     MockCardDetails,
     MockContainer,
     MockGameObject,
-    MockMulticastDelegate,
     MockPlayer,
 } from "ttpg-mock";
 import { GarbageContainer, GarbageHandler } from "./garbage-container";
@@ -197,24 +196,21 @@ it("container onInserted", () => {
     GarbageContainer.addHandler(new RecycleAll());
     GarbageContainer.onRecycled.add(onRecycledHandler);
 
-    const container: Container = new MockContainer();
+    const container: MockContainer = new MockContainer();
     new GarbageContainer(container);
-    const onInserted = container.onInserted as MockMulticastDelegate<
-        (
-            container: Container,
-            insertedObjects: GameObject[],
-            player: Player
-        ) => void
-    >;
 
     const obj1 = new MockGameObject({ id: "my-obj-1" });
     const obj2 = new MockGameObject({ id: "my-obj-2" });
     const obj3 = new MockGameObject({ id: "my-obj-2" });
     const player = new MockPlayer();
 
-    container.addObjects([obj1, obj2, obj3]);
+    container._addObjectsAsPlayer(
+        [obj1, obj2, obj3],
+        undefined,
+        undefined,
+        player
+    );
     expect(container.getItems()).toEqual([obj1, obj2, obj3]);
-    onInserted._trigger(container, [obj1, obj2, obj3], player);
 
     // Destroy before processing.
     obj2.destroy();

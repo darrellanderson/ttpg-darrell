@@ -1,12 +1,6 @@
 import { Card, GameObject, Player } from "@tabletop-playground/api";
 import { AbstractRightClickDeck } from "./abstract-right-click-deck";
-import {
-    MockCard,
-    MockCardDetails,
-    MockMulticastDelegate,
-    MockPlayer,
-    mockWorld,
-} from "ttpg-mock";
+import { MockCard, MockCardDetails, MockPlayer, mockWorld } from "ttpg-mock";
 import { OnCardBecameSingletonOrDeck } from "../event/on-card-became-singleton-or-deck";
 
 it("constructor", () => {
@@ -47,36 +41,29 @@ it("deck yes", () => {
     new MyClass(deckNsidPrefix, customActionName, customActionHandler).init();
     process.flushTicks();
 
-    const onCustomAction = deck.onCustomAction as MockMulticastDelegate<
-        (object: MockCard, player: Player, identifier: string) => void
-    >;
-    const onRemoved = deck.onRemoved as MockMulticastDelegate<
-        (
-            deck: MockCard,
-            removedCard: Card,
-            position: number,
-            player?: Player
-        ) => void
-    >;
-
     expect(customActionCount).toEqual(0);
 
-    onCustomAction._trigger(deck, player, customActionName);
+    deck._customActionAsPlayer(player, customActionName);
     expect(customActionCount).toEqual(1);
 
     // convert deck into singleton
     expect(deck.getStackSize()).toEqual(2);
 
-    const card: Card | undefined = deck.takeCards(1);
+    const card: Card | undefined = deck._takeCardsAsPlayer(
+        1,
+        undefined,
+        undefined,
+        undefined,
+        player
+    );
     expect(card).toBeDefined();
     if (!card) {
         throw new Error("takeCards failed");
     }
-    onRemoved._trigger(deck, card, 0, player);
     process.flushTicks();
 
     // Custom event handler got removed.
-    onCustomAction._trigger(deck, player, customActionName);
+    deck._customActionAsPlayer(player, customActionName);
     expect(customActionCount).toEqual(1);
 });
 
@@ -105,21 +92,9 @@ it("deck no", () => {
     new MyClass(deckNsidPrefix, customActionName, customActionHandler).init();
     process.flushTicks();
 
-    const onCustomAction = deck.onCustomAction as MockMulticastDelegate<
-        (object: MockCard, player: Player, identifier: string) => void
-    >;
-    const onRemoved = deck.onRemoved as MockMulticastDelegate<
-        (
-            deck: MockCard,
-            removedCard: Card,
-            position: number,
-            player?: Player
-        ) => void
-    >;
-
     expect(customActionCount).toEqual(0);
 
     // Cards do not match require nsid prefix, no handler installed.
-    onCustomAction._trigger(deck, player, customActionName);
+    deck._customActionAsPlayer(player, customActionName);
     expect(customActionCount).toEqual(0);
 });

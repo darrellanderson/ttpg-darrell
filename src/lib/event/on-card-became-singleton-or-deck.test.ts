@@ -2,7 +2,7 @@ import {
     MockCard,
     MockCardDetails,
     MockGameObject,
-    MockMulticastDelegate,
+    MockPlayer,
     mockWorld,
 } from "ttpg-mock";
 import { OnCardBecameSingletonOrDeck } from "./on-card-became-singleton-or-deck";
@@ -82,17 +82,15 @@ it("create deck", () => {
     expect(singletonCreatedCount).toEqual(0);
     expect(madeDeckCount).toEqual(0);
 
-    const onInserted = card1.onInserted as MockMulticastDelegate<
-        (
-            deck: MockCard, // "this" means test must name mock type
-            insertedCard: Card,
-            position: number,
-            player?: Player
-        ) => void
-    >;
-
-    card1.addCards(card2);
-    onInserted._trigger(card1, card2, 0);
+    const player = new MockPlayer();
+    card1._addCardsAsPlayer(
+        card2,
+        undefined,
+        undefined,
+        undefined,
+        undefined,
+        player
+    );
     process.flushTicks();
 
     expect(singletonCreatedCount).toEqual(0);
@@ -123,20 +121,17 @@ it("create singleton (deck remains)", () => {
     expect(singletonCreatedCount).toEqual(0);
     expect(madeDeckCount).toEqual(0);
 
-    const onRemoved = deck.onRemoved as MockMulticastDelegate<
-        (
-            deck: MockCard, // "this" means test must name mock type
-            removedCard: Card,
-            position: number,
-            player?: Player
-        ) => void
-    >;
-
-    const removedCard: Card | undefined = deck.takeCards(1);
+    const player = new MockPlayer();
+    const removedCard: Card | undefined = deck._takeCardsAsPlayer(
+        1,
+        undefined,
+        undefined,
+        undefined,
+        player
+    );
     if (!removedCard) {
         throw new Error("takeCards");
     }
-    onRemoved._trigger(deck, removedCard, 0);
     process.flushTicks();
     process.flushTicks(); // onObjectCreated triggers onSingleCardCreated, which waits
 
@@ -164,20 +159,17 @@ it("create singleton (card remains)", () => {
     expect(singletonCreatedCount).toEqual(0);
     expect(madeDeckCount).toEqual(0);
 
-    const onRemoved = deck.onRemoved as MockMulticastDelegate<
-        (
-            deck: MockCard, // "this" means test must name mock type
-            removedCard: Card,
-            position: number,
-            player?: Player
-        ) => void
-    >;
-
-    const removedCard: Card | undefined = deck.takeCards(1);
+    const player = new MockPlayer();
+    const removedCard: Card | undefined = deck._takeCardsAsPlayer(
+        1,
+        undefined,
+        undefined,
+        undefined,
+        player
+    );
     if (!removedCard) {
         throw new Error("takeCards");
     }
-    onRemoved._trigger(deck, removedCard, 0);
     process.flushTicks();
     process.flushTicks(); // onObjectCreated triggers onSingleCardCreated, which waits
 

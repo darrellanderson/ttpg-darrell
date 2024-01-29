@@ -1,7 +1,5 @@
 import {
-    Button,
     CardHolder,
-    GameObject,
     globalEvents,
     Player,
     UIElement,
@@ -11,7 +9,6 @@ import {
     MockButton,
     MockCardHolder,
     MockGameObject,
-    MockMulticastDelegate,
     MockPlayer,
     mockWorld,
 } from "ttpg-mock";
@@ -68,11 +65,8 @@ it("click to take seat", () => {
     if (!(button instanceof MockButton)) {
         throw new Error("not Button");
     }
-    const onClicked = button.onClicked as MockMulticastDelegate<
-        (button: MockButton, player: Player) => void
-    >;
     expect(player.getSlot()).toEqual(1);
-    onClicked._trigger(button, player);
+    button._clickAsPlayer(player);
     expect(player.getSlot()).toEqual(7);
 
     process.flushTicks();
@@ -93,12 +87,9 @@ it("click to take seat (invalid slot)", () => {
     if (!(button instanceof MockButton)) {
         throw new Error("not Button");
     }
-    const onClicked = button.onClicked as MockMulticastDelegate<
-        (button: MockButton, player: Player) => void
-    >;
     const player = new MockPlayer({ slot: 1 });
     expect(() => {
-        onClicked._trigger(button, player);
+        button._clickAsPlayer(player);
     }).toThrow();
 });
 

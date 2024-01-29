@@ -3,8 +3,8 @@ import { LeaveSeat } from "./leave-seat";
 import {
     GameObject,
     MockGameObject,
-    MockMulticastDelegate,
     MockPlayer,
+    mockGlobalEvents,
     mockWorld,
 } from "ttpg-mock";
 
@@ -39,11 +39,10 @@ it("leaveSeat (context menu event)", () => {
     mockWorld._reset({ gameObjects: [obj], players: [player] });
 
     expect(player.getSlot()).toEqual(0);
-    (
-        globalEvents.onCustomAction as MockMulticastDelegate<
-            (player: Player, identifier: string) => void
-        >
-    )._trigger(player, LeaveSeat.CUSTOM_ACTION_NAME);
+    mockGlobalEvents._customActionAsPlayer(
+        player,
+        LeaveSeat.CUSTOM_ACTION_NAME
+    );
     expect(player.getSlot()).toEqual(2);
 
     jest.restoreAllMocks();
