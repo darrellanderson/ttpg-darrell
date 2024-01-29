@@ -22,7 +22,7 @@ it("createWidget", () => {
         playerSlot,
         clickingPlayer
     );
-    turnClickedWidget.createWidget();
+    turnClickedWidget.getWidget();
 });
 
 it("attach/detach", () => {

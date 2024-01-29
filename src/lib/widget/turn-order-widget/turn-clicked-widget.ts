@@ -22,10 +22,9 @@ import { TurnOrderWidgetParams } from "./turn-order-widget";
 export class TurnClickedWidget {
     private readonly _turnOrder: TurnOrder;
     private readonly _params: TurnOrderWidgetParams;
-    private readonly _playerSlot: number;
-    private readonly _clickingPlayerName: string;
     private readonly _clickingPlayerSlot: number;
-    private readonly _targetPlayerName: string;
+    private readonly _targetPlayerIndex: number;
+    private readonly _widget: Widget;
 
     private _screenUI: ScreenUIElement | undefined;
 
@@ -37,56 +36,52 @@ export class TurnClickedWidget {
     ) {
         this._turnOrder = turnOrder;
         this._params = params;
-        this._playerSlot = playerSlot;
-        this._clickingPlayerName = clickingPlayer.getName();
         this._clickingPlayerSlot = clickingPlayer.getSlot();
+
+        const clickingPlayerName = clickingPlayer.getName();
 
         const targetPlayer: Player | undefined =
             world.getPlayerBySlot(playerSlot);
-        this._targetPlayerName =
+        const targetPlayerName =
             targetPlayer?.getName() ?? locale("player_name_missing");
-
-        this.attachToScreen();
-    }
-
-    createWidget(): Widget {
-        const player: Player | undefined = world.getPlayerBySlot(
-            this._playerSlot
+        this._targetPlayerIndex = Math.max(
+            this._turnOrder.getTurnOrder().indexOf(playerSlot),
+            0
         );
-        const playerName: string = player?.getName() ?? "<empty>";
+
         const header = new Text()
-            .setText(playerName)
+            .setText(targetPlayerName)
             .setJustification(TextJustification.Center);
 
         const setTurn = new Button().setText("Set current turn");
         setTurn.onClicked.add((button: Button, player: Player) => {
-            const msg = `${this._clickingPlayerName} set current turn to ${this._targetPlayerName}`;
+            const msg = `${clickingPlayerName} set current turn to ${targetPlayerName}`;
             console.log(msg);
-            if (this._turnOrder.getTurnOrder().indexOf(this._playerSlot) >= 0) {
-                this._turnOrder.setCurrentTurn(this._playerSlot);
+            if (this._turnOrder.getTurnOrder().indexOf(playerSlot) >= 0) {
+                this._turnOrder.setCurrentTurn(playerSlot);
             }
             this.detachFromScreen();
         });
 
-        const isPassed: boolean = this._turnOrder.getPassed(this._playerSlot);
+        const isPassed: boolean = this._turnOrder.getPassed(playerSlot);
         const passed = new Button().setText(
             isPassed ? "Clear passed" : "Set passed"
         );
         passed.onClicked.add((button: Button, player: Player) => {
-            const msg = `${this._clickingPlayerName} toggled passed for ${this._targetPlayerName}`;
+            const msg = `${clickingPlayerName} toggled passed for ${targetPlayerName}`;
             console.log(msg);
-            this._turnOrder.setPassed(this._playerSlot, !isPassed);
+            this._turnOrder.setPassed(playerSlot, !isPassed);
             this.detachFromScreen();
         });
 
-        const isEliminated = this._turnOrder.getEliminated(this._playerSlot);
+        const isEliminated = this._turnOrder.getEliminated(playerSlot);
         const eliminated = new Button().setText(
             isEliminated ? "Clear eliminated" : "Set eliminated"
         );
         eliminated.onClicked.add((button: Button, player: Player) => {
-            const msg = `${this._clickingPlayerName} toggled eliminated for ${this._targetPlayerName}`;
+            const msg = `${clickingPlayerName} toggled eliminated for ${targetPlayerName}`;
             console.log(msg);
-            this._turnOrder.setEliminated(this._playerSlot, !isEliminated);
+            this._turnOrder.setEliminated(playerSlot, !isEliminated);
             this.detachFromScreen();
         });
 
@@ -101,17 +96,18 @@ export class TurnClickedWidget {
             .addChild(passed)
             .addChild(eliminated)
             .addChild(cancel);
-        return new LayoutBox()
+        this._widget = new LayoutBox()
             .setVerticalAlignment(VerticalAlignment.Top)
             .setChild(new Border().setChild(panel));
+
+        this.attachToScreen();
+    }
+
+    getWidget(): Widget {
+        return this._widget;
     }
 
     attachToScreen(): this {
-        const index = Math.max(
-            this._turnOrder.getTurnOrder().indexOf(this._playerSlot),
-            0
-        );
-
         if (this._screenUI) {
             world.removeScreenUIElement(this._screenUI);
             this._screenUI = undefined;
@@ -121,13 +117,13 @@ export class TurnClickedWidget {
         this._screenUI.anchorY = 0;
         this._screenUI.positionX = 1;
         this._screenUI.positionY = Math.round(
-            this._params.entryHeight * (index + 1.1)
+            this._params.entryHeight * (this._targetPlayerIndex + 1.1)
         );
         this._screenUI.relativePositionX = true;
         this._screenUI.relativePositionY = false;
         this._screenUI.height = 300;
         this._screenUI.width = 200;
-        this._screenUI.widget = this.createWidget();
+        this._screenUI.widget = this.getWidget();
         this._screenUI.players = new PlayerPermission().setPlayerSlots([
             this._clickingPlayerSlot,
         ]);
