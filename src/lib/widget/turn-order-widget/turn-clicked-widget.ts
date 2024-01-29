@@ -13,12 +13,15 @@ import {
     world,
 } from "@tabletop-playground/api";
 import { locale } from "../../locale/locale";
+import { Broadcast } from "../../broadcast/broadcast";
 import { TurnOrder } from "../../turn-order/turn-order";
 import { TurnOrderWidgetParams } from "./turn-order-widget";
 
 import turnOrderLocaleData from "./turn-order-locale.data";
-import { Broadcast } from "../../broadcast/broadcast";
 locale.inject(turnOrderLocaleData);
+
+import globalLocaleData from "../../../locale.data";
+locale.inject(globalLocaleData);
 
 /**
  * "Popup" with options when clicking on a TurnEntryWidget.

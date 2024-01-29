@@ -42,6 +42,18 @@ export class TurnEntryWidget {
         return text;
     }
 
+    public static getFgBgColors(
+        turnOrder: TurnOrder,
+        playerSlot: number
+    ): { fgColor: Color; bgColor: Color } {
+        let fgColor: Color = world.getSlotColor(playerSlot);
+        let bgColor: Color = new Color(0, 0, 0, 1);
+        if (turnOrder.getCurrentTurn() === playerSlot) {
+            [fgColor, bgColor] = [bgColor, fgColor];
+        }
+        return { fgColor, bgColor };
+    }
+
     constructor(params: TurnOrderWidgetParams) {
         this._params = params;
 
@@ -130,20 +142,11 @@ export class TurnEntryWidget {
         return this._canvas;
     }
 
-    public getFgBgColors(
-        turnOrder: TurnOrder,
-        playerSlot: number
-    ): { fgColor: Color; bgColor: Color } {
-        let fgColor: Color = world.getSlotColor(playerSlot);
-        let bgColor: Color = new Color(0, 0, 0, 1);
-        if (turnOrder.getCurrentTurn() === playerSlot) {
-            [fgColor, bgColor] = [bgColor, fgColor];
-        }
-        return { fgColor, bgColor };
-    }
-
     public update(turnOrder: TurnOrder, playerSlot: number): void {
-        const { fgColor, bgColor } = this.getFgBgColors(turnOrder, playerSlot);
+        const { fgColor, bgColor } = TurnEntryWidget.getFgBgColors(
+            turnOrder,
+            playerSlot
+        );
 
         // Background.
         this._bgBorder.setColor(bgColor);

@@ -1,9 +1,9 @@
-import { Button } from "@tabletop-playground/api";
 import { MockButton, MockPlayer } from "ttpg-mock";
 import { TurnOrder } from "../../turn-order/turn-order";
 import { TurnClickedWidget } from "./turn-clicked-widget";
 import { TurnOrderWidgetParams } from "./turn-order-widget";
 import { Broadcast } from "../../broadcast/broadcast";
+import { locale } from "../../locale/locale";
 
 it("constructor", () => {
     const turnOrder = new TurnOrder("@test/test");
@@ -102,14 +102,23 @@ it("toggle passed button", () => {
     );
     const button: MockButton =
         turnClickedWidget._createTogglePassedButton() as MockButton;
-    expect(button.getText()).toEqual("Set passed");
+
+    let localeKey = "turn-order.passed.set";
+    let localeValue = locale(localeKey);
+    expect(localeKey).not.toEqual(localeValue);
+    expect(button.getText()).toEqual(localeValue);
 
     expect(turnOrder.getPassed(targetPlayerSlot)).toBeFalsy();
     button._clickAsPlayer(clickingPlayer);
     expect(turnOrder.getPassed(targetPlayerSlot)).toBeTruthy();
-    expect(Broadcast.lastMessage).toEqual(
-        `${clickingPlayer.getName()} toggled passed for ${targetPlayer.getName()}`
-    );
+
+    localeKey = "turn-order.passed.toggled-by";
+    localeValue = locale(localeKey, {
+        clickingPlayer: clickingPlayer.getName(),
+        targetPlayer: targetPlayer.getName(),
+    });
+    expect(localeKey).not.toEqual(localeValue);
+    expect(Broadcast.lastMessage).toEqual(localeValue);
 
     // Clicking again keeps the opposite of initial state.
     button._clickAsPlayer(clickingPlayer);
@@ -118,7 +127,12 @@ it("toggle passed button", () => {
     // Create a new button to toggle again.
     const button2: MockButton =
         turnClickedWidget._createTogglePassedButton() as MockButton;
-    expect(button2.getText()).toEqual("Clear passed");
+
+    localeKey = "turn-order.passed.clear";
+    localeValue = locale(localeKey);
+    expect(localeKey).not.toEqual(localeValue);
+    expect(button2.getText()).toEqual(localeValue);
+
     button2._clickAsPlayer(clickingPlayer);
     expect(turnOrder.getPassed(targetPlayerSlot)).toBeFalsy();
 });
@@ -143,14 +157,23 @@ it("toggle eliminated button", () => {
     );
     const button: MockButton =
         turnClickedWidget._createToggleEliminatedButton() as MockButton;
-    expect(button.getText()).toEqual("Set eliminated");
+
+    let localeKey = "turn-order.eliminated.set";
+    let localeValue = locale(localeKey);
+    expect(localeKey).not.toEqual(localeValue);
+    expect(button.getText()).toEqual(localeValue);
 
     expect(turnOrder.getEliminated(targetPlayerSlot)).toBeFalsy();
     button._clickAsPlayer(clickingPlayer);
     expect(turnOrder.getEliminated(targetPlayerSlot)).toBeTruthy();
-    expect(Broadcast.lastMessage).toEqual(
-        `${clickingPlayer.getName()} toggled eliminated for ${targetPlayer.getName()}`
-    );
+
+    localeKey = "turn-order.eliminated.toggled-by";
+    localeValue = locale(localeKey, {
+        clickingPlayer: clickingPlayer.getName(),
+        targetPlayer: targetPlayer.getName(),
+    });
+    expect(localeKey).not.toEqual(localeValue);
+    expect(Broadcast.lastMessage).toEqual(localeValue);
 
     // Clicking again keeps the opposite of initial state.
     button._clickAsPlayer(clickingPlayer);
@@ -159,7 +182,12 @@ it("toggle eliminated button", () => {
     // Create a new button to toggle again.
     const button2: MockButton =
         turnClickedWidget._createToggleEliminatedButton() as MockButton;
-    expect(button2.getText()).toEqual("Clear eliminated");
+
+    localeKey = "turn-order.eliminated.clear";
+    localeValue = locale(localeKey);
+    expect(localeKey).not.toEqual(localeValue);
+    expect(button2.getText()).toEqual(localeValue);
+
     button2._clickAsPlayer(clickingPlayer);
     expect(turnOrder.getEliminated(targetPlayerSlot)).toBeFalsy();
 });
@@ -176,5 +204,11 @@ it("cancel button", () => {
     );
     const button: MockButton =
         turnClickedWidget._createCancelButton() as MockButton;
+
+    let localeKey = "button.cancel";
+    let localeValue = locale(localeKey);
+    expect(localeKey).not.toEqual(localeValue);
+    expect(button.getText()).toEqual(localeValue);
+
     button._clickAsPlayer(clickingPlayer);
 });
