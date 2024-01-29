@@ -1,3 +1,4 @@
+import { Color } from "@tabletop-playground/api";
 import { TurnEntryWidget } from "./turn-entry-widget";
 import { TurnOrderWidgetParams } from "./turn-order-widget";
 
@@ -30,5 +31,5 @@ export abstract class TurnEntryWart {
     /**
      * Update the turn entry widget.
      */
-    abstract update(playerSlot: number): void;
+    abstract update(playerSlot: number, fgColor: Color, bgColor: Color): void;
 }

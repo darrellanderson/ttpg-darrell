@@ -188,7 +188,7 @@ export class TurnEntryWidget {
 
         // Warts.
         for (const wart of this._warts) {
-            wart.update(playerSlot);
+            wart.update(playerSlot, fgColor, bgColor);
         }
     }
 }
