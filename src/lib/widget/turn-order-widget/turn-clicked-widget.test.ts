@@ -7,7 +7,11 @@ import { locale } from "../../locale/locale";
 
 it("constructor", () => {
     const turnOrder = new TurnOrder("@test/test");
-    const params: TurnOrderWidgetParams = { entryWidth: 1, entryHeight: 1 };
+    const params: TurnOrderWidgetParams = {
+        entryWidth: 1,
+        entryHeight: 1,
+        reserveSlots: 6,
+    };
     const playerSlot = 7;
     new MockPlayer({ slot: playerSlot, name: "my-name" });
     new TurnClickedWidget(turnOrder, params, playerSlot);
@@ -15,14 +19,22 @@ it("constructor", () => {
 
 it("constructor (missing player)", () => {
     const turnOrder = new TurnOrder("@test/test");
-    const params: TurnOrderWidgetParams = { entryWidth: 1, entryHeight: 1 };
+    const params: TurnOrderWidgetParams = {
+        entryWidth: 1,
+        entryHeight: 1,
+        reserveSlots: 6,
+    };
     const playerSlot = 7;
     new TurnClickedWidget(turnOrder, params, playerSlot);
 });
 
 it("createWidget", () => {
     const turnOrder = new TurnOrder("@test/test");
-    const params: TurnOrderWidgetParams = { entryWidth: 1, entryHeight: 1 };
+    const params: TurnOrderWidgetParams = {
+        entryWidth: 1,
+        entryHeight: 1,
+        reserveSlots: 6,
+    };
     const playerSlot = 7;
     const turnClickedWidget = new TurnClickedWidget(
         turnOrder,
@@ -34,7 +46,11 @@ it("createWidget", () => {
 
 it("attach/detach", () => {
     const turnOrder = new TurnOrder("@test/test");
-    const params: TurnOrderWidgetParams = { entryWidth: 1, entryHeight: 1 };
+    const params: TurnOrderWidgetParams = {
+        entryWidth: 1,
+        entryHeight: 1,
+        reserveSlots: 6,
+    };
     const playerSlot = 7;
     const turnClickedWidget = new TurnClickedWidget(
         turnOrder,
@@ -44,8 +60,8 @@ it("attach/detach", () => {
     const clickingPlayer = new MockPlayer();
     turnClickedWidget.attachToScreen(clickingPlayer);
     turnClickedWidget.attachToScreen(clickingPlayer); // safe to repeat
-    turnClickedWidget.detachFromScreen();
-    turnClickedWidget.detachFromScreen();
+    turnClickedWidget.detach();
+    turnClickedWidget.detach();
 });
 
 it("set turn button", () => {
@@ -64,7 +80,11 @@ it("set turn button", () => {
         "forward",
         1
     );
-    const params: TurnOrderWidgetParams = { entryWidth: 1, entryHeight: 1 };
+    const params: TurnOrderWidgetParams = {
+        entryWidth: 1,
+        entryHeight: 1,
+        reserveSlots: 6,
+    };
     const turnClickedWidget = new TurnClickedWidget(
         turnOrder,
         params,
@@ -94,7 +114,11 @@ it("toggle passed button", () => {
         slot: clickingPlayerSlot,
     });
     const turnOrder = new TurnOrder("@test/test");
-    const params: TurnOrderWidgetParams = { entryWidth: 1, entryHeight: 1 };
+    const params: TurnOrderWidgetParams = {
+        entryWidth: 1,
+        entryHeight: 1,
+        reserveSlots: 6,
+    };
     const turnClickedWidget = new TurnClickedWidget(
         turnOrder,
         params,
@@ -149,7 +173,11 @@ it("toggle eliminated button", () => {
         slot: clickingPlayerSlot,
     });
     const turnOrder = new TurnOrder("@test/test");
-    const params: TurnOrderWidgetParams = { entryWidth: 1, entryHeight: 1 };
+    const params: TurnOrderWidgetParams = {
+        entryWidth: 1,
+        entryHeight: 1,
+        reserveSlots: 6,
+    };
     const turnClickedWidget = new TurnClickedWidget(
         turnOrder,
         params,
@@ -196,7 +224,11 @@ it("cancel button", () => {
     const targetPlayerSlot = 2;
     const clickingPlayer = new MockPlayer();
     const turnOrder = new TurnOrder("@test/test");
-    const params: TurnOrderWidgetParams = { entryWidth: 1, entryHeight: 1 };
+    const params: TurnOrderWidgetParams = {
+        entryWidth: 1,
+        entryHeight: 1,
+        reserveSlots: 6,
+    };
     const turnClickedWidget = new TurnClickedWidget(
         turnOrder,
         params,

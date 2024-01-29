@@ -33,6 +33,7 @@ const turnOrderWidget = new TurnOrderWidget(turnOrder, {
         top: 0,
         bottom: 0,
     },
+    reserveSlots: 6,
     wartGenerators: [
         (turnEntryWidget: TurnEntryWidget, params: TurnOrderWidgetParams) => {
             class MyWart extends TurnEntryWart {
@@ -59,7 +60,7 @@ const turnOrderWidget = new TurnOrderWidget(turnOrder, {
     ],
 });
 
-turnOrderWidget.attachToScreen(8);
+turnOrderWidget.attachToScreen();
 
 refObject.onPrimaryAction.add(() => {
     turnOrder.nextTurn();

@@ -1,5 +1,6 @@
 import {
     Border,
+    PlayerPermission,
     ScreenUIElement,
     VerticalBox,
     Widget,
@@ -30,6 +31,9 @@ export type TurnOrderWidgetParams = {
         height?: number; // suggest 25
     };
 
+    // Size for N turns.
+    reserveSlots: number;
+
     // Attach additional items to the turn entry (e.g. score, faction, etc).
     wartGenerators?: TurnEntryWartGenerator[];
 };
@@ -41,6 +45,7 @@ export class TurnOrderWidget {
     private readonly _params: TurnOrderWidgetParams;
     private readonly _turnOrder: TurnOrder;
     private readonly _panel: VerticalBox;
+    private readonly _visibleToPlayerSlots: number[];
     private _turnEntryWidgets: TurnEntryWidget[] = [];
     private _screenUI: ScreenUIElement | undefined;
 
@@ -49,6 +54,7 @@ export class TurnOrderWidget {
         this._turnOrder = turnOrder;
 
         this._panel = new VerticalBox().setChildDistance(0);
+        this._visibleToPlayerSlots = [...Array(20).keys()];
 
         TurnOrder.onTurnStateChanged.add((turnOrder: TurnOrder) => {
             if (turnOrder === this._turnOrder) {
@@ -90,7 +96,7 @@ export class TurnOrderWidget {
         return this;
     }
 
-    public attachToScreen(reserveSlots: number): this {
+    public attachToScreen(): this {
         if (this._screenUI) {
             world.removeScreenUIElement(this._screenUI);
             this._screenUI = undefined;
@@ -101,7 +107,8 @@ export class TurnOrderWidget {
         this._screenUI.positionX = 1;
         this._screenUI.relativePositionX = true;
         this._screenUI.relativePositionY = true;
-        this._screenUI.height = this._params.entryHeight * reserveSlots + 2;
+        this._screenUI.height =
+            this._params.entryHeight * this._params.reserveSlots + 2;
         this._screenUI.width = this._params.entryWidth;
         this._screenUI.widget = this.getWidget();
         world.addScreenUI(this._screenUI);
@@ -109,10 +116,26 @@ export class TurnOrderWidget {
         return this;
     }
 
-    public detachFromScreen(): this {
+    public detach(): this {
         if (this._screenUI) {
             world.removeScreenUIElement(this._screenUI);
             this._screenUI = undefined;
+        }
+        return this;
+    }
+
+    public toggleVisibility(playerSlot: number): this {
+        const index = this._visibleToPlayerSlots.indexOf(playerSlot);
+        if (index >= 0) {
+            this._visibleToPlayerSlots.splice(index, 1);
+        } else {
+            this._visibleToPlayerSlots.push(playerSlot);
+        }
+
+        if (this._screenUI) {
+            this._screenUI.players = new PlayerPermission().setPlayerSlots(
+                this._visibleToPlayerSlots
+            );
         }
         return this;
     }

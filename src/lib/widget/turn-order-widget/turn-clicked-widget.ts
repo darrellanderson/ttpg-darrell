@@ -67,7 +67,7 @@ export class TurnClickedWidget {
             if (index >= 0) {
                 this._turnOrder.setCurrentTurn(this._targetPlayerSlot);
             }
-            this.detachFromScreen();
+            this.detach();
         });
         return button;
     }
@@ -86,7 +86,7 @@ export class TurnClickedWidget {
             });
             Broadcast.chatAll(msg);
             this._turnOrder.setPassed(this._targetPlayerSlot, !isPassed);
-            this.detachFromScreen();
+            this.detach();
         });
         return button;
     }
@@ -108,7 +108,7 @@ export class TurnClickedWidget {
                 this._targetPlayerSlot,
                 !isEliminated
             );
-            this.detachFromScreen();
+            this.detach();
         });
         return button;
     }
@@ -116,7 +116,7 @@ export class TurnClickedWidget {
     _createCancelButton(): Button {
         const button = new Button().setText(locale("button.cancel"));
         button.onClicked.add((button: Button, clickingPlayer: Player) => {
-            this.detachFromScreen();
+            this.detach();
         });
         return button;
     }
@@ -162,7 +162,7 @@ export class TurnClickedWidget {
         return this;
     }
 
-    detachFromScreen(): this {
+    detach(): this {
         if (this._screenUI) {
             world.removeScreenUIElement(this._screenUI);
             this._screenUI = undefined;

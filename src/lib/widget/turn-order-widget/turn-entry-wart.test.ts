@@ -15,6 +15,7 @@ it("constructor", () => {
     const params: TurnOrderWidgetParams = {
         entryWidth: 1,
         entryHeight: 1,
+        reserveSlots: 6,
     };
     const turnEntryWidget = new TurnEntryWidget(params);
     new MyTurnEntryWart(turnEntryWidget, params);

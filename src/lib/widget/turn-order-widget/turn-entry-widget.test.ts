@@ -51,7 +51,11 @@ it("getFgBgColors (not current player)", () => {
 });
 
 it("constructor", () => {
-    const params: TurnOrderWidgetParams = { entryWidth: 1, entryHeight: 1 };
+    const params: TurnOrderWidgetParams = {
+        entryWidth: 1,
+        entryHeight: 1,
+        reserveSlots: 6,
+    };
     new TurnEntryWidget(params);
 });
 
@@ -59,6 +63,7 @@ it("constructor (with margin and name box)", () => {
     const params: TurnOrderWidgetParams = {
         entryWidth: 1,
         entryHeight: 1,
+        reserveSlots: 6,
         margins: { left: 1, top: 1, right: 1, bottom: 1 },
         nameBox: { left: 1, top: 1, width: 1, height: 1 },
     };
@@ -73,6 +78,7 @@ it("constructor (with wart generator)", () => {
     const params: TurnOrderWidgetParams = {
         entryWidth: 1,
         entryHeight: 1,
+        reserveSlots: 6,
         wartGenerators: [
             (turnEntryWidget: TurnEntryWidget, params: TurnOrderWidgetParams) =>
                 new MyWart(turnEntryWidget, params),
@@ -90,6 +96,7 @@ it("update and destroy (with warts)", () => {
     const params: TurnOrderWidgetParams = {
         entryWidth: 1,
         entryHeight: 1,
+        reserveSlots: 6,
         wartGenerators: [
             (turnEntryWidget: TurnEntryWidget, params: TurnOrderWidgetParams) =>
                 new MyWart(turnEntryWidget, params),
@@ -109,6 +116,7 @@ it("update (passed)", () => {
     const params: TurnOrderWidgetParams = {
         entryWidth: 1,
         entryHeight: 1,
+        reserveSlots: 6,
     };
     const turnEntryWidget = new TurnEntryWidget(params);
     const turnOrder = new TurnOrder("@test/test")
@@ -121,6 +129,7 @@ it("getWidget", () => {
     const params: TurnOrderWidgetParams = {
         entryWidth: 1,
         entryHeight: 1,
+        reserveSlots: 6,
     };
     new TurnEntryWidget(params).getWidget();
 });
@@ -129,6 +138,7 @@ it("getCanvas", () => {
     const params: TurnOrderWidgetParams = {
         entryWidth: 1,
         entryHeight: 1,
+        reserveSlots: 6,
     };
     new TurnEntryWidget(params).getCanvas();
 });
@@ -137,6 +147,7 @@ it("click", () => {
     const params: TurnOrderWidgetParams = {
         entryWidth: 1,
         entryHeight: 1,
+        reserveSlots: 6,
     };
     const turnEntryWidget = new TurnEntryWidget(params);
     const turnOrder = new TurnOrder("@test/test");
