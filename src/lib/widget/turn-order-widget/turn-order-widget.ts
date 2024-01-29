@@ -1,4 +1,10 @@
-import { VerticalBox, Widget } from "@tabletop-playground/api";
+import {
+    Border,
+    ScreenUIElement,
+    VerticalBox,
+    Widget,
+    world,
+} from "@tabletop-playground/api";
 import { TurnOrder } from "../../turn-order/turn-order";
 import { TurnEntryWartGenerator } from "./turn-entry-wart";
 import { TurnEntryWidget } from "./turn-entry-widget";
@@ -34,14 +40,15 @@ export type TurnOrderWidgetParams = {
 export class TurnOrderWidget {
     private readonly _params: TurnOrderWidgetParams;
     private readonly _turnOrder: TurnOrder;
-    private readonly _widget: VerticalBox;
+    private readonly _panel: VerticalBox;
     private _turnEntryWidgets: TurnEntryWidget[] = [];
+    private _screenUI: ScreenUIElement | undefined;
 
     constructor(turnOrder: TurnOrder, params: TurnOrderWidgetParams) {
         this._params = params;
         this._turnOrder = turnOrder;
 
-        this._widget = new VerticalBox().setChildDistance(0);
+        this._panel = new VerticalBox().setChildDistance(0);
 
         TurnOrder.onTurnStateChanged.add((turnOrder: TurnOrder) => {
             if (turnOrder === this._turnOrder) {
@@ -53,7 +60,7 @@ export class TurnOrderWidget {
     }
 
     public getWidget(): Widget {
-        return this._widget;
+        return this._panel;
     }
 
     public update(): this {
@@ -61,7 +68,7 @@ export class TurnOrderWidget {
 
         // Only reset turn widgets if the number of turn entries changes.
         if (this._turnEntryWidgets.length !== order.length) {
-            this._widget.removeAllChildren();
+            this._panel.removeAllChildren();
             for (const turnEnryWidget of this._turnEntryWidgets) {
                 turnEnryWidget.destroy();
             }
@@ -69,7 +76,7 @@ export class TurnOrderWidget {
             for (let i = 0; i < order.length; i++) {
                 const turnEnryWidget = new TurnEntryWidget(this._params);
                 this._turnEntryWidgets.push(turnEnryWidget);
-                this._widget.addChild(turnEnryWidget.getWidget());
+                this._panel.addChild(turnEnryWidget.getWidget());
             }
         }
 
@@ -80,6 +87,33 @@ export class TurnOrderWidget {
             turnWidget.update(this._turnOrder, playerSlot);
         }
 
+        return this;
+    }
+
+    public attachToScreen(reserveSlots: number): this {
+        if (this._screenUI) {
+            world.removeScreenUIElement(this._screenUI);
+            this._screenUI = undefined;
+        }
+        this._screenUI = new ScreenUIElement();
+        this._screenUI.anchorX = 1.1;
+        this._screenUI.anchorY = -0.1;
+        this._screenUI.positionX = 1;
+        this._screenUI.relativePositionX = true;
+        this._screenUI.relativePositionY = true;
+        this._screenUI.height = this._params.entryHeight * reserveSlots + 2;
+        this._screenUI.width = this._params.entryWidth;
+        this._screenUI.widget = this.getWidget();
+        world.addScreenUI(this._screenUI);
+
+        return this;
+    }
+
+    public detachFromScreen(): this {
+        if (this._screenUI) {
+            world.removeScreenUIElement(this._screenUI);
+            this._screenUI = undefined;
+        }
         return this;
     }
 }

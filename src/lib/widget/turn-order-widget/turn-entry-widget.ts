@@ -29,7 +29,7 @@ export class TurnEntryWidget {
     private readonly _warts: TurnEntryWart[] = [];
     private readonly _nameW: number;
 
-    static computeFontSize(boxHeight: number) {
+    static computeFontSize(boxHeight: number): number {
         return Math.ceil(boxHeight * 0.5);
     }
 
@@ -53,7 +53,7 @@ export class TurnEntryWidget {
             w: 0, // remaining width
             h: 0, // remaining height
         };
-        m.w = params.entryWidth - (m.l + m.r) + 2; // dunno why off by 2
+        m.w = params.entryWidth - (m.l + m.r);
         m.h = params.entryHeight - (m.t + m.b);
 
         // Name postition.
@@ -151,7 +151,7 @@ export class TurnEntryWidget {
         const player: Player | undefined = world.getPlayerBySlot(playerSlot);
         const playerName = TurnEntryWidget.truncateLongText(
             this._nameW,
-            player?.getName() ?? "< - >"
+            player?.getName() ?? "<empty>"
         );
         this._nameText.setText(playerName).setTextColor(fgColor);
 

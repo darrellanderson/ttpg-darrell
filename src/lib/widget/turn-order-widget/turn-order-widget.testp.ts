@@ -59,16 +59,7 @@ const turnOrderWidget = new TurnOrderWidget(turnOrder, {
     ],
 });
 
-const screenUI = new ScreenUIElement();
-screenUI.anchorX = 1.1;
-screenUI.anchorY = -0.1;
-screenUI.positionX = 1;
-screenUI.relativePositionX = true;
-screenUI.height = h * turnOrder.getTurnOrder().length + 2;
-screenUI.width = w + 2;
-screenUI.widget = turnOrderWidget.getWidget();
-
-world.addScreenUI(screenUI);
+turnOrderWidget.attachToScreen(8);
 
 refObject.onPrimaryAction.add(() => {
     turnOrder.nextTurn();
