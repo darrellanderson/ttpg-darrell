@@ -1,3 +1,5 @@
+import { locale } from "./lib/locale/locale";
+
 export * from "./lib/bug-workarounds/bug-card-holder-assignment";
 export * from "./lib/bug-workarounds/bug-unique-cards";
 export * from "./lib/card-util/card-util";
@@ -25,3 +27,6 @@ export * from "./lib/turn-order/turn-order";
 export * from "./lib/widget/confirm-button/confirm-button";
 export * from "./lib/widget/d6widget/d6widget";
 export * from "./lib/widget/turn-order-widget/turn-order-widget";
+
+import locale_data from "./locale.data";
+locale.inject(locale_data);
