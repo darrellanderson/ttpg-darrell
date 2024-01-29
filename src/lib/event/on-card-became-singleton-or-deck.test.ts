@@ -97,6 +97,40 @@ it("create deck", () => {
     expect(madeDeckCount).toEqual(1);
 });
 
+it("create deck (flipped)", () => {
+    const card1 = new MockCard({ cardDetails: [new MockCardDetails()] });
+    const card2 = new MockCard({ cardDetails: [new MockCardDetails()] });
+    mockWorld._reset({ gameObjects: [card1, card2] });
+
+    new OnCardBecameSingletonOrDeck().init(); // queues runnable
+    process.flushTicks(); // run it
+
+    let singletonCreatedCount = 0;
+    let madeDeckCount = 0;
+    OnCardBecameSingletonOrDeck.onSingletonCardCreated.add(() => {
+        singletonCreatedCount++;
+    });
+    OnCardBecameSingletonOrDeck.onSingletonCardMadeDeck.add(() => {
+        madeDeckCount++;
+    });
+    expect(singletonCreatedCount).toEqual(0);
+    expect(madeDeckCount).toEqual(0);
+
+    const player = new MockPlayer();
+    card1._addCardsAsPlayer(
+        card2,
+        true,
+        undefined,
+        undefined,
+        undefined,
+        player
+    );
+    process.flushTicks();
+
+    expect(singletonCreatedCount).toEqual(0);
+    expect(madeDeckCount).toEqual(1);
+});
+
 it("create singleton (deck remains)", () => {
     const deck = new MockCard({
         cardDetails: [

@@ -173,9 +173,8 @@ export class TurnEntryWidget {
                 new TurnClickedWidget(
                     turnOrder,
                     this._params,
-                    playerSlot,
-                    clickingPlayer
-                );
+                    playerSlot
+                ).attachToScreen(clickingPlayer);
             }
         );
 

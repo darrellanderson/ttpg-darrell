@@ -16,98 +16,125 @@ import { locale } from "../../locale/locale";
 import { TurnOrder } from "../../turn-order/turn-order";
 import { TurnOrderWidgetParams } from "./turn-order-widget";
 
+import turnOrderLocaleData from "./turn-order-locale.data";
+import { Broadcast } from "../../broadcast/broadcast";
+locale.inject(turnOrderLocaleData);
+
 /**
  * "Popup" with options when clicking on a TurnEntryWidget.
  */
 export class TurnClickedWidget {
     private readonly _turnOrder: TurnOrder;
     private readonly _params: TurnOrderWidgetParams;
-    private readonly _clickingPlayerSlot: number;
+    private readonly _targetPlayerSlot: number;
+    private readonly _targetPlayerName: string;
     private readonly _targetPlayerIndex: number;
-    private readonly _widget: Widget;
 
     private _screenUI: ScreenUIElement | undefined;
 
     constructor(
         turnOrder: TurnOrder,
         params: TurnOrderWidgetParams,
-        playerSlot: number,
-        clickingPlayer: Player
+        playerSlot: number
     ) {
         this._turnOrder = turnOrder;
         this._params = params;
-        this._clickingPlayerSlot = clickingPlayer.getSlot();
-
-        const clickingPlayerName = clickingPlayer.getName();
+        this._targetPlayerSlot = playerSlot;
 
         const targetPlayer: Player | undefined =
             world.getPlayerBySlot(playerSlot);
-        const targetPlayerName =
-            targetPlayer?.getName() ?? locale("player_name_missing");
+        this._targetPlayerName =
+            targetPlayer?.getName() ?? locale("turn-order.player-name.missing");
         this._targetPlayerIndex = Math.max(
             this._turnOrder.getTurnOrder().indexOf(playerSlot),
             0
         );
+    }
 
-        const header = new Text()
-            .setText(targetPlayerName)
-            .setJustification(TextJustification.Center);
-
-        const setTurn = new Button().setText("Set current turn");
-        setTurn.onClicked.add((button: Button, player: Player) => {
-            const msg = `${clickingPlayerName} set current turn to ${targetPlayerName}`;
-            console.log(msg);
-            if (this._turnOrder.getTurnOrder().indexOf(playerSlot) >= 0) {
-                this._turnOrder.setCurrentTurn(playerSlot);
+    _createSetTurnButton(): Button {
+        const button = new Button().setText(locale("turn-order.set-turn"));
+        button.onClicked.add((button: Button, clickingPlayer: Player) => {
+            const msg: string = locale("turn-order.set-turn-by", {
+                clickingPlayer: clickingPlayer.getName(),
+                targetPlayer: this._targetPlayerName,
+            });
+            Broadcast.chatAll(msg);
+            const order: number[] = this._turnOrder.getTurnOrder();
+            const index: number = order.indexOf(this._targetPlayerSlot);
+            if (index >= 0) {
+                this._turnOrder.setCurrentTurn(this._targetPlayerSlot);
             }
             this.detachFromScreen();
         });
+        return button;
+    }
 
-        const isPassed: boolean = this._turnOrder.getPassed(playerSlot);
-        const passed = new Button().setText(
-            isPassed ? "Clear passed" : "Set passed"
+    _createTogglePassedButton(): Button {
+        const isPassed: boolean = this._turnOrder.getPassed(
+            this._targetPlayerSlot
         );
-        passed.onClicked.add((button: Button, player: Player) => {
-            const msg = `${clickingPlayerName} toggled passed for ${targetPlayerName}`;
-            console.log(msg);
-            this._turnOrder.setPassed(playerSlot, !isPassed);
-            this.detachFromScreen();
-        });
-
-        const isEliminated = this._turnOrder.getEliminated(playerSlot);
-        const eliminated = new Button().setText(
-            isEliminated ? "Clear eliminated" : "Set eliminated"
+        const button = new Button().setText(
+            locale("turn-order.passed." + (isPassed ? "clear" : "set"))
         );
-        eliminated.onClicked.add((button: Button, player: Player) => {
-            const msg = `${clickingPlayerName} toggled eliminated for ${targetPlayerName}`;
-            console.log(msg);
-            this._turnOrder.setEliminated(playerSlot, !isEliminated);
+        button.onClicked.add((button: Button, clickingPlayer: Player) => {
+            const msg: string = locale("turn-order.passed.toggled-by", {
+                clickingPlayer: clickingPlayer.getName(),
+                targetPlayer: this._targetPlayerName,
+            });
+            Broadcast.chatAll(msg);
+            this._turnOrder.setPassed(this._targetPlayerSlot, !isPassed);
             this.detachFromScreen();
         });
+        return button;
+    }
 
-        const cancel = new Button().setText("Cancel");
-        cancel.onClicked.add((button: Button, player: Player) => {
+    _createToggleEliminatedButton(): Button {
+        const isEliminated = this._turnOrder.getEliminated(
+            this._targetPlayerSlot
+        );
+        const button = new Button().setText(
+            locale("turn-order.eliminated." + (isEliminated ? "clear" : "set"))
+        );
+        button.onClicked.add((button: Button, clickingPlayer: Player) => {
+            const msg: string = locale("turn-order.eliminated.toggled-by", {
+                clickingPlayer: clickingPlayer.getName(),
+                targetPlayer: this._targetPlayerName,
+            });
+            Broadcast.chatAll(msg);
+            this._turnOrder.setEliminated(
+                this._targetPlayerSlot,
+                !isEliminated
+            );
             this.detachFromScreen();
         });
+        return button;
+    }
 
-        const panel = new VerticalBox()
-            .addChild(header)
-            .addChild(setTurn)
-            .addChild(passed)
-            .addChild(eliminated)
-            .addChild(cancel);
-        this._widget = new LayoutBox()
-            .setVerticalAlignment(VerticalAlignment.Top)
-            .setChild(new Border().setChild(panel));
-
-        this.attachToScreen();
+    _createCancelButton(): Button {
+        const button = new Button().setText(locale("button.cancel"));
+        button.onClicked.add((button: Button, clickingPlayer: Player) => {
+            this.detachFromScreen();
+        });
+        return button;
     }
 
     getWidget(): Widget {
-        return this._widget;
+        const header = new Text()
+            .setText(this._targetPlayerName)
+            .setJustification(TextJustification.Center);
+
+        const panel = new VerticalBox()
+            .addChild(header)
+            .addChild(this._createSetTurnButton())
+            .addChild(this._createTogglePassedButton())
+            .addChild(this._createToggleEliminatedButton())
+            .addChild(this._createCancelButton());
+        return new LayoutBox()
+            .setVerticalAlignment(VerticalAlignment.Top)
+            .setChild(new Border().setChild(panel));
     }
 
-    attachToScreen(): this {
+    attachToScreen(visibleToPlayer: Player): this {
         if (this._screenUI) {
             world.removeScreenUIElement(this._screenUI);
             this._screenUI = undefined;
@@ -125,7 +152,7 @@ export class TurnClickedWidget {
         this._screenUI.width = 200;
         this._screenUI.widget = this.getWidget();
         this._screenUI.players = new PlayerPermission().setPlayerSlots([
-            this._clickingPlayerSlot,
+            visibleToPlayer.getSlot(),
         ]);
         world.addScreenUI(this._screenUI);
 

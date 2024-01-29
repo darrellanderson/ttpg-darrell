@@ -1,3 +1,4 @@
 export default {
-    player_name_missing: "<empty>",
+    "button.cancel": "Cancel",
+    "button.ok": "OK",
 };
