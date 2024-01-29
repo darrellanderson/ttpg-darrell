@@ -15,7 +15,7 @@ import {
 import { locale } from "../../locale/locale";
 import { Broadcast } from "../../broadcast/broadcast";
 import { TurnOrder } from "../../turn-order/turn-order";
-import { TurnOrderWidgetParams } from "./turn-order-widget";
+import { TurnOrderWidget, TurnOrderWidgetParams } from "./turn-order-widget";
 
 import turnOrderLocaleData from "./turn-order-locale.data";
 locale.inject(turnOrderLocaleData);
@@ -138,6 +138,9 @@ export class TurnClickedWidget {
     }
 
     attachToScreen(visibleToPlayer: Player): this {
+        const h: number =
+            this._params.entryHeight ?? TurnOrderWidget.DEFAULT_ENTRY_HEIGHT;
+
         if (this._screenUI) {
             world.removeScreenUIElement(this._screenUI);
             this._screenUI = undefined;
@@ -147,7 +150,7 @@ export class TurnClickedWidget {
         this._screenUI.anchorY = 0;
         this._screenUI.positionX = 1;
         this._screenUI.positionY = Math.round(
-            this._params.entryHeight * (this._targetPlayerIndex + 1.1)
+            h * (this._targetPlayerIndex + 1.1)
         );
         this._screenUI.relativePositionX = true;
         this._screenUI.relativePositionY = false;

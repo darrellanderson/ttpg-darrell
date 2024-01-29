@@ -11,7 +11,7 @@ import {
     world,
 } from "@tabletop-playground/api";
 import { TurnOrder } from "../../turn-order/turn-order";
-import { TurnOrderWidgetParams } from "./turn-order-widget";
+import { TurnOrderWidget, TurnOrderWidgetParams } from "./turn-order-widget";
 import { TurnEntryWart } from "./turn-entry-wart";
 import { TurnClickedWidget } from "./turn-clicked-widget";
 import { locale } from "../../locale/locale";
@@ -55,6 +55,11 @@ export class TurnEntryWidget {
     }
 
     constructor(params: TurnOrderWidgetParams) {
+        const w: number =
+            params.entryWidth ?? TurnOrderWidget.DEFAULT_ENTRY_WIDTH;
+        const h: number =
+            params.entryHeight ?? TurnOrderWidget.DEFAULT_ENTRY_HEIGHT;
+
         this._params = params;
 
         // Margin aliases.
@@ -66,15 +71,15 @@ export class TurnEntryWidget {
             w: 0, // remaining width
             h: 0, // remaining height
         };
-        m.w = params.entryWidth - (m.l + m.r);
-        m.h = params.entryHeight - (m.t + m.b);
+        m.w = w - (m.l + m.r);
+        m.h = w - (m.t + m.b);
 
         // Name postition.
         const name = {
             l: (params.nameBox?.left ?? 0) - m.l,
             t: (params.nameBox?.top ?? 0) - m.t,
-            w: params.nameBox?.width ?? params.entryWidth,
-            h: params.nameBox?.height ?? params.entryHeight,
+            w: params.nameBox?.width ?? w,
+            h: params.nameBox?.height ?? h,
         };
         const d = Math.floor(name.h * 0.06); // tweak to center text vertically
         name.t += d;
@@ -115,8 +120,8 @@ export class TurnEntryWidget {
         );
 
         this._widget = new LayoutBox()
-            .setOverrideWidth(params.entryWidth)
-            .setOverrideHeight(params.entryHeight)
+            .setOverrideWidth(w)
+            .setOverrideHeight(h)
             .setChild(paddedCanvas);
 
         // Attach warts.

@@ -12,8 +12,8 @@ import { TurnEntryWidget } from "./turn-entry-widget";
 
 export type TurnOrderWidgetParams = {
     // Per-turn entry size, stacked vertically.
-    entryWidth: number;
-    entryHeight: number;
+    entryWidth?: number;
+    entryHeight?: number;
 
     // Consume pixels at edges to highlight for mouseover (max useful is 4).
     margins?: {
@@ -27,12 +27,12 @@ export type TurnOrderWidgetParams = {
     nameBox?: {
         left?: number;
         top?: number;
-        width?: number; // suggest 150
-        height?: number; // suggest 25
+        width?: number;
+        height?: number;
     };
 
     // Size for N turns.
-    reserveSlots: number;
+    reserveSlots?: number;
 
     // Attach additional items to the turn entry (e.g. score, faction, etc).
     wartGenerators?: TurnEntryWartGenerator[];
@@ -42,6 +42,10 @@ export type TurnOrderWidgetParams = {
  * Display turn order, update when turn order changes.
  */
 export class TurnOrderWidget {
+    public static readonly DEFAULT_ENTRY_WIDTH = 150;
+    public static readonly DEFAULT_ENTRY_HEIGHT = 25;
+    public static readonly DEFAULT_RESERVE_SLOTS = 8;
+
     private readonly _params: TurnOrderWidgetParams;
     private readonly _turnOrder: TurnOrder;
     private readonly _panel: VerticalBox;
@@ -97,6 +101,13 @@ export class TurnOrderWidget {
     }
 
     public attachToScreen(): this {
+        const w: number =
+            this._params.entryWidth ?? TurnOrderWidget.DEFAULT_ENTRY_WIDTH;
+        const h: number =
+            this._params.entryHeight ?? TurnOrderWidget.DEFAULT_ENTRY_HEIGHT;
+        const reserveSlots: number =
+            this._params.reserveSlots ?? TurnOrderWidget.DEFAULT_RESERVE_SLOTS;
+
         if (this._screenUI) {
             world.removeScreenUIElement(this._screenUI);
             this._screenUI = undefined;
@@ -107,9 +118,8 @@ export class TurnOrderWidget {
         this._screenUI.positionX = 1;
         this._screenUI.relativePositionX = true;
         this._screenUI.relativePositionY = true;
-        this._screenUI.height =
-            this._params.entryHeight * this._params.reserveSlots + 2;
-        this._screenUI.width = this._params.entryWidth;
+        this._screenUI.height = h * reserveSlots + 2;
+        this._screenUI.width = w;
         this._screenUI.widget = this.getWidget();
         world.addScreenUI(this._screenUI);
 

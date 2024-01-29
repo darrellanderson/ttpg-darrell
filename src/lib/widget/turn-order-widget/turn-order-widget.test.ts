@@ -3,40 +3,37 @@ import { TurnOrderWidget } from "./turn-order-widget";
 
 it("constructor", () => {
     const turnOrder: TurnOrder = new TurnOrder("@test/test");
-    new TurnOrderWidget(turnOrder, {
-        entryWidth: 1,
-        entryHeight: 1,
-        reserveSlots: 1,
-    });
+    new TurnOrderWidget(turnOrder, {});
 });
 
 it("update (via event)", () => {
     const turnOrder: TurnOrder = new TurnOrder("@test/test");
-    new TurnOrderWidget(turnOrder, {
-        entryWidth: 1,
-        entryHeight: 1,
-        reserveSlots: 1,
-    });
+    new TurnOrderWidget(turnOrder, {});
     TurnOrder.onTurnStateChanged.trigger(turnOrder);
 });
 
 it("update (change player count)", () => {
     const turnOrder: TurnOrder = new TurnOrder("@test/test");
-    new TurnOrderWidget(turnOrder, {
-        entryWidth: 1,
-        entryHeight: 1,
-        reserveSlots: 1,
-    });
+    new TurnOrderWidget(turnOrder, {});
     turnOrder.setTurnOrder([1, 2], "forward", 1);
     turnOrder.setTurnOrder([1, 2, 3], "forward", 1);
 });
 
-it("attach/detach", () => {
+it("attach/detach (defaults)", () => {
+    const turnOrder: TurnOrder = new TurnOrder("@test/test");
+    const widget = new TurnOrderWidget(turnOrder, {});
+    widget.attachToScreen();
+    widget.attachToScreen();
+    widget.detach();
+    widget.detach();
+});
+
+it("attach/detach (override values)", () => {
     const turnOrder: TurnOrder = new TurnOrder("@test/test");
     const widget = new TurnOrderWidget(turnOrder, {
         entryWidth: 1,
         entryHeight: 1,
-        reserveSlots: 1,
+        reserveSlots: 4,
     });
     widget.attachToScreen();
     widget.attachToScreen();
@@ -46,11 +43,7 @@ it("attach/detach", () => {
 
 it("toggle visibility", () => {
     const turnOrder: TurnOrder = new TurnOrder("@test/test");
-    const widget = new TurnOrderWidget(turnOrder, {
-        entryWidth: 1,
-        entryHeight: 1,
-        reserveSlots: 1,
-    });
+    const widget = new TurnOrderWidget(turnOrder, {});
     widget.attachToScreen();
     widget.toggleVisibility(1);
     widget.toggleVisibility(1);
