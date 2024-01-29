@@ -14,6 +14,7 @@ import { TurnOrder } from "../../turn-order/turn-order";
 import { TurnOrderWidgetParams } from "./turn-order-widget";
 import { TurnEntryWart } from "./turn-entry-wart";
 import { TurnClickedWidget } from "./turn-clicked-widget";
+import { locale } from "../../locale/locale";
 
 /**
  * A single widget in the TurnOrderWidget's vertical stack.
@@ -151,7 +152,7 @@ export class TurnEntryWidget {
         const player: Player | undefined = world.getPlayerBySlot(playerSlot);
         const playerName = TurnEntryWidget.truncateLongText(
             this._nameW,
-            player?.getName() ?? "<empty>"
+            player?.getName() ?? locale("player_name_missing")
         );
         this._nameText.setText(playerName).setTextColor(fgColor);
 

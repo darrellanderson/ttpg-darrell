@@ -12,6 +12,7 @@ import {
     Widget,
     world,
 } from "@tabletop-playground/api";
+import { locale } from "../../locale/locale";
 import { TurnOrder } from "../../turn-order/turn-order";
 import { TurnOrderWidgetParams } from "./turn-order-widget";
 
@@ -23,6 +24,7 @@ export class TurnClickedWidget {
     private readonly _params: TurnOrderWidgetParams;
     private readonly _playerSlot: number;
     private readonly _clickingPlayerName: string;
+    private readonly _clickingPlayerSlot: number;
     private readonly _targetPlayerName: string;
 
     private _screenUI: ScreenUIElement | undefined;
@@ -37,15 +39,14 @@ export class TurnClickedWidget {
         this._params = params;
         this._playerSlot = playerSlot;
         this._clickingPlayerName = clickingPlayer.getName();
+        this._clickingPlayerSlot = clickingPlayer.getSlot();
 
         const targetPlayer: Player | undefined =
             world.getPlayerBySlot(playerSlot);
-        this._targetPlayerName = targetPlayer?.getName() ?? "<empty>";
+        this._targetPlayerName =
+            targetPlayer?.getName() ?? locale("player_name_missing");
 
-        const msg = `TurnClickedWidget: ${clickingPlayer.getName()} changed the current turn to ${playerSlot}`;
-        console.log(msg);
-        turnOrder.setCurrentTurn(playerSlot);
-        this.attachToScreen(clickingPlayer);
+        this.attachToScreen();
     }
 
     createWidget(): Widget {
@@ -105,7 +106,7 @@ export class TurnClickedWidget {
             .setChild(new Border().setChild(panel));
     }
 
-    attachToScreen(clickingPlayer: Player): this {
+    attachToScreen(): this {
         const index = Math.max(
             this._turnOrder.getTurnOrder().indexOf(this._playerSlot),
             0
@@ -128,7 +129,7 @@ export class TurnClickedWidget {
         this._screenUI.width = 200;
         this._screenUI.widget = this.createWidget();
         this._screenUI.players = new PlayerPermission().setPlayerSlots([
-            clickingPlayer.getSlot(),
+            this._clickingPlayerSlot,
         ]);
         world.addScreenUI(this._screenUI);
 
