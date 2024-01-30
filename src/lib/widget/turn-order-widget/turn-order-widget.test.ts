@@ -1,3 +1,6 @@
+import { Player } from "@tabletop-playground/api";
+import { mockGlobalEvents, MockPlayer } from "ttpg-mock";
+import { locale } from "../../locale/locale";
 import { TurnOrder } from "../../turn-order/turn-order";
 import { TurnOrderWidget } from "./turn-order-widget";
 
@@ -56,6 +59,25 @@ it("toggle visibility", () => {
     const turnOrder: TurnOrder = new TurnOrder("@test/test");
     const widget = new TurnOrderWidget(turnOrder, {});
     widget.attachToScreen();
+
+    expect(widget.isVisibleTo(1)).toBeTruthy();
     widget.toggleVisibility(1);
+    expect(widget.isVisibleTo(1)).toBeFalsy();
     widget.toggleVisibility(1);
+    expect(widget.isVisibleTo(1)).toBeTruthy();
+});
+
+it("toggle visibility (context menu)", () => {
+    const turnOrder: TurnOrder = new TurnOrder("@test/test");
+    const widget = new TurnOrderWidget(turnOrder, {});
+    widget.attachToScreen();
+
+    const player: Player = new MockPlayer({ slot: 1 });
+    const actionName: string = locale(
+        "turn-order.context-menu.toggle-visibility"
+    );
+
+    expect(widget.isVisibleTo(1)).toBeTruthy();
+    mockGlobalEvents._customActionAsPlayer(player, actionName);
+    expect(widget.isVisibleTo(1)).toBeFalsy();
 });

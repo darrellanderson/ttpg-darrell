@@ -26,7 +26,8 @@ locale.inject(TurnOrderLocaleData);
  * A single widget in the TurnOrderWidget's vertical stack.
  */
 export class TurnEntryWidget {
-    private readonly _params: TurnOrderWidgetParams;
+    private readonly _nameWidth: number;
+    private readonly _entryHeight: number;
     private readonly _widget: LayoutBox;
     private readonly _contentButton: ContentButton;
     private readonly _canvas: Canvas;
@@ -34,7 +35,6 @@ export class TurnEntryWidget {
     private readonly _nameText: Text;
     private readonly _passedText: Text;
     private readonly _warts: TurnEntryWart[] = [];
-    private readonly _nameW: number;
 
     static computeFontSize(boxHeight: number): number {
         return Math.ceil(boxHeight * 0.5);
@@ -66,8 +66,6 @@ export class TurnEntryWidget {
         const h: number =
             params.entryHeight ?? TurnOrderWidgetDefaults.DEFAULT_ENTRY_WIDTH;
 
-        this._params = params;
-
         // Margin aliases.
         const m = {
             l: params.margins?.left ?? 0,
@@ -89,7 +87,9 @@ export class TurnEntryWidget {
         };
         const d = Math.floor(name.h * 0.06); // tweak to center text vertically
         name.t += d;
-        this._nameW = name.w;
+
+        this._entryHeight = h;
+        this._nameWidth = name.w;
 
         this._bgBorder = new Border();
 
@@ -165,7 +165,7 @@ export class TurnEntryWidget {
         // Name.
         const player: Player | undefined = world.getPlayerBySlot(playerSlot);
         const playerName = TurnEntryWidget.truncateLongText(
-            this._nameW,
+            this._nameWidth,
             player?.getName() ?? locale("turn-order.player-name.missing")
         );
         this._nameText.setText(playerName).setTextColor(fgColor);
@@ -186,8 +186,7 @@ export class TurnEntryWidget {
             (button: ContentButton, clickingPlayer: Player) => {
                 new TurnClickedWidget(
                     turnOrder,
-                    this._params.entryHeight ??
-                        TurnOrderWidgetDefaults.DEFAULT_ENTRY_HEIGHT,
+                    this._entryHeight,
                     playerSlot
                 ).attachToScreen(clickingPlayer);
             }

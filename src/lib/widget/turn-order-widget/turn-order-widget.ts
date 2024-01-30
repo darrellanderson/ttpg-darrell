@@ -134,6 +134,10 @@ export class TurnOrderWidget {
         return this;
     }
 
+    public isVisibleTo(playerSlot: number): boolean {
+        return this._visibleToPlayerSlots.includes(playerSlot);
+    }
+
     public toggleVisibility(playerSlot: number): this {
         const index = this._visibleToPlayerSlots.indexOf(playerSlot);
         if (index >= 0) {
