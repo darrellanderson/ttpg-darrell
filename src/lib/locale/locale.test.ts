@@ -30,6 +30,12 @@ it("empty replace string", () => {
     );
 });
 
+it("unknown replace entry", () => {
+    expect(
+        locale("example.replaced", { player: "", x: 2, noSuchItem: "x" })
+    ).toEqual(" has run this script 2 times");
+});
+
 it("missing", () => {
     const s = "test.does_not_exist.foo.bar.baz";
     expect(locale(s)).toEqual(s);
