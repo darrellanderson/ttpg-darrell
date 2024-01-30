@@ -1,98 +1,332 @@
-import { Color, Dice, Vector, world } from "@tabletop-playground/api";
-import { TriggerableMulticastDelegate } from "../event/triggerable-multicast-delegate";
+import {
+    Color,
+    Dice,
+    GameObject,
+    Player,
+    Vector,
+    globalEvents,
+    world,
+} from "@tabletop-playground/api";
 import { AbstractGlobal } from "../global/abstract-global";
 
+/**
+ * Setup for a single die.
+ */
 export type DiceParams = {
     sides: 4 | 6 | 8 | 10 | 12 | 20;
     id?: string;
-    color?: Color | [r: number, g: number, b: number, a: number];
+    primaryColor?: Color | [r: number, g: number, b: number, a: number];
+    secondaryColor?: Color | [r: number, g: number, b: number, a: number];
     name?: string;
     hit?: number;
     crit?: number;
-    reroll?: boolean;
+    reroll?: boolean; // reroll once if not a hit
+};
+
+/**
+ * Setup for a group of dice.
+ */
+export type DiceGroupParams = {
+    diceParams: DiceParams[];
+    player: Player;
+    timeoutSeconds?: number;
+    deleteAfterSeconds?: number;
+    callback?: (diceResults: DiceResult[], player: Player) => void;
+    position?: Vector | [x: number, y: number, z: number];
+    doFakeRoll?: boolean;
 };
 
 export type DiceResult = {
-    value: number;
-    id?: string;
-    hit: boolean;
-    crit: boolean;
-    rerolled?: number;
+    diceParams: DiceParams;
+    dice?: Dice;
+    value: number; // one based
+    hit?: boolean; // one based
+    crit?: boolean; // one based
+    rerolledValue?: number; // one based
 };
 
-const DICE_GROUP_SAVED_DATA_KEY = "__DiceGroup_Dice__";
+export const DICE_GROUP_SAVED_DATA_KEY = "__DiceGroup_DiceId__";
 
+/**
+ * Remove any lingering DiceGroup dice.
+ */
 export class DiceGroupCleanup extends AbstractGlobal {
     init(): void {
         const skipContained = true;
         for (const obj of world.getAllObjects(skipContained)) {
-            if (obj.getSavedData(DICE_GROUP_SAVED_DATA_KEY)) {
+            if (!(obj instanceof Dice)) {
+                continue;
+            }
+            const value = obj.getSavedData(DICE_GROUP_SAVED_DATA_KEY);
+            if (value && value.length > 0) {
                 obj.destroy();
             }
         }
     }
 }
 
+/**
+ * Roll a collection of dice, listen to onRolled for overall result.
+ * Can only be used once, create a new one for new rolls.
+ */
 export class DiceGroup {
-    public static readonly TIMEOUT_SECONDS = 3;
+    public static readonly DEFAULT_TIMEOUT_SECONDS = 3;
+    public static readonly DEFAULT_DELETE_AFTER_SECONDS = 5;
 
-    public readonly onRolled = new TriggerableMulticastDelegate<
-        (diceResults: DiceResult[]) => void
-    >();
-
-    private readonly _diceParamsArray: DiceParams[] = [];
-    private readonly _dice: Dice[] = [];
-    private _deleteAfterSeconds: number = -1;
-    private _position: Vector | [x: number, y: number, z: number] | undefined;
-
-    constructor() {}
-
-    addDice(diceParams: DiceParams): this {
-        this._diceParamsArray.push(diceParams);
-        return this;
+    /**
+     * Create and roll dice group.
+     * Do via static to prevent attempting to reuse the single-use instance.
+     *
+     * @param params
+     */
+    public static roll(params: DiceGroupParams) {
+        const diceGroup = new DiceGroup(params);
+        if (params.doFakeRoll) {
+            diceGroup.fakeRoll();
+        } else {
+            diceGroup.roll();
+        }
     }
 
-    setDeleteAfterSeconds(value: number): this {
-        this._deleteAfterSeconds = value;
-        return this;
-    }
+    private readonly _diceParamsArray: DiceParams[];
+    private readonly _player: Player;
+    private readonly _callback:
+        | ((diceResults: DiceResult[], player: Player) => void)
+        | undefined;
+    private readonly _deleteAfterSeconds: number;
+    private readonly _timeoutSeconds: number;
+    private readonly _position: Vector | [x: number, y: number, z: number];
 
-    roll(): this {
-        // Create dice.
-        const dice: Dice[] = [];
-        const deleteDice = () => {
-            for (const die of dice) {
-                die.destroy();
+    private readonly _diceObjIdToDiceResult: { [key: string]: DiceResult } = {};
+    private readonly _activeDice: Set<Dice> = new Set<Dice>();
+
+    private _timeoutHandle: timeout_handle | undefined;
+    private _spent: boolean = false;
+
+    private readonly _onDiceRolledHandler = (
+        player: Player,
+        diceArray: Dice[]
+    ): void => {
+        for (const dice of diceArray) {
+            const diceResult: DiceResult | undefined =
+                this._diceObjIdToDiceResult[dice.getId()];
+            if (!diceResult) {
+                return; // not one of ours
             }
-        };
-        const sendResult = () => {
-            const result: DiceResult[] = [];
-            // TODO
-            this.onRolled.trigger(result);
-        };
+            const diceParams = diceResult.diceParams;
+            const value = dice.getCurrentFaceIndex() + 1;
 
-        // Stop if not finished after enough time.
-        const timeoutMsecs - 
-        const timeoutHandle = setTimeout(() => {
-            sendResult();
-            deleteDice();
-        }, DiceGroup.TIMEOUT_SECONDS * 1000);
+            diceResult.value = value;
+            diceResult.hit =
+                value >= (diceParams.hit ?? Number.MAX_SAFE_INTEGER);
+            diceResult.crit =
+                value >= (diceParams.crit ?? Number.MAX_SAFE_INTEGER);
 
-        // Delete after seconds.
-        let deleteAfterSecondsHandle;
+            if (
+                diceParams.reroll &&
+                !diceResult.hit &&
+                !diceResult.rerolledValue
+            ) {
+                diceResult.rerolledValue = value;
+                dice.roll(player);
+            } else {
+                this._activeDice.delete(dice);
+                if (this._activeDice.size === 0) {
+                    this._sendResult();
+                }
+            }
+        }
+    };
+
+    private readonly _onTimeoutHandler = (): void => {
+        this._sendResult();
+    };
+
+    private readonly _onDeleteDiceHandler = (): void => {
+        for (const diceResult of Object.values(this._diceObjIdToDiceResult)) {
+            if (diceResult.dice && diceResult.dice.isValid()) {
+                diceResult.dice.destroy();
+            }
+        }
+    };
+
+    private constructor(params: DiceGroupParams) {
+        this._diceParamsArray = params.diceParams;
+        this._player = params.player;
+        this._callback = params.callback;
+        this._deleteAfterSeconds =
+            params.deleteAfterSeconds ?? DiceGroup.DEFAULT_DELETE_AFTER_SECONDS;
+        this._timeoutSeconds =
+            params.timeoutSeconds ?? DiceGroup.DEFAULT_TIMEOUT_SECONDS;
+        this._position = params.position ?? [0, 0, 0];
+    }
+
+    fakeRoll(): void {
+        if (this._spent) {
+            throw new Error("DiceGroup already rolled, cannot reuse");
+        }
+        this._spent = true;
+
+        let index = 0;
+        for (const diceParams of this._diceParamsArray) {
+            const diceResult: DiceResult = { diceParams, value: -1 };
+            DiceGroup._setFakeValue(diceResult);
+            const id = "dice" + index++;
+            this._diceObjIdToDiceResult[id] = diceResult;
+        }
+        this._sendResult();
+    }
+
+    roll(): void {
+        if (this._spent) {
+            throw new Error("DiceGroup already rolled, cannot reuse");
+        }
+        this._spent = true;
+
+        if (this._timeoutSeconds > 0) {
+            this._timeoutHandle = setTimeout(
+                this._onTimeoutHandler,
+                this._timeoutSeconds * 1000
+            );
+        }
+
+        // Delete dice after time.
         if (this._deleteAfterSeconds > 0) {
-            deleteAfterSecondsHandle = setTimeout(
-                deleteDice,
+            setTimeout(
+                this._onDeleteDiceHandler,
                 this._deleteAfterSeconds * 1000
             );
         }
 
-        // Roll.
+        // Listen for results, do rerolls.
+        globalEvents.onDiceRolled.add(this._onDiceRolledHandler);
 
-        return this;
+        // Create dice.  Wait to roll until after all dice registered.
+        for (const diceParams of this._diceParamsArray) {
+            const pos = new Vector(0, 0, 0);
+            const dice: Dice = DiceGroup._createDice(diceParams, pos);
+            this._diceObjIdToDiceResult[dice.getId()] = {
+                diceParams,
+                dice,
+                value: -1,
+            };
+            this._activeDice.add(dice);
+        }
+
+        // Now that all dice are registered, roll.
+        for (const dice of this._activeDice) {
+            dice.roll(this._player);
+        }
     }
 
-    fakeRoll(): this {
-        return this;
+    _sendResult(): void {
+        // Clear listeners.
+        if (this._timeoutHandle) {
+            clearTimeout(this._timeoutHandle);
+            this._timeoutHandle = undefined;
+        }
+        globalEvents.onDiceRolled.remove(this._onDiceRolledHandler);
+
+        // If any dice did not finish (e.g. timeout) use a fake value.
+        const diceResults: DiceResult[] = Object.values(
+            this._diceObjIdToDiceResult
+        );
+        for (const diceResult of diceResults) {
+            if (diceResult.dice && this._activeDice.has(diceResult.dice)) {
+                DiceGroup._setFakeValue(diceResult);
+            }
+        }
+
+        // Tell listeners.
+        if (this._callback) {
+            this._callback(diceResults, this._player);
+        }
+    }
+
+    static _setFakeValue(diceResult: DiceResult): void {
+        const diceParams: DiceParams = diceResult.diceParams;
+
+        // Roll.
+        let faceIndex = Math.floor(Math.random() * diceParams.sides);
+        diceResult.value = faceIndex + 1;
+
+        // Maybe reroll.
+        if (
+            diceParams.reroll !== undefined &&
+            diceParams.hit !== undefined &&
+            diceResult.value < diceParams.hit
+        ) {
+            diceResult.rerolledValue = diceResult.value;
+            faceIndex = Math.floor(Math.random() * diceParams.sides);
+            diceResult.value = faceIndex + 1;
+        }
+
+        // Create result record.
+        diceResult.hit =
+            diceResult.value >= (diceParams.hit ?? Number.MAX_SAFE_INTEGER);
+        diceResult.crit =
+            diceResult.value >= (diceParams.crit ?? Number.MAX_SAFE_INTEGER);
+    }
+
+    static _createDice(
+        diceParams: DiceParams,
+        position: Vector | [x: number, y: number, z: number]
+    ): Dice {
+        // Create dice.
+        let templateId: string;
+        switch (diceParams.sides) {
+            case 4:
+                templateId = "1885447D4CF808B36797CFB1DD679BAC";
+                break;
+            case 6:
+                templateId = "A897158B490E36F0911B03B3BE9BA52A";
+                break;
+            case 8:
+                templateId = "10614E404E82F969E6CFD48CAC80F363";
+                break;
+            case 10:
+                templateId = "9065AC5141F87F8ADE1F5AB6390BBEE4";
+                break;
+            case 12:
+                templateId = "9FD625E14B5EEEA9C6C998B2DB3E9085";
+                break;
+            case 20:
+                templateId = "0A2C628E4A706A123AA3CF9C34CAB9A1";
+                break;
+            default:
+                throw new Error(`invalid sides: "${diceParams.sides}"`);
+        }
+        const dice: GameObject | undefined = world.createObjectFromTemplate(
+            templateId,
+            position
+        );
+        if (!dice) {
+            throw new Error(
+                `created failed for d${diceParams.sides} (${templateId})`
+            );
+        }
+        if (!(dice instanceof Dice)) {
+            throw new Error(
+                `not Dice for d${diceParams.sides} (${templateId})`
+            );
+        }
+
+        // Apply settings.
+        const id: string =
+            diceParams.id && diceParams.id.length > 0
+                ? diceParams.id
+                : "dice-group-die";
+        dice.setSavedData(id, DICE_GROUP_SAVED_DATA_KEY);
+        if (diceParams.primaryColor) {
+            dice.setPrimaryColor(diceParams.primaryColor);
+        }
+        if (diceParams.secondaryColor) {
+            dice.setSecondaryColor(diceParams.secondaryColor);
+        }
+        if (diceParams.name) {
+            dice.setName(diceParams.name);
+        }
+
+        return dice;
     }
 }
