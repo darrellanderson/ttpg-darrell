@@ -54,6 +54,12 @@ export class TurnOrder {
         return turnOrder;
     }
 
+    /**
+     * Constructor.  Does NOT register with shared instance memory; ALWAYS
+     * use getInstance if you want to find/create a shared instance.
+     *
+     * @param savedDataKey
+     */
     constructor(savedDataKey: NamedspacedId) {
         this._savedDataKey = savedDataKey;
         this._restoreState();
