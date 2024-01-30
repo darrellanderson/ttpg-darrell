@@ -8,7 +8,6 @@ export class Broadcast {
     public static lastMessage: string = "";
 
     public static broadcastAll(
-        player: Player,
         message: string,
         color?: Color | [r: number, g: number, b: number, a: number]
     ) {
