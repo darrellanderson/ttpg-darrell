@@ -74,7 +74,7 @@ it("constructor (with wart generator)", () => {
     const params: TurnOrderWidgetParams = {
         wartGenerators: [
             (turnEntryWidget: TurnEntryWidget, params: TurnOrderWidgetParams) =>
-                new MyWart(turnEntryWidget, params),
+                new MyWart(),
         ],
     };
     new TurnEntryWidget(params);
@@ -89,7 +89,7 @@ it("update and destroy (with warts)", () => {
     const params: TurnOrderWidgetParams = {
         wartGenerators: [
             (turnEntryWidget: TurnEntryWidget, params: TurnOrderWidgetParams) =>
-                new MyWart(turnEntryWidget, params),
+                new MyWart(),
         ],
     };
     const turnEntryWidget = new TurnEntryWidget(params);

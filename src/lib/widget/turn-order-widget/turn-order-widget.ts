@@ -1,5 +1,4 @@
 import {
-    Border,
     PlayerPermission,
     ScreenUIElement,
     VerticalBox,
@@ -7,43 +6,17 @@ import {
     world,
 } from "@tabletop-playground/api";
 import { TurnOrder } from "../../turn-order/turn-order";
-import { TurnEntryWartGenerator } from "./turn-entry-wart";
-import { TurnEntryWidget } from "./turn-entry-widget";
+import { TurnEntryWidgetParams, TurnEntryWidget } from "./turn-entry-widget";
 
-export type TurnOrderWidgetParams = {
-    // Per-turn entry size, stacked vertically.
-    entryWidth?: number;
-    entryHeight?: number;
-
-    // Consume pixels at edges to highlight for mouseover (max useful is 4).
-    margins?: {
-        left?: number;
-        top?: number;
-        right?: number;
-        bottom?: number;
-    };
-
-    // Where should the player name appear?  Defaults to full entry.
-    nameBox?: {
-        left?: number;
-        top?: number;
-        width?: number;
-        height?: number;
-    };
-
+export type TurnOrderWidgetParams = TurnEntryWidgetParams & {
     // Size for N turns.
     reserveSlots?: number;
-
-    // Attach additional items to the turn entry (e.g. score, faction, etc).
-    wartGenerators?: TurnEntryWartGenerator[];
 };
 
 /**
  * Display turn order, update when turn order changes.
  */
 export class TurnOrderWidget {
-    public static readonly DEFAULT_ENTRY_WIDTH = 150;
-    public static readonly DEFAULT_ENTRY_HEIGHT = 25;
     public static readonly DEFAULT_RESERVE_SLOTS = 8;
 
     private readonly _params: TurnOrderWidgetParams;
@@ -107,12 +80,11 @@ export class TurnOrderWidget {
     }
 
     public attachToScreen(): this {
-        const w: number =
-            this._params.entryWidth ?? TurnOrderWidget.DEFAULT_ENTRY_WIDTH;
-        const h: number =
-            this._params.entryHeight ?? TurnOrderWidget.DEFAULT_ENTRY_HEIGHT;
+        const params = this._params;
+        const w: number = params.entryWidth ?? TurnEntryWidget.DEFAULT_WIDTH;
+        const h: number = params.entryHeight ?? TurnEntryWidget.DEFAULT_HEIGHT;
         const reserveSlots: number =
-            this._params.reserveSlots ?? TurnOrderWidget.DEFAULT_RESERVE_SLOTS;
+            params.reserveSlots ?? TurnOrderWidget.DEFAULT_RESERVE_SLOTS;
 
         if (this._screenUI) {
             world.removeScreenUIElement(this._screenUI);

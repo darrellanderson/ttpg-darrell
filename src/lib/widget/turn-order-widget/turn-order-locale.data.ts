@@ -1,4 +1,4 @@
-export default {
+export const DICT: { [key: string]: string } = {
     "turn-order.eliminated.clear": "Clear eliminated",
     "turn-order.eliminated.set": "Set eliminated",
     "turn-order.eliminated.toggled-by":
@@ -14,4 +14,4 @@ export default {
     "turn-order.set-turn": "Set current turn",
     "turn-order.set-turn-by":
         "{clickingPlayer} set current turn to {targetPlayer}",
-};
+} as const;

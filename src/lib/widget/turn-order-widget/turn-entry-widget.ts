@@ -10,17 +10,47 @@ import {
     Widget,
     world,
 } from "@tabletop-playground/api";
-import { TurnOrder } from "../../turn-order/turn-order";
-import { TurnOrderWidget, TurnOrderWidgetParams } from "./turn-order-widget";
-import { TurnEntryWart } from "./turn-entry-wart";
-import { TurnClickedWidget } from "./turn-clicked-widget";
 import { locale } from "../../locale/locale";
+import { DICT as TurnOrderLocaleData } from "./turn-order-locale.data";
+import { TurnClickedWidget } from "./turn-clicked-widget";
+import { TurnEntryWart, TurnEntryWartGenerator } from "./turn-entry-wart";
+import { TurnOrder } from "../../turn-order/turn-order";
+
+locale.inject(TurnOrderLocaleData);
+
+export type TurnEntryWidgetParams = {
+    // Per-turn entry size, stacked vertically.
+    entryWidth?: number;
+    entryHeight?: number;
+
+    // Consume pixels at edges to highlight for mouseover (max useful is 4).
+    margins?: {
+        left?: number;
+        top?: number;
+        right?: number;
+        bottom?: number;
+    };
+
+    // Where should the player name appear?  Defaults to full entry.
+    nameBox?: {
+        left?: number;
+        top?: number;
+        width?: number;
+        height?: number;
+    };
+
+    // Attach additional items to the turn entry (e.g. score, faction, etc).
+    wartGenerators?: TurnEntryWartGenerator[];
+};
 
 /**
  * A single widget in the TurnOrderWidget's vertical stack.
  */
 export class TurnEntryWidget {
-    private readonly _params: TurnOrderWidgetParams;
+    public static readonly DEFAULT_WIDTH = 150;
+    public static readonly DEFAULT_HEIGHT = 25;
+
+    private readonly _params: TurnEntryWidgetParams;
     private readonly _widget: LayoutBox;
     private readonly _contentButton: ContentButton;
     private readonly _canvas: Canvas;
@@ -54,11 +84,9 @@ export class TurnEntryWidget {
         return { fgColor, bgColor };
     }
 
-    constructor(params: TurnOrderWidgetParams) {
-        const w: number =
-            params.entryWidth ?? TurnOrderWidget.DEFAULT_ENTRY_WIDTH;
-        const h: number =
-            params.entryHeight ?? TurnOrderWidget.DEFAULT_ENTRY_HEIGHT;
+    constructor(params: TurnEntryWidgetParams) {
+        const w: number = params.entryWidth ?? TurnEntryWidget.DEFAULT_WIDTH;
+        const h: number = params.entryHeight ?? TurnEntryWidget.DEFAULT_HEIGHT;
 
         this._params = params;
 
@@ -160,7 +188,7 @@ export class TurnEntryWidget {
         const player: Player | undefined = world.getPlayerBySlot(playerSlot);
         const playerName = TurnEntryWidget.truncateLongText(
             this._nameW,
-            player?.getName() ?? locale("player_name_missing")
+            player?.getName() ?? locale("turn-order.player-name.missing")
         );
         this._nameText.setText(playerName).setTextColor(fgColor);
 
@@ -180,7 +208,7 @@ export class TurnEntryWidget {
             (button: ContentButton, clickingPlayer: Player) => {
                 new TurnClickedWidget(
                     turnOrder,
-                    this._params,
+                    this._params.entryHeight ?? TurnEntryWidget.DEFAULT_HEIGHT,
                     playerSlot
                 ).attachToScreen(clickingPlayer);
             }

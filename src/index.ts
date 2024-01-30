@@ -31,5 +31,5 @@ export * from "./lib/widget/turn-order-widget/turn-entry-wart";
 export * from "./lib/widget/turn-order-widget/turn-entry-widget";
 export * from "./lib/widget/turn-order-widget/turn-order-widget";
 
-import locale_data from "./locale.data";
-locale.inject(locale_data);
+import { DICT } from "./locale.data";
+locale.inject(DICT);

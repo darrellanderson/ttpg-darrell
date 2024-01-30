@@ -12,8 +12,5 @@ it("constructor", () => {
             throw new Error("Method not implemented.");
         }
     }
-
-    const params: TurnOrderWidgetParams = {};
-    const turnEntryWidget = new TurnEntryWidget(params);
-    new MyTurnEntryWart(turnEntryWidget, params);
+    new MyTurnEntryWart();
 });

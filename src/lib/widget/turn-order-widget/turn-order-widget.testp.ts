@@ -1,16 +1,14 @@
 // Resolution options are all 16/9 aspect ratio, but what about full screen?
 // Tests see window height is 720 when using the smallest option for screen resolution.
 
-import {
-    Border,
-    ScreenUIElement,
-    refObject,
-    world,
-} from "@tabletop-playground/api";
+import { Border, refObject } from "@tabletop-playground/api";
+import { ErrorHandler } from "../../error-handler/error-handler";
 import { TurnEntryWart } from "./turn-entry-wart";
 import { TurnEntryWidget } from "./turn-entry-widget";
 import { TurnOrder } from "../../turn-order/turn-order";
 import { TurnOrderWidget, TurnOrderWidgetParams } from "./turn-order-widget";
+
+new ErrorHandler().init();
 
 console.log("--- TURN ORDER WIDGET TEST ---");
 
@@ -41,7 +39,7 @@ const turnOrderWidget = new TurnOrderWidget(turnOrder, {
                     turnEntryWidget: TurnEntryWidget,
                     params: TurnOrderWidgetParams
                 ) {
-                    super(turnEntryWidget, params);
+                    super();
                     turnEntryWidget
                         .getCanvas()
                         .addChild(

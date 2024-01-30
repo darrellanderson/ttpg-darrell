@@ -15,33 +15,27 @@ import {
 import { locale } from "../../locale/locale";
 import { Broadcast } from "../../broadcast/broadcast";
 import { TurnOrder } from "../../turn-order/turn-order";
-import { TurnOrderWidget, TurnOrderWidgetParams } from "./turn-order-widget";
 
-import turnOrderLocaleData from "./turn-order-locale.data";
-locale.inject(turnOrderLocaleData);
-
-import globalLocaleData from "../../../locale.data";
-locale.inject(globalLocaleData);
+import { DICT as GlobalLocaleData } from "../../../locale.data";
+import { DICT as TurnOrderLocaleData } from "./turn-order-locale.data";
+locale.inject(GlobalLocaleData);
+locale.inject(TurnOrderLocaleData);
 
 /**
  * "Popup" with options when clicking on a TurnEntryWidget.
  */
 export class TurnClickedWidget {
     private readonly _turnOrder: TurnOrder;
-    private readonly _params: TurnOrderWidgetParams;
+    private readonly _entryHeight: number;
     private readonly _targetPlayerSlot: number;
     private readonly _targetPlayerName: string;
     private readonly _targetPlayerIndex: number;
 
     private _screenUI: ScreenUIElement | undefined;
 
-    constructor(
-        turnOrder: TurnOrder,
-        params: TurnOrderWidgetParams,
-        playerSlot: number
-    ) {
+    constructor(turnOrder: TurnOrder, entryHeight: number, playerSlot: number) {
         this._turnOrder = turnOrder;
-        this._params = params;
+        this._entryHeight = entryHeight;
         this._targetPlayerSlot = playerSlot;
 
         const targetPlayer: Player | undefined =
@@ -138,9 +132,6 @@ export class TurnClickedWidget {
     }
 
     attachToScreen(visibleToPlayer: Player): this {
-        const h: number =
-            this._params.entryHeight ?? TurnOrderWidget.DEFAULT_ENTRY_HEIGHT;
-
         if (this._screenUI) {
             world.removeScreenUIElement(this._screenUI);
             this._screenUI = undefined;
@@ -150,7 +141,7 @@ export class TurnClickedWidget {
         this._screenUI.anchorY = 0;
         this._screenUI.positionX = 1;
         this._screenUI.positionY = Math.round(
-            h * (this._targetPlayerIndex + 1.1)
+            this._entryHeight * (this._targetPlayerIndex + 1.1)
         );
         this._screenUI.relativePositionX = true;
         this._screenUI.relativePositionY = false;
