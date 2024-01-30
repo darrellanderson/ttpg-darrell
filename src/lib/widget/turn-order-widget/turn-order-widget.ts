@@ -53,6 +53,12 @@ export class TurnOrderWidget {
     private _turnEntryWidgets: TurnEntryWidget[] = [];
     private _screenUI: ScreenUIElement | undefined;
 
+    private readonly _onTurnStateChangedHandler = (turnOrder: TurnOrder) => {
+        if (turnOrder === this._turnOrder) {
+            this.update();
+        }
+    };
+
     constructor(turnOrder: TurnOrder, params: TurnOrderWidgetParams) {
         this._params = params;
         this._turnOrder = turnOrder;
@@ -60,13 +66,13 @@ export class TurnOrderWidget {
         this._panel = new VerticalBox().setChildDistance(0);
         this._visibleToPlayerSlots = [...Array(20).keys()];
 
-        TurnOrder.onTurnStateChanged.add((turnOrder: TurnOrder) => {
-            if (turnOrder === this._turnOrder) {
-                this.update();
-            }
-        });
+        TurnOrder.onTurnStateChanged.add(this._onTurnStateChangedHandler);
 
         this.update();
+    }
+
+    public destroy(): void {
+        TurnOrder.onTurnStateChanged.remove(this._onTurnStateChangedHandler);
     }
 
     public getWidget(): Widget {
@@ -115,6 +121,9 @@ export class TurnOrderWidget {
         this._screenUI = new ScreenUIElement();
         this._screenUI.anchorX = 1.1;
         this._screenUI.anchorY = -0.1;
+        this._screenUI.players = new PlayerPermission().setPlayerSlots(
+            this._visibleToPlayerSlots
+        );
         this._screenUI.positionX = 1;
         this._screenUI.relativePositionX = true;
         this._screenUI.relativePositionY = true;
@@ -146,6 +155,7 @@ export class TurnOrderWidget {
             this._screenUI.players = new PlayerPermission().setPlayerSlots(
                 this._visibleToPlayerSlots
             );
+            world.updateScreenUI(this._screenUI);
         }
         return this;
     }

@@ -6,6 +6,11 @@ it("constructor", () => {
     new TurnOrderWidget(turnOrder, {});
 });
 
+it("destroy", () => {
+    const turnOrder: TurnOrder = new TurnOrder("@test/test");
+    new TurnOrderWidget(turnOrder, {}).destroy();
+});
+
 it("update (via event)", () => {
     const turnOrder: TurnOrder = new TurnOrder("@test/test");
     new TurnOrderWidget(turnOrder, {});
