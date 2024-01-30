@@ -10,7 +10,7 @@ const _lang: { [key: string]: string } = {};
 export const locale = (
     key: string,
     replacement: { [key: string]: string | number } | undefined = undefined
-) => {
+): string => {
     const str = _lang[key];
     if (!str) {
         return key; // not registered, use key as stand-in
@@ -41,7 +41,7 @@ export const locale = (
         });
 };
 
-locale.inject = (dict: { [key: string]: string }) => {
+locale.inject = (dict: { [key: string]: string }): void => {
     for (const [k, v] of Object.entries(dict)) {
         _lang[k] = v;
     }

@@ -4,13 +4,13 @@ import {
     Color,
     LayoutBox,
     Player,
+    PlayerPermission,
     ScreenUIElement,
     Sound,
     Widget,
     world,
 } from "@tabletop-playground/api";
 import { locale } from "../../locale/locale";
-import { PlayerPermission } from "ttpg-mock";
 import { TurnOrder } from "../../turn-order/turn-order";
 
 import localeData from "./end-turn-locale.data";
@@ -28,7 +28,7 @@ export type EndTurnButtonParams = {
  * Optionally play a sound when it becomes a player's turn.
  */
 export class EndTurnButton {
-    public static readonly WIDTH = 200;
+    public static readonly WIDTH = 180;
     public static readonly HEIGHT = 60;
     public static readonly FONT_SIZE = 18;
     public static readonly BORDER_SIZE = 2;
@@ -103,7 +103,7 @@ export class EndTurnButton {
     }
 
     update(): void {
-        const current = this._turnOrder.getCurrentTurn();
+        const current: number = this._turnOrder.getCurrentTurn();
         if (current === this._visibleTo) {
             return; // already set up for current player
         }
@@ -111,9 +111,8 @@ export class EndTurnButton {
         this._visibleTo = current;
         const color: Color =
             current >= 0 ? world.getSlotColor(current) : new Color(1, 1, 1, 1);
-        const playerPermission = new PlayerPermission().setPlayerSlots([
-            this._visibleTo,
-        ]);
+        const playerPermission: PlayerPermission =
+            new PlayerPermission().setPlayerSlots([this._visibleTo]);
         this._widget.setVisible(this._visibleTo >= 0);
 
         // Update color.
@@ -145,15 +144,21 @@ export class EndTurnButton {
             this._screenUI = undefined;
         }
 
+        const playerPermission = new PlayerPermission().setPlayerSlots([
+            this._visibleTo,
+        ]);
+        const scale = this._params.scale ?? 1;
+
         this._screenUI = new ScreenUIElement();
         this._screenUI.anchorX = 0.5;
         this._screenUI.anchorY = 0;
-        this._screenUI.players = new PlayerPermission().setPlayerSlots([
-            this._visibleTo,
-        ]);
+        this._screenUI.players = playerPermission;
         this._screenUI.positionX = 0.5;
         this._screenUI.positionY = EndTurnButton.OFFSET_TOP;
         this._screenUI.relativePositionX = true;
+        this._screenUI.relativePositionY = false;
+        this._screenUI.width = Math.round(EndTurnButton.WIDTH * scale);
+        this._screenUI.height = Math.round(EndTurnButton.HEIGHT * scale);
         this._screenUI.widget = this._widget;
         world.addScreenUI(this._screenUI);
 

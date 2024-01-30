@@ -30,6 +30,10 @@ export class TurnOrder {
     public static readonly onTurnStateChanged =
         new TriggerableMulticastDelegate<(turnOrder: TurnOrder) => void>();
 
+    private static readonly _idToTurnOrder: {
+        [key: NamedspacedId]: TurnOrder;
+    } = {};
+
     private readonly _savedDataKey: NamedspacedId;
     private readonly _passed: Set<PlayerSlot> = new Set();
     private readonly _eliminated: Set<PlayerSlot> = new Set();
@@ -39,6 +43,16 @@ export class TurnOrder {
     private _currentTurn: PlayerSlot = -1;
     private _snake: boolean = false;
     private _snakeNeedsAnotherTurn: boolean = false;
+
+    static getInstance(savedDataKey: NamedspacedId): TurnOrder {
+        let turnOrder: TurnOrder | undefined =
+            TurnOrder._idToTurnOrder[savedDataKey];
+        if (!turnOrder) {
+            turnOrder = new TurnOrder(savedDataKey);
+            TurnOrder._idToTurnOrder[savedDataKey] = turnOrder;
+        }
+        return turnOrder;
+    }
 
     constructor(savedDataKey: NamedspacedId) {
         this._savedDataKey = savedDataKey;

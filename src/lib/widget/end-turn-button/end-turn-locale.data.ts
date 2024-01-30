@@ -1,3 +1,3 @@
 export default {
-    "button.end-turn": "End turn",
+    "button.end-turn": "END TURN",
 };

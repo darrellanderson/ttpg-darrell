@@ -12,7 +12,7 @@ new ErrorHandler().init();
 
 console.log("--- TURN ORDER WIDGET TEST ---");
 
-const turnOrder = new TurnOrder("@test/test")
+const turnOrder = TurnOrder.getInstance("@test/test")
     .setTurnOrder([0, 1, 2, 3, 4, 5], "forward", 0)
     .setPassed(0, true);
 
