@@ -1,24 +1,24 @@
 import {
+    Player,
     PlayerPermission,
     ScreenUIElement,
     VerticalBox,
     Widget,
+    globalEvents,
     world,
 } from "@tabletop-playground/api";
+import { locale } from "../../locale/locale";
+import { TurnEntryWidget } from "./turn-entry-widget";
 import { TurnOrder } from "../../turn-order/turn-order";
-import { TurnEntryWidgetParams, TurnEntryWidget } from "./turn-entry-widget";
-
-export type TurnOrderWidgetParams = TurnEntryWidgetParams & {
-    // Size for N turns.
-    reserveSlots?: number;
-};
+import {
+    TurnOrderWidgetDefaults,
+    TurnOrderWidgetParams,
+} from "./turn-order-widget-params";
 
 /**
  * Display turn order, update when turn order changes.
  */
 export class TurnOrderWidget {
-    public static readonly DEFAULT_RESERVE_SLOTS = 8;
-
     private readonly _params: TurnOrderWidgetParams;
     private readonly _turnOrder: TurnOrder;
     private readonly _panel: VerticalBox;
@@ -32,6 +32,18 @@ export class TurnOrderWidget {
         }
     };
 
+    private readonly _toggleVisibilityActionName = locale(
+        "turn-order.context-menu.toggle-visibility"
+    );
+    private readonly _onCustomActionHandler = (
+        player: Player,
+        identifier: string
+    ) => {
+        if (identifier === this._toggleVisibilityActionName) {
+            this.toggleVisibility(player.getSlot());
+        }
+    };
+
     constructor(turnOrder: TurnOrder, params: TurnOrderWidgetParams) {
         this._params = params;
         this._turnOrder = turnOrder;
@@ -40,12 +52,16 @@ export class TurnOrderWidget {
         this._visibleToPlayerSlots = [...Array(20).keys()];
 
         TurnOrder.onTurnStateChanged.add(this._onTurnStateChangedHandler);
+        globalEvents.onCustomAction.add(this._onCustomActionHandler);
+        world.removeCustomAction(this._toggleVisibilityActionName);
+        world.addCustomAction(this._toggleVisibilityActionName);
 
         this.update();
     }
 
     public destroy(): void {
         TurnOrder.onTurnStateChanged.remove(this._onTurnStateChangedHandler);
+        globalEvents.onCustomAction.remove(this._onCustomActionHandler);
     }
 
     public getWidget(): Widget {
@@ -81,10 +97,13 @@ export class TurnOrderWidget {
 
     public attachToScreen(): this {
         const params = this._params;
-        const w: number = params.entryWidth ?? TurnEntryWidget.DEFAULT_WIDTH;
-        const h: number = params.entryHeight ?? TurnEntryWidget.DEFAULT_HEIGHT;
+        const w: number =
+            params.entryWidth ?? TurnOrderWidgetDefaults.DEFAULT_ENTRY_WIDTH;
+        const h: number =
+            params.entryHeight ?? TurnOrderWidgetDefaults.DEFAULT_ENTRY_HEIGHT;
         const reserveSlots: number =
-            params.reserveSlots ?? TurnOrderWidget.DEFAULT_RESERVE_SLOTS;
+            params.reserveSlots ??
+            TurnOrderWidgetDefaults.DEFAULT_RESERVE_SLOTS;
 
         if (this._screenUI) {
             world.removeScreenUIElement(this._screenUI);

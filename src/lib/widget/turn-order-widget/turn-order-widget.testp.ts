@@ -6,7 +6,8 @@ import { ErrorHandler } from "../../error-handler/error-handler";
 import { TurnEntryWart } from "./turn-entry-wart";
 import { TurnEntryWidget } from "./turn-entry-widget";
 import { TurnOrder } from "../../turn-order/turn-order";
-import { TurnOrderWidget, TurnOrderWidgetParams } from "./turn-order-widget";
+import { TurnOrderWidget } from "./turn-order-widget";
+import { TurnOrderWidgetParams } from "./turn-order-widget-params";
 
 new ErrorHandler().init();
 

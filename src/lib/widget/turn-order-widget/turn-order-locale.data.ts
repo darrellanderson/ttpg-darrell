@@ -1,4 +1,6 @@
 export const DICT: { [key: string]: string } = {
+    "turn-order.context-menu.toggle-visibility": "* Toggle turn order",
+
     "turn-order.eliminated.clear": "Clear eliminated",
     "turn-order.eliminated.set": "Set eliminated",
     "turn-order.eliminated.toggled-by":

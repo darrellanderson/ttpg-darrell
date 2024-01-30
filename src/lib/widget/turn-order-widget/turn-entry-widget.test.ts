@@ -4,11 +4,11 @@ import {
     LayoutBox,
     Widget,
 } from "@tabletop-playground/api";
-import { TurnOrder } from "../../turn-order/turn-order";
+import { MockContentButton, MockPlayer } from "ttpg-mock";
 import { TurnEntryWart } from "./turn-entry-wart";
 import { TurnEntryWidget } from "./turn-entry-widget";
-import { TurnOrderWidgetParams } from "./turn-order-widget";
-import { MockContentButton, MockPlayer } from "ttpg-mock";
+import { TurnOrder } from "../../turn-order/turn-order";
+import { TurnOrderWidgetParams } from "./turn-order-widget-params";
 
 it("computeFontSize", () => {
     const value: number = TurnEntryWidget.computeFontSize(100);

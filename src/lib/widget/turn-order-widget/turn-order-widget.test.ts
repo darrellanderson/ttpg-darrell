@@ -1,6 +1,12 @@
 import { TurnOrder } from "../../turn-order/turn-order";
 import { TurnOrderWidget } from "./turn-order-widget";
 
+it("getInstance", () => {
+    const turnOrder1 = TurnOrder.getInstance("@test/shared");
+    const turnOrder2 = TurnOrder.getInstance("@test/shared");
+    expect(turnOrder1).toBe(turnOrder2);
+});
+
 it("constructor", () => {
     const turnOrder: TurnOrder = new TurnOrder("@test/test");
     new TurnOrderWidget(turnOrder, {});
