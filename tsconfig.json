@@ -10,8 +10,9 @@
         "types": ["@types/jest", "@types/node", "@tabletop-playground/api"],
         "skipLibCheck": true,
         "declaration": true,
-        "sourceMap": true
+        "removeComments": true,
+        "sourceMap": true,
     },
     "include": ["./src/**/*.ts"],
-    "exclude": ["./src/**/*.test.ts"]
+    "exclude": ["./src/**/*.test.ts"],
 }
