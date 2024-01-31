@@ -39,7 +39,7 @@ export class PerfWidget {
         return this._webBrowser;
     }
 
-    toggleVisibility(playerSlot: number): void {
+    toggleVisibility(playerSlot: number): this {
         const index = this._visibleToPlayerSlots.indexOf(playerSlot);
         if (index >= 0) {
             this._visibleToPlayerSlots.splice(index, 1);
@@ -59,6 +59,7 @@ export class PerfWidget {
         } else if (!this._screenUI) {
             this.attachToScreen();
         }
+        return this;
     }
 
     attachToScreen(): void {
