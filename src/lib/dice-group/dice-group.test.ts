@@ -1,4 +1,10 @@
-import { MockDice, MockPlayer, mockWorld } from "ttpg-mock";
+import {
+    MockDice,
+    MockGameObject,
+    MockPlayer,
+    globalEvents,
+    mockWorld,
+} from "ttpg-mock";
 import {
     DICE_GROUP_SAVED_DATA_KEY,
     DiceGroup,
@@ -41,15 +47,18 @@ it("cleanup", () => {
         savedData: { [DICE_GROUP_SAVED_DATA_KEY]: value },
     });
     const diceNo = new MockDice({});
+    const objNo = new MockGameObject();
 
     expect(diceYes.getSavedData(DICE_GROUP_SAVED_DATA_KEY)).toEqual(value);
     expect(diceYes.isValid()).toBeTruthy();
     expect(diceNo.isValid()).toBeTruthy();
+    expect(objNo.isValid()).toBeTruthy();
 
     new DiceGroupCleanup().init();
 
     expect(diceYes.isValid()).toBeFalsy();
     expect(diceNo.isValid()).toBeTruthy();
+    expect(objNo.isValid()).toBeTruthy();
 });
 
 it("fakeRoll (empty)", () => {
@@ -105,6 +114,70 @@ it("fakeRoll", () => {
         doFakeRoll: true,
     });
 
+    expect(eventCount).toEqual(1);
+    expect(diceCount).toEqual(3);
+    expect(rerolledCount).toEqual(2);
+    expect(hitCount).toEqual(1);
+    expect(critCount).toEqual(1);
+});
+
+it("roll (empty)", () => {
+    const player = new MockPlayer();
+    DiceGroup.roll({
+        diceParams: [],
+        player,
+        timeoutSeconds: -1,
+        deleteAfterSeconds: -1,
+    });
+});
+
+it("roll", () => {
+    mockWorld._reset({
+        _templateIdToMockGameObjectParams: {
+            "9065AC5141F87F8ADE1F5AB6390BBEE4": { _objType: "Dice" },
+        },
+    });
+
+    let genericDiceEventCount = 0;
+    globalEvents.onDiceRolled.add(() => {
+        genericDiceEventCount++;
+    });
+
+    let eventCount = 0;
+    let diceCount = 0;
+    let rerolledCount = 0;
+    let hitCount = 0;
+    let critCount = 0;
+    const callback = (diceResults: DiceResult[], player: Player): void => {
+        eventCount += 1;
+        diceCount += diceResults.length;
+        for (const diceResult of diceResults) {
+            if (diceResult.rerolledValue !== undefined) {
+                rerolledCount += 1;
+            }
+            if (diceResult.hit) {
+                hitCount += 1;
+            }
+            if (diceResult.crit) {
+                critCount += 1;
+            }
+        }
+    };
+
+    const player = new MockPlayer();
+    DiceGroup.roll({
+        diceParams: [
+            { sides: 10, hit: 11, reroll: true }, // hit larger than max guarantee reroll
+            { sides: 10, hit: 11, reroll: true }, // hit larger than max guarantee reroll
+            { sides: 10, hit: 0, crit: 0, reroll: true }, // hit zero guarantee hit
+        ],
+        player,
+        timeoutSeconds: -1,
+        deleteAfterSeconds: -1,
+        callback,
+    });
+
+    expect(genericDiceEventCount).toEqual(5); // 3 + 2 rerolls
     expect(eventCount).toEqual(1);
     expect(diceCount).toEqual(3);
     expect(rerolledCount).toEqual(2);
