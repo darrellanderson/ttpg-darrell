@@ -2,6 +2,10 @@ import { globalEvents } from "@tabletop-playground/api";
 import { MockMulticastDelegate } from "ttpg-mock";
 import { Perf, PerfReport } from "./perf";
 
+it("init", () => {
+    new Perf().init();
+});
+
 it("constructor", () => {
     new Perf();
 });
