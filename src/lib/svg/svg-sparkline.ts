@@ -6,7 +6,7 @@ export class SvgSparkline {
      * @returns
      */
     static svg(values: number[]): string {
-        const max = Math.max(...values);
+        const max = Math.max(...values, 0);
         if (max === 0) {
             return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 100'></svg>`;
         }
