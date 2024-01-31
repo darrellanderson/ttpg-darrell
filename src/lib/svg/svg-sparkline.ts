@@ -6,10 +6,24 @@ export class SvgSparkline {
      * @returns
      */
     static svg(values: number[]): string {
-        const max = Math.max(...values, 0);
+        // Get the average non-zero value.
+        const nonZeroValues = values.filter((value) => value > 0);
+        if (nonZeroValues.length === 0) {
+            nonZeroValues.push(0);
+        }
+        const mean: number =
+            nonZeroValues.reduce((a, b) => a + b, 0) / nonZeroValues.length;
+
+        // Compute an upper bound, cap at a multiple of the average.
+        let max = Math.min(Math.max(...values, 0), mean * 3);
         if (max === 0) {
             return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 100'></svg>`;
         }
+
+        // Round up factor of 10.
+        max = Math.floor(max + 9) * 10;
+
+        // Convert to [0:100] for display.
         const v = values.map((value) => 100 - Math.round((value * 100) / max));
         const path = [`M 0 ${v[0]}`];
         for (let i = 1; i < v.length; i++) {
