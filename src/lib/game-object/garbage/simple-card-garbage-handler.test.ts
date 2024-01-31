@@ -105,10 +105,8 @@ it("recycle (no deck)", () => {
 });
 
 it("recycle (missing mat)", () => {
-    const matNsid = "mat:base/my-mat";
     const snapPointTag = "my-snap-point-tag";
     const cardNsidPrefix = "my-prefix";
-    const deckPos = new MockVector(100, 0, 0);
 
     const scgh = new SimpleCardGarbageHandler()
         .setSnapPointTag(snapPointTag)

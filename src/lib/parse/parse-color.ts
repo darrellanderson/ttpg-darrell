@@ -26,7 +26,7 @@ export class ParseColor {
             b = Number.parseInt(hexStr.substring(4, 6), 16) / 255;
         }
         if (hexStr.length === 8) {
-            b = Number.parseInt(hexStr.substring(6, 8), 16) / 255;
+            a = Number.parseInt(hexStr.substring(6, 8), 16) / 255;
         }
         return new Color(r, g, b, a);
     }

@@ -55,7 +55,7 @@ it("add/clear", () => {
 });
 
 it("error (single)", () => {
-    const handler = (value: number) => {
+    const handler = () => {
         throw new Error("err!");
     };
 
@@ -74,7 +74,7 @@ it("error (single)", () => {
 });
 
 it("error (double)", () => {
-    const handler = (value: number) => {
+    const handler = () => {
         throw new Error("err!");
     };
 

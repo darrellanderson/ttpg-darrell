@@ -34,7 +34,7 @@ it("long data", () => {
 
     dataStore.set(dataId, data);
 
-    let output = dataStore.get(dataId);
+    const output = dataStore.get(dataId);
     expect(output).toBe(data);
     expect(world.getAllObjects().length).toEqual(2);
 

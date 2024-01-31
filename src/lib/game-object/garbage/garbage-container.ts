@@ -1,10 +1,4 @@
-import {
-    Card,
-    Container,
-    GameObject,
-    Player,
-    Vector,
-} from "@tabletop-playground/api";
+import { Card, Container, GameObject, Vector } from "@tabletop-playground/api";
 import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate";
 
 /**
@@ -113,17 +107,11 @@ export class GarbageContainer {
         }
         this._container = container;
 
-        container.onInserted.add(
-            (
-                container: Container,
-                insertedObjects: GameObject[],
-                player: Player
-            ) => {
-                process.nextTick(() => {
-                    this._recycle();
-                });
-            }
-        );
+        container.onInserted.add(() => {
+            process.nextTick(() => {
+                this._recycle();
+            });
+        });
     }
 
     // Expose for testing.

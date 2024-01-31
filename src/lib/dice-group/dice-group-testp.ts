@@ -1,4 +1,4 @@
-import { Player, refObject, world } from "@tabletop-playground/api";
+import { refObject, world } from "@tabletop-playground/api";
 import { DiceGroup, DiceGroupCleanup, DiceResult } from "./dice-group";
 
 world.setShowDiceRollMessages(false);
@@ -27,7 +27,7 @@ DiceGroup.roll({
     position: refObject.getPosition().add([0, 4, 0]),
     timeoutSeconds: -1, // no timeout
     deleteAfterSeconds: -1, // no delete
-    callback: (diceResults: DiceResult[], player: Player) => {
+    callback: (diceResults: DiceResult[]) => {
         console.log(
             diceResults
                 .map((diceResult) => DiceGroup.format(diceResult))

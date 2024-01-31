@@ -109,7 +109,7 @@ export class TurnClickedWidget {
 
     _createCancelButton(): Button {
         const button = new Button().setText(locale("button.cancel"));
-        button.onClicked.add((button: Button, clickingPlayer: Player) => {
+        button.onClicked.add(() => {
             this.detach();
         });
         return button;

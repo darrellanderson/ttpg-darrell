@@ -21,7 +21,7 @@ export abstract class ErrorBatcher {
         return entry.join("\n");
     }
 
-    static runMaybeThrowAtEnd(runnables: ((x: void) => any)[]): void {
+    static runMaybeThrowAtEnd(runnables: ((x: void) => unknown)[]): void {
         const errors: Error[] = ErrorBatcher.runGatherErrors(runnables);
         if (errors.length > 0) {
             const message = `ErrorBatcher (${errors.length}):`;
@@ -35,7 +35,7 @@ export abstract class ErrorBatcher {
         }
     }
 
-    static runGatherErrors(runnables: ((x: void) => any)[]): Error[] {
+    static runGatherErrors(runnables: ((x: void) => unknown)[]): Error[] {
         const errors: Error[] = [];
         for (const runnable of runnables) {
             try {

@@ -37,14 +37,14 @@ export class UiVisibility {
         return this._visibleToPlayerSlots.includes(playerSlot);
     }
 
-    setNone(): this {
-        this._visibleToPlayerSlots = [];
+    setAll(): this {
+        this._visibleToPlayerSlots = [...Array(20).keys()];
         this._update();
         return this;
     }
 
-    setAll(): this {
-        this._visibleToPlayerSlots = [...Array(20).keys()];
+    setNone(): this {
+        this._visibleToPlayerSlots = [];
         this._update();
         return this;
     }

@@ -220,8 +220,8 @@ it("cancel button", () => {
     const button: MockButton =
         turnClickedWidget._createCancelButton() as MockButton;
 
-    let localeKey = "button.cancel";
-    let localeValue = locale(localeKey);
+    const localeKey = "button.cancel";
+    const localeValue = locale(localeKey);
     expect(localeKey).not.toEqual(localeValue);
     expect(button.getText()).toEqual(localeValue);
 

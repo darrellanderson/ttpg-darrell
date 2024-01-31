@@ -1,5 +1,3 @@
-import { world } from "@tabletop-playground/api";
-
 const REPLACE_REGEX = /(?<!\\){(?!#)(.*?)(?<!\\)}/gm;
 const PLURAL_REGEX = /(?<!\\){#(.*?)(?<!\\)}/gm;
 const PLURAL_SEPERATOR = /(?<!\\)\|/gm;

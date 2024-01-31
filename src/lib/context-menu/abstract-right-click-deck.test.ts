@@ -1,4 +1,4 @@
-import { Card, GameObject, Player } from "@tabletop-playground/api";
+import { Card } from "@tabletop-playground/api";
 import { AbstractRightClickDeck } from "./abstract-right-click-deck";
 import { MockCard, MockCardDetails, MockPlayer, mockWorld } from "ttpg-mock";
 import { OnCardBecameSingletonOrDeck } from "../event/on-card-became-singleton-or-deck";
@@ -8,11 +8,7 @@ it("constructor", () => {
 
     const deckNsidPrefix = "my-nsid";
     const customActionName = "* My action";
-    const customActionHandler = (
-        object: GameObject,
-        player: Player,
-        identifier: string
-    ) => {};
+    const customActionHandler = () => {};
     new MyClass(deckNsidPrefix, customActionName, customActionHandler);
 });
 
@@ -31,11 +27,7 @@ it("deck yes", () => {
     let customActionCount = 0;
     class MyClass extends AbstractRightClickDeck {}
     const customActionName = "* My action";
-    const customActionHandler = (
-        object: GameObject,
-        player: Player,
-        identifier: string
-    ) => {
+    const customActionHandler = () => {
         customActionCount++;
     };
     new MyClass(deckNsidPrefix, customActionName, customActionHandler).init();
@@ -82,11 +74,7 @@ it("deck no", () => {
     let customActionCount = 0;
     class MyClass extends AbstractRightClickDeck {}
     const customActionName = "* My action";
-    const customActionHandler = (
-        object: GameObject,
-        player: Player,
-        identifier: string
-    ) => {
+    const customActionHandler = () => {
         customActionCount++;
     };
     new MyClass(deckNsidPrefix, customActionName, customActionHandler).init();

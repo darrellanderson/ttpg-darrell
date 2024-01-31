@@ -113,7 +113,7 @@ export class LayoutObjects {
      * @returns {LayoutObjectsSize}
      */
     calculateSize(): LayoutObjectsSize {
-        let size = this.calculateChildrenSize();
+        const size = this.calculateChildrenSize();
         if (this._overrideHeight > 0) {
             size.h = this._overrideHeight;
         }

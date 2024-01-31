@@ -1,4 +1,3 @@
-import { Color } from "@tabletop-playground/api";
 import { TurnEntryWart } from "./turn-entry-wart";
 
 it("constructor", () => {
@@ -6,7 +5,7 @@ it("constructor", () => {
         destroy(): void {
             throw new Error("Method not implemented.");
         }
-        update(playerSlot: number, fgColor: Color, bgColor: Color): void {
+        update(): void {
             throw new Error("Method not implemented.");
         }
     }

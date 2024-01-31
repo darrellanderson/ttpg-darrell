@@ -4,7 +4,6 @@ import {
     Color,
     LayoutBox,
     Player,
-    PlayerPermission,
     ScreenUIElement,
     Sound,
     Widget,

@@ -7,7 +7,6 @@ import { TurnEntryWart } from "./turn-entry-wart";
 import { TurnEntryWidget } from "./turn-entry-widget";
 import { TurnOrder } from "../../turn-order/turn-order";
 import { TurnOrderWidget } from "./turn-order-widget";
-import { TurnOrderWidgetParams } from "./turn-order-widget-params";
 
 new ErrorHandler().init();
 
@@ -34,12 +33,9 @@ const turnOrderWidget = new TurnOrderWidget(turnOrder, {
     },
     reserveSlots: 6,
     wartGenerators: [
-        (turnEntryWidget: TurnEntryWidget, params: TurnOrderWidgetParams) => {
+        (turnEntryWidget: TurnEntryWidget) => {
             class MyWart extends TurnEntryWart {
-                constructor(
-                    turnEntryWidget: TurnEntryWidget,
-                    params: TurnOrderWidgetParams
-                ) {
+                constructor(turnEntryWidget: TurnEntryWidget) {
                     super();
                     turnEntryWidget
                         .getCanvas()
@@ -52,9 +48,9 @@ const turnOrderWidget = new TurnOrderWidget(turnOrder, {
                         );
                 }
                 destroy(): void {}
-                update(playerSlot: number): void {}
+                update(): void {}
             }
-            return new MyWart(turnEntryWidget, params);
+            return new MyWart(turnEntryWidget);
         },
     ],
 });

@@ -69,13 +69,10 @@ it("constructor (with most optional parameters)", () => {
 it("constructor (with wart generator)", () => {
     class MyWart extends TurnEntryWart {
         destroy(): void {}
-        update(playerSlot: number): void {}
+        update(): void {}
     }
     const params: TurnOrderWidgetParams = {
-        wartGenerators: [
-            (turnEntryWidget: TurnEntryWidget, params: TurnOrderWidgetParams) =>
-                new MyWart(),
-        ],
+        wartGenerators: [() => new MyWart()],
     };
     new TurnEntryWidget(params);
 });
@@ -84,13 +81,10 @@ it("update and destroy (with warts)", () => {
     new MockPlayer({ slot: 1, name: "my-name" });
     class MyWart extends TurnEntryWart {
         destroy(): void {}
-        update(playerSlot: number): void {}
+        update(): void {}
     }
     const params: TurnOrderWidgetParams = {
-        wartGenerators: [
-            (turnEntryWidget: TurnEntryWidget, params: TurnOrderWidgetParams) =>
-                new MyWart(),
-        ],
+        wartGenerators: [() => new MyWart()],
     };
     const turnEntryWidget = new TurnEntryWidget(params);
     const turnOrder = new TurnOrder("@test/test").setTurnOrder(

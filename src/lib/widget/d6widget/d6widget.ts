@@ -78,8 +78,8 @@ export class D6Widget {
 
         // Shift the image so the visible portion is col/row of the 3x3.
         const s: number = this._layoutBox.getOverrideWidth();
-        let x: number = col * -s;
-        let y: number = row * -s;
+        const x: number = col * -s;
+        const y: number = row * -s;
 
         this._canvas.updateChild(this._imageWidget, x, y, s * 3, s * 3);
         return this;

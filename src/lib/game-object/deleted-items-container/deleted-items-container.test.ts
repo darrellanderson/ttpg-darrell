@@ -1,4 +1,4 @@
-import { Card, Container, Player } from "@tabletop-playground/api";
+import { Container } from "@tabletop-playground/api";
 import { MockCard, MockContainer, MockGameObject, MockPlayer } from "ttpg-mock";
 import { DeletedItemsContainer } from "./deleted-items-container";
 
@@ -56,7 +56,7 @@ it("onObjectestroyed handler (skipped by nsid)", () => {
 it("onObjectCreated handler", () => {
     const container: Container = new MockContainer();
     new DeletedItemsContainer(container);
-    const card = new MockCard();
+    new MockCard();
 });
 
 it("ignore cards getting added to decks", () => {

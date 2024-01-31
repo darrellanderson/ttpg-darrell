@@ -13,8 +13,6 @@ import {
 
 console.log("--- SCREEN TEST ---");
 
-const box = new LayoutBox();
-
 const screenUI = new ScreenUIElement();
 screenUI.anchorX = 1.1;
 screenUI.anchorY = -0.1;

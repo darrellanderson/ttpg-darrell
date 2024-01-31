@@ -30,8 +30,8 @@ export class BugSplatRemoteReporter implements IGlobal {
     }
 
     onError(error: string): void {
-        const onSuccess = (res: FetchResponse) => {};
-        const onError = (res: FetchResponse) => {};
+        const onSuccess = () => {};
+        const onError = () => {};
         this.sendError(error).then(onSuccess, onError);
     }
 

@@ -27,8 +27,8 @@ it("parseErrorLocation (with method)", () => {
 
 it("report error", () => {
     let output: string = "";
-    jest.spyOn(console, "log").mockImplementation((message?: any) => {
-        output = message;
+    jest.spyOn(console, "log").mockImplementation((message?: unknown) => {
+        output = message as string;
     });
     new ErrorHandler().reportError("test");
     jest.restoreAllMocks();
@@ -211,6 +211,7 @@ it("init", () => {
     new ErrorHandler().init();
 });
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 declare module globalThis {
     // eslint-disable-next-line no-var
     var $uncaughtException: (e: string) => void;

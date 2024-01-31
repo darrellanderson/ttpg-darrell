@@ -145,7 +145,7 @@ export class DataStore {
         for (let i = 0; i < n; i++) {
             const blockLocation: DataBlockLocation = blockLocations[i];
             const block: DataBlock = blocks[i];
-            const blockEnc: { [key: string]: any } = {
+            const blockEnc: { [key: string]: string | number } = {
                 [KEY_BLOCK_DATA]: block.data,
             };
             if (i < dataChunks.length - 1) {

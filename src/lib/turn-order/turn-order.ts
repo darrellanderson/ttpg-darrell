@@ -115,7 +115,7 @@ export class TurnOrder {
 
         let playerSlot: PlayerSlot = -1;
         let attempts = this._order.length * 2 + 1;
-        while (attempts > 0) {
+        while (attempts-- > 0) {
             // Advance to next slot.
             if (this._snake && this._snakeNeedsAnotherTurn) {
                 this._snakeNeedsAnotherTurn = false;

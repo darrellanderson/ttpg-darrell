@@ -1,4 +1,4 @@
-import { Player, globalEvents } from "@tabletop-playground/api";
+import { Player } from "@tabletop-playground/api";
 import { LeaveSeat } from "./leave-seat";
 import {
     GameObject,

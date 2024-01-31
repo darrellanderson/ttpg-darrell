@@ -1,0 +1,27 @@
+{
+    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+    "parser": "@typescript-eslint/parser",
+    "plugins": ["@typescript-eslint"],
+    "root": true,
+    "parserOptions": {
+        "sourceType": "module",
+    },
+    "env": {
+        "node": true,
+        "es6": true,
+    },
+    "overrides": [{ "files": ["src/**/*.ts"] }],
+    "rules": {
+        "no-unused-vars": ["warn", { "vars": "all", "args": "none" }],
+        "no-extra-semi": 0,
+    },
+    "globals": {
+        "it": "readonly",
+        "describe": "readonly",
+        "afterEach": "readonly",
+        "beforeEach": "readonly",
+        "expect": "readonly",
+        "jest": "readonly",
+        "gc": "readonly",
+    },
+}

@@ -52,6 +52,10 @@ it("createFetchOptions", () => {
     ]);
 });
 
+it("use FetchResponse", () => {
+    expect(FetchResponse).toBeDefined();
+});
+
 /*// This test sends an actual crash report, remove from general use!!
 it("error", async () => {
     const reporter = new BugSplatRemoteReporter({

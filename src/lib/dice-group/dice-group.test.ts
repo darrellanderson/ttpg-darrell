@@ -64,7 +64,7 @@ it("cleanup", () => {
 it("fakeRoll (empty)", () => {
     let eventCount = 0;
     let diceCount = 0;
-    const callback = (diceResults: DiceResult[], player: Player): void => {
+    const callback = (diceResults: DiceResult[]): void => {
         eventCount += 1;
         diceCount += diceResults.length;
     };
@@ -86,6 +86,7 @@ it("fakeRoll", () => {
     let rerolledCount = 0;
     let hitCount = 0;
     let critCount = 0;
+    let rollingPlayer: Player | undefined;
     const callback = (diceResults: DiceResult[], player: Player): void => {
         eventCount += 1;
         diceCount += diceResults.length;
@@ -100,6 +101,7 @@ it("fakeRoll", () => {
                 critCount += 1;
             }
         }
+        rollingPlayer = player;
     };
 
     const player = new MockPlayer();
@@ -119,6 +121,7 @@ it("fakeRoll", () => {
     expect(rerolledCount).toEqual(2);
     expect(hitCount).toEqual(1);
     expect(critCount).toEqual(1);
+    expect(rollingPlayer).toEqual(player);
 });
 
 it("roll (empty)", () => {
@@ -148,7 +151,7 @@ it("roll", () => {
     let rerolledCount = 0;
     let hitCount = 0;
     let critCount = 0;
-    const callback = (diceResults: DiceResult[], player: Player): void => {
+    const callback = (diceResults: DiceResult[]): void => {
         eventCount += 1;
         diceCount += diceResults.length;
         for (const diceResult of diceResults) {

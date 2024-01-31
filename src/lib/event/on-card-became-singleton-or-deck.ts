@@ -28,10 +28,12 @@ import { NSID } from "../nsid/nsid";
 
 export class OnCardBecameSingletonOrDeck implements IGlobal {
     public static readonly onSingletonCardCreated =
-        new TriggerableMulticastDelegate<(card: Card) => void>();
+        new TriggerableMulticastDelegate<
+            (card: Card, player?: Player) => void
+        >();
     public static readonly onSingletonCardMadeDeck =
         new TriggerableMulticastDelegate<
-            (card: Card, oldNsid: string) => void
+            (card: Card, oldNsid: string, player?: Player) => void
         >();
 
     private static readonly _onInsertedHandler = (
@@ -61,7 +63,8 @@ export class OnCardBecameSingletonOrDeck implements IGlobal {
                     nsids[position === 1 ? 0 : nsids.length - 1];
                 OnCardBecameSingletonOrDeck.onSingletonCardMadeDeck.trigger(
                     deck,
-                    oldNsid
+                    oldNsid,
+                    player
                 );
             }
         });
@@ -87,7 +90,8 @@ export class OnCardBecameSingletonOrDeck implements IGlobal {
                     OnCardBecameSingletonOrDeck._onInsertedHandler
                 );
                 OnCardBecameSingletonOrDeck.onSingletonCardCreated.trigger(
-                    deck
+                    deck,
+                    player
                 );
             }
         });

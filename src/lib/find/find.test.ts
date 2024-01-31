@@ -89,11 +89,8 @@ it("findCardHolderBySlot", () => {
 
 it("findCardHolderBySlot (missing)", () => {
     const playerSlot = 7;
-
     const find = new Find();
-    let found: CardHolder | undefined;
-
-    found = find.findCardHolderBySlot(playerSlot);
+    const found: CardHolder | undefined = find.findCardHolderBySlot(playerSlot);
     expect(found).toBeUndefined();
 });
 

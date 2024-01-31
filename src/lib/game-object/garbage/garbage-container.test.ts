@@ -1,4 +1,4 @@
-import { Card, Container, GameObject, Player } from "@tabletop-playground/api";
+import { Card, Container, GameObject } from "@tabletop-playground/api";
 import {
     MockCard,
     MockCardDetails,
@@ -22,7 +22,7 @@ it("constructor (bad obj)", () => {
 it("_tryRecycleObj", () => {
     class OnlyFirstRecycler implements GarbageHandler {
         public recycled: GameObject | undefined;
-        public canRecycle(obj: GameObject): boolean {
+        public canRecycle(): boolean {
             return true;
         }
         public recycle(obj: GameObject): boolean {
@@ -51,10 +51,10 @@ it("_tryRecycleObj", () => {
 
 it("_tryRecycleDeck (all)", () => {
     class RecycleAll implements GarbageHandler {
-        public canRecycle(obj: GameObject): boolean {
+        public canRecycle(): boolean {
             return true;
         }
-        public recycle(obj: GameObject): boolean {
+        public recycle(): boolean {
             return true;
         }
     }
@@ -84,7 +84,7 @@ it("_tryRecycleDeck (all)", () => {
 it("_tryRecycleDeck (first)", () => {
     class RecycleFirst implements GarbageHandler {
         _recycled: GameObject | undefined;
-        public canRecycle(obj: GameObject): boolean {
+        public canRecycle(): boolean {
             return true;
         }
         public recycle(obj: GameObject): boolean {
@@ -120,10 +120,10 @@ it("_tryRecycleDeck (first)", () => {
 
 it("_tryRecycleDeck (none)", () => {
     class RecycleNone implements GarbageHandler {
-        public canRecycle(obj: GameObject): boolean {
+        public canRecycle(): boolean {
             return false;
         }
-        public recycle(obj: GameObject): boolean {
+        public recycle(): boolean {
             return false;
         }
     }
@@ -157,10 +157,10 @@ it("onRecycled", () => {
     };
 
     class RecycleAll implements GarbageHandler {
-        public canRecycle(obj: GameObject): boolean {
+        public canRecycle(): boolean {
             return true;
         }
-        public recycle(obj: GameObject): boolean {
+        public recycle(): boolean {
             return true;
         }
     }
@@ -184,10 +184,10 @@ it("container onInserted", () => {
     };
 
     class RecycleAll implements GarbageHandler {
-        public canRecycle(obj: GameObject): boolean {
+        public canRecycle(): boolean {
             return true;
         }
-        public recycle(obj: GameObject): boolean {
+        public recycle(): boolean {
             return true;
         }
     }

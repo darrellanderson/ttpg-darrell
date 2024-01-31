@@ -211,7 +211,7 @@ export class Find {
 
     findSnapPointByTag(tag: string): SnapPoint | undefined {
         // Check cache.
-        let snapPoint: SnapPoint | undefined =
+        const snapPoint: SnapPoint | undefined =
             this._snapPointTagToSnapPoint[tag];
         const parent: StaticObject | undefined = snapPoint?.getParentObject();
         if (snapPoint && (!parent || parent.isValid())) {

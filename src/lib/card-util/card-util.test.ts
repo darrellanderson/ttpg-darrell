@@ -1,10 +1,4 @@
-import {
-    Card,
-    CardHolder,
-    Container,
-    Player,
-    SnapPoint,
-} from "@tabletop-playground/api";
+import { Card, CardHolder, Container, Player } from "@tabletop-playground/api";
 import { CardUtil } from "./card-util";
 import {
     MockCard,
