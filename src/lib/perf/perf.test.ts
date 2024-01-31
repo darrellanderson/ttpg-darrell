@@ -31,6 +31,16 @@ it("report", () => {
     expect(report.stdDev).toBeCloseTo(25.804);
 });
 
+it("report (empty)", () => {
+    const perf = new Perf();
+    const report: PerfReport = perf.getReport();
+    expect(report.fps).toBeCloseTo(0);
+    expect(report.mean).toBeCloseTo(0);
+    expect(report.median).toBeCloseTo(0);
+    expect(report.scrubbed).toBeCloseTo(0);
+    expect(report.stdDev).toBeCloseTo(0);
+});
+
 it("reportStr", () => {
     const perf = new Perf();
     const onTick = globalEvents.onTick as MockMulticastDelegate<

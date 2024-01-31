@@ -69,7 +69,7 @@ export class Perf {
                   scrubbedArray.length
                 : mean;
 
-        const fps: number = 1000 / scrubbed;
+        const fps: number = scrubbed > 0 ? 1000 / scrubbed : 0;
 
         // Round to 3 decimal places for cleaner log / json.
         return {
