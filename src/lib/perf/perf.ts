@@ -1,4 +1,5 @@
 import { globalEvents } from "@tabletop-playground/api";
+import { IGlobal } from "../global/i-global";
 
 export type PerfReport = {
     median: number;
@@ -8,7 +9,9 @@ export type PerfReport = {
     fps: number;
 };
 
-export class Perf {
+export class Perf implements IGlobal {
+    private static _instance: Perf | undefined;
+
     private readonly _windowFrameSecs: number[];
     private _nextWindowFrameMsecsIndex: number = 0;
 
@@ -33,9 +36,20 @@ export class Perf {
         }
     };
 
+    public static getInstance(): Perf {
+        if (!Perf._instance) {
+            Perf._instance = new Perf();
+        }
+        return Perf._instance;
+    }
+
     constructor(windowSize: number = 50) {
         this._windowFrameSecs = Array(windowSize).fill(-1);
         globalEvents.onTick.add(this._onTickHandler);
+    }
+
+    init(): void {
+        Perf.getInstance();
     }
 
     destroy(): void {

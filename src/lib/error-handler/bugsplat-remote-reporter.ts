@@ -1,6 +1,6 @@
 import { FetchOptions, FetchResponse, fetch } from "@tabletop-playground/api";
-import { AbstractGlobal } from "../global/abstract-global";
 import { ErrorHandler } from "./error-handler";
+import { IGlobal } from "../global/i-global";
 
 export type BugSplatRemoteReporterParams = {
     database: string;
@@ -11,14 +11,13 @@ export type BugSplatRemoteReporterParams = {
 /**
  * Report errors or other messages to a remote service.
  */
-export class BugSplatRemoteReporter extends AbstractGlobal {
+export class BugSplatRemoteReporter implements IGlobal {
     // Required fields?
     private readonly _database: string;
     private readonly _appName: string;
     private readonly _appVersion: string;
 
     constructor(params: BugSplatRemoteReporterParams) {
-        super();
         this._database = params.database;
         this._appName = params.appName;
         this._appVersion = params.appVersion;

@@ -1,16 +1,17 @@
-import { AbstractGlobal } from "./abstract-global";
+import { GlobalInit } from "./global-init";
+import { IGlobal } from "./i-global";
 
 it("batch errors", () => {
-    class MyAbstractGlobal extends AbstractGlobal {
+    class MyGlobal implements IGlobal {
         init(): void {
             throw new Error("Method not implemented.");
         }
     }
 
-    const two = [new MyAbstractGlobal(), new MyAbstractGlobal()];
+    const two = [new MyGlobal(), new MyGlobal()];
     let error: Error | undefined;
     try {
-        AbstractGlobal.runAbstractGlobalInit(two);
+        GlobalInit.runGlobalInit(two);
     } catch (e: unknown) {
         if (e instanceof Error) {
             error = e;

@@ -1,4 +1,4 @@
-import { AbstractGlobal } from "../global/abstract-global";
+import { AbstractGlobal } from "../global/global-init";
 
 /**
  * Monitor card holder, expect it to be the primary holder for

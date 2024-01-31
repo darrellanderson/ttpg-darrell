@@ -23,10 +23,10 @@ import {
     world,
 } from "@tabletop-playground/api";
 import { TriggerableMulticastDelegate } from "./triggerable-multicast-delegate";
-import { AbstractGlobal } from "../global/abstract-global";
+import { IGlobal } from "../global/i-global";
 import { NSID } from "../nsid/nsid";
 
-export class OnCardBecameSingletonOrDeck implements AbstractGlobal {
+export class OnCardBecameSingletonOrDeck implements IGlobal {
     public static readonly onSingletonCardCreated =
         new TriggerableMulticastDelegate<(card: Card) => void>();
     public static readonly onSingletonCardMadeDeck =

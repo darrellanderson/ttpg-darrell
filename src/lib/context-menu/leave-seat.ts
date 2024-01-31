@@ -1,12 +1,12 @@
 import { Player, globalEvents, world } from "@tabletop-playground/api";
-import { AbstractGlobal } from "../global/abstract-global";
+import { IGlobal } from "../global/i-global";
 
 /**
  * Global content menu item to leave seat.  Move to an unused slot, NOT the
  * spectator slot (spectators cannot interact, preventing them from clicking
  * any "take seat" buttons).
  */
-export class LeaveSeat implements AbstractGlobal {
+export class LeaveSeat implements IGlobal {
     public static readonly CUSTOM_ACTION_NAME = "* Leave seat";
     private static readonly _customActionHandler = (
         player: Player,

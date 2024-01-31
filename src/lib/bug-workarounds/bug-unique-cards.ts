@@ -1,4 +1,4 @@
-import { AbstractGlobal } from "../global/abstract-global";
+import { AbstractGlobal } from "../global/global-init";
 
 /**
  * Monitor given decks expecting no NSID (metadata) repeats.

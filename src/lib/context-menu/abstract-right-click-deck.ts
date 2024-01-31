@@ -1,6 +1,6 @@
 import { GameObject, Player, Card } from "@tabletop-playground/api";
 import { OnCardBecameSingletonOrDeck } from "../event/on-card-became-singleton-or-deck";
-import { AbstractGlobal } from "../global/abstract-global";
+import { IGlobal } from "../global/i-global";
 import { NSID } from "../nsid/nsid";
 
 /**
@@ -13,7 +13,7 @@ import { NSID } from "../nsid/nsid";
  * the identifier before processing!  This is to match other onCustomAction
  * handling rather than create a new signature.
  */
-export abstract class AbstractRightClickDeck extends AbstractGlobal {
+export abstract class AbstractRightClickDeck implements IGlobal {
     private readonly _deckNsidPrefix: string;
     private readonly _customActionName: string;
     private readonly _customActionHandler: (
@@ -31,7 +31,6 @@ export abstract class AbstractRightClickDeck extends AbstractGlobal {
             identifier: string
         ) => void
     ) {
-        super();
         this._deckNsidPrefix = deckNsidPrefix;
         this._customActionName = customActionName;
         this._customActionHandler = customActionHandler;

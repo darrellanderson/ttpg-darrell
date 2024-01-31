@@ -7,7 +7,7 @@ import {
     globalEvents,
     world,
 } from "@tabletop-playground/api";
-import { AbstractGlobal } from "../global/abstract-global";
+import { IGlobal } from "../global/i-global";
 
 /**
  * Setup for a single die.
@@ -51,7 +51,7 @@ export const DICE_GROUP_SAVED_DATA_KEY = "__DiceGroup_DiceId__";
 /**
  * Remove any lingering DiceGroup dice.
  */
-export class DiceGroupCleanup extends AbstractGlobal {
+export class DiceGroupCleanup implements IGlobal {
     init(): void {
         const skipContained = true;
         for (const obj of world.getAllObjects(skipContained)) {

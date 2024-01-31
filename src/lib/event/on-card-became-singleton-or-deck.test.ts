@@ -6,12 +6,7 @@ import {
     mockWorld,
 } from "ttpg-mock";
 import { OnCardBecameSingletonOrDeck } from "./on-card-became-singleton-or-deck";
-import {
-    Card,
-    GameObject,
-    Player,
-    globalEvents,
-} from "@tabletop-playground/api";
+import { Card } from "@tabletop-playground/api";
 
 it("init", () => {
     const onCardBecameSingletonOrDeck = new OnCardBecameSingletonOrDeck();

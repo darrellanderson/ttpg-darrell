@@ -1,6 +1,6 @@
 import { GameWorld, world } from "@tabletop-playground/api";
-import { AbstractGlobal } from "../global/abstract-global";
 import { TriggerableMulticastDelegate } from "../event/triggerable-multicast-delegate";
+import { IGlobal } from "../global/i-global";
 
 // This probably belongs in @TabletopPlayground.api?
 // eslint-disable-next-line @typescript-eslint/no-namespace
@@ -25,7 +25,7 @@ export type ErrorLocation = {
  *
  * Install the error handler via `new ErrorHandler().init()`.
  */
-export class ErrorHandler extends AbstractGlobal {
+export class ErrorHandler implements IGlobal {
     // Event that sends the rewritten error (line mapping).
     public static readonly onError: TriggerableMulticastDelegate<
         (error: string) => void
@@ -37,8 +37,6 @@ export class ErrorHandler extends AbstractGlobal {
     } = {};
 
     constructor() {
-        super();
-
         const base64Alphabet =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         this._reverseBase64Alphabet = new Map(

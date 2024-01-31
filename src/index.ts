@@ -16,7 +16,7 @@ export * from "./lib/game-object/garbage/garbage-container";
 export * from "./lib/game-object/garbage/simple-card-garbage-handler";
 export * from "./lib/game-object/garbage/simple-to-container-handler";
 export * from "./lib/game-object/garbage/simple-to-snap-point-handler";
-export * from "./lib/global/abstract-global";
+export * from "./lib/global/global-init";
 export * from "./lib/layout-objects/layout-objects";
 export * from "./lib/locale/locale";
 export * from "./lib/nsid/nsid";
