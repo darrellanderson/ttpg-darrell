@@ -10,7 +10,6 @@
         "types": ["@types/jest", "@types/node", "@tabletop-playground/api"],
         "skipLibCheck": true,
         "declaration": true,
-        "removeComments": true,
         "sourceMap": true,
     },
     "include": ["./src/**/*.ts"],
