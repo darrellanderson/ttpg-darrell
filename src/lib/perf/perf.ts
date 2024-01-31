@@ -29,6 +29,7 @@ export class Perf implements IGlobal {
         // Store one minute of FPS values, as per-second intervals.
         const nowSeconds = Math.floor(Date.now() / 1000);
         if (nowSeconds !== this._lastFpsUpdateSecond) {
+            this._lastFpsUpdateSecond = nowSeconds;
             const fps = this.getReport().fps;
             this._windowFps[this._nextWindowFpsIndex] = fps;
             this._nextWindowFpsIndex =

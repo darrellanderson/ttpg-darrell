@@ -1,21 +1,35 @@
 import { PerfWidget } from "./perf-widget";
 
 it("constructor", () => {
-    new PerfWidget();
+    const perfWidget = new PerfWidget();
+    perfWidget.destroy();
 });
 
 it("destroy", () => {
-    new PerfWidget().destroy();
+    const perfWidget = new PerfWidget();
+    perfWidget.destroy();
 });
 
 it("refresh", () => {
-    new PerfWidget().refresh();
+    const perfWidget = new PerfWidget();
+    perfWidget.refresh();
+    perfWidget.destroy();
 });
 
 it("getWidget", () => {
-    new PerfWidget().getWidget();
+    const perfWidget = new PerfWidget();
+    perfWidget.getWidget();
+    perfWidget.destroy();
 });
 
 it("toggleVisibility", () => {
-    new PerfWidget().toggleVisibility(1).toggleVisibility(1);
+    const perfWidget = new PerfWidget();
+    perfWidget.toggleVisibility(1).toggleVisibility(1);
+    perfWidget.destroy();
+});
+
+it("attach/detach", () => {
+    const perfWidget = new PerfWidget();
+    perfWidget.attachToScreen().attachToScreen().detach().detach();
+    perfWidget.destroy();
 });
