@@ -185,6 +185,37 @@ it("roll", () => {
     expect(critCount).toEqual(1);
 });
 
+it("unmanaged dice rolled", () => {
+    mockWorld._reset({
+        _templateIdToMockGameObjectParams: {
+            "9065AC5141F87F8ADE1F5AB6390BBEE4": { _objType: "Dice" },
+        },
+    });
+    const player = new MockPlayer();
+
+    // Roll a new die inside the generic handler,
+    // the listener is still attached.
+    let genericDiceEventCount = 0;
+    globalEvents.onDiceRolled.add(() => {
+        if (genericDiceEventCount++ === 0) {
+            new MockDice().roll(player);
+        }
+    });
+
+    DiceGroup.roll({
+        diceParams: [
+            { sides: 10, hit: 11, reroll: true }, // hit larger than max guarantee reroll
+            { sides: 10, hit: 11, reroll: true }, // hit larger than max guarantee reroll
+            { sides: 10, hit: 0, crit: 0, reroll: true }, // hit zero guarantee hit
+        ],
+        player,
+        timeoutSeconds: 1,
+        deleteAfterSeconds: -1,
+    });
+
+    expect(genericDiceEventCount).toEqual(6); // 3, 2 rerolls, 1 unmanaged dice
+});
+
 it("_createDice", () => {
     mockWorld._reset({
         _templateIdToMockGameObjectParams: {

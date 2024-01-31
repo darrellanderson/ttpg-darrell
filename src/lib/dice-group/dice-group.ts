@@ -125,7 +125,6 @@ export class DiceGroup {
     private readonly _activeDice: Set<Dice> = new Set<Dice>();
 
     private _timeoutHandle: timeout_handle | undefined;
-    private _spent: boolean = false;
 
     private readonly _onDiceRolledHandler = (
         player: Player,
@@ -186,11 +185,6 @@ export class DiceGroup {
     }
 
     fakeRoll(): void {
-        if (this._spent) {
-            throw new Error("DiceGroup already rolled, cannot reuse");
-        }
-        this._spent = true;
-
         let index = 0;
         for (const diceParams of this._diceParamsArray) {
             const diceResult: DiceResult = { diceParams, value: -1 };
@@ -202,11 +196,6 @@ export class DiceGroup {
     }
 
     roll(): void {
-        if (this._spent) {
-            throw new Error("DiceGroup already rolled, cannot reuse");
-        }
-        this._spent = true;
-
         if (this._timeoutSeconds > 0) {
             this._timeoutHandle = setTimeout(
                 this._onTimeoutHandler,
