@@ -9,24 +9,41 @@ export type PerfReport = {
 };
 
 export class Perf {
-    private readonly _window: number[];
-    private _windowIndex: number = 0;
+    private readonly _windowFrameSecs: number[];
+    private _nextWindowFrameMsecsIndex: number = 0;
+
+    private readonly _windowFps: number[] = Array(60).fill(0);
+    private _nextWindowFpsIndex: number = 0;
+    private _lastFpsUpdateSecond: number = -1;
+
     private _onTickHandler = (prevTickDurationSecs: number) => {
-        this._window[this._windowIndex] = prevTickDurationSecs;
-        this._windowIndex = (this._windowIndex + 1) % this._window.length;
+        this._windowFrameSecs[this._nextWindowFrameMsecsIndex] =
+            prevTickDurationSecs;
+        this._nextWindowFrameMsecsIndex =
+            (this._nextWindowFrameMsecsIndex + 1) %
+            this._windowFrameSecs.length;
+
+        // Store one minute of FPS values, as per-second intervals.
+        const nowSeconds = Math.floor(Date.now() / 1000);
+        if (nowSeconds !== this._lastFpsUpdateSecond) {
+            const fps = this.getReport().fps;
+            this._windowFps[this._nextWindowFpsIndex] = fps;
+            this._nextWindowFpsIndex =
+                (this._nextWindowFpsIndex + 1) % this._windowFps.length;
+        }
     };
 
-    constructor(windowSize: number = 100) {
-        this._window = Array(windowSize).fill(-1);
+    constructor(windowSize: number = 50) {
+        this._windowFrameSecs = Array(windowSize).fill(-1);
         globalEvents.onTick.add(this._onTickHandler);
     }
 
-    destroy() {
+    destroy(): void {
         globalEvents.onTick.remove(this._onTickHandler);
     }
 
     getReport(): PerfReport {
-        const msecs: number[] = this._window
+        const msecs: number[] = this._windowFrameSecs
             .filter((seconds) => seconds > 0)
             .map((seconds) => seconds * 1000);
         if (msecs.length === 0) {
@@ -40,14 +57,17 @@ export class Perf {
         const sorted: number[] = msecs.sort((a, b) => b - a);
         const median: number = sorted[Math.floor(sorted.length / 2)];
 
-        // Mean of values within 3x stdDev
+        // Mean of values within 3x stdDev (in the unlikely event of none,
+        // use the regular mean).
         const tolerance: number = stdDev * 3;
         const scrubbedArray: number[] = msecs.filter(
             (x) => x > mean - tolerance && x < mean + tolerance
         );
         const scrubbed: number =
-            scrubbedArray.reduce((a, b) => a + b, 0) /
-            Math.max(scrubbedArray.length, 0);
+            scrubbedArray.length > 0
+                ? scrubbedArray.reduce((a, b) => a + b, 0) /
+                  scrubbedArray.length
+                : mean;
 
         const fps: number = 1000 / scrubbed;
 
@@ -61,7 +81,7 @@ export class Perf {
         };
     }
 
-    getReportStr() {
+    getReportStr(): string {
         const report: PerfReport = this.getReport();
         const median = report.median.toFixed(1);
         const mean = report.mean.toFixed(1);
@@ -69,5 +89,17 @@ export class Perf {
         const stdDev = report.stdDev.toFixed(2);
         const fps = report.fps.toFixed(1);
         return `frame msecs: median=${median} mean=${mean} scrubbed=${scrubbed} stdDev=${stdDev} [${fps}]`;
+    }
+
+    /**
+     * Get per-second FPS for the last minute, in time order.
+     *
+     * @returns
+     */
+    getFpsHistory(): number[] {
+        return [
+            ...this._windowFps.slice(this._nextWindowFpsIndex),
+            ...this._windowFps.slice(0, this._nextWindowFpsIndex),
+        ];
     }
 }
