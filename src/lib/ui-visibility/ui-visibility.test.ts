@@ -23,7 +23,6 @@ it("constructor (world with obj)", () => {
 
 it("constructor (missing widget)", () => {
     const screenUI = new ScreenUIElement();
-    console.log(screenUI.widget);
     expect(() => {
         new UiVisibility(screenUI);
     }).toThrow();

@@ -6,18 +6,19 @@ it("constructor", () => {
 
 it("trigger", () => {
     let total = 0;
-    const handler = (value: number) => {
-        total += value;
+    const handler = (value1: number, value2: number) => {
+        total += value1;
+        total += value2;
     };
 
     const multicastDelegate = new TriggerableMulticastDelegate<
-        (value: number) => void
+        (value1: number, value2: number) => void
     >();
     multicastDelegate.add(handler);
 
-    multicastDelegate.trigger(7);
-    multicastDelegate.trigger(2);
-    expect(total).toEqual(9);
+    multicastDelegate.trigger(7, 1);
+    multicastDelegate.trigger(2, 1);
+    expect(total).toEqual(11);
 });
 
 it("add/remove", () => {

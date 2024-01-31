@@ -3,10 +3,8 @@ import { ErrorBatcher } from "../error-handler/error-batcher";
 /**
  * Lookalike for TTPG's MulticastDelegate, but with a trigger method.
  */
-export class TriggerableMulticastDelegate<
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    T extends (...args: any[]) => any,
-> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export class TriggerableMulticastDelegate<T extends (...args: any[]) => any> {
     private readonly _listeners: T[] = [];
 
     /**
