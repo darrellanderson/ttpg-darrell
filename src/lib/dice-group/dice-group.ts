@@ -20,6 +20,7 @@ export type DiceParams = {
     name?: string;
     hit?: number;
     crit?: number;
+    critCount?: number; // how many extra hits per crit?
     reroll?: boolean; // reroll once if not a hit
 };
 
@@ -86,6 +87,29 @@ export class DiceGroup {
         } else {
             diceGroup.roll();
         }
+    }
+
+    /**
+     * Format a dice result for display.
+     *
+     * @param diceResult
+     * @returns
+     */
+    public static format(diceResult: DiceResult) {
+        const parts: string[] = [];
+        if (diceResult.rerolledValue) {
+            parts.push(`${diceResult.rerolledValue}->`);
+        }
+        parts.push(diceResult.value.toString());
+        if (diceResult.hit) {
+            parts.push("#");
+        }
+        if (diceResult.crit) {
+            for (let i = 0; i < (diceResult.diceParams.critCount ?? 1); i++) {
+                parts.push("#");
+            }
+        }
+        return parts.join("");
     }
 
     private readonly _diceParamsArray: DiceParams[];
@@ -202,8 +226,12 @@ export class DiceGroup {
         globalEvents.onDiceRolled.add(this._onDiceRolledHandler);
 
         // Create dice.  Wait to roll until after all dice registered.
-        for (const diceParams of this._diceParamsArray) {
-            const pos = new Vector(0, 0, 0);
+        const z = world.getTableHeight() + 2;
+        for (let i = 0; i < this._diceParamsArray.length; i++) {
+            const diceParams: DiceParams = this._diceParamsArray[i];
+            const phi = (i / this._diceParamsArray.length) * Math.PI * 2;
+            const r = this._diceParamsArray.length * 0.3;
+            const pos = new Vector(Math.cos(phi) * r, Math.sin(phi) * r, z);
             const dice: Dice = DiceGroup._createDice(diceParams, pos);
             this._diceObjIdToDiceResult[dice.getId()] = {
                 diceParams,

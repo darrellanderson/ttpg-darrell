@@ -3,9 +3,28 @@ import {
     DICE_GROUP_SAVED_DATA_KEY,
     DiceGroup,
     DiceGroupCleanup,
+    DiceParams,
     DiceResult,
 } from "./dice-group";
 import { Player } from "@tabletop-playground/api";
+
+it("format", () => {
+    const diceParams: DiceParams = { sides: 10 };
+    const diceResult: DiceResult = { diceParams, value: 7 };
+    expect(DiceGroup.format(diceResult)).toEqual("7");
+
+    diceResult.hit = true;
+    expect(DiceGroup.format(diceResult)).toEqual("7#");
+
+    diceResult.crit = true;
+    expect(DiceGroup.format(diceResult)).toEqual("7##");
+
+    diceParams.critCount = 2;
+    expect(DiceGroup.format(diceResult)).toEqual("7###");
+
+    diceResult.rerolledValue = 5;
+    expect(DiceGroup.format(diceResult)).toEqual("5->7###");
+});
 
 it("constructor", () => {
     const player = new MockPlayer();

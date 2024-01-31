@@ -5,6 +5,7 @@ export * from "./lib/bug-workarounds/bug-unique-cards";
 export * from "./lib/card-util/card-util";
 export * from "./lib/context-menu/leave-seat";
 export * from "./lib/data-store/data-store";
+export * from "./lib/dice-group/dice-group";
 export * from "./lib/error-handler/error-handler";
 export * from "./lib/event/on-card-became-singleton-or-deck";
 export * from "./lib/event/triggerable-multicast-delegate";
