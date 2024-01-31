@@ -1,6 +1,5 @@
 import {
     Player,
-    PlayerPermission,
     ScreenUIElement,
     VerticalBox,
     Widget,
@@ -14,6 +13,7 @@ import {
     TurnOrderWidgetDefaults,
     TurnOrderWidgetParams,
 } from "./turn-order-widget-params";
+import { UiVisibility } from "../../ui-visibility/ui-visibility";
 
 /**
  * Display turn order, update when turn order changes.
@@ -22,14 +22,12 @@ export class TurnOrderWidget {
     private readonly _params: TurnOrderWidgetParams;
     private readonly _turnOrder: TurnOrder;
     private readonly _panel: VerticalBox;
-    private readonly _visibleToPlayerSlots: number[];
+    private readonly _screenUI: ScreenUIElement;
+    private readonly _uiVisibility: UiVisibility;
     private _turnEntryWidgets: TurnEntryWidget[] = [];
-    private _screenUI: ScreenUIElement | undefined;
 
-    private readonly _onTurnStateChangedHandler = (turnOrder: TurnOrder) => {
-        if (turnOrder === this._turnOrder) {
-            this.update();
-        }
+    private readonly _doUpdate = () => {
+        this.update();
     };
 
     private readonly _toggleVisibilityActionName = locale(
@@ -49,9 +47,30 @@ export class TurnOrderWidget {
         this._turnOrder = turnOrder;
 
         this._panel = new VerticalBox().setChildDistance(0);
-        this._visibleToPlayerSlots = [...Array(20).keys()];
+        this._screenUI = new ScreenUIElement();
+        const w: number =
+            params.entryWidth ?? TurnOrderWidgetDefaults.DEFAULT_ENTRY_WIDTH;
+        const h: number =
+            params.entryHeight ?? TurnOrderWidgetDefaults.DEFAULT_ENTRY_HEIGHT;
+        const reserveSlots: number =
+            params.reserveSlots ??
+            TurnOrderWidgetDefaults.DEFAULT_RESERVE_SLOTS;
 
-        TurnOrder.onTurnStateChanged.add(this._onTurnStateChangedHandler);
+        this._screenUI.anchorX = 1.1;
+        this._screenUI.anchorY = -0.1;
+        this._screenUI.positionX = 1;
+        this._screenUI.relativePositionX = true;
+        this._screenUI.relativePositionY = true;
+        this._screenUI.height = h * reserveSlots + 2;
+        this._screenUI.width = w;
+        this._screenUI.widget = this.getWidget();
+
+        this._uiVisibility = new UiVisibility(this._screenUI);
+
+        TurnOrder.onTurnStateChanged.add(this._doUpdate);
+        globalEvents.onPlayerJoined.add(this._doUpdate);
+        globalEvents.onPlayerLeft.add(this._doUpdate);
+        globalEvents.onPlayerSwitchedSlots.add(this._doUpdate);
         globalEvents.onCustomAction.add(this._onCustomActionHandler);
         world.removeCustomAction(this._toggleVisibilityActionName);
         world.addCustomAction(this._toggleVisibilityActionName);
@@ -60,7 +79,10 @@ export class TurnOrderWidget {
     }
 
     public destroy(): void {
-        TurnOrder.onTurnStateChanged.remove(this._onTurnStateChangedHandler);
+        TurnOrder.onTurnStateChanged.remove(this._doUpdate);
+        globalEvents.onPlayerJoined.remove(this._doUpdate);
+        globalEvents.onPlayerLeft.remove(this._doUpdate);
+        globalEvents.onPlayerSwitchedSlots.remove(this._doUpdate);
         globalEvents.onCustomAction.remove(this._onCustomActionHandler);
     }
 
@@ -96,62 +118,21 @@ export class TurnOrderWidget {
     }
 
     public attachToScreen(): this {
-        const params = this._params;
-        const w: number =
-            params.entryWidth ?? TurnOrderWidgetDefaults.DEFAULT_ENTRY_WIDTH;
-        const h: number =
-            params.entryHeight ?? TurnOrderWidgetDefaults.DEFAULT_ENTRY_HEIGHT;
-        const reserveSlots: number =
-            params.reserveSlots ??
-            TurnOrderWidgetDefaults.DEFAULT_RESERVE_SLOTS;
-
-        if (this._screenUI) {
-            world.removeScreenUIElement(this._screenUI);
-            this._screenUI = undefined;
-        }
-        this._screenUI = new ScreenUIElement();
-        this._screenUI.anchorX = 1.1;
-        this._screenUI.anchorY = -0.1;
-        this._screenUI.players = new PlayerPermission().setPlayerSlots(
-            this._visibleToPlayerSlots
-        );
-        this._screenUI.positionX = 1;
-        this._screenUI.relativePositionX = true;
-        this._screenUI.relativePositionY = true;
-        this._screenUI.height = h * reserveSlots + 2;
-        this._screenUI.width = w;
-        this._screenUI.widget = this.getWidget();
         world.addScreenUI(this._screenUI);
-
         return this;
     }
 
     public detach(): this {
-        if (this._screenUI) {
-            world.removeScreenUIElement(this._screenUI);
-            this._screenUI = undefined;
-        }
+        world.removeScreenUIElement(this._screenUI);
         return this;
     }
 
     public isVisibleTo(playerSlot: number): boolean {
-        return this._visibleToPlayerSlots.includes(playerSlot);
+        return this._uiVisibility.isVisibleToPlayer(playerSlot);
     }
 
     public toggleVisibility(playerSlot: number): this {
-        const index = this._visibleToPlayerSlots.indexOf(playerSlot);
-        if (index >= 0) {
-            this._visibleToPlayerSlots.splice(index, 1);
-        } else {
-            this._visibleToPlayerSlots.push(playerSlot);
-        }
-
-        if (this._screenUI) {
-            this._screenUI.players = new PlayerPermission().setPlayerSlots(
-                this._visibleToPlayerSlots
-            );
-            world.updateScreenUI(this._screenUI);
-        }
+        this._uiVisibility.togglePlayer(playerSlot);
         return this;
     }
 }

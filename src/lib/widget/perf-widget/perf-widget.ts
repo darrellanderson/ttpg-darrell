@@ -1,7 +1,5 @@
 import {
     Border,
-    Canvas,
-    PlayerPermission,
     ScreenUIElement,
     Text,
     TextJustification,
@@ -12,14 +10,15 @@ import {
 } from "@tabletop-playground/api";
 import { Perf, PerfReport } from "../../perf/perf";
 import { SvgSparkline } from "../../svg/svg-sparkline";
+import { UiVisibility } from "../../ui-visibility/ui-visibility";
 
 export class PerfWidget {
     private readonly _perf: Perf;
     private readonly _webBrowser: WebBrowser;
     private readonly _fpsText: Text;
+    private readonly _screenUI: ScreenUIElement;
+    private readonly _uiVisibility: UiVisibility;
     private readonly _refreshHandle: timeout_handle;
-    private readonly _visibleToPlayerSlots: number[] = [];
-    private _screenUI: ScreenUIElement | undefined;
 
     constructor() {
         this._perf = new Perf();
@@ -27,6 +26,19 @@ export class PerfWidget {
         this._fpsText = new Text()
             .setFontSize(10)
             .setJustification(TextJustification.Center);
+
+        this._screenUI = new ScreenUIElement();
+        this._screenUI.anchorX = 1.2;
+        this._screenUI.anchorY = 1.4;
+        this._screenUI.positionX = 1;
+        this._screenUI.positionY = 1;
+        this._screenUI.relativePositionX = true;
+        this._screenUI.relativePositionY = true;
+        this._screenUI.width = SvgSparkline.WIDTH;
+        this._screenUI.height = Math.round((SvgSparkline.HEIGHT * 100) / 85); // fixed svg aspect ratio
+        this._screenUI.widget = this.getWidget();
+
+        this._uiVisibility = new UiVisibility(this._screenUI).setNone();
         this._refreshHandle = setInterval(() => {
             this.refresh();
         }, 1000);
@@ -57,59 +69,17 @@ export class PerfWidget {
     }
 
     toggleVisibility(playerSlot: number): this {
-        const index = this._visibleToPlayerSlots.indexOf(playerSlot);
-        if (index >= 0) {
-            this._visibleToPlayerSlots.splice(index, 1);
-        } else {
-            this._visibleToPlayerSlots.push(playerSlot);
-        }
-
-        if (this._screenUI) {
-            this._screenUI.players = new PlayerPermission().setPlayerSlots(
-                this._visibleToPlayerSlots
-            );
-            world.updateScreenUI(this._screenUI);
-        }
-
-        if (this._visibleToPlayerSlots.length === 0) {
-            this.detach();
-        } else if (!this._screenUI) {
-            this.attachToScreen();
-        }
+        this._uiVisibility.togglePlayer(playerSlot);
         return this;
     }
 
     attachToScreen(): this {
-        if (this._screenUI) {
-            world.removeScreenUIElement(this._screenUI);
-            this._screenUI = undefined;
-        }
-
-        const playerPermission = new PlayerPermission().setPlayerSlots(
-            this._visibleToPlayerSlots
-        );
-
-        this._screenUI = new ScreenUIElement();
-        this._screenUI.anchorX = 1.2;
-        this._screenUI.anchorY = 1.4;
-        this._screenUI.players = playerPermission;
-        this._screenUI.positionX = 1;
-        this._screenUI.positionY = 1;
-        this._screenUI.relativePositionX = true;
-        this._screenUI.relativePositionY = true;
-        this._screenUI.width = SvgSparkline.WIDTH;
-        this._screenUI.height = Math.round((SvgSparkline.HEIGHT * 100) / 85); // fixed svg aspect ratio
-        this._screenUI.widget = this.getWidget();
         world.addScreenUI(this._screenUI);
-
         return this;
     }
 
     detach(): this {
-        if (this._screenUI) {
-            world.removeScreenUIElement(this._screenUI);
-            this._screenUI = undefined;
-        }
+        world.removeScreenUIElement(this._screenUI);
         return this;
     }
 }

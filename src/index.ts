@@ -25,6 +25,7 @@ export * from "./lib/setup/abstract-setup";
 export * from "./lib/shuffle/shuffle";
 export * from "./lib/spawn/spawn";
 export * from "./lib/turn-order/turn-order";
+export * from "./lib/ui-visibility/ui-visibility";
 export * from "./lib/widget/confirm-button/confirm-button";
 export * from "./lib/widget/d6widget/d6widget";
 export * from "./lib/widget/turn-order-widget/turn-clicked-widget";
