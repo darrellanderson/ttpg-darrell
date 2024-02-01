@@ -1,9 +1,15 @@
 import { MockGameObject, MockVector } from "ttpg-mock";
 import { LayoutObjects } from "./layout-objects";
+import {
+    HorizontalAlignment,
+    VerticalAlignment,
+} from "@tabletop-playground/api";
 
 it("calculateSize (1x1)", () => {
     const size = new LayoutObjects()
         .setIsVertical(false)
+        .setHorizontalAlignment(HorizontalAlignment.Fill)
+        .setVerticalAlignment(VerticalAlignment.Fill)
         .setChildDistance(1)
         .add(new MockGameObject({ _modelSize: [10, 10, 10] }))
         .calculateSize();
@@ -134,4 +140,15 @@ it("layout (2x1, origin, rot)", () => {
     const want2 = new MockVector(-5.5, 0, 0);
     expect(obj1.getPosition().toString()).toEqual(want1.toString());
     expect(obj2.getPosition().toString()).toEqual(want2.toString());
+});
+
+it("after layout", () => {
+    let count = 0;
+    const after = () => {
+        count++;
+    };
+    new LayoutObjects()
+        .addAfterLayout(after)
+        .doLayoutAtPoint(new MockVector(0, 0, 0), 0);
+    expect(count).toEqual(1);
 });
