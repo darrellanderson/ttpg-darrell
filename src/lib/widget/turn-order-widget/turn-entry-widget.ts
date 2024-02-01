@@ -28,14 +28,18 @@ locale.inject(TurnOrderLocaleData);
 export class TurnEntryWidget {
     private readonly _params: TurnOrderWidgetParams;
     private readonly _nameWidth: number;
-    private readonly _entryHeight: number;
     private readonly _widget: LayoutBox;
     private readonly _contentButton: ContentButton;
     private readonly _canvas: Canvas;
     private readonly _bgBorder: Border;
     private readonly _nameText: Text;
-    private readonly _passedText: Text;
+    private readonly _passedLine: Border;
     private readonly _warts: TurnEntryWart[] = [];
+
+    private readonly _nameCenter: {
+        x: number;
+        y: number;
+    };
 
     static computeFontSize(boxHeight: number): number {
         return Math.ceil(boxHeight * 0.5);
@@ -87,10 +91,13 @@ export class TurnEntryWidget {
             w: params.nameBox?.width ?? w,
             h: params.nameBox?.height ?? h,
         };
+        this._nameCenter = {
+            x: name.l + Math.floor(name.w / 2),
+            y: name.t + Math.floor(name.h / 2),
+        };
         const d = Math.floor(name.h * 0.06); // tweak to center text vertically
         name.t += d;
 
-        this._entryHeight = h;
         this._nameWidth = name.w;
 
         this._bgBorder = new Border();
@@ -100,16 +107,19 @@ export class TurnEntryWidget {
             .setBold(true)
             .setJustification(TextJustification.Center)
             .setFontSize(fontSize);
-        this._passedText = new Text()
-            .setBold(true)
-            .setJustification(TextJustification.Center)
-            .setFontSize(fontSize);
+        this._passedLine = new Border();
 
         // Wrap the primary canvas in a layout box to enforce size.
         this._canvas = new Canvas()
             .addChild(this._bgBorder, 0, 0, m.w, m.h)
             .addChild(this._nameText, name.l, name.t, name.w, name.h)
-            .addChild(this._passedText, name.l, name.t, name.w, name.h);
+            .addChild(
+                this._passedLine,
+                name.l,
+                this._nameCenter.y - 1,
+                name.w,
+                2
+            );
         const innerCanvasBox = new LayoutBox()
             .setOverrideWidth(m.w)
             .setOverrideHeight(m.h)
@@ -173,14 +183,19 @@ export class TurnEntryWidget {
         this._nameText.setText(playerName).setTextColor(fgColor);
 
         // Passed or eliminated?
-        let passedValue: string = "";
-        if (
+        this._passedLine.setVisible(
             turnOrder.getPassed(playerSlot) ||
-            turnOrder.getEliminated(playerSlot)
-        ) {
-            passedValue = "–".repeat(playerName.length + 2);
-        }
-        this._passedText.setText(passedValue).setTextColor(fgColor);
+                turnOrder.getEliminated(playerSlot)
+        );
+        this._passedLine.setColor(fgColor);
+        const halfW = Math.floor(playerName.length * 6);
+        this._canvas.updateChild(
+            this._passedLine,
+            this._nameCenter.x - halfW,
+            this._nameCenter.y - 1,
+            halfW * 2,
+            2
+        );
 
         // Click behavior.
         this._contentButton.onClicked.clear();

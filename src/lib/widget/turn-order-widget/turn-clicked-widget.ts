@@ -148,6 +148,7 @@ export class TurnClickedWidget {
                     );
                 }
             });
+            panel.addChild(button);
         }
         panel.addChild(this._createCancelButton());
         return new LayoutBox()

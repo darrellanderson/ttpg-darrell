@@ -53,6 +53,7 @@ const turnOrderWidget = new TurnOrderWidget(turnOrder, {
             return new MyWart(turnEntryWidget);
         },
     ],
+    togglePassed: true,
     customActions: [
         {
             name: "My action!",
