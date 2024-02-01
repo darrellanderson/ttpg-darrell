@@ -4,6 +4,13 @@ import { TurnOrder } from "../../turn-order/turn-order";
 import { TurnClickedWidget } from "./turn-clicked-widget";
 import { Broadcast } from "../../broadcast/broadcast";
 import { TurnOrderWidgetParams } from "./turn-order-widget-params";
+import {
+    Border,
+    Button,
+    LayoutBox,
+    Panel,
+    Widget,
+} from "@tabletop-playground/api";
 
 it("constructor", () => {
     const turnOrder = new TurnOrder("@test/test");
@@ -32,6 +39,43 @@ it("createWidget", () => {
     turnClickedWidget.getWidget();
 });
 
+it("createWidget (optional items)", () => {
+    const turnOrder = new TurnOrder("@test/test");
+    const params: TurnOrderWidgetParams = {
+        togglePassed: true,
+        toggleEliminated: true,
+        customActions: [
+            { name: "my-name" },
+            { name: "my-name2", identifier: "my-identifier" },
+        ],
+        onCustomAction: () => {},
+    };
+    const playerSlot = 7;
+    const turnClickedWidget = new TurnClickedWidget(
+        turnOrder,
+        params,
+        playerSlot
+    );
+    const widget = turnClickedWidget.getWidget();
+
+    const clickAll = (widget: Widget | undefined) => {
+        if (widget instanceof Panel) {
+            for (const child of widget.getAllChildren()) {
+                clickAll(child);
+            }
+        } else if (widget instanceof LayoutBox) {
+            clickAll(widget.getChild());
+        } else if (widget instanceof Border) {
+            clickAll(widget.getChild());
+        } else if (widget instanceof Button) {
+            const mockButton = widget as MockButton;
+            const clickingPlayer = new MockPlayer();
+            mockButton._clickAsPlayer(clickingPlayer);
+        }
+    };
+    clickAll(widget);
+});
+
 it("attach/detach (defaults)", () => {
     const turnOrder = new TurnOrder("@test/test");
     const params: TurnOrderWidgetParams = {};
@@ -50,7 +94,9 @@ it("attach/detach (defaults)", () => {
 
 it("attach/detach (override height)", () => {
     const turnOrder = new TurnOrder("@test/test");
-    const params: TurnOrderWidgetParams = {};
+    const params: TurnOrderWidgetParams = {
+        entryHeight: 1,
+    };
     const playerSlot = 7;
     const turnClickedWidget = new TurnClickedWidget(
         turnOrder,

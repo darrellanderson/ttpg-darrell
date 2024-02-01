@@ -138,14 +138,12 @@ export class TurnClickedWidget {
             panel.addChild(this._createToggleEliminatedButton());
         }
         for (const customAction of this._params.customActions ?? []) {
+            const identifier = customAction.identifier ?? customAction.name;
             const button = new Button().setText(customAction.name);
             button.onClicked.add((button: Button, player: Player) => {
                 this.detach();
                 if (this._params.onCustomAction) {
-                    this._params.onCustomAction(
-                        player,
-                        customAction.identifier ?? customAction.name
-                    );
+                    this._params.onCustomAction(player, identifier);
                 }
             });
             panel.addChild(button);
