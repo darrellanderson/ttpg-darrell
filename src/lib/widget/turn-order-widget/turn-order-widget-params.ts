@@ -1,3 +1,4 @@
+import { Player } from "@tabletop-playground/api";
 import { TurnEntryWartGenerator } from "./turn-entry-wart";
 
 export const TurnOrderWidgetDefaults = {
@@ -32,4 +33,16 @@ export type TurnOrderWidgetParams = {
 
     // Size for N turns.
     reserveSlots?: number;
+
+    // Options for toggling player state.
+    togglePassed?: boolean;
+    toggleEliminated?: boolean;
+
+    // Add extra options.
+    customActions?: {
+        name: string;
+        tooltip?: string;
+        identifier?: string;
+    }[];
+    onCustomAction?: (player: Player, identifier: string) => void;
 };

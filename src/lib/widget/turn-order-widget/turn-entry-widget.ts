@@ -26,6 +26,7 @@ locale.inject(TurnOrderLocaleData);
  * A single widget in the TurnOrderWidget's vertical stack.
  */
 export class TurnEntryWidget {
+    private readonly _params: TurnOrderWidgetParams;
     private readonly _nameWidth: number;
     private readonly _entryHeight: number;
     private readonly _widget: LayoutBox;
@@ -61,6 +62,7 @@ export class TurnEntryWidget {
     }
 
     constructor(params: TurnOrderWidgetParams) {
+        this._params = params;
         const w: number =
             params.entryWidth ?? TurnOrderWidgetDefaults.DEFAULT_ENTRY_WIDTH;
         const h: number =
@@ -186,7 +188,7 @@ export class TurnEntryWidget {
             (button: ContentButton, clickingPlayer: Player) => {
                 new TurnClickedWidget(
                     turnOrder,
-                    this._entryHeight,
+                    this._params,
                     playerSlot
                 ).attachToScreen(clickingPlayer);
             }
