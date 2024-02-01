@@ -11,7 +11,7 @@ import {
     world,
 } from "@tabletop-playground/api";
 import { locale } from "../../locale/locale";
-import { DICT as TurnOrderLocaleData } from "./turn-order-locale.data";
+import { TurnOrderLocaleData } from "./turn-order-locale.data";
 import { TurnClickedWidget } from "./turn-clicked-widget";
 import { TurnEntryWart } from "./turn-entry-wart";
 import { TurnOrder } from "../../turn-order/turn-order";

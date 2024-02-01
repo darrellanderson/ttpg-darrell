@@ -1,3 +1,3 @@
-export const DICT: { [key: string]: string } = {
+export const PerfWidgetLocaleData: { [key: string]: string } = {
     "perf-widget.context-menu.toggle-perf": "* Toggle perf",
 };

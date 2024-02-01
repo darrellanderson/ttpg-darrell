@@ -13,9 +13,9 @@ import {
 import { locale } from "../../locale/locale";
 import { TurnOrder } from "../../turn-order/turn-order";
 
-import localeData from "./end-turn-locale.data";
+import { EndTurnLocaleData } from "./end-turn-locale.data";
 import { UiVisibility } from "../../ui-visibility/ui-visibility";
-locale.inject(localeData);
+locale.inject(EndTurnLocaleData);
 
 export type EndTurnButtonParams = {
     scale?: number;

@@ -1,4 +1,4 @@
-export const DICT: { [key: string]: string } = {
+export const TurnOrderLocaleData: { [key: string]: string } = {
     "turn-order.context-menu.toggle-visibility": "* Toggle turn order",
 
     "turn-order.eliminated.clear": "Clear eliminated",

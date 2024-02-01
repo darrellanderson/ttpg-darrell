@@ -16,8 +16,8 @@ import { locale } from "../../locale/locale";
 import { Broadcast } from "../../broadcast/broadcast";
 import { TurnOrder } from "../../turn-order/turn-order";
 
-import { DICT as GlobalLocaleData } from "../../../locale.data";
-import { DICT as TurnOrderLocaleData } from "./turn-order-locale.data";
+import { GlobalLocaleData } from "../../../locale.data";
+import { TurnOrderLocaleData } from "./turn-order-locale.data";
 import {
     TurnOrderWidgetDefaults,
     TurnOrderWidgetParams,
