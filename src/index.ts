@@ -1,8 +1,3 @@
-import { locale } from "./lib/locale/locale";
-import { GlobalLocaleData } from "./locale.data";
-locale.inject(GlobalLocaleData);
-// grep -r src -e export -l | sort | uniq | grep -v "^src/index" | sed -e "s/\.ts$//" | sed -e "s#src/\(.*\)#export * from \"./\1\";#" | pbcopy
-
 export * from "./lib/broadcast/broadcast";
 export * from "./lib/bug-workarounds/bug-card-holder-assignment";
 export * from "./lib/bug-workarounds/bug-unique-cards";
