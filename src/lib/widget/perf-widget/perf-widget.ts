@@ -1,16 +1,22 @@
 import {
     Border,
+    Player,
     ScreenUIElement,
     Text,
     TextJustification,
     VerticalBox,
     WebBrowser,
     Widget,
+    globalEvents,
     world,
 } from "@tabletop-playground/api";
 import { Perf, PerfReport } from "../../perf/perf";
 import { SvgSparkline } from "../../svg/svg-sparkline";
 import { UiVisibility } from "../../ui-visibility/ui-visibility";
+
+import { DICT as PerfWidgetLocaleData } from "./perf-widget-locale.data";
+import { locale } from "../../locale/locale";
+locale.inject(PerfWidgetLocaleData);
 
 export class PerfWidget {
     private readonly _perf: Perf;
@@ -19,6 +25,18 @@ export class PerfWidget {
     private readonly _screenUI: ScreenUIElement;
     private readonly _uiVisibility: UiVisibility;
     private readonly _refreshHandle: timeout_handle;
+
+    private readonly _toggleVisibilityActionName = locale(
+        "perf-widget.context-menu.toggle-perf"
+    );
+    private readonly _onCustomActionHandler = (
+        player: Player,
+        identifier: string
+    ) => {
+        if (identifier === this._toggleVisibilityActionName) {
+            this.toggleVisibility(player.getSlot());
+        }
+    };
 
     constructor() {
         this._perf = new Perf();
@@ -42,6 +60,10 @@ export class PerfWidget {
         this._refreshHandle = setInterval(() => {
             this.refresh();
         }, 1000);
+
+        globalEvents.onCustomAction.add(this._onCustomActionHandler);
+        world.removeCustomAction(this._toggleVisibilityActionName);
+        world.addCustomAction(this._toggleVisibilityActionName);
     }
 
     destroy(): void {
