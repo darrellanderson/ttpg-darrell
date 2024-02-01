@@ -24,6 +24,10 @@ export class PerfWidget {
     private readonly _fpsText: Text;
     private readonly _screenUI: ScreenUIElement;
     private readonly _uiVisibility: UiVisibility;
+
+    private readonly _refresh = () => {
+        this.refresh();
+    };
     private readonly _refreshHandle: timeout_handle;
 
     private readonly _toggleVisibilityActionName = locale(
@@ -57,13 +61,13 @@ export class PerfWidget {
         this._screenUI.widget = this.getWidget();
 
         this._uiVisibility = new UiVisibility(this._screenUI).setNone();
-        this._refreshHandle = setInterval(() => {
-            this.refresh();
-        }, 1000);
+        this._refreshHandle = setInterval(this._refresh, 1000);
 
         globalEvents.onCustomAction.add(this._onCustomActionHandler);
         world.removeCustomAction(this._toggleVisibilityActionName);
         world.addCustomAction(this._toggleVisibilityActionName);
+
+        this._refresh();
     }
 
     destroy(): void {
