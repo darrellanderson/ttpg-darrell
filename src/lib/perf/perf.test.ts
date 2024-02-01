@@ -1,5 +1,4 @@
-import { globalEvents } from "@tabletop-playground/api";
-import { MockMulticastDelegate } from "ttpg-mock";
+import { mockGlobalEvents } from "ttpg-mock";
 import { Perf, PerfReport } from "./perf";
 
 it("init", () => {
@@ -16,16 +15,13 @@ it("destroy", () => {
 
 it("report", () => {
     const perf = new Perf();
-    const onTick = globalEvents.onTick as MockMulticastDelegate<
-        (seconds: number) => void
-    >;
     for (let i = 0; i < 20; i++) {
-        onTick._trigger(0.016);
-        onTick._trigger(0.016);
-        onTick._trigger(0.017);
-        onTick._trigger(0.018);
+        mockGlobalEvents._tick(0.016);
+        mockGlobalEvents._tick(0.016);
+        mockGlobalEvents._tick(0.017);
+        mockGlobalEvents._tick(0.018);
     }
-    onTick._trigger(0.201);
+    mockGlobalEvents._tick(0.201);
 
     const report: PerfReport = perf.getReport();
     expect(report.fps).toBeCloseTo(59.61);
@@ -47,16 +43,13 @@ it("report (empty)", () => {
 
 it("reportStr", () => {
     const perf = new Perf();
-    const onTick = globalEvents.onTick as MockMulticastDelegate<
-        (seconds: number) => void
-    >;
     for (let i = 0; i < 20; i++) {
-        onTick._trigger(0.016);
-        onTick._trigger(0.016);
-        onTick._trigger(0.017);
-        onTick._trigger(0.018);
+        mockGlobalEvents._tick(0.016);
+        mockGlobalEvents._tick(0.016);
+        mockGlobalEvents._tick(0.017);
+        mockGlobalEvents._tick(0.018);
     }
-    onTick._trigger(0.201);
+    mockGlobalEvents._tick(0.201);
 
     const reportStr: string = perf.getReportStr();
     expect(reportStr).toEqual(
@@ -66,10 +59,7 @@ it("reportStr", () => {
 
 it("getFpsHistory", () => {
     const perf = new Perf();
-    const onTick = globalEvents.onTick as MockMulticastDelegate<
-        (seconds: number) => void
-    >;
-    onTick._trigger(0.201);
+    mockGlobalEvents._tick(0.201);
     const history: number[] = perf.getFpsHistory();
     expect(history.length).toEqual(60);
     expect(history[0]).toEqual(0);
