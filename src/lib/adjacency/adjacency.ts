@@ -1,33 +1,12 @@
 /**
- * Explicit link between A and B.
- */
-export type AdjacencyLink = {
-    type: string;
-    a: string;
-    b: string;
-};
-
-/**
- * Ambigous link between A and all other hubs with the same type.
- */
-export type AdjacencyHub = {
-    type: string;
-    a: string;
-};
-
-export class Adjacency {}
-
-/**
  * Compute adjacency (including at distance) from a collection of links.
  */
 export class AdjacencyBuilder {
-    private readonly _links: AdjacencyLink[] = [];
-    private readonly _hubs: AdjacencyHub[] = [];
-
-    private readonly _blockLinksStrinified: Set<string> = new Set<string>();
-    private readonly _blockHubTypes: Set<string> = new Set<string>();
-
-    private readonly _hubTypeToLinkedHubTypesSet: {
+    private readonly _linkTypeToSrcNodeToDstNodeSet: {
+        [key: string]: { [key: string]: Set<string> };
+    } = {};
+    private readonly _hubTypeToNodeSet: { [key: string]: Set<string> } = {};
+    private readonly _srcHubTypeToDstHubTypeSet: {
         [key: string]: Set<string>;
     } = {};
 
