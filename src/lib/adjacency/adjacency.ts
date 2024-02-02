@@ -41,20 +41,17 @@ export class Adjacency {
         let srcNodeToDstNodeSet: { [key: string]: Set<string> } | undefined;
         srcNodeToDstNodeSet = this._linkTypeToSrcNodeToDstNodeSet[linkType];
         if (!srcNodeToDstNodeSet) {
-            srcNodeToDstNodeSet = {};
-            this._linkTypeToSrcNodeToDstNodeSet[linkType] = srcNodeToDstNodeSet;
+            return this;
         }
         let dstNodeSet: Set<string> | undefined;
         dstNodeSet = srcNodeToDstNodeSet[a];
         if (!dstNodeSet) {
-            dstNodeSet = new Set<string>();
-            srcNodeToDstNodeSet[a] = dstNodeSet;
+            return this;
         }
         dstNodeSet.delete(b);
         dstNodeSet = srcNodeToDstNodeSet[b];
         if (!dstNodeSet) {
-            dstNodeSet = new Set<string>();
-            srcNodeToDstNodeSet[b] = dstNodeSet;
+            return this;
         }
         dstNodeSet.delete(a);
         return this;
@@ -88,8 +85,7 @@ export class Adjacency {
         let nodeSet: Set<string> | undefined;
         nodeSet = this._hubTypeToNodeSet[hubType];
         if (!nodeSet) {
-            nodeSet = new Set<string>();
-            this._hubTypeToNodeSet[hubType] = nodeSet;
+            return this;
         }
         nodeSet.delete(a);
         return this;
@@ -125,14 +121,12 @@ export class Adjacency {
         let hubTypeSet: Set<string>;
         hubTypeSet = this._srcHubTypeToDstHubTypeSet[a];
         if (!hubTypeSet) {
-            hubTypeSet = new Set<string>();
-            this._srcHubTypeToDstHubTypeSet[a] = hubTypeSet;
+            return this;
         }
         hubTypeSet.delete(b);
         hubTypeSet = this._srcHubTypeToDstHubTypeSet[b];
         if (!hubTypeSet) {
-            hubTypeSet = new Set<string>();
-            this._srcHubTypeToDstHubTypeSet[b] = hubTypeSet;
+            return this;
         }
         hubTypeSet.delete(a);
         return this;
