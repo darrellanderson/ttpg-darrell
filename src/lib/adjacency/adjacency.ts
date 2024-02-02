@@ -1,7 +1,7 @@
 /**
  * Compute adjacency (including at distance) from a collection of links.
  */
-export class AdjacencyBuilder {
+export class Adjacency {
     private readonly _linkTypeToSrcNodeToDstNodeSet: {
         [key: string]: { [key: string]: Set<string> };
     } = {};
@@ -10,99 +10,164 @@ export class AdjacencyBuilder {
         [key: string]: Set<string>;
     } = {};
 
-    static _createCanonicalLink(
-        type: string,
-        a: string,
-        b: string
-    ): AdjacencyLink {
-        if (a < b) {
-            [a, b] = [b, a];
+    addNodeLink(linkType: string, a: string, b: string): this {
+        let srcNodeToDstNodeSet: { [key: string]: Set<string> } | undefined;
+        let dstNodeSet: Set<string> | undefined;
+
+        srcNodeToDstNodeSet = this._linkTypeToSrcNodeToDstNodeSet[linkType];
+        if (!srcNodeToDstNodeSet) {
+            srcNodeToDstNodeSet = {};
+            this._linkTypeToSrcNodeToDstNodeSet[linkType] = srcNodeToDstNodeSet;
         }
-        return { type, a, b };
-    }
 
-    static _stringifyCanonicalLink(link: AdjacencyLink): string {
-        return `${link.type}:${link.a}:${link.b}`;
-    }
-
-    addLink(type: string, a: string, b: string): this {
-        const link = AdjacencyBuilder._createCanonicalLink(type, a, b);
-        this._links.push(link);
-        return this;
-    }
-
-    addHub(type: string, a: string): this {
-        const hub: AdjacencyHub = { type, a };
-        this._hubs.push(hub);
-        return this;
-    }
-
-    blockLink(type: string, a: string, b: string): this {
-        const link = AdjacencyBuilder._createCanonicalLink(type, a, b);
-        const stringified = AdjacencyBuilder._stringifyCanonicalLink(link);
-        this._blockLinksStrinified.add(stringified);
-        return this;
-    }
-
-    linkHubs(type1: string, type2: string): this {
-        let linkedHubTypesSet: Set<string> | undefined;
-
-        // 1 -> 2
-        linkedHubTypesSet = this._hubTypeToLinkedHubTypesSet[type1];
-        if (!linkedHubTypesSet) {
-            linkedHubTypesSet = new Set<string>();
-            this._hubTypeToLinkedHubTypesSet[type1] = linkedHubTypesSet;
+        dstNodeSet = srcNodeToDstNodeSet[a];
+        if (!dstNodeSet) {
+            dstNodeSet = new Set<string>();
+            srcNodeToDstNodeSet[a] = dstNodeSet;
         }
-        linkedHubTypesSet.add(type2);
+        dstNodeSet.add(b);
 
-        // 2 -> 1
-        linkedHubTypesSet = this._hubTypeToLinkedHubTypesSet[type2];
-        if (!linkedHubTypesSet) {
-            linkedHubTypesSet = new Set<string>();
-            this._hubTypeToLinkedHubTypesSet[type2] = linkedHubTypesSet;
+        dstNodeSet = srcNodeToDstNodeSet[b];
+        if (!dstNodeSet) {
+            dstNodeSet = new Set<string>();
+            srcNodeToDstNodeSet[b] = dstNodeSet;
         }
-        linkedHubTypesSet.add(type1);
+        dstNodeSet.add(a);
+
         return this;
     }
 
-    _getUnblockedLinks(): AdjacencyLink[] {
-        return this._links.filter((link) => {
-            return !this._blockLinksStrinified.has(
-                AdjacencyBuilder._stringifyCanonicalLink(link)
-            );
-        });
+    removeNodeLink(linkType: string, a: string, b: string): this {
+        let srcNodeToDstNodeSet: { [key: string]: Set<string> } | undefined;
+        srcNodeToDstNodeSet = this._linkTypeToSrcNodeToDstNodeSet[linkType];
+        if (!srcNodeToDstNodeSet) {
+            srcNodeToDstNodeSet = {};
+            this._linkTypeToSrcNodeToDstNodeSet[linkType] = srcNodeToDstNodeSet;
+        }
+        let dstNodeSet: Set<string> | undefined;
+        dstNodeSet = srcNodeToDstNodeSet[a];
+        if (!dstNodeSet) {
+            dstNodeSet = new Set<string>();
+            srcNodeToDstNodeSet[a] = dstNodeSet;
+        }
+        dstNodeSet.delete(b);
+        dstNodeSet = srcNodeToDstNodeSet[b];
+        if (!dstNodeSet) {
+            dstNodeSet = new Set<string>();
+            srcNodeToDstNodeSet[b] = dstNodeSet;
+        }
+        dstNodeSet.delete(a);
+        return this;
     }
 
-    _getUnblockedHubs(): AdjacencyHub[] {
-        return this._hubs.filter((hub) => {
-            return !this._blockHubTypes.has(hub.type);
-        });
+    hasNodeLink(linkType: string, a: string, b: string): boolean {
+        const srcNodeToDstNodeSet: { [key: string]: Set<string> } | undefined =
+            this._linkTypeToSrcNodeToDstNodeSet[linkType];
+        if (!srcNodeToDstNodeSet) {
+            return false;
+        }
+        const dstNodeSet: Set<string> | undefined = srcNodeToDstNodeSet[a];
+        if (!dstNodeSet) {
+            false;
+        }
+        return dstNodeSet.has(b);
     }
 
-    _getTransitiveLinkedHubTypes(type: string): string[] {
+    addNodeHub(hubType: string, a: string): this {
+        let nodeSet: Set<string> | undefined;
+        nodeSet = this._hubTypeToNodeSet[hubType];
+        if (!nodeSet) {
+            nodeSet = new Set<string>();
+            this._hubTypeToNodeSet[hubType] = nodeSet;
+        }
+        nodeSet.add(a);
+        return this;
+    }
+
+    removeNodeHub(hubType: string, a: string): this {
+        let nodeSet: Set<string> | undefined;
+        nodeSet = this._hubTypeToNodeSet[hubType];
+        if (!nodeSet) {
+            nodeSet = new Set<string>();
+            this._hubTypeToNodeSet[hubType] = nodeSet;
+        }
+        nodeSet.delete(a);
+        return this;
+    }
+
+    hasNodeHub(hubType: string, a: string): boolean {
+        const nodeSet: Set<string> | undefined =
+            this._hubTypeToNodeSet[hubType];
+        if (!nodeSet) {
+            return false;
+        }
+        return nodeSet.has(a);
+    }
+
+    addHubLink(a: string, b: string): this {
+        let hubTypeSet: Set<string>;
+        hubTypeSet = this._srcHubTypeToDstHubTypeSet[a];
+        if (!hubTypeSet) {
+            hubTypeSet = new Set<string>();
+            this._srcHubTypeToDstHubTypeSet[a] = hubTypeSet;
+        }
+        hubTypeSet.add(b);
+        hubTypeSet = this._srcHubTypeToDstHubTypeSet[b];
+        if (!hubTypeSet) {
+            hubTypeSet = new Set<string>();
+            this._srcHubTypeToDstHubTypeSet[b] = hubTypeSet;
+        }
+        hubTypeSet.add(a);
+        return this;
+    }
+
+    removeHubLink(a: string, b: string): this {
+        let hubTypeSet: Set<string>;
+        hubTypeSet = this._srcHubTypeToDstHubTypeSet[a];
+        if (!hubTypeSet) {
+            hubTypeSet = new Set<string>();
+            this._srcHubTypeToDstHubTypeSet[a] = hubTypeSet;
+        }
+        hubTypeSet.delete(b);
+        hubTypeSet = this._srcHubTypeToDstHubTypeSet[b];
+        if (!hubTypeSet) {
+            hubTypeSet = new Set<string>();
+            this._srcHubTypeToDstHubTypeSet[b] = hubTypeSet;
+        }
+        hubTypeSet.delete(a);
+        return this;
+    }
+
+    hasHubLink(a: string, b: string): boolean {
+        const hubTypeSet: Set<string> = this._srcHubTypeToDstHubTypeSet[a];
+        if (!hubTypeSet) {
+            return false;
+        }
+        return hubTypeSet.has(b);
+    }
+
+    _getTransitiveHubTypes(hubType: string): string[] {
         const linkedHubTypes: Set<string> = new Set<string>();
-        const toVisit: string[] = [type];
+        const toVisit: string[] = [hubType];
         const visited: Set<string> = new Set<string>();
 
         while (toVisit.length > 0) {
-            const visitType: string | undefined = toVisit.shift();
-            if (!visitType) {
+            const srcHubType: string | undefined = toVisit.shift();
+            if (!srcHubType) {
                 throw new Error("shift failed when length was positive");
             }
-            visited.add(visitType);
-            const linkedTypesSet: Set<string> | undefined =
-                this._hubTypeToLinkedHubTypesSet[visitType];
-            if (linkedTypesSet) {
-                for (const linkedType of linkedTypesSet) {
-                    linkedHubTypes.add(linkedType);
-                    if (!visited.has(linkedType)) {
-                        toVisit.push(linkedType);
+            visited.add(srcHubType);
+            const dstHubTypeSet: Set<string> | undefined =
+                this._srcHubTypeToDstHubTypeSet[srcHubType];
+            if (dstHubTypeSet) {
+                for (const dstHubType of dstHubTypeSet) {
+                    linkedHubTypes.add(dstHubType);
+                    if (!visited.has(dstHubType)) {
+                        toVisit.push(dstHubType);
                     }
                 }
             }
         }
         return Array.from(linkedHubTypes);
     }
-
-    build(origin: string, maxDistance: number): Adjacency {}
 }
