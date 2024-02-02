@@ -49,3 +49,18 @@ it("add/remove hub link", () => {
     expect(adj.hasHubLink(a, b)).toBeFalsy();
     expect(adj.hasHubLink(b, a)).toBeFalsy();
 });
+
+it("transitive hub link", () => {
+    const adj = new Adjacency();
+    const a = "my-a";
+    const b = "my-b";
+    const c = "my-c";
+    const not = "my-not";
+    adj.addHubLink(a, b);
+    adj.addHubLink(c, b); // reverse order
+    const adjHubs: string[] = adj._getTransitiveHubTypes(a);
+    expect(adjHubs.includes(a)).toBeTruthy();
+    expect(adjHubs.includes(b)).toBeTruthy();
+    expect(adjHubs.includes(c)).toBeTruthy();
+    expect(adjHubs.includes(not)).toBeFalsy();
+});

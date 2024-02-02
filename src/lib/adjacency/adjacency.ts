@@ -170,4 +170,18 @@ export class Adjacency {
         }
         return Array.from(linkedHubTypes);
     }
+
+    getAdjacent(
+        origin: string,
+        maxDistance: number
+    ): { [key: string]: number } {
+        const nodeToDistance: { [key: string]: number } = {};
+
+        const ab: { [key: string]: string } = {};
+        for (const srcNodeToDstNodeSet of Object.values(
+            this._linkTypeToSrcNodeToDstNodeSet
+        )) {
+        }
+        return nodeToDistance;
+    }
 }
