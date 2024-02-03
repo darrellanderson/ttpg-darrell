@@ -1,19 +1,24 @@
+// Alias to make it more obvious which type is being used.
+export type LinkType = string;
+export type NodeType = string;
+export type HubType = string;
+
 /**
  * Compute adjacency (including at distance) from a collection of links.
  */
 export class Adjacency {
     // Links from A to B.
     private readonly _linkTypeToSrcNodeToDstNodeSet: {
-        [key: string]: { [key: string]: Set<string> };
+        [key: LinkType]: { [key: NodeType]: Set<NodeType> };
     } = {};
 
     // Hubs connect all nodes with the given hub type.
-    private readonly _hubTypeToNodeSet: { [key: string]: Set<string> } = {};
-    private readonly _nodeToHubTypes: { [key: string]: Set<string> } = {};
+    private readonly _hubTypeToNodeSet: { [key: HubType]: Set<NodeType> } = {};
+    private readonly _nodeToHubTypes: { [key: NodeType]: Set<HubType> } = {};
 
     // Hubs can link to other hubs.
     private readonly _srcHubTypeToDstHubTypeSet: {
-        [key: string]: Set<string>;
+        [key: HubType]: Set<HubType>;
     } = {};
 
     /**
@@ -24,22 +29,23 @@ export class Adjacency {
      * @param b
      * @returns
      */
-    addNodeLink(linkType: string, a: string, b: string): this {
-        let srcNodeToDstNodeSet: { [key: string]: Set<string> } | undefined =
-            this._linkTypeToSrcNodeToDstNodeSet[linkType];
+    addNodeLink(linkType: LinkType, a: NodeType, b: NodeType): this {
+        let srcNodeToDstNodeSet:
+            | { [key: NodeType]: Set<NodeType> }
+            | undefined = this._linkTypeToSrcNodeToDstNodeSet[linkType];
         if (!srcNodeToDstNodeSet) {
             srcNodeToDstNodeSet = {};
             this._linkTypeToSrcNodeToDstNodeSet[linkType] = srcNodeToDstNodeSet;
         }
-        let aSet: Set<string> | undefined = srcNodeToDstNodeSet[a];
+        let aSet: Set<NodeType> | undefined = srcNodeToDstNodeSet[a];
         if (!aSet) {
-            aSet = new Set<string>();
+            aSet = new Set<NodeType>();
             srcNodeToDstNodeSet[a] = aSet;
         }
         aSet.add(b);
-        let bSet: Set<string> | undefined = srcNodeToDstNodeSet[b];
+        let bSet: Set<NodeType> | undefined = srcNodeToDstNodeSet[b];
         if (!bSet) {
-            bSet = new Set<string>();
+            bSet = new Set<NodeType>();
             srcNodeToDstNodeSet[b] = bSet;
         }
         bSet.add(a);
@@ -54,18 +60,19 @@ export class Adjacency {
      * @param b
      * @returns
      */
-    removeNodeLink(linkType: string, a: string, b: string): this {
-        const srcNodeToDstNodeSet: { [key: string]: Set<string> } | undefined =
-            this._linkTypeToSrcNodeToDstNodeSet[linkType];
+    removeNodeLink(linkType: LinkType, a: NodeType, b: NodeType): this {
+        const srcNodeToDstNodeSet:
+            | { [key: NodeType]: Set<NodeType> }
+            | undefined = this._linkTypeToSrcNodeToDstNodeSet[linkType];
         if (!srcNodeToDstNodeSet) {
             return this;
         }
 
-        const aSet: Set<string> | undefined = srcNodeToDstNodeSet[a];
+        const aSet: Set<NodeType> | undefined = srcNodeToDstNodeSet[a];
         if (aSet) {
             aSet.delete(b);
         }
-        const bSet: Set<string> | undefined = srcNodeToDstNodeSet[b];
+        const bSet: Set<NodeType> | undefined = srcNodeToDstNodeSet[b];
         if (bSet) {
             bSet.delete(a);
         }
@@ -80,32 +87,33 @@ export class Adjacency {
      * @param b
      * @returns
      */
-    hasNodeLink(linkType: string, a: string, b: string): boolean {
-        const srcNodeToDstNodeSet: { [key: string]: Set<string> } | undefined =
-            this._linkTypeToSrcNodeToDstNodeSet[linkType];
+    hasNodeLink(linkType: LinkType, a: NodeType, b: NodeType): boolean {
+        const srcNodeToDstNodeSet:
+            | { [key: NodeType]: Set<NodeType> }
+            | undefined = this._linkTypeToSrcNodeToDstNodeSet[linkType];
         if (!srcNodeToDstNodeSet) {
             return false;
         }
-        const dstNodeSet: Set<string> | undefined = srcNodeToDstNodeSet[a];
+        const dstNodeSet: Set<NodeType> | undefined = srcNodeToDstNodeSet[a];
         if (!dstNodeSet) {
             false;
         }
         return dstNodeSet.has(b);
     }
 
-    addNodeHub(hubType: string, a: string): this {
-        let nodeSet: Set<string> | undefined;
+    addNodeHub(a: NodeType, hubType: HubType): this {
+        let nodeSet: Set<NodeType> | undefined;
         nodeSet = this._hubTypeToNodeSet[hubType];
         if (!nodeSet) {
-            nodeSet = new Set<string>();
+            nodeSet = new Set<NodeType>();
             this._hubTypeToNodeSet[hubType] = nodeSet;
         }
         nodeSet.add(a);
 
-        let hubTypes: Set<string> | undefined;
+        let hubTypes: Set<HubType> | undefined;
         hubTypes = this._nodeToHubTypes[a];
         if (!hubTypes) {
-            hubTypes = new Set<string>();
+            hubTypes = new Set<HubType>();
             this._nodeToHubTypes[a] = hubTypes;
         }
         hubTypes.add(hubType);
@@ -113,14 +121,14 @@ export class Adjacency {
         return this;
     }
 
-    removeNodeHub(hubType: string, a: string): this {
-        const nodeSet: Set<string> | undefined =
+    removeNodeHub(a: NodeType, hubType: HubType): this {
+        const nodeSet: Set<NodeType> | undefined =
             this._hubTypeToNodeSet[hubType];
         if (nodeSet) {
             nodeSet.delete(a);
         }
 
-        const hubTypes: Set<string> | undefined = this._nodeToHubTypes[a];
+        const hubTypes: Set<HubType> | undefined = this._nodeToHubTypes[a];
         if (hubTypes) {
             hubTypes.delete(hubType);
         }
@@ -128,61 +136,60 @@ export class Adjacency {
         return this;
     }
 
-    hasNodeHub(hubType: string, a: string): boolean {
-        const nodeSet: Set<string> | undefined =
+    hasNodeHub(hubType: HubType, a: NodeType): boolean {
+        const nodeSet: Set<NodeType> | undefined =
             this._hubTypeToNodeSet[hubType];
         return nodeSet && nodeSet.has(a);
     }
 
-    addHubLink(a: string, b: string): this {
-        let hubTypeSet: Set<string>;
+    addHubLink(a: HubType, b: HubType): this {
+        let hubTypeSet: Set<HubType>;
         hubTypeSet = this._srcHubTypeToDstHubTypeSet[a];
         if (!hubTypeSet) {
-            hubTypeSet = new Set<string>();
+            hubTypeSet = new Set<HubType>();
             this._srcHubTypeToDstHubTypeSet[a] = hubTypeSet;
         }
         hubTypeSet.add(b);
         hubTypeSet = this._srcHubTypeToDstHubTypeSet[b];
         if (!hubTypeSet) {
-            hubTypeSet = new Set<string>();
+            hubTypeSet = new Set<HubType>();
             this._srcHubTypeToDstHubTypeSet[b] = hubTypeSet;
         }
         hubTypeSet.add(a);
         return this;
     }
 
-    removeHubLink(a: string, b: string): this {
-        let hubTypeSet: Set<string>;
+    removeHubLink(a: HubType, b: HubType): this {
+        let hubTypeSet: Set<HubType>;
         hubTypeSet = this._srcHubTypeToDstHubTypeSet[a];
-        if (!hubTypeSet) {
-            return this;
+        if (hubTypeSet) {
+            hubTypeSet.delete(b);
         }
-        hubTypeSet.delete(b);
         hubTypeSet = this._srcHubTypeToDstHubTypeSet[b];
-        if (!hubTypeSet) {
-            return this;
+        if (hubTypeSet) {
+            hubTypeSet.delete(a);
         }
-        hubTypeSet.delete(a);
         return this;
     }
 
-    hasHubLink(a: string, b: string): boolean {
-        const hubTypeSet: Set<string> = this._srcHubTypeToDstHubTypeSet[a];
+    hasHubLink(a: HubType, b: HubType): boolean {
+        const hubTypeSet: Set<HubType> = this._srcHubTypeToDstHubTypeSet[a];
         return hubTypeSet && hubTypeSet.has(b);
     }
 
-    _getTransitiveHubTypes(hubTypes: string[]): string[] {
-        const linkedHubTypes: Set<string> = new Set<string>();
-        const toVisit: string[] = [...hubTypes];
-        const visited: Set<string> = new Set<string>();
+    _getTransitiveHubTypes(hubType: HubType): HubType[] {
+        const linkedHubTypes: Set<HubType> = new Set<HubType>();
+        const toVisit: HubType[] = [hubType];
+        const visited: Set<HubType> = new Set<HubType>();
 
         while (toVisit.length > 0) {
-            const srcHubType: string | undefined = toVisit.shift();
+            const srcHubType: HubType | undefined = toVisit.shift();
             if (!srcHubType) {
                 throw new Error("shift failed when length was positive");
             }
             visited.add(srcHubType);
-            const dstHubTypeSet: Set<string> | undefined =
+            linkedHubTypes.add(srcHubType);
+            const dstHubTypeSet: Set<HubType> | undefined =
                 this._srcHubTypeToDstHubTypeSet[srcHubType];
             if (dstHubTypeSet) {
                 for (const dstHubType of dstHubTypeSet) {
@@ -196,52 +203,75 @@ export class Adjacency {
         return Array.from(linkedHubTypes);
     }
 
-    getAdjacent(
-        origin: string,
+    getAdjacentAtDistanceArray(
+        origin: NodeType,
         maxDistance: number
-    ): { [key: string]: number } {
-        const nodeToDistance: { [key: string]: number } = { [origin]: 0 };
-        const toVisit: string[] = [origin];
+    ): Set<string>[] {
+        const nodeToDistance: { [key: NodeType]: number } = { [origin]: 0 };
+        const toVisit: NodeType[] = [origin];
+
+        const srcNodeToDstNodeSet: { [key: NodeType]: Set<NodeType> } = {};
+        const addLink = (a: NodeType, b: NodeType) => {
+            let bNodeSet: Set<string> = srcNodeToDstNodeSet[a];
+            if (!bNodeSet) {
+                bNodeSet = new Set<NodeType>();
+                srcNodeToDstNodeSet[a] = bNodeSet;
+            }
+            bNodeSet.add(a);
+            let aNodeSet: Set<string> = srcNodeToDstNodeSet[b];
+            if (!aNodeSet) {
+                aNodeSet = new Set<NodeType>();
+                srcNodeToDstNodeSet[b] = aNodeSet;
+            }
+            aNodeSet.add(b);
+        };
 
         // Get link edges.
-        const srcNodeToDstNodeSet: { [key: string]: Set<string> } = {};
-        srcNodeToDstNodeSet[origin] = new Set<string>();
         for (const linkSrcNodeToLinkDstNodeSet of Object.values(
             this._linkTypeToSrcNodeToDstNodeSet
         )) {
-            for (const [linkSrcNode, linkDstNodeSet] of Object.entries(
+            for (const [a, bSet] of Object.entries(
                 linkSrcNodeToLinkDstNodeSet
             )) {
-                let dstNodeSet: Set<string> = srcNodeToDstNodeSet[linkSrcNode];
-                if (!dstNodeSet) {
-                    dstNodeSet = new Set<string>();
-                    srcNodeToDstNodeSet[linkSrcNode] = dstNodeSet;
-                }
-                for (const linkDstNode of linkDstNodeSet) {
-                    dstNodeSet.add(linkDstNode);
+                for (const b of bSet) {
+                    addLink(a, b);
                 }
             }
         }
 
         // Get hub edges.
-        const hubTypes: Set<string> | undefined = this._nodeToHubTypes[origin];
-        if (hubTypes) {
-            const transitiveHubTypes: string[] = this._getTransitiveHubTypes(
-                Array.from(hubTypes)
-            );
+        for (const hubType of Object.keys(this._hubTypeToNodeSet)) {
+            console.log("looking at " + hubType);
+            const aNodes: Set<NodeType> | undefined =
+                this._hubTypeToNodeSet[hubType];
+            if (!aNodes) {
+                continue;
+            }
+            const transitiveHubTypes: HubType[] =
+                this._getTransitiveHubTypes(hubType);
             for (const transitiveHubType of transitiveHubTypes) {
-                const nodeSet: Set<string> | undefined =
+                console.log("t " + transitiveHubType);
+                const bNodes: Set<NodeType> | undefined =
                     this._hubTypeToNodeSet[transitiveHubType];
-                if (nodeSet) {
-                    for (const b of nodeSet) {
-                        srcNodeToDstNodeSet[origin].add(b);
+                if (!bNodes) {
+                    continue;
+                }
+                console.log(hubType + " " + transitiveHubType);
+                for (const a of aNodes) {
+                    console.log("a:" + a);
+                    for (const b of bNodes) {
+                        if (a === b) {
+                            continue;
+                        }
+                        console.log("a:" + a + " b:" + b);
+                        addLink(a, b);
                     }
                 }
             }
         }
 
         while (toVisit.length > 0) {
-            const a: string | undefined = toVisit.shift();
+            const a: NodeType | undefined = toVisit.shift();
             if (!a) {
                 throw new Error("length positive but shift failed");
             }
@@ -253,18 +283,28 @@ export class Adjacency {
             }
 
             // Add adjacent.
-            for (const b of srcNodeToDstNodeSet[a]) {
-                if (nodeToDistance[b] !== undefined) {
-                    continue; // already visited
-                }
-                const bDistance: number = aDistance + 1;
-                nodeToDistance[b] = bDistance;
-                if (bDistance < maxDistance) {
-                    toVisit.push(b);
+            const dstNodeSet: Set<NodeType> | undefined =
+                srcNodeToDstNodeSet[a];
+            if (dstNodeSet) {
+                for (const b of dstNodeSet) {
+                    if (nodeToDistance[b] !== undefined) {
+                        continue; // already visited
+                    }
+                    const bDistance: number = aDistance + 1;
+                    nodeToDistance[b] = bDistance;
+                    if (bDistance < maxDistance) {
+                        toVisit.push(b);
+                    }
                 }
             }
         }
 
-        return nodeToDistance;
+        const result = Array(maxDistance + 1) // include nodes at maxDistance
+            .fill(0)
+            .map(() => new Set<NodeType>());
+        for (const [node, distance] of Object.entries(nodeToDistance)) {
+            result[distance].add(node);
+        }
+        return result;
     }
 }
