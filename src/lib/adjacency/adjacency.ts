@@ -29,13 +29,6 @@ export class Adjacency {
     private readonly _tagToLinkedTagsSet: { [key: string]: Set<string> } = {};
     private readonly _transitNodes: Set<string> = new Set<string>();
 
-    static _canonicalLink(tag1: string, tag2: string): string {
-        if (tag1 < tag2) {
-            [tag1, tag2] = [tag2, tag1];
-        }
-        return `${tag1}|${tag2}`;
-    }
-
     public addNodeTags(node: string, tags: string[]): this {
         let nodeSet: Set<string> | undefined;
         for (const tag of tags) {
@@ -140,13 +133,17 @@ export class Adjacency {
         return nodeToTags;
     }
 
-    _getTagToTransitiveTagSet(): { [key: string]: Set<string> } {
+    _getTagToTransitiveTagSet(): { [key: string]: Set<string> | undefined } {
         const tagToTransitiveTags: { [key: string]: Set<string> } = {};
 
-        for (const [originTag] of Object.keys(this._tagToLinkedTagsSet)) {
+        for (const originTag of Object.keys(this._tagToLinkedTagsSet)) {
             const transitiveTags: Set<string> = new Set<string>();
-            const toVisit: string[] = [originTag];
+            const toVisit: string[] = [];
             const visited: Set<string> = new Set<string>();
+
+            const linkedTagSet: Set<string> =
+                this._tagToLinkedTagsSet[originTag];
+            toVisit.push(...Array.from(linkedTagSet));
 
             while (toVisit.length > 0) {
                 const tag = toVisit.pop();
