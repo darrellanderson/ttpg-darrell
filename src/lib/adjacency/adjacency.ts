@@ -12,6 +12,8 @@
  * - node1 NOT adjacent to node2
  * - add link:tagAlpha-tagAlpha
  * - node1 is now adjacent to node2
+ *
+ * Tansit nodes are on a path, but do not add to distance ("hyperlane").
  */
 export type AdjacencyNode = {
     node: string;
@@ -25,7 +27,7 @@ export type AdjacencyLink = {
 export class Adjacency {
     private readonly _tagToNodeSet: { [key: string]: Set<string> } = {};
     private readonly _tagToLinkedTagsSet: { [key: string]: Set<string> } = {};
-    private readonly _tagLinkToOverrideDistance: { [key: string]: number } = {};
+    private readonly _transitNodes: Set<string> = new Set<string>();
 
     static _canonicalLink(tag1: string, tag2: string): string {
         if (tag1 < tag2) {
@@ -63,7 +65,7 @@ export class Adjacency {
         return nodeSet && nodeSet.has(node);
     }
 
-    public addLink(tag1: string, tag2: string, distance: number = 1): this {
+    public addLink(tag1: string, tag2: string): this {
         let linkedTagSet: Set<string> | undefined;
 
         // 1 -> 2.
@@ -81,12 +83,6 @@ export class Adjacency {
             this._tagToLinkedTagsSet[tag2] = linkedTagSet;
         }
         linkedTagSet.add(tag1);
-
-        // Store non-1 distances.
-        if (distance !== 1) {
-            const canonical: string = Adjacency._canonicalLink(tag1, tag2);
-            this._tagLinkToOverrideDistance[canonical] = distance;
-        }
 
         return this;
     }
@@ -113,6 +109,20 @@ export class Adjacency {
         const linkedTagSet: Set<string> | undefined =
             this._tagToLinkedTagsSet[tag1];
         return linkedTagSet && linkedTagSet.has(tag2);
+    }
+
+    public addTransitNode(node: string): this {
+        this._transitNodes.add(node);
+        return this;
+    }
+
+    public removeTransitNode(node: string): this {
+        this._transitNodes.delete(node);
+        return this;
+    }
+
+    public hasTransitNode(node: string): boolean {
+        return this._transitNodes.has(node);
     }
 
     _getNodeToTagSets(): { [key: string]: Set<string> } {

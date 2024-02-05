@@ -57,6 +57,18 @@ it("add/remove link (reverse arg order)", () => {
     expect(adj.hasLink(tag2, tag1)).toBeFalsy();
 });
 
+it("add/remove transit node", () => {
+    const adj = new Adjacency();
+    const node = "my-node";
+    expect(adj.hasTransitNode(node)).toBeFalsy();
+
+    adj.addTransitNode(node);
+    expect(adj.hasTransitNode(node)).toBeTruthy();
+
+    adj.removeTransitNode(node);
+    expect(adj.hasTransitNode(node)).toBeFalsy();
+});
+
 it("_getNodeToTagSets", () => {
     const adj = new Adjacency();
     const node = "my-node";
