@@ -125,22 +125,22 @@ export class TurnEntryWidget {
             .setOverrideHeight(m.h)
             .setChild(this._canvas);
 
-        // Place primary canvas in a content button, then nest that in another
-        // canvas positioned to keep margin amounts of content button border.
+        // Place primary canvas in a content button, then nest that in an
+        // outset (negative margin) layout box to keep margin amounts of
+        // content button border.
         const borderSize = 4;
         this._contentButton = new ContentButton().setChild(innerCanvasBox);
-        const paddedCanvas = new Canvas().addChild(
-            this._contentButton,
-            m.l - borderSize,
-            m.t - borderSize,
-            m.w + borderSize * 2,
-            m.h + borderSize * 2
-        );
 
         this._widget = new LayoutBox()
+            .setPadding(
+                m.l - borderSize,
+                m.r - borderSize,
+                m.t - borderSize,
+                m.b - borderSize
+            )
             .setOverrideWidth(w)
             .setOverrideHeight(h)
-            .setChild(paddedCanvas);
+            .setChild(this._contentButton);
 
         // Attach warts.
         if (params.wartGenerators) {
