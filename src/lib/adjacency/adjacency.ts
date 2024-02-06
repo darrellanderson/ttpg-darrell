@@ -15,13 +15,11 @@
  *
  * Tansit nodes are on a path, but do not add to distance ("hyperlane").
  */
-export type AdjacencyNode = {
+
+export type AdjacencyPath = {
     node: string;
-    tags: string[];
-};
-export type AdjacencyLink = {
-    tags: string[];
-    overrideDistance: number | undefined; // defaults to 1
+    distance: number;
+    nodePath: string[];
 };
 
 export class Adjacency {
@@ -133,41 +131,63 @@ export class Adjacency {
         return nodeToTags;
     }
 
-    _getTagToTransitiveTagSet(): { [key: string]: Set<string> | undefined } {
-        const tagToTransitiveTags: { [key: string]: Set<string> } = {};
+    _getTransitiveTagSet(tagSet: Set<string>): Set<string> {
+        const transitiveTagsSet: Set<string> = new Set<string>();
+        const toVisit: string[] = Array.from(tagSet);
+        const visited: Set<string> = new Set<string>();
 
-        for (const originTag of Object.keys(this._tagToLinkedTagsSet)) {
-            const transitiveTags: Set<string> = new Set<string>();
-            const toVisit: string[] = [];
-            const visited: Set<string> = new Set<string>();
-
-            const linkedTagSet: Set<string> =
-                this._tagToLinkedTagsSet[originTag];
-            toVisit.push(...Array.from(linkedTagSet));
-
-            while (toVisit.length > 0) {
-                const tag = toVisit.pop();
-                if (!tag) {
-                    throw new Error("pop failed with positive length"); // stop 'maybe undefined' warning
-                }
-                transitiveTags.add(tag);
-                visited.add(tag);
-                const linkedTagSet: Set<string> | undefined =
-                    this._tagToLinkedTagsSet[tag];
-                if (linkedTagSet) {
-                    for (const linkedTag of linkedTagSet) {
-                        if (!visited.has(linkedTag)) {
-                            toVisit.push(linkedTag);
-                        }
+        while (toVisit.length > 0) {
+            const tag = toVisit.pop();
+            if (!tag) {
+                throw new Error("pop failed with positive length"); // stop 'maybe undefined' warning
+            }
+            visited.add(tag);
+            const linkedTagSet: Set<string> | undefined =
+                this._tagToLinkedTagsSet[tag];
+            if (linkedTagSet) {
+                for (const linkedTag of linkedTagSet) {
+                    transitiveTagsSet.add(tag);
+                    if (!visited.has(linkedTag)) {
+                        toVisit.push(linkedTag);
                     }
                 }
             }
         }
-
-        return tagToTransitiveTags;
+        return transitiveTagsSet;
     }
 
-    //public get(origin: string, maxDistance: number) : [] {
-    //    // Compute node to tags.
-    //}
+    public get(origin: string, maxDistance: number): AdjacencyPath[] {
+        const nodeToTagSet: { [key: string]: Set<string> } =
+            this._getNodeToTagSets();
+
+        const nodePath: string[] = [];
+        const toVisit: string[] = [origin];
+        const visited: Set<string> = new Set<string>();
+        const result: AdjacencyPath[] = [];
+
+        while (toVisit.length > 0) {
+            const node: string | undefined = toVisit.shift();
+            if (!node) {
+                throw new Error("shift failed with positive length"); // stop 'maybe undefined' warning
+            }
+            visited.add(node);
+            nodePath.push(node);
+            const distance = nodePath.filter(
+                (pathNode) => !this._transitNodes.has(pathNode)
+            ).length;
+            result.push({
+                node,
+                distance,
+                nodePath: [...nodePath],
+            });
+
+            const tagSet: Set<string> = nodeToTagSet[node] ?? new Set<string>();
+            for (const tag of tagSet) {
+            }
+
+            nodePath.pop();
+        }
+
+        return [];
+    }
 }

@@ -105,46 +105,61 @@ it("_getNodeToTagSets", () => {
     expect(tagList).toEqual([tag1, tag3]);
 });
 
-it("_getTagToTransitiveTagSet", () => {
+it("_getTransitiveTagSet", () => {
     const adj = new Adjacency();
     const node = "my-node";
     const tag1 = "my-tag-1";
     const tag2 = "my-tag-2";
     const tag3 = "my-tag-3";
+    const tag4 = "my-tag-4";
+    const tag5 = "my-tag-5";
 
-    let tagToTransitiveTagSet: { [key: string]: Set<string> | undefined } = {};
-    let tag1TransitiveTagSet: Set<string> | undefined;
-
-    tagToTransitiveTagSet = adj._getTagToTransitiveTagSet();
-    tag1TransitiveTagSet = tagToTransitiveTagSet[tag1];
-    expect(tag1TransitiveTagSet).toBeUndefined();
+    const tag1and4Set = new Set<string>().add(tag1).add(tag4);
+    let transitiveTagSet: Set<string> | undefined;
+    transitiveTagSet = adj._getTransitiveTagSet(tag1and4Set);
+    expect(transitiveTagSet?.has(tag1)).toBeFalsy();
+    expect(transitiveTagSet?.has(tag2)).toBeFalsy();
+    expect(transitiveTagSet?.has(tag3)).toBeFalsy();
+    expect(transitiveTagSet?.has(tag4)).toBeFalsy();
+    expect(transitiveTagSet?.has(tag5)).toBeFalsy();
 
     adj.addLink(tag1, tag1);
-    tagToTransitiveTagSet = adj._getTagToTransitiveTagSet();
-    tag1TransitiveTagSet = tagToTransitiveTagSet[tag1];
-    expect(tag1TransitiveTagSet?.has(tag1)).toBeTruthy();
-    expect(tag1TransitiveTagSet?.has(tag2)).toBeFalsy();
-    expect(tag1TransitiveTagSet?.has(tag3)).toBeFalsy();
+    transitiveTagSet = adj._getTransitiveTagSet(tag1and4Set);
+    expect(transitiveTagSet?.has(tag1)).toBeTruthy();
+    expect(transitiveTagSet?.has(tag2)).toBeFalsy();
+    expect(transitiveTagSet?.has(tag3)).toBeFalsy();
+    expect(transitiveTagSet?.has(tag4)).toBeFalsy();
+    expect(transitiveTagSet?.has(tag5)).toBeFalsy();
 
     adj.addLink(tag1, tag2);
-    tagToTransitiveTagSet = adj._getTagToTransitiveTagSet();
-    tag1TransitiveTagSet = tagToTransitiveTagSet[tag1];
-    tag1TransitiveTagSet = tagToTransitiveTagSet[tag1];
-    expect(tag1TransitiveTagSet?.has(tag1)).toBeTruthy();
-    expect(tag1TransitiveTagSet?.has(tag2)).toBeTruthy();
-    expect(tag1TransitiveTagSet?.has(tag3)).toBeFalsy();
+    transitiveTagSet = adj._getTransitiveTagSet(tag1and4Set);
+    expect(transitiveTagSet?.has(tag1)).toBeTruthy();
+    expect(transitiveTagSet?.has(tag2)).toBeTruthy();
+    expect(transitiveTagSet?.has(tag3)).toBeFalsy();
+    expect(transitiveTagSet?.has(tag4)).toBeFalsy();
+    expect(transitiveTagSet?.has(tag5)).toBeFalsy();
 
     adj.addLink(tag2, tag3);
-    tagToTransitiveTagSet = adj._getTagToTransitiveTagSet();
-    tag1TransitiveTagSet = tagToTransitiveTagSet[tag1];
-    expect(tag1TransitiveTagSet?.has(tag1)).toBeTruthy();
-    expect(tag1TransitiveTagSet?.has(tag2)).toBeTruthy();
-    expect(tag1TransitiveTagSet?.has(tag3)).toBeTruthy();
+    transitiveTagSet = adj._getTransitiveTagSet(tag1and4Set);
+    expect(transitiveTagSet?.has(tag1)).toBeTruthy();
+    expect(transitiveTagSet?.has(tag2)).toBeTruthy();
+    expect(transitiveTagSet?.has(tag3)).toBeTruthy();
+    expect(transitiveTagSet?.has(tag4)).toBeFalsy();
+    expect(transitiveTagSet?.has(tag5)).toBeFalsy();
 
     adj.removeLink(tag1, tag2);
-    tagToTransitiveTagSet = adj._getTagToTransitiveTagSet();
-    tag1TransitiveTagSet = tagToTransitiveTagSet[tag1];
-    expect(tag1TransitiveTagSet?.has(tag1)).toBeTruthy();
-    expect(tag1TransitiveTagSet?.has(tag2)).toBeFalsy();
-    expect(tag1TransitiveTagSet?.has(tag3)).toBeFalsy();
+    transitiveTagSet = adj._getTransitiveTagSet(tag1and4Set);
+    expect(transitiveTagSet?.has(tag1)).toBeTruthy();
+    expect(transitiveTagSet?.has(tag2)).toBeFalsy();
+    expect(transitiveTagSet?.has(tag3)).toBeFalsy();
+    expect(transitiveTagSet?.has(tag4)).toBeFalsy();
+    expect(transitiveTagSet?.has(tag5)).toBeFalsy();
+
+    adj.addLink(tag4, tag5);
+    transitiveTagSet = adj._getTransitiveTagSet(tag1and4Set);
+    expect(transitiveTagSet?.has(tag1)).toBeTruthy();
+    expect(transitiveTagSet?.has(tag2)).toBeFalsy();
+    expect(transitiveTagSet?.has(tag3)).toBeFalsy();
+    expect(transitiveTagSet?.has(tag4)).toBeTruthy();
+    expect(transitiveTagSet?.has(tag5)).toBeTruthy();
 });
