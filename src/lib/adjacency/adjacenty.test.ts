@@ -1,5 +1,5 @@
 import exp from "constants";
-import { Adjacency } from "./adjacency";
+import { Adjacency, AdjacencyPath } from "./adjacency";
 
 it("constructor", () => {
     new Adjacency();
@@ -162,4 +162,40 @@ it("_getTransitiveTagSet", () => {
     expect(transitiveTagSet?.has(tag3)).toBeFalsy();
     expect(transitiveTagSet?.has(tag4)).toBeTruthy();
     expect(transitiveTagSet?.has(tag5)).toBeTruthy();
+});
+
+it("get", () => {
+    // 00 10 20 30 40 50
+    // 01 -- -- -- -- 51
+    const adj = new Adjacency()
+        .addNodeTags("00", ["tag-00"])
+        .addNodeTags("10", ["tag-10"])
+        .addNodeTags("20", ["tag-20"])
+        .addNodeTags("30", ["tag-30"])
+        .addNodeTags("40", ["tag-40"])
+        .addNodeTags("50", ["tag-50"])
+        .addNodeTags("01", ["tag-01"])
+        .addNodeTags("11", ["tag-11"])
+        .addNodeTags("21", ["tag-21"])
+        .addNodeTags("31", ["tag-31"])
+        .addNodeTags("41", ["tag-41"])
+        .addNodeTags("51", ["tag-51"])
+        .addTransitNode("11")
+        .addTransitNode("21")
+        .addTransitNode("31")
+        .addTransitNode("41")
+        .addLink("tag-00", "tag-10")
+        .addLink("tag-10", "tag-20")
+        .addLink("tag-20", "tag-30")
+        .addLink("tag-40", "tag-50")
+        .addLink("tag-00", "tag-01")
+        .addLink("tag-01", "tag-11")
+        .addLink("tag-11", "tag-21")
+        .addLink("tag-21", "tag-31")
+        .addLink("tag-31", "tag-41")
+        .addLink("tag-41", "tag-51");
+
+    const adjList: AdjacencyPath[] = adj.get("00", 9);
+    const path10 = adjList.find((predicate) => predicate.node == "10");
+    expect(path10?.distance).toEqual(1);
 });

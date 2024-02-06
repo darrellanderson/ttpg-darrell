@@ -182,12 +182,23 @@ export class Adjacency {
             });
 
             const tagSet: Set<string> = nodeToTagSet[node] ?? new Set<string>();
-            for (const tag of tagSet) {
+            const transitiveTagSet: Set<string> =
+                this._getTransitiveTagSet(tagSet);
+            for (const tag of transitiveTagSet) {
+                for (const adjNode of this._tagToNodeSet[tag]) {
+                    if (!visited.has(adjNode)) {
+                        if (this._transitNodes.has(adjNode)) {
+                            toVisit.unshift(adjNode);
+                        } else {
+                            toVisit.push(adjNode);
+                        }
+                    }
+                }
             }
 
             nodePath.pop();
         }
 
-        return [];
+        return result;
     }
 }
