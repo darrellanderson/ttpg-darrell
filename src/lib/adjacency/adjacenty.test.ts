@@ -193,9 +193,15 @@ it("get", () => {
         .addLink("tag-11", "tag-21")
         .addLink("tag-21", "tag-31")
         .addLink("tag-31", "tag-41")
-        .addLink("tag-41", "tag-51");
+        .addLink("tag-41", "tag-51")
+        .addLink("tag-51", "tag-50");
 
     const adjList: AdjacencyPath[] = adj.get("00", 9);
-    const path10 = adjList.find((predicate) => predicate.node == "10");
-    expect(path10?.distance).toEqual(1);
+    let path: AdjacencyPath | undefined;
+
+    path = adjList.find((predicate) => predicate.node == "10");
+    expect(path?.distance).toEqual(1);
+
+    path = adjList.find((predicate) => predicate.node == "20");
+    expect(path?.distance).toEqual(2);
 });
