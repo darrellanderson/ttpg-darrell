@@ -61,7 +61,7 @@ export class TurnOrderWidget {
         this._screenUI.positionX = 1;
         this._screenUI.relativePositionX = true;
         this._screenUI.relativePositionY = true;
-        this._screenUI.height = h * reserveSlots + 2;
+        this._screenUI.height = h * reserveSlots;
         this._screenUI.width = w;
         this._screenUI.widget = this.getWidget();
 
