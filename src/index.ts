@@ -1,3 +1,4 @@
+export * from "./lib/adjacency/adjacency";
 export * from "./lib/broadcast/broadcast";
 export * from "./lib/bug-workarounds/bug-card-holder-assignment";
 export * from "./lib/bug-workarounds/bug-unique-cards";
@@ -39,6 +40,8 @@ export * from "./lib/widget/confirm-button/confirm-button";
 export * from "./lib/widget/d6widget/d6widget";
 export * from "./lib/widget/end-turn-button/end-turn-button";
 export * from "./lib/widget/end-turn-button/end-turn-locale.data";
+export * from "./lib/widget/hot-seat-button/hot-seat-button";
+export * from "./lib/widget/hot-seat-button/hot-seat-locale.data";
 export * from "./lib/widget/perf-widget/perf-widget-locale.data";
 export * from "./lib/widget/perf-widget/perf-widget";
 export * from "./lib/widget/turn-order-widget/turn-clicked-widget";
