@@ -64,7 +64,7 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
             throw new Error("nsid mismatch");
         }
 
-        // Find mat.
+        // Find snap point.
         const snapPoint: SnapPoint | undefined = this._find.findSnapPointByTag(
             this._snapPointTag
         );

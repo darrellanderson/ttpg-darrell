@@ -70,7 +70,7 @@ export class TurnEntryWidget {
         const w: number =
             params.entryWidth ?? TurnOrderWidgetDefaults.DEFAULT_ENTRY_WIDTH;
         const h: number =
-            params.entryHeight ?? TurnOrderWidgetDefaults.DEFAULT_ENTRY_WIDTH;
+            params.entryHeight ?? TurnOrderWidgetDefaults.DEFAULT_ENTRY_HEIGHT;
 
         // Margin aliases.
         const m = {
