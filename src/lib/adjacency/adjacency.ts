@@ -63,6 +63,11 @@ export class Adjacency {
         return tagSet && tagSet.has(tag);
     }
 
+    public hasTagNode(tag: string, node: string): boolean {
+        const nodeSet: Set<string> | undefined = this._tagToNodeSet[tag];
+        return nodeSet && nodeSet.has(node);
+    }
+
     public addLink(tag1: string, tag2: string): this {
         let linkedTagSet: Set<string> | undefined;
 

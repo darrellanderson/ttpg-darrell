@@ -13,16 +13,25 @@ it("add/remove node tag", () => {
     expect(adj.hasNodeTag(node, tag1)).toBeFalsy();
     expect(adj.hasNodeTag(node, tag2)).toBeFalsy();
     expect(adj.hasNodeTag(node, tag3)).toBeFalsy();
+    expect(adj.hasTagNode(tag1, node)).toBeFalsy();
+    expect(adj.hasTagNode(tag1, node)).toBeFalsy();
+    expect(adj.hasTagNode(tag1, node)).toBeFalsy();
 
     adj.addNodeTags(node, [tag1, tag2, tag3]);
     expect(adj.hasNodeTag(node, tag1)).toBeTruthy();
     expect(adj.hasNodeTag(node, tag2)).toBeTruthy();
     expect(adj.hasNodeTag(node, tag3)).toBeTruthy();
+    expect(adj.hasTagNode(tag1, node)).toBeTruthy();
+    expect(adj.hasTagNode(tag1, node)).toBeTruthy();
+    expect(adj.hasTagNode(tag1, node)).toBeTruthy();
 
     adj.removeNodeTags(node, [tag1, tag3]);
     expect(adj.hasNodeTag(node, tag1)).toBeFalsy();
     expect(adj.hasNodeTag(node, tag2)).toBeTruthy();
     expect(adj.hasNodeTag(node, tag3)).toBeFalsy();
+    expect(adj.hasTagNode(tag1, node)).toBeTruthy();
+    expect(adj.hasTagNode(tag1, node)).toBeFalsy();
+    expect(adj.hasTagNode(tag1, node)).toBeTruthy();
 });
 
 it("add/remove link", () => {
