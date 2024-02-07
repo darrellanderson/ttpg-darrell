@@ -1,10 +1,5 @@
 /**
- * Nodes have tags, links connect tags.
- *
- * Links are transitive:
- * - add link1:a-b
- * - add link2:b-c
- * - implicit link:a-c
+ * Nodes have tags, links connect tags.  Merged tags are treated as one tag.
  *
  * A tag does NOT link to itself by default, specify a self-link to do so.
  * - node1:tagAlpha
@@ -16,28 +11,46 @@
  * Tansit nodes are on a path, but do not add to distance ("hyperlane").
  */
 
+export type AdjacencyResult = {
+    node: string;
+    distance: number;
+    path: string[];
+};
+
 export class Adjacency {
+    private readonly _nodeToTagSet: { [key: string]: Set<string> } = {};
     private readonly _tagToNodeSet: { [key: string]: Set<string> } = {};
-    private readonly _tagToLinkedTagsSet: { [key: string]: Set<string> } = {};
+    private readonly _tagToLinkedTagSet: { [key: string]: Set<string> } = {};
+    private readonly _tagToMergedTagSet: { [key: string]: Set<string> } = {};
     private readonly _transitNodes: Set<string> = new Set<string>();
 
     public addNodeTags(node: string, tags: string[]): this {
+        let tagSet: Set<string> | undefined;
         let nodeSet: Set<string> | undefined;
+        tagSet = this._nodeToTagSet[node];
+        if (!tagSet) {
+            tagSet = new Set<string>();
+            this._nodeToTagSet[node] = tagSet;
+        }
         for (const tag of tags) {
+            tagSet.add(tag);
             nodeSet = this._tagToNodeSet[tag];
             if (!nodeSet) {
                 nodeSet = new Set<string>();
-                this._tagToNodeSet[tag] = nodeSet;
+                this._tagToLinkedTagSet[tag] = nodeSet;
             }
-            nodeSet.add(node);
+            nodeSet.add(tag);
         }
         return this;
     }
 
     public removeNodeTags(node: string, tags: string[]): this {
-        let nodeSet: Set<string> | undefined;
+        const tagSet: Set<string> | undefined = this._nodeToTagSet[node];
         for (const tag of tags) {
-            nodeSet = this._tagToNodeSet[tag];
+            if (tagSet) {
+                tagSet.delete(tag);
+            }
+            const nodeSet: Set<string> | undefined = this._tagToNodeSet[tag];
             if (nodeSet) {
                 nodeSet.delete(node);
             }
@@ -46,26 +59,26 @@ export class Adjacency {
     }
 
     public hasNodeTag(node: string, tag: string): boolean {
-        const nodeSet: Set<string> | undefined = this._tagToNodeSet[tag];
-        return nodeSet && nodeSet.has(node);
+        const tagSet: Set<string> | undefined = this._nodeToTagSet[node];
+        return tagSet && tagSet.has(tag);
     }
 
     public addLink(tag1: string, tag2: string): this {
         let linkedTagSet: Set<string> | undefined;
 
         // 1 -> 2.
-        linkedTagSet = this._tagToLinkedTagsSet[tag1];
+        linkedTagSet = this._tagToLinkedTagSet[tag1];
         if (!linkedTagSet) {
             linkedTagSet = new Set<string>();
-            this._tagToLinkedTagsSet[tag1] = linkedTagSet;
+            this._tagToLinkedTagSet[tag1] = linkedTagSet;
         }
         linkedTagSet.add(tag2);
 
         // 2 -> 1.
-        linkedTagSet = this._tagToLinkedTagsSet[tag2];
+        linkedTagSet = this._tagToLinkedTagSet[tag2];
         if (!linkedTagSet) {
             linkedTagSet = new Set<string>();
-            this._tagToLinkedTagsSet[tag2] = linkedTagSet;
+            this._tagToLinkedTagSet[tag2] = linkedTagSet;
         }
         linkedTagSet.add(tag1);
 
@@ -76,13 +89,13 @@ export class Adjacency {
         let linkedTagSet: Set<string> | undefined;
 
         // 1 -> 2.
-        linkedTagSet = this._tagToLinkedTagsSet[tag1];
+        linkedTagSet = this._tagToLinkedTagSet[tag1];
         if (linkedTagSet) {
             linkedTagSet.delete(tag2);
         }
 
         // 2 -> 1.
-        linkedTagSet = this._tagToLinkedTagsSet[tag2];
+        linkedTagSet = this._tagToLinkedTagSet[tag2];
         if (linkedTagSet) {
             linkedTagSet.delete(tag1);
         }
@@ -92,8 +105,50 @@ export class Adjacency {
 
     public hasLink(tag1: string, tag2: string): boolean {
         const linkedTagSet: Set<string> | undefined =
-            this._tagToLinkedTagsSet[tag1];
+            this._tagToLinkedTagSet[tag1];
         return linkedTagSet && linkedTagSet.has(tag2);
+    }
+
+    public addMergedTag(tag1: string, tag2: string): this {
+        let mergedTagSet: Set<string> | undefined;
+
+        mergedTagSet = this._tagToMergedTagSet[tag1];
+        if (!mergedTagSet) {
+            mergedTagSet = new Set<string>();
+            this._tagToMergedTagSet[tag1] = mergedTagSet;
+        }
+        mergedTagSet.add(tag2);
+
+        mergedTagSet = this._tagToMergedTagSet[tag2];
+        if (!mergedTagSet) {
+            mergedTagSet = new Set<string>();
+            this._tagToMergedTagSet[tag2] = mergedTagSet;
+        }
+        mergedTagSet.add(tag1);
+
+        return this;
+    }
+
+    public removeMergedTag(tag1: string, tag2: string): this {
+        let mergedTagSet: Set<string> | undefined;
+
+        mergedTagSet = this._tagToMergedTagSet[tag1];
+        if (mergedTagSet) {
+            mergedTagSet.delete(tag2);
+        }
+
+        mergedTagSet = this._tagToMergedTagSet[tag2];
+        if (mergedTagSet) {
+            mergedTagSet.delete(tag1);
+        }
+
+        return this;
+    }
+
+    public hasMergedTag(tag1: string, tag2: string): boolean {
+        const mergedTagSet: Set<string> | undefined =
+            this._tagToMergedTagSet[tag1];
+        return mergedTagSet && mergedTagSet.has(tag2);
     }
 
     public addTransitNode(node: string): this {
@@ -110,23 +165,8 @@ export class Adjacency {
         return this._transitNodes.has(node);
     }
 
-    _getNodeToTagSets(): { [key: string]: Set<string> } {
-        const nodeToTags: { [key: string]: Set<string> } = {};
-        for (const [tag, nodes] of Object.entries(this._tagToNodeSet)) {
-            for (const node of nodes) {
-                let tagSet: Set<string> | undefined = nodeToTags[node];
-                if (!tagSet) {
-                    tagSet = new Set<string>();
-                    nodeToTags[node] = tagSet;
-                }
-                tagSet.add(tag);
-            }
-        }
-        return nodeToTags;
-    }
-
-    _getTransitiveTagSet(tagSet: Set<string>): Set<string> {
-        const transitiveTagsSet: Set<string> = new Set<string>();
+    _getMergedTagSet(tagSet: Set<string>): Set<string> {
+        const overallMergedTagsSet: Set<string> = new Set<string>();
         const toVisit: string[] = Array.from(tagSet);
         const visited: Set<string> = new Set<string>();
 
@@ -136,90 +176,103 @@ export class Adjacency {
                 throw new Error("pop failed with positive length"); // stop 'maybe undefined' warning
             }
             visited.add(tag);
-            const linkedTagSet: Set<string> | undefined =
-                this._tagToLinkedTagsSet[tag];
-            if (linkedTagSet) {
-                for (const linkedTag of linkedTagSet) {
-                    transitiveTagsSet.add(tag);
-                    if (!visited.has(linkedTag)) {
-                        toVisit.push(linkedTag);
+            overallMergedTagsSet.add(tag);
+            const mergedTagSet: Set<string> | undefined =
+                this._tagToMergedTagSet[tag];
+            if (mergedTagSet) {
+                for (const mergedTag of mergedTagSet) {
+                    overallMergedTagsSet.add(tag);
+                    if (!visited.has(mergedTag)) {
+                        toVisit.push(mergedTag);
                     }
                 }
             }
         }
-        return transitiveTagsSet;
+        return overallMergedTagsSet;
     }
 
-    public get(origin: string, maxDistance: number): { [key: string]: number } {
-        const nodeToTagSet: { [key: string]: Set<string> } =
-            this._getNodeToTagSets();
+    _getAdjacentNodeSet(node: string): Set<string> {
+        const tagSet: Set<string> | undefined = this._nodeToTagSet[node];
+        const mergedTagSet: Set<string> = this._getMergedTagSet(tagSet);
+        const adjNodeSet: Set<string> = new Set<string>();
 
-        const nodeToDistance: { [key: string]: number } = {
-            [origin]: 0,
-        };
-        const nodeToPath: { [key: string]: string[] } = {
-            [origin]: [],
-        };
+        for (const tag of mergedTagSet) {
+            const linkedTagSet = this._tagToLinkedTagSet[tag];
+            console.log(`linked: ${Array.from(linkedTagSet).join(", ")}`);
+            for (const linkedTag of linkedTagSet) {
+                const nodeSet: Set<string> | undefined =
+                    this._tagToNodeSet[linkedTag];
+                console.log(
+                    `linked node set: ${Array.from(nodeSet).join(", ")}`
+                );
+                if (nodeSet) {
+                    for (const node of nodeSet) {
+                        adjNodeSet.add(node);
+                    }
+                }
+            }
+        }
 
-        const toVisit: Set<string> = new Set<string>([origin]);
+        console.log(`tagSet: ${Array.from(tagSet).join(", ")}`);
+        console.log(`mergedTagSet: ${Array.from(mergedTagSet).join(", ")}`);
+        console.log(`adj: ${Array.from(adjNodeSet).join(", ")}`);
+
+        return adjNodeSet;
+    }
+
+    public get(origin: string, maxDistance: number): AdjacencyResult[] {
+        const originAdjacencyResult: AdjacencyResult = {
+            node: origin,
+            distance: 0,
+            path: [],
+        };
+        const nodeToAdjacencyResult: { [key: string]: AdjacencyResult } = {
+            [origin]: originAdjacencyResult,
+        };
+        const toVisit: Set<AdjacencyResult> = new Set<AdjacencyResult>([
+            originAdjacencyResult,
+        ]);
         const visited: Set<string> = new Set<string>();
 
         while (toVisit.size > 0) {
             // Find the closest of the to-visit nodes.
             // A heap would be better but the size here is small.
-            let closest: string | undefined;
-            let closestDistance: number = Number.MAX_SAFE_INTEGER;
+            let closest: AdjacencyResult | undefined;
             for (const candidate of toVisit) {
-                const candidateDistance: number = nodeToDistance[candidate];
-                if (candidateDistance < closestDistance) {
+                if (!closest || candidate.distance < closest.distance) {
                     closest = candidate;
-                    closestDistance = candidateDistance;
                 }
             }
             if (!closest) {
                 throw new Error("no closest node but list was not empty");
             }
             toVisit.delete(closest);
-            visited.add(closest);
+            visited.add(closest.node);
 
-            if (closestDistance < maxDistance) {
-                const tagSet: Set<string> =
-                    nodeToTagSet[closest] ?? new Set<string>();
-                const transitiveTagSet: Set<string> =
-                    this._getTransitiveTagSet(tagSet);
-                console.log(
-                    closest +
-                        " tags: " +
-                        Array.from(transitiveTagSet).join(", ")
+            console.log(`closest: ${closest.node}`);
+
+            if (closest.distance < maxDistance) {
+                const adjNodeSet: Set<string> = this._getAdjacentNodeSet(
+                    closest.node
                 );
-                for (const tag of transitiveTagSet) {
-                    for (const adjNode of this._tagToNodeSet[tag]) {
-                        if (!visited.has(adjNode)) {
-                            // Add to result.
-                            const extraDistance = this._transitNodes.has(
-                                adjNode
-                            )
-                                ? 0
-                                : 1;
-                            nodeToDistance[adjNode] =
-                                closestDistance + extraDistance;
-                            nodeToPath[adjNode] = [
-                                ...nodeToPath[closest],
-                                adjNode,
-                            ];
-                            toVisit.add(adjNode);
-                        }
+                for (const adjNode of adjNodeSet) {
+                    console.log(`XXX ${adjNode}`);
+                    if (!visited.has(adjNode)) {
+                        // Add to result.
+                        const isTransit = this._transitNodes.has(adjNode);
+                        const extraDistance = isTransit ? 0 : 1;
+                        const adjResult: AdjacencyResult = {
+                            node: adjNode,
+                            distance: closest.distance + extraDistance,
+                            path: [...closest.path, adjNode],
+                        };
+                        nodeToAdjacencyResult[adjNode] = adjResult;
+
+                        toVisit.add(adjResult);
                     }
                 }
             }
         }
-
-        console.log(
-            Object.values(nodeToPath)
-                .map((x) => x.join(", "))
-                .join("\n")
-        );
-
-        return nodeToDistance;
+        return Object.values(nodeToAdjacencyResult);
     }
 }

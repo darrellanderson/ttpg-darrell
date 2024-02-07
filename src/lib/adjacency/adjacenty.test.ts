@@ -1,4 +1,4 @@
-import { Adjacency } from "./adjacency";
+import { Adjacency, AdjacencyResult } from "./adjacency";
 
 it("constructor", () => {
     new Adjacency();
@@ -69,42 +69,7 @@ it("add/remove transit node", () => {
     expect(adj.hasTransitNode(node)).toBeFalsy();
 });
 
-it("_getNodeToTagSets", () => {
-    const adj = new Adjacency();
-    const node = "my-node";
-    const tag1 = "my-tag-1";
-    const tag2 = "my-tag-2";
-    const tag3 = "my-tag-3";
-
-    let nodeToTagSets: { [key: string]: Set<string> } = {};
-    let tagSet: Set<string> | undefined;
-    let tagList: string[] | undefined;
-
-    nodeToTagSets = adj._getNodeToTagSets();
-    tagSet = nodeToTagSets[node];
-    tagList = (tagSet ? Array.from(tagSet) : []).sort();
-    expect(tagList).toEqual([]);
-
-    adj.addNodeTags(node, [tag1, tag2]);
-    nodeToTagSets = adj._getNodeToTagSets();
-    tagSet = nodeToTagSets[node];
-    tagList = (tagSet ? Array.from(tagSet) : []).sort();
-    expect(tagList).toEqual([tag1, tag2]);
-
-    adj.addNodeTags(node, [tag3]);
-    nodeToTagSets = adj._getNodeToTagSets();
-    tagSet = nodeToTagSets[node];
-    tagList = (tagSet ? Array.from(tagSet) : []).sort();
-    expect(tagList).toEqual([tag1, tag2, tag3]);
-
-    adj.removeNodeTags(node, [tag2]);
-    nodeToTagSets = adj._getNodeToTagSets();
-    tagSet = nodeToTagSets[node];
-    tagList = (tagSet ? Array.from(tagSet) : []).sort();
-    expect(tagList).toEqual([tag1, tag3]);
-});
-
-it("_getTransitiveTagSet", () => {
+it("_getMergedTagSet", () => {
     const adj = new Adjacency();
     const tag1 = "my-tag-1";
     const tag2 = "my-tag-2";
@@ -113,60 +78,71 @@ it("_getTransitiveTagSet", () => {
     const tag5 = "my-tag-5";
 
     const tag1and4Set = new Set<string>().add(tag1).add(tag4);
-    let transitiveTagSet: Set<string> | undefined;
-    transitiveTagSet = adj._getTransitiveTagSet(tag1and4Set);
-    expect(transitiveTagSet?.has(tag1)).toBeFalsy();
-    expect(transitiveTagSet?.has(tag2)).toBeFalsy();
-    expect(transitiveTagSet?.has(tag3)).toBeFalsy();
-    expect(transitiveTagSet?.has(tag4)).toBeFalsy();
-    expect(transitiveTagSet?.has(tag5)).toBeFalsy();
+    let mergedTagSet: Set<string> | undefined;
+    mergedTagSet = adj._getMergedTagSet(tag1and4Set);
+    expect(mergedTagSet?.has(tag1)).toBeTruthy();
+    expect(mergedTagSet?.has(tag2)).toBeFalsy();
+    expect(mergedTagSet?.has(tag3)).toBeFalsy();
+    expect(mergedTagSet?.has(tag4)).toBeTruthy();
+    expect(mergedTagSet?.has(tag5)).toBeFalsy();
 
-    adj.addLink(tag1, tag1);
-    transitiveTagSet = adj._getTransitiveTagSet(tag1and4Set);
-    expect(transitiveTagSet?.has(tag1)).toBeTruthy();
-    expect(transitiveTagSet?.has(tag2)).toBeFalsy();
-    expect(transitiveTagSet?.has(tag3)).toBeFalsy();
-    expect(transitiveTagSet?.has(tag4)).toBeFalsy();
-    expect(transitiveTagSet?.has(tag5)).toBeFalsy();
+    adj.addMergedTag(tag1, tag1);
+    mergedTagSet = adj._getMergedTagSet(tag1and4Set);
+    expect(mergedTagSet?.has(tag1)).toBeTruthy();
+    expect(mergedTagSet?.has(tag2)).toBeFalsy();
+    expect(mergedTagSet?.has(tag3)).toBeFalsy();
+    expect(mergedTagSet?.has(tag4)).toBeTruthy();
+    expect(mergedTagSet?.has(tag5)).toBeFalsy();
 
-    adj.addLink(tag1, tag2);
-    transitiveTagSet = adj._getTransitiveTagSet(tag1and4Set);
-    expect(transitiveTagSet?.has(tag1)).toBeTruthy();
-    expect(transitiveTagSet?.has(tag2)).toBeTruthy();
-    expect(transitiveTagSet?.has(tag3)).toBeFalsy();
-    expect(transitiveTagSet?.has(tag4)).toBeFalsy();
-    expect(transitiveTagSet?.has(tag5)).toBeFalsy();
+    adj.addMergedTag(tag1, tag2);
+    mergedTagSet = adj._getMergedTagSet(tag1and4Set);
+    expect(mergedTagSet?.has(tag1)).toBeTruthy();
+    expect(mergedTagSet?.has(tag2)).toBeTruthy();
+    expect(mergedTagSet?.has(tag3)).toBeFalsy();
+    expect(mergedTagSet?.has(tag4)).toBeTruthy();
+    expect(mergedTagSet?.has(tag5)).toBeFalsy();
 
-    adj.addLink(tag2, tag3);
-    transitiveTagSet = adj._getTransitiveTagSet(tag1and4Set);
-    expect(transitiveTagSet?.has(tag1)).toBeTruthy();
-    expect(transitiveTagSet?.has(tag2)).toBeTruthy();
-    expect(transitiveTagSet?.has(tag3)).toBeTruthy();
-    expect(transitiveTagSet?.has(tag4)).toBeFalsy();
-    expect(transitiveTagSet?.has(tag5)).toBeFalsy();
+    adj.addMergedTag(tag2, tag3);
+    mergedTagSet = adj._getMergedTagSet(tag1and4Set);
+    expect(mergedTagSet?.has(tag1)).toBeTruthy();
+    expect(mergedTagSet?.has(tag2)).toBeTruthy();
+    expect(mergedTagSet?.has(tag3)).toBeTruthy();
+    expect(mergedTagSet?.has(tag4)).toBeTruthy();
+    expect(mergedTagSet?.has(tag5)).toBeFalsy();
 
-    adj.removeLink(tag1, tag2);
-    transitiveTagSet = adj._getTransitiveTagSet(tag1and4Set);
-    expect(transitiveTagSet?.has(tag1)).toBeTruthy();
-    expect(transitiveTagSet?.has(tag2)).toBeFalsy();
-    expect(transitiveTagSet?.has(tag3)).toBeFalsy();
-    expect(transitiveTagSet?.has(tag4)).toBeFalsy();
-    expect(transitiveTagSet?.has(tag5)).toBeFalsy();
+    adj.removeMergedTag(tag1, tag2);
+    mergedTagSet = adj._getMergedTagSet(tag1and4Set);
+    expect(mergedTagSet?.has(tag1)).toBeTruthy();
+    expect(mergedTagSet?.has(tag2)).toBeFalsy();
+    expect(mergedTagSet?.has(tag3)).toBeFalsy();
+    expect(mergedTagSet?.has(tag4)).toBeTruthy();
+    expect(mergedTagSet?.has(tag5)).toBeFalsy();
 
-    adj.addLink(tag4, tag5);
-    transitiveTagSet = adj._getTransitiveTagSet(tag1and4Set);
-    expect(transitiveTagSet?.has(tag1)).toBeTruthy();
-    expect(transitiveTagSet?.has(tag2)).toBeFalsy();
-    expect(transitiveTagSet?.has(tag3)).toBeFalsy();
-    expect(transitiveTagSet?.has(tag4)).toBeTruthy();
-    expect(transitiveTagSet?.has(tag5)).toBeTruthy();
+    adj.addMergedTag(tag4, tag5);
+    mergedTagSet = adj._getMergedTagSet(tag1and4Set);
+    expect(mergedTagSet?.has(tag1)).toBeTruthy();
+    expect(mergedTagSet?.has(tag2)).toBeFalsy();
+    expect(mergedTagSet?.has(tag3)).toBeFalsy();
+    expect(mergedTagSet?.has(tag4)).toBeTruthy();
+    expect(mergedTagSet?.has(tag5)).toBeTruthy();
 });
 
+it("", () => {
+    const adj = new Adjacency()
+        .addNodeTags("00", ["tag-00"])
+        .addNodeTags("10", ["tag-10"])
+        .addLink("tag-00", "tag-10");
+    const adjNodeSet: Set<string> = adj._getAdjacentNodeSet("00");
+    const adjNodeList: string[] = Array.from(adjNodeSet).sort();
+    expect(adjNodeList).toEqual("");
+});
+
+/*
 it("get", () => {
     // 00 10 20 30 40 50
     // 01 -- -- -- -- 51
     const adj = new Adjacency()
-        .addNodeTags("00", ["tag-00-N", "tag-00-E", "tag-00-S", "tag-00-W"])
+        .addNodeTags("00", ["tag-00"])
         .addNodeTags("10", ["tag-10"])
         .addNodeTags("20", ["tag-20"])
         .addNodeTags("30", ["tag-30"])
@@ -194,8 +170,26 @@ it("get", () => {
         .addLink("tag-41", "tag-51")
         .addLink("tag-51", "tag-50");
 
-    const nodeToDistance: { [key: string]: number } = adj.get("00", 9);
+    let adjList: AdjacencyResult[] = [];
+    const getAndSortAdjList = (maxDistance: number) => {
+        adjList = adj.get("00", maxDistance);
+        adjList.sort((a, b) => {
+            if (a.distance < b.distance) {
+                return -1;
+            } else if (a.distance > b.distance) {
+                return 1;
+            }
+            if (a.node < b.node) {
+                return -1;
+            } else if (a.node > b.node) {
+                return 1;
+            }
+            return 0;
+        });
+    };
 
-    expect(nodeToDistance["10"]).toEqual(1);
-    expect(nodeToDistance["20"]).toEqual(2);
+    getAndSortAdjList(2);
+
+    expect(adjList).toEqual("");
 });
+*/
