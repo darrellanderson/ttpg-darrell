@@ -13,25 +13,25 @@ it("add/remove node tag", () => {
     expect(adj.hasNodeTag(node, tag1)).toBeFalsy();
     expect(adj.hasNodeTag(node, tag2)).toBeFalsy();
     expect(adj.hasNodeTag(node, tag3)).toBeFalsy();
-    expect(adj.hasTagNode(tag1, node)).toBeFalsy();
-    expect(adj.hasTagNode(tag1, node)).toBeFalsy();
-    expect(adj.hasTagNode(tag1, node)).toBeFalsy();
+    expect(adj._hasTagNode(tag1, node)).toBeFalsy();
+    expect(adj._hasTagNode(tag2, node)).toBeFalsy();
+    expect(adj._hasTagNode(tag3, node)).toBeFalsy();
 
     adj.addNodeTags(node, [tag1, tag2, tag3]);
     expect(adj.hasNodeTag(node, tag1)).toBeTruthy();
     expect(adj.hasNodeTag(node, tag2)).toBeTruthy();
     expect(adj.hasNodeTag(node, tag3)).toBeTruthy();
-    expect(adj.hasTagNode(tag1, node)).toBeTruthy();
-    expect(adj.hasTagNode(tag1, node)).toBeTruthy();
-    expect(adj.hasTagNode(tag1, node)).toBeTruthy();
+    expect(adj._hasTagNode(tag1, node)).toBeTruthy();
+    expect(adj._hasTagNode(tag2, node)).toBeTruthy();
+    expect(adj._hasTagNode(tag3, node)).toBeTruthy();
 
     adj.removeNodeTags(node, [tag1, tag3]);
     expect(adj.hasNodeTag(node, tag1)).toBeFalsy();
     expect(adj.hasNodeTag(node, tag2)).toBeTruthy();
     expect(adj.hasNodeTag(node, tag3)).toBeFalsy();
-    expect(adj.hasTagNode(tag1, node)).toBeTruthy();
-    expect(adj.hasTagNode(tag1, node)).toBeFalsy();
-    expect(adj.hasTagNode(tag1, node)).toBeTruthy();
+    expect(adj._hasTagNode(tag1, node)).toBeFalsy();
+    expect(adj._hasTagNode(tag2, node)).toBeTruthy();
+    expect(adj._hasTagNode(tag3, node)).toBeFalsy();
 });
 
 it("add/remove link", () => {
@@ -136,17 +136,34 @@ it("_getMergedTagSet", () => {
     expect(mergedTagSet?.has(tag5)).toBeTruthy();
 });
 
-it("", () => {
+it("_getAdjacentNodeSet", () => {
     const adj = new Adjacency()
         .addNodeTags("00", ["tag-00"])
         .addNodeTags("10", ["tag-10"])
-        .addLink("tag-00", "tag-10");
-    const adjNodeSet: Set<string> = adj._getAdjacentNodeSet("00");
-    const adjNodeList: string[] = Array.from(adjNodeSet).sort();
-    expect(adjNodeList).toEqual("");
+        .addNodeTags("20", ["tag-20"])
+        .addLink("tag-00", "tag-10")
+        .addLink("tag-10", "tag-20");
+    let adjNodeSet: Set<string>;
+    let adjNodeList: string[];
+
+    adjNodeSet = adj._getAdjacentNodeSet("00");
+    adjNodeList = Array.from(adjNodeSet).sort();
+    expect(adjNodeList).toEqual(["10"]);
+
+    adjNodeSet = adj._getAdjacentNodeSet("10");
+    adjNodeList = Array.from(adjNodeSet).sort();
+    expect(adjNodeList).toEqual(["00", "20"]);
+
+    adjNodeSet = adj._getAdjacentNodeSet("20");
+    adjNodeList = Array.from(adjNodeSet).sort();
+    expect(adjNodeList).toEqual(["10"]);
+
+    adj.addMergedTag("tag-00", "tag-20");
+    adjNodeSet = adj._getAdjacentNodeSet("00");
+    adjNodeList = Array.from(adjNodeSet).sort();
+    expect(adjNodeList).toEqual(["10", "20"]);
 });
 
-/*
 it("get", () => {
     // 00 10 20 30 40 50
     // 01 -- -- -- -- 51
@@ -180,8 +197,10 @@ it("get", () => {
         .addLink("tag-51", "tag-50");
 
     let adjList: AdjacencyResult[] = [];
-    const getAndSortAdjList = (maxDistance: number) => {
-        adjList = adj.get("00", maxDistance);
+    const getAndSortAdjList = (minDistance: number, maxDistance: number) => {
+        adjList = adj
+            .get("00", maxDistance)
+            .filter((x) => x.distance >= minDistance);
         adjList.sort((a, b) => {
             if (a.distance < b.distance) {
                 return -1;
@@ -197,8 +216,42 @@ it("get", () => {
         });
     };
 
-    getAndSortAdjList(2);
+    getAndSortAdjList(0, 0);
+    expect(adjList).toEqual([{ distance: 0, node: "00", path: [] }]);
 
-    expect(adjList).toEqual("");
+    getAndSortAdjList(0, 1);
+    expect(adjList).toEqual([
+        { distance: 0, node: "00", path: [] },
+        { distance: 1, node: "01", path: ["01"] },
+        { distance: 1, node: "10", path: ["10"] },
+        { distance: 1, node: "11", path: ["01", "11"] },
+        { distance: 1, node: "21", path: ["01", "11", "21"] },
+        { distance: 1, node: "31", path: ["01", "11", "21", "31"] },
+        { distance: 1, node: "41", path: ["01", "11", "21", "31", "41"] },
+    ]);
+
+    getAndSortAdjList(0, 2);
+    expect(adjList).toEqual([
+        { distance: 0, node: "00", path: [] },
+        { distance: 1, node: "01", path: ["01"] },
+        { distance: 1, node: "10", path: ["10"] },
+        { distance: 1, node: "11", path: ["01", "11"] },
+        { distance: 1, node: "21", path: ["01", "11", "21"] },
+        { distance: 1, node: "31", path: ["01", "11", "21", "31"] },
+        { distance: 1, node: "41", path: ["01", "11", "21", "31", "41"] },
+        { distance: 2, node: "20", path: ["10", "20"] },
+        { distance: 2, node: "51", path: ["01", "11", "21", "31", "41", "51"] },
+    ]);
+
+    getAndSortAdjList(2, 3);
+    expect(adjList).toEqual([
+        { distance: 2, node: "20", path: ["10", "20"] },
+        { distance: 2, node: "51", path: ["01", "11", "21", "31", "41", "51"] },
+        { distance: 3, node: "30", path: ["10", "20", "30"] },
+        {
+            distance: 3,
+            node: "50",
+            path: ["01", "11", "21", "31", "41", "51", "50"],
+        },
+    ]);
 });
-*/
