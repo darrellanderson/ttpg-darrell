@@ -166,7 +166,7 @@ it("get", () => {
     // 00 10 20 30 40 50
     // 01 -- -- -- -- 51
     const adj = new Adjacency()
-        .addNodeTags("00", ["tag-00"])
+        .addNodeTags("00", ["tag-00-N", "tag-00-E", "tag-00-S", "tag-00-W"])
         .addNodeTags("10", ["tag-10"])
         .addNodeTags("20", ["tag-20"])
         .addNodeTags("30", ["tag-30"])
