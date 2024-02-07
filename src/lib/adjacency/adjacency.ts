@@ -16,12 +16,6 @@
  * Tansit nodes are on a path, but do not add to distance ("hyperlane").
  */
 
-export type AdjacencyPath = {
-    node: string;
-    distance: number;
-    nodePath: string[];
-};
-
 export class Adjacency {
     private readonly _tagToNodeSet: { [key: string]: Set<string> } = {};
     private readonly _tagToLinkedTagsSet: { [key: string]: Set<string> } = {};
@@ -156,49 +150,76 @@ export class Adjacency {
         return transitiveTagsSet;
     }
 
-    public get(origin: string, maxDistance: number): AdjacencyPath[] {
+    public get(origin: string, maxDistance: number): { [key: string]: number } {
         const nodeToTagSet: { [key: string]: Set<string> } =
             this._getNodeToTagSets();
 
-        const nodePath: string[] = [];
-        const toVisit: string[] = [origin];
+        const nodeToDistance: { [key: string]: number } = {
+            [origin]: 0,
+        };
+        const nodeToPath: { [key: string]: string[] } = {
+            [origin]: [],
+        };
+
+        const toVisit: Set<string> = new Set<string>([origin]);
         const visited: Set<string> = new Set<string>();
-        const result: AdjacencyPath[] = [];
 
-        while (toVisit.length > 0) {
-            const node: string | undefined = toVisit.shift();
-            if (!node) {
-                throw new Error("shift failed with positive length"); // stop 'maybe undefined' warning
+        while (toVisit.size > 0) {
+            // Find the closest of the to-visit nodes.
+            // A heap would be better but the size here is small.
+            let closest: string | undefined;
+            let closestDistance: number = Number.MAX_SAFE_INTEGER;
+            for (const candidate of toVisit) {
+                const candidateDistance: number = nodeToDistance[candidate];
+                if (candidateDistance < closestDistance) {
+                    closest = candidate;
+                    closestDistance = candidateDistance;
+                }
             }
-            visited.add(node);
-            nodePath.push(node);
-            const distance = nodePath.filter(
-                (pathNode) => !this._transitNodes.has(pathNode)
-            ).length;
-            result.push({
-                node,
-                distance,
-                nodePath: [...nodePath],
-            });
+            if (!closest) {
+                throw new Error("no closest node but list was not empty");
+            }
+            toVisit.delete(closest);
+            visited.add(closest);
 
-            const tagSet: Set<string> = nodeToTagSet[node] ?? new Set<string>();
-            const transitiveTagSet: Set<string> =
-                this._getTransitiveTagSet(tagSet);
-            for (const tag of transitiveTagSet) {
-                for (const adjNode of this._tagToNodeSet[tag]) {
-                    if (!visited.has(adjNode)) {
-                        if (this._transitNodes.has(adjNode)) {
-                            toVisit.unshift(adjNode);
-                        } else {
-                            toVisit.push(adjNode);
+            if (closestDistance < maxDistance) {
+                const tagSet: Set<string> =
+                    nodeToTagSet[closest] ?? new Set<string>();
+                const transitiveTagSet: Set<string> =
+                    this._getTransitiveTagSet(tagSet);
+                console.log(
+                    closest +
+                        " tags: " +
+                        Array.from(transitiveTagSet).join(", ")
+                );
+                for (const tag of transitiveTagSet) {
+                    for (const adjNode of this._tagToNodeSet[tag]) {
+                        if (!visited.has(adjNode)) {
+                            // Add to result.
+                            const extraDistance = this._transitNodes.has(
+                                adjNode
+                            )
+                                ? 0
+                                : 1;
+                            nodeToDistance[adjNode] =
+                                closestDistance + extraDistance;
+                            nodeToPath[adjNode] = [
+                                ...nodeToPath[closest],
+                                adjNode,
+                            ];
+                            toVisit.add(adjNode);
                         }
                     }
                 }
             }
-
-            nodePath.pop();
         }
 
-        return result;
+        console.log(
+            Object.values(nodeToPath)
+                .map((x) => x.join(", "))
+                .join("\n")
+        );
+
+        return nodeToDistance;
     }
 }

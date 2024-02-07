@@ -1,5 +1,4 @@
-import exp from "constants";
-import { Adjacency, AdjacencyPath } from "./adjacency";
+import { Adjacency } from "./adjacency";
 
 it("constructor", () => {
     new Adjacency();
@@ -107,7 +106,6 @@ it("_getNodeToTagSets", () => {
 
 it("_getTransitiveTagSet", () => {
     const adj = new Adjacency();
-    const node = "my-node";
     const tag1 = "my-tag-1";
     const tag2 = "my-tag-2";
     const tag3 = "my-tag-3";
@@ -196,12 +194,8 @@ it("get", () => {
         .addLink("tag-41", "tag-51")
         .addLink("tag-51", "tag-50");
 
-    const adjList: AdjacencyPath[] = adj.get("00", 9);
-    let path: AdjacencyPath | undefined;
+    const nodeToDistance: { [key: string]: number } = adj.get("00", 9);
 
-    path = adjList.find((predicate) => predicate.node == "10");
-    expect(path?.distance).toEqual(1);
-
-    path = adjList.find((predicate) => predicate.node == "20");
-    expect(path?.distance).toEqual(2);
+    expect(nodeToDistance["10"]).toEqual(1);
+    expect(nodeToDistance["20"]).toEqual(2);
 });
