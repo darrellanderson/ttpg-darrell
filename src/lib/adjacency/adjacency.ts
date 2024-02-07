@@ -60,6 +60,16 @@ export class Adjacency {
         return nodeSet && nodeSet.has(node);
     }
 
+    public removeTagFromAllNodes(tag: string): this {
+        const nodeSet: Set<string> | undefined = this._tagToNodeSet[tag];
+        if (nodeSet) {
+            for (const node of nodeSet) {
+                this.removeNodeTags(node, [tag]);
+            }
+        }
+        return this;
+    }
+
     public addLink(tag1: string, tag2: string): this {
         let linkedTagSet: Set<string> | undefined;
 

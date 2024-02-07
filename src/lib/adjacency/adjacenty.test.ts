@@ -34,6 +34,27 @@ it("add/remove node tag", () => {
     expect(adj._hasTagNode(tag3, node)).toBeFalsy();
 });
 
+it("removeTagFromAllNodes", () => {
+    const adj = new Adjacency();
+    const node = "my-node";
+    const tag1 = "my-tag-1";
+    const tag2 = "my-tag-2";
+    const tag3 = "my-tag-3";
+    expect(adj.hasNodeTag(node, tag1)).toBeFalsy();
+    expect(adj.hasNodeTag(node, tag2)).toBeFalsy();
+    expect(adj.hasNodeTag(node, tag3)).toBeFalsy();
+
+    adj.addNodeTags(node, [tag1, tag2, tag3]);
+    expect(adj.hasNodeTag(node, tag1)).toBeTruthy();
+    expect(adj.hasNodeTag(node, tag2)).toBeTruthy();
+    expect(adj.hasNodeTag(node, tag3)).toBeTruthy();
+
+    adj.removeTagFromAllNodes(tag2);
+    expect(adj.hasNodeTag(node, tag1)).toBeTruthy();
+    expect(adj.hasNodeTag(node, tag2)).toBeFalsy();
+    expect(adj.hasNodeTag(node, tag3)).toBeTruthy();
+});
+
 it("add/remove link", () => {
     const adj = new Adjacency();
     const tag1 = "my-tag-1";
@@ -89,14 +110,7 @@ it("_getMergedTagSet", () => {
     const tag1and4Set = new Set<string>().add(tag1).add(tag4);
     let mergedTagSet: Set<string> | undefined;
     mergedTagSet = adj._getMergedTagSet(tag1and4Set);
-    expect(mergedTagSet?.has(tag1)).toBeTruthy();
-    expect(mergedTagSet?.has(tag2)).toBeFalsy();
-    expect(mergedTagSet?.has(tag3)).toBeFalsy();
-    expect(mergedTagSet?.has(tag4)).toBeTruthy();
-    expect(mergedTagSet?.has(tag5)).toBeFalsy();
-
-    adj.addMergedTag(tag1, tag1);
-    mergedTagSet = adj._getMergedTagSet(tag1and4Set);
+    expect(adj.hasMergedTag(tag1, tag2)).toBeFalsy();
     expect(mergedTagSet?.has(tag1)).toBeTruthy();
     expect(mergedTagSet?.has(tag2)).toBeFalsy();
     expect(mergedTagSet?.has(tag3)).toBeFalsy();
@@ -104,6 +118,7 @@ it("_getMergedTagSet", () => {
     expect(mergedTagSet?.has(tag5)).toBeFalsy();
 
     adj.addMergedTag(tag1, tag2);
+    expect(adj.hasMergedTag(tag1, tag2)).toBeTruthy();
     mergedTagSet = adj._getMergedTagSet(tag1and4Set);
     expect(mergedTagSet?.has(tag1)).toBeTruthy();
     expect(mergedTagSet?.has(tag2)).toBeTruthy();
@@ -112,6 +127,7 @@ it("_getMergedTagSet", () => {
     expect(mergedTagSet?.has(tag5)).toBeFalsy();
 
     adj.addMergedTag(tag2, tag3);
+    expect(adj.hasMergedTag(tag1, tag2)).toBeTruthy();
     mergedTagSet = adj._getMergedTagSet(tag1and4Set);
     expect(mergedTagSet?.has(tag1)).toBeTruthy();
     expect(mergedTagSet?.has(tag2)).toBeTruthy();
@@ -120,6 +136,7 @@ it("_getMergedTagSet", () => {
     expect(mergedTagSet?.has(tag5)).toBeFalsy();
 
     adj.removeMergedTag(tag1, tag2);
+    expect(adj.hasMergedTag(tag1, tag2)).toBeFalsy();
     mergedTagSet = adj._getMergedTagSet(tag1and4Set);
     expect(mergedTagSet?.has(tag1)).toBeTruthy();
     expect(mergedTagSet?.has(tag2)).toBeFalsy();
@@ -128,6 +145,7 @@ it("_getMergedTagSet", () => {
     expect(mergedTagSet?.has(tag5)).toBeFalsy();
 
     adj.addMergedTag(tag4, tag5);
+    expect(adj.hasMergedTag(tag1, tag2)).toBeFalsy();
     mergedTagSet = adj._getMergedTagSet(tag1and4Set);
     expect(mergedTagSet?.has(tag1)).toBeTruthy();
     expect(mergedTagSet?.has(tag2)).toBeFalsy();
