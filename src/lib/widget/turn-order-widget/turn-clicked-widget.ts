@@ -143,7 +143,11 @@ export class TurnClickedWidget {
             button.onClicked.add((button: Button, player: Player) => {
                 this.detach();
                 if (this._params.onCustomAction) {
-                    this._params.onCustomAction(player, identifier);
+                    this._params.onCustomAction(
+                        player,
+                        identifier,
+                        this._targetPlayerSlot
+                    );
                 }
             });
             panel.addChild(button);

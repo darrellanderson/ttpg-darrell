@@ -44,5 +44,9 @@ export type TurnOrderWidgetParams = {
         tooltip?: string;
         identifier?: string;
     }[];
-    onCustomAction?: (player: Player, identifier: string) => void;
+    onCustomAction?: (
+        clickingPlayer: Player,
+        identifier: string,
+        targetPlayerSlot: number
+    ) => void;
 };
