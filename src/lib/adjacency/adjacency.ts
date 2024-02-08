@@ -63,12 +63,12 @@ export class Adjacency {
 
     public hasNodeTag(node: string, tag: string): boolean {
         const tagSet: Set<string> | undefined = this._nodeToTagSet[node];
-        return tagSet && tagSet.has(tag);
+        return tagSet?.has(tag) ?? false;
     }
 
     public _hasTagNode(tag: string, node: string): boolean {
         const nodeSet: Set<string> | undefined = this._tagToNodeSet[tag];
-        return nodeSet && nodeSet.has(node);
+        return nodeSet?.has(node) ?? false;
     }
 
     /**
@@ -125,7 +125,7 @@ export class Adjacency {
     public hasLink(tag1: string, tag2: string): boolean {
         const linkedTagSet: Set<string> | undefined =
             this._tagToLinkedTagSet[tag1];
-        return linkedTagSet && linkedTagSet.has(tag2);
+        return linkedTagSet?.has(tag2) ?? false;
     }
 
     /**
@@ -153,17 +153,19 @@ export class Adjacency {
         const tagSet: Set<string> | undefined = this._nodeToTagSet[node];
         const adjNodeSet: Set<string> = new Set<string>();
 
-        for (const tag of tagSet) {
-            const linkedTagSet: Set<string> | undefined =
-                this._tagToLinkedTagSet[tag];
-            if (linkedTagSet) {
-                for (const linkedTag of linkedTagSet) {
-                    const nodeSet: Set<string> | undefined =
-                        this._tagToNodeSet[linkedTag];
-                    if (nodeSet) {
-                        for (const linkedNode of nodeSet) {
-                            if (linkedNode !== node) {
-                                adjNodeSet.add(linkedNode);
+        if (tagSet) {
+            for (const tag of tagSet) {
+                const linkedTagSet: Set<string> | undefined =
+                    this._tagToLinkedTagSet[tag];
+                if (linkedTagSet) {
+                    for (const linkedTag of linkedTagSet) {
+                        const nodeSet: Set<string> | undefined =
+                            this._tagToNodeSet[linkedTag];
+                        if (nodeSet) {
+                            for (const linkedNode of nodeSet) {
+                                if (linkedNode !== node) {
+                                    adjNodeSet.add(linkedNode);
+                                }
                             }
                         }
                     }

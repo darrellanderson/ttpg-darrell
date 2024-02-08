@@ -79,12 +79,16 @@ export abstract class NSID {
         if (!m) {
             return undefined;
         }
+        const type: string = m[1] ?? "";
+        const source: string = m[2] ?? "";
+        const name: string = m[3] ?? "";
+        const extra: string = m[4] ?? "";
         return {
             nsid: nsid,
-            typeParts: m[1].split("."),
-            sourceParts: m[2].split("."),
-            nameParts: m[3].split("."),
-            extra: m[4].length > 0 ? m[4] : undefined,
+            typeParts: type.split("."),
+            sourceParts: source.split("."),
+            nameParts: name.split("."),
+            extra: extra.length > 0 ? m[4] : undefined,
         };
     }
 }

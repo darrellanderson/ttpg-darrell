@@ -70,7 +70,11 @@ export class Perf implements IGlobal {
             msecs.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n
         );
         const sorted: number[] = msecs.sort((a, b) => b - a);
-        const median: number = sorted[Math.floor(sorted.length / 2)];
+        const median: number | undefined =
+            sorted[Math.floor(sorted.length / 2)];
+        if (median === undefined) {
+            throw new Error("missing median");
+        }
 
         // Mean of values within 3x stdDev (in the unlikely event of none,
         // use the regular mean).

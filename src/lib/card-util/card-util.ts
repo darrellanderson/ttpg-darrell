@@ -111,7 +111,8 @@ export class CardUtil {
         let result: Card | undefined;
         const nsids = NSID.getDeck(deck);
         for (let i = nsids.length - 1; i >= 0; i--) {
-            if (filter(nsids[i])) {
+            const nsid: string | undefined = nsids[i];
+            if (nsid && filter(nsid)) {
                 // Remove card from deck.
                 let card: Card | undefined;
                 if (deck.getStackSize() === 1) {

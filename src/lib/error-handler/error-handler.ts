@@ -98,19 +98,32 @@ export class ErrorHandler implements IGlobal {
 
         m = stackTraceLine.match(re1);
         if (m) {
+            const file: string | undefined = m[1];
+            const jsLine: string | undefined = m[2];
+            const jsColumn: string | undefined = m[3];
+            if (!file || !jsLine || !jsColumn) {
+                throw new Error("parse error");
+            }
             errorLocation = {
-                file: m[1],
-                jsLine: Number.parseInt(m[2]),
-                jsColumn: Number.parseInt(m[3]),
+                file,
+                jsLine: Number.parseInt(jsLine),
+                jsColumn: Number.parseInt(jsColumn),
             };
         } else {
             m = stackTraceLine.match(re2);
             if (m) {
+                const method: string | undefined = m[1];
+                const file: string | undefined = m[2];
+                const jsLine: string | undefined = m[3];
+                const jsColumn: string | undefined = m[4];
+                if (!method || !file || !jsLine || !jsColumn) {
+                    throw new Error("parse error");
+                }
                 errorLocation = {
-                    method: m[1],
-                    file: m[2],
-                    jsLine: Number.parseInt(m[3]),
-                    jsColumn: Number.parseInt(m[4]),
+                    method,
+                    file,
+                    jsLine: Number.parseInt(jsLine),
+                    jsColumn: Number.parseInt(jsColumn),
                 };
             }
         }
@@ -201,7 +214,7 @@ export class ErrorHandler implements IGlobal {
         const mappings: string[] = mappingsEncoded.split(";"); // one entry per line
         for (const mapping of mappings) {
             const segments: string[] = mapping.split(",");
-            const firstSegment: string = segments[0];
+            const firstSegment: string = segments[0] ?? "";
             const fields = this.parseSourceMappingSegment(firstSegment);
             // [delta-js-col, src-index, delta-ts-line, delta-ts-col, names-index]
             let tsLine: number = fields[2] ?? -1;

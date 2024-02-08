@@ -1,7 +1,6 @@
 {
     "compilerOptions": {
         "target": "ES6",
-        "strict": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "outDir": "build/module_type_should_override_this",
@@ -11,7 +10,10 @@
         "skipLibCheck": true,
         "declaration": true,
         "sourceMap": true,
+
+        "strict": true,
+        "noUncheckedIndexedAccess": true
     },
     "include": ["./src/**/*.ts"],
-    "exclude": ["./src/**/*.test.ts"],
+    "exclude": ["./src/**/*.test.ts"]
 }

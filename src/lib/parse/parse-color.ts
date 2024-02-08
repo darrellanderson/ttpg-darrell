@@ -10,7 +10,10 @@ export class ParseColor {
         if (!m) {
             return undefined;
         }
-        const hexStr: string = m[1];
+        const hexStr: string | undefined = m[1];
+        if (hexStr === undefined) {
+            throw new Error("missing hexStr");
+        }
 
         let r = 0;
         let g = 0;
