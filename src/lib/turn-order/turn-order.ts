@@ -136,8 +136,9 @@ export class TurnOrder {
             }
 
             // Is the candidate available?
-            playerSlot = this._order[cursor];
+            playerSlot = this._order[cursor] ?? -1;
             if (
+                playerSlot >= 0 &&
                 !this._passed.has(playerSlot) &&
                 !this._eliminated.has(playerSlot)
             ) {

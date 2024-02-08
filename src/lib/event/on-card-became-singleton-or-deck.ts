@@ -59,8 +59,11 @@ export class OnCardBecameSingletonOrDeck implements IGlobal {
 
                 // Tested in TTPG, with face up and down decks.
                 const nsids: string[] = NSID.getDeck(deck);
-                const oldNsid: string =
+                const oldNsid: string | undefined =
                     nsids[position === 1 ? 0 : nsids.length - 1];
+                if (oldNsid === undefined) {
+                    throw new Error("missing oldNsid");
+                }
                 OnCardBecameSingletonOrDeck.onSingletonCardMadeDeck.trigger(
                     deck,
                     oldNsid,
@@ -114,7 +117,11 @@ export class OnCardBecameSingletonOrDeck implements IGlobal {
                 obj.onRemoved.add(
                     OnCardBecameSingletonOrDeck._onRemovedHandler
                 );
-                const oldNsid: string = NSID.getDeck(obj)[0];
+                const oldNsid: string | undefined = NSID.getDeck(obj)[0];
+                if (oldNsid === undefined) {
+                    throw new Error("missing oldNsid");
+                }
+
                 OnCardBecameSingletonOrDeck.onSingletonCardMadeDeck.trigger(
                     obj,
                     oldNsid

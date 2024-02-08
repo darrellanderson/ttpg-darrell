@@ -1,9 +1,14 @@
-import { refObject, world } from "@tabletop-playground/api";
+import { Player, refObject, world } from "@tabletop-playground/api";
 import { DiceGroup, DiceGroupCleanup, DiceResult } from "./dice-group";
 
 world.setShowDiceRollMessages(false);
 
 new DiceGroupCleanup().init();
+
+const player: Player | undefined = world.getAllPlayers()[0];
+if (!player) {
+    throw new Error("no player");
+}
 
 DiceGroup.roll({
     diceParams: [
@@ -23,7 +28,7 @@ DiceGroup.roll({
         { sides: 12 },
         { sides: 20 },
     ],
-    player: world.getAllPlayers()[0],
+    player,
     position: refObject.getPosition().add([0, 4, 0]),
     timeoutSeconds: -1, // no timeout
     deleteAfterSeconds: -1, // no delete

@@ -6,12 +6,22 @@ export class Shuffle {
         // Fisher-Yates
         for (let i = items.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [items[i], items[j]] = [items[j], items[i]];
+            const a: T | undefined = items[i];
+            const b: T | undefined = items[j];
+            if (a !== undefined && b !== undefined) {
+                items[i] = b;
+                items[j] = a;
+            }
         }
         return items;
     }
 
     static choice<T>(items: T[]): T {
-        return items[Math.floor(Math.random() * items.length)];
+        const item: T | undefined =
+            items[Math.floor(Math.random() * items.length)];
+        if (item === undefined) {
+            throw new Error("item undefined");
+        }
+        return item;
     }
 }

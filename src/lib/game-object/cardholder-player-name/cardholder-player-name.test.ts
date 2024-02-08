@@ -56,7 +56,7 @@ it("click to take seat", () => {
     new CardHolderPlayerName(cardHolder);
     const uis: UIElement[] = cardHolder.getUIs();
     expect(uis.length).toEqual(1);
-    const switcher = uis[0].widget;
+    const switcher = uis[0]?.widget;
     expect(switcher).toBeInstanceOf(WidgetSwitcher);
     if (!(switcher instanceof WidgetSwitcher)) {
         throw new Error("not WidgetSwitcher");
@@ -78,7 +78,7 @@ it("click to take seat (invalid slot)", () => {
     new CardHolderPlayerName(cardHolder);
     const uis: UIElement[] = cardHolder.getUIs();
     expect(uis.length).toEqual(1);
-    const switcher = uis[0].widget;
+    const switcher = uis[0]?.widget;
     expect(switcher).toBeInstanceOf(WidgetSwitcher);
     if (!(switcher instanceof WidgetSwitcher)) {
         throw new Error("not WidgetSwitcher");
@@ -102,7 +102,7 @@ it("onPlayerJoined", () => {
     new CardHolderPlayerName(cardHolder);
     const uis: UIElement[] = cardHolder.getUIs();
     expect(uis.length).toEqual(1);
-    const switcher = uis[0].widget;
+    const switcher = uis[0]?.widget;
     expect(switcher).toBeInstanceOf(WidgetSwitcher);
     if (!(switcher instanceof WidgetSwitcher)) {
         throw new Error("not WidgetSwitcher");

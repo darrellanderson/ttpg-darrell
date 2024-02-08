@@ -217,7 +217,10 @@ export class DiceGroup {
         // Create dice.  Wait to roll until after all dice registered.
         const z = world.getTableHeight() + 2;
         for (let i = 0; i < this._diceParamsArray.length; i++) {
-            const diceParams: DiceParams = this._diceParamsArray[i];
+            const diceParams: DiceParams | undefined = this._diceParamsArray[i];
+            if (!diceParams) {
+                throw new Error("missing diceParams");
+            }
             const phi = (i / this._diceParamsArray.length) * Math.PI * 2;
             const r = this._diceParamsArray.length * 0.3;
             const pos = new Vector(Math.cos(phi) * r, Math.sin(phi) * r, z);

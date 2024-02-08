@@ -71,7 +71,11 @@ export class D6Widget {
             { col: 0, row: 2 }, // 5
             { col: 2, row: 1 }, // 6
         ];
-        const { col, row } = colRow[index];
+        const colRowEntry = colRow[index];
+        if (!colRowEntry) {
+            throw new Error("invalid index");
+        }
+        const { col, row } = colRowEntry;
         if (typeof col !== "number" || typeof row !== "number") {
             throw new Error("bad index");
         }

@@ -132,24 +132,38 @@ export class DataStore {
         // Create chained blocks.
         const blocks: DataBlock[] = [];
         for (let i = 0; i < n; i++) {
-            const block: DataBlock = {
-                data: dataChunks[i],
-            };
-            if (i < dataChunks.length - 1) {
-                block.next = blockLocations[i + 1];
+            const data: string | undefined = dataChunks[i];
+            if (data) {
+                const block: DataBlock = {
+                    data,
+                };
+                if (i < dataChunks.length - 1) {
+                    block.next = blockLocations[i + 1];
+                }
+                blocks.push(block);
             }
-            blocks.push(block);
         }
 
         // Save blocks.
         for (let i = 0; i < n; i++) {
-            const blockLocation: DataBlockLocation = blockLocations[i];
-            const block: DataBlock = blocks[i];
+            const blockLocation: DataBlockLocation | undefined =
+                blockLocations[i];
+            if (!blockLocation) {
+                throw new Error("missing block location");
+            }
+            const block: DataBlock | undefined = blocks[i];
+            if (!block) {
+                throw new Error("missing block");
+            }
             const blockEnc: { [key: string]: string | number } = {
                 [KEY_BLOCK_DATA]: block.data,
             };
             if (i < dataChunks.length - 1) {
-                const nextLocation = blockLocations[i + 1];
+                const nextLocation: DataBlockLocation | undefined =
+                    blockLocations[i + 1];
+                if (!nextLocation) {
+                    throw new Error("missing next");
+                }
                 blockEnc[KEY_NEXT_BLOCK_INDEX] = nextLocation.index;
                 if (blockLocation.obj !== nextLocation.obj) {
                     blockEnc[KEY_NEXT_OBJECT_ID] = nextLocation.obj.getId();
@@ -162,9 +176,14 @@ export class DataStore {
         }
 
         // Save root entry.
+        const id: string | undefined = blockLocations[0]?.obj.getId();
+        const index: number | undefined = blockLocations[0]?.index;
+        if (id === undefined || index === undefined) {
+            throw new Error("missing root");
+        }
         const rootEnc = {
-            [KEY_NEXT_OBJECT_ID]: blockLocations[0].obj.getId(),
-            [KEY_NEXT_BLOCK_INDEX]: blockLocations[0].index,
+            [KEY_NEXT_OBJECT_ID]: id,
+            [KEY_NEXT_BLOCK_INDEX]: index,
         };
         this._root.setSavedData(JSON.stringify(rootEnc), dataId);
     }
@@ -252,7 +271,7 @@ export class DataStore {
                 blockLocation = block.next; // iterate to next block
             }
             blocks.push(block);
-        } while (blocks[blocks.length - 1].next);
+        } while (blocks[blocks.length - 1]?.next);
         return blocks;
     }
 
@@ -384,7 +403,10 @@ export class DataStore {
         }
 
         if (rootStoreIds.length > 0) {
-            const objId = rootStoreIds[0];
+            const objId: string | undefined = rootStoreIds[0];
+            if (!objId) {
+                throw new Error("missing objId");
+            }
             const obj = world.getObjectById(objId);
             if (!obj) {
                 throw new Error("bad obj");

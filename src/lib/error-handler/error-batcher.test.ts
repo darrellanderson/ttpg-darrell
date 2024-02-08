@@ -7,7 +7,7 @@ it("errorToString", () => {
 
     expect(strLines.length).toBeGreaterThanOrEqual(2);
     expect(strLines[0]).toEqual("Error: my message");
-    expect(strLines[1].startsWith("    at Object.<anonymous>")).toBeTruthy();
+    expect(strLines[1]?.startsWith("    at Object.<anonymous>")).toBeTruthy();
 });
 
 it("runGatherErrors", () => {

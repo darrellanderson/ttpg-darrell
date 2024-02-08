@@ -109,9 +109,12 @@ export class TurnOrderWidget {
 
         // Update turn widgets.
         for (let i = 0; i < order.length; i++) {
-            const playerSlot: number = order[i];
-            const turnWidget: TurnEntryWidget = this._turnEntryWidgets[i];
-            turnWidget.update(this._turnOrder, playerSlot);
+            const playerSlot: number | undefined = order[i];
+            const turnWidget: TurnEntryWidget | undefined =
+                this._turnEntryWidgets[i];
+            if (playerSlot && turnWidget) {
+                turnWidget.update(this._turnOrder, playerSlot);
+            }
         }
 
         return this;
