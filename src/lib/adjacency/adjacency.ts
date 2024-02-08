@@ -1,6 +1,9 @@
 /**
  * Nodes have tags, links connect tags.  Merged tags are treated as one tag.
  * Tansit nodes are on a path, but do not add to distance ("hyperlane").
+ *
+ * If two nodes share a tag they are NOT connected UNLESS there is a link
+ * from tag back to itself.  ("hub link" like a wormhole with multiple outs.)
  */
 
 export type AdjacencyResult = {
@@ -208,16 +211,19 @@ export class Adjacency {
         const adjNodeSet: Set<string> = new Set<string>();
 
         for (const tag of mergedTagSet) {
-            const linkedTagSet: Set<string> = this._tagToLinkedTagSet[tag];
-            const linkedMergedSet: Set<string> =
-                this._getMergedTagSet(linkedTagSet);
-            for (const linkedTag of linkedMergedSet) {
-                const nodeSet: Set<string> | undefined =
-                    this._tagToNodeSet[linkedTag];
-                if (nodeSet) {
-                    for (const linkedNode of nodeSet) {
-                        if (linkedNode !== node) {
-                            adjNodeSet.add(linkedNode);
+            const linkedTagSet: Set<string> | undefined =
+                this._tagToLinkedTagSet[tag];
+            if (linkedTagSet) {
+                const linkedMergedSet: Set<string> =
+                    this._getMergedTagSet(linkedTagSet);
+                for (const linkedTag of linkedMergedSet) {
+                    const nodeSet: Set<string> | undefined =
+                        this._tagToNodeSet[linkedTag];
+                    if (nodeSet) {
+                        for (const linkedNode of nodeSet) {
+                            if (linkedNode !== node) {
+                                adjNodeSet.add(linkedNode);
+                            }
                         }
                     }
                 }
@@ -230,7 +236,7 @@ export class Adjacency {
         const originAdjacencyResult: AdjacencyResult = {
             node: origin,
             distance: 0,
-            path: [],
+            path: [origin],
         };
         const nodeToAdjacencyResult: { [key: string]: AdjacencyResult } = {
             [origin]: originAdjacencyResult,
