@@ -12,9 +12,9 @@ import {
 } from "@tabletop-playground/api";
 import { locale } from "../../locale/locale";
 import { TurnOrder } from "../../turn-order/turn-order";
+import { UiVisibility } from "../../ui-visibility/ui-visibility";
 
 import { EndTurnLocaleData } from "./end-turn-locale.data";
-import { UiVisibility } from "../../ui-visibility/ui-visibility";
 locale.inject(EndTurnLocaleData);
 
 export type EndTurnButtonParams = {
