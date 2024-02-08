@@ -9,7 +9,9 @@ export type AdjacencyResult = {
  * Tansit nodes are on a path, but do not add to distance ("hyperlane").
  *
  * If two nodes share a tag they are NOT connected UNLESS there is a link
- * from tag back to itself.  ("hub link" like a wormhole with multiple outs.)
+ * from tag back to itself.
+ *
+ * A link may connect to multiple nodes that share the tag.
  */
 export class Adjacency {
     private readonly _nodeToTagSet: { [key: string]: Set<string> } = {};
@@ -17,6 +19,14 @@ export class Adjacency {
     private readonly _tagToLinkedTagSet: { [key: string]: Set<string> } = {};
     private readonly _transitNodes: Set<string> = new Set<string>();
 
+    /**
+     * Add a node tag.  Node tags may name the node, a specific edge, or a
+     * possibly-many-neighbors "hub tag" such as a wormhole.
+     *
+     * @param node
+     * @param tags
+     * @returns
+     */
     public addNodeTags(node: string, tags: string[]): this {
         let tagSet: Set<string> | undefined;
         let nodeSet: Set<string> | undefined;
@@ -61,6 +71,13 @@ export class Adjacency {
         return nodeSet && nodeSet.has(node);
     }
 
+    /**
+     * Add a link.  A node with one tag is connected to a node with the other.
+     *
+     * @param tag1
+     * @param tag2
+     * @returns
+     */
     public addLink(tag1: string, tag2: string): this {
         let linkedTagSet: Set<string> | undefined;
 
@@ -111,6 +128,13 @@ export class Adjacency {
         return linkedTagSet && linkedTagSet.has(tag2);
     }
 
+    /**
+     * Transit nodes can appear along a path but do not add to distance
+     * (e.g. hyperlanes).
+     *
+     * @param node
+     * @returns
+     */
     public addTransitNode(node: string): this {
         this._transitNodes.add(node);
         return this;
@@ -149,6 +173,13 @@ export class Adjacency {
         return adjNodeSet;
     }
 
+    /**
+     * Compute shortest paths to all nodes within maxDistance.
+     *
+     * @param origin
+     * @param maxDistance
+     * @returns
+     */
     public get(origin: string, maxDistance: number): AdjacencyResult[] {
         const originAdjacencyResult: AdjacencyResult = {
             node: origin,
