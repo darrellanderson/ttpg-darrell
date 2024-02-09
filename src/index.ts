@@ -23,6 +23,7 @@ export * from "./lib/game-object/garbage/simple-to-container-handler";
 export * from "./lib/game-object/garbage/simple-to-snap-point-handler";
 export * from "./lib/global/global-init";
 export * from "./lib/global/i-global";
+export * from "./lib/heap/heap";
 export * from "./lib/layout-objects/layout-objects";
 export * from "./lib/locale/locale";
 export * from "./lib/namespace-id/namespace-id";
