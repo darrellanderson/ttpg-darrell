@@ -103,14 +103,14 @@ export class Heap<T> {
                 const right = rightHeapEntry.value;
                 const current = currentHeapEntry.value;
                 if (left <= right) {
-                    if (current >= left) {
+                    if (current > left) {
                         this._swap(currentIndex, leftIndex);
                         currentIndex = leftIndex;
                     } else {
                         break;
                     }
                 } else {
-                    if (current >= right) {
+                    if (current > right) {
                         this._swap(currentIndex, rightIndex);
                         currentIndex = rightIndex;
                     } else {

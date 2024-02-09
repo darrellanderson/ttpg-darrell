@@ -4,6 +4,17 @@ it("constructor", () => {
     new Heap<string>();
 });
 
+it("size", () => {
+    const heap = new Heap<string>();
+    expect(heap.size()).toEqual(0);
+
+    heap.add("one", 1);
+    expect(heap.size()).toEqual(1);
+
+    heap.add("two", 2);
+    expect(heap.size()).toEqual(2);
+});
+
 it("add/peek", () => {
     const heap = new Heap<string>();
     expect(heap.peekMin()).toBeUndefined();
@@ -68,6 +79,21 @@ it("add/remove (mixed)", () => {
     expect(heap.removeMin()).toEqual("three");
     expect(heap.removeMin()).toEqual("four");
     expect(heap.removeMin()).toEqual("five");
+    expect(heap.removeMin()).toBeUndefined();
+});
+
+it("add/remove (most same)", () => {
+    const heap = new Heap<string>()
+        .add("one", 1)
+        .add("one", 1)
+        .add("one", 1)
+        .add("two", 2)
+        .add("one", 1);
+    expect(heap.removeMin()).toEqual("one");
+    expect(heap.removeMin()).toEqual("one");
+    expect(heap.removeMin()).toEqual("one");
+    expect(heap.removeMin()).toEqual("one");
+    expect(heap.removeMin()).toEqual("two");
     expect(heap.removeMin()).toBeUndefined();
 });
 
