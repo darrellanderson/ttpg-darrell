@@ -38,6 +38,7 @@ it("add/remove", () => {
     expect(heap.removeMin()).toEqual("three");
     expect(heap.removeMin()).toEqual("four");
     expect(heap.removeMin()).toEqual("five");
+    expect(heap.removeMin()).toBeUndefined();
 });
 
 it("add/remove (reverse)", () => {
@@ -52,6 +53,7 @@ it("add/remove (reverse)", () => {
     expect(heap.removeMin()).toEqual("three");
     expect(heap.removeMin()).toEqual("four");
     expect(heap.removeMin()).toEqual("five");
+    expect(heap.removeMin()).toBeUndefined();
 });
 
 it("add/remove (mixed)", () => {
@@ -66,4 +68,16 @@ it("add/remove (mixed)", () => {
     expect(heap.removeMin()).toEqual("three");
     expect(heap.removeMin()).toEqual("four");
     expect(heap.removeMin()).toEqual("five");
+    expect(heap.removeMin()).toBeUndefined();
+});
+
+it("remove (empty)", () => {
+    const heap = new Heap<string>();
+    expect(heap.removeMin()).toBeUndefined();
+});
+
+it("remove (singleton)", () => {
+    const heap = new Heap<string>().add("one", 1);
+    expect(heap.removeMin()).toEqual("one");
+    expect(heap.removeMin()).toBeUndefined();
 });

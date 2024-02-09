@@ -53,12 +53,15 @@ export class Heap<T> {
     public removeMin(): T | undefined {
         // Replace first entry with last, bubble down.
         const firstHeapEntry: HeapEntry<T> | undefined = this._heap[0];
-        if (firstHeapEntry === undefined) {
+        if (!firstHeapEntry) {
             return undefined;
         }
         const lastHeapEntry: HeapEntry<T> | undefined = this._heap.pop();
-        if (lastHeapEntry === undefined) {
+        if (!lastHeapEntry) {
             throw new Error("no last heap entry");
+        }
+        if (this._heap.length === 0) {
+            return firstHeapEntry.item;
         }
         this._heap[0] = lastHeapEntry;
 
@@ -86,8 +89,8 @@ export class Heap<T> {
             }
 
             // 1 child
-            else if (leftHeapEntry && !rightHeapEntry) {
-                if (currentHeapEntry?.value > leftHeapEntry.value) {
+            if (leftHeapEntry && !rightHeapEntry) {
+                if (currentHeapEntry?.value >= leftHeapEntry.value) {
                     this._swap(currentIndex, leftIndex);
                     currentIndex = leftIndex;
                 }
@@ -95,19 +98,19 @@ export class Heap<T> {
             }
 
             // 2 children
-            else if (leftHeapEntry && rightHeapEntry) {
+            if (leftHeapEntry && rightHeapEntry) {
                 const left = leftHeapEntry.value;
                 const right = rightHeapEntry.value;
                 const current = currentHeapEntry.value;
-                if (left < right) {
-                    if (current > left) {
+                if (left <= right) {
+                    if (current >= left) {
                         this._swap(currentIndex, leftIndex);
                         currentIndex = leftIndex;
                     } else {
                         break;
                     }
-                } else if (left > right) {
-                    if (current > right) {
+                } else {
+                    if (current >= right) {
                         this._swap(currentIndex, rightIndex);
                         currentIndex = rightIndex;
                     } else {

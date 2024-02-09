@@ -1,3 +1,5 @@
+import { Heap } from "../heap/heap";
+
 export type AdjacencyResult = {
     node: string;
     distance: number;
@@ -196,17 +198,18 @@ export class Adjacency {
         ]);
         const visited: Set<string> = new Set<string>();
 
+        const heap: Heap<string> = new Heap<string>().add(origin, 0);
+
         while (toVisit.size > 0) {
             // Find the closest of the to-visit nodes.
-            // A heap would be better but the size here is small.
-            let closest: AdjacencyResult | undefined;
-            for (const candidate of toVisit) {
-                if (!closest || candidate.distance < closest.distance) {
-                    closest = candidate;
-                }
+            const closestNode: string | undefined = heap.removeMin();
+            if (!closestNode) {
+                throw new Error("missing closest node");
             }
+            const closest: AdjacencyResult | undefined =
+                nodeToAdjacencyResult[closestNode];
             if (!closest) {
-                throw new Error("no closest node but list was not empty");
+                throw new Error("missing closest");
             }
             toVisit.delete(closest);
             visited.add(closest.node);
@@ -228,6 +231,7 @@ export class Adjacency {
                         };
                         nodeToAdjacencyResult[adjNode] = adjResult;
                         toVisit.add(adjResult);
+                        heap.add(adjNode, distance);
                     }
                 }
             }
