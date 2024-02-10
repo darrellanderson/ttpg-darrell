@@ -41,10 +41,6 @@ export class ImageCell implements ICell {
     }
 
     toBuffer(): Promise<Buffer> {
-        if (!this._imageFile) {
-            throw new Error("must setImageFile first");
-        }
-
         return new Promise<Buffer>((resolve, reject) => {
             const image = sharp(this._imageFile);
             image.metadata().then((metadata: Metadata) => {
