@@ -8,10 +8,13 @@ export class RowCell extends AbstractCell {
             child: AbstractCell;
             left: number;
             top: number;
-        }> = children.map((child) => {
+        }> = children.map((child, index) => {
+            if (index > 0) {
+                lastRight += spacing;
+            }
             const left: number = lastRight;
             const { width, height } = child.getSize();
-            lastRight += width + spacing;
+            lastRight += width;
             maxHeight = Math.max(maxHeight, height);
             return { child, left, top: 0 };
         });

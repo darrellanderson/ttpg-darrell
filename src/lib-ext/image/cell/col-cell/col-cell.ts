@@ -8,10 +8,13 @@ export class ColCell extends AbstractCell {
             child: AbstractCell;
             left: number;
             top: number;
-        }> = children.map((child) => {
+        }> = children.map((child, index) => {
+            if (index > 0) {
+                lastTop += spacing;
+            }
             const top: number = lastTop;
             const { width, height } = child.getSize();
-            lastTop += height + spacing;
+            lastTop += height;
             maxWidth = Math.max(maxWidth, width);
             return { child, left: 0, top };
         });
