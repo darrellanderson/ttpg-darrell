@@ -1,17 +1,15 @@
 import path from "fs-extra";
-import { ICell } from "../i-cell";
 import sharp, { Metadata } from "sharp";
+import { AbstractCell } from "../abstract-cell/abstract-cell";
 
 /**
  * Load an image from a file.
  * Require the image size at construtor time for synchronous use.
  */
-export class ImageCell implements ICell {
+export class ImageCell extends AbstractCell {
     private readonly _imageFile: string | undefined;
-    private readonly _width: number;
-    private readonly _height: number;
 
-    static from(imageFile: string): Promise<ImageCell> {
+    public static from(imageFile: string): Promise<ImageCell> {
         return new Promise<ImageCell>((resolve, reject) => {
             sharp(imageFile)
                 .metadata()
@@ -21,37 +19,30 @@ export class ImageCell implements ICell {
                     if (w === undefined || h === undefined) {
                         reject("missing width or height");
                     } else {
-                        resolve(new ImageCell(imageFile, w, h));
+                        resolve(new ImageCell(w, h, imageFile));
                     }
                 });
         });
     }
 
-    constructor(imageFile: string, width: number, height: number) {
+    constructor(width: number, height: number, imageFile: string) {
+        super(width, height);
         if (!path.existsSync(imageFile)) {
             throw new Error(`no file "${imageFile}"`);
         }
         this._imageFile = imageFile;
-        this._width = width;
-        this._height = height;
     }
 
-    getCellSize(): { w: number; h: number } {
-        return { w: this._width, h: this._height };
-    }
-
-    toBuffer(): Promise<Buffer> {
+    public toBuffer(): Promise<Buffer> {
         return new Promise<Buffer>((resolve, reject) => {
+            const { width, height } = this.getSize();
             const image = sharp(this._imageFile);
             image.metadata().then((metadata: Metadata) => {
-                if (
-                    metadata.width === this._width &&
-                    metadata.height === this._height
-                ) {
+                if (metadata.width === width && metadata.height === height) {
                     resolve(image.toBuffer());
                 } else {
                     reject(
-                        `size mimatch (observed ${metadata.width}x${metadata.height}, expected ${this._width}x${this._height})`
+                        `size mimatch (observed ${metadata.width}x${metadata.height}, expected ${width}x${height})`
                     );
                 }
             });

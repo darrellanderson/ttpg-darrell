@@ -1,49 +1,53 @@
-import { ICell } from "../i-cell";
 import sharp from "sharp";
+import { AbstractCell } from "../abstract-cell/abstract-cell";
 
-export class TextCell implements ICell {
+export class TextCell extends AbstractCell {
     private readonly _text: string;
-    private readonly _width: number;
-    private readonly _height: number;
     private _font: string = "Futura";
     private _fontStyle: string = "Regular";
     private _fontSize: number = 16;
-    private _bgColor: string = "#ffffff";
+    private _bgColor: string = "transparent";
     private _fgColor: string = "#000000";
 
-    constructor(text: string, width: number, height: number) {
+    constructor(width: number, height: number, text: string) {
+        super(width, height);
         this._text = text;
-        this._width = width;
-        this._height = height;
     }
 
-    setFont(font: string): this {
+    public setBgColor(color: string) {
+        this._bgColor = color;
+        return this;
+    }
+
+    public setFgColor(color: string) {
+        this._fgColor = color;
+        return this;
+    }
+
+    public setFont(font: string): this {
         this._font = font;
         return this;
     }
 
-    setFontSize(fontSize: number): this {
+    public setFontSize(fontSize: number): this {
         this._fontSize = fontSize;
         return this;
     }
 
-    setFontStyle(fontStyle: string): this {
+    public setFontStyle(fontStyle: string): this {
         this._fontStyle = fontStyle;
         return this;
     }
 
-    getCellSize(): { w: number; h: number } {
-        return { w: this._width, h: this._height };
-    }
-
-    toBuffer(): Promise<Buffer> {
+    public toBuffer(): Promise<Buffer> {
+        const { width, height } = this.getSize();
         const dy: number = Math.floor(this._fontSize * 0.37);
         const svgText: string = `<?xml version="1.0" standalone="no"?>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 xml:lang="en"
-                height="${this._height}"
-                width="${this._width}"
+                height="${height}"
+                width="${width}"
             >
                 <rect width="100%" height="100%" fill="${this._bgColor}" /> 
                 <text

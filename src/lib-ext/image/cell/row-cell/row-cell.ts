@@ -1,23 +1,34 @@
-import { ICell } from "../i-cell";
+import sharp from "sharp";
+import { AbstractCell } from "../abstract-cell/abstract-cell";
 
-export class RowCell implements ICell {
-    private readonly _cells: ICell[] = [];
-
-    getCellSize(): { w: number; h: number } {
-        let w = 0;
-        let h = 0;
-        for (const cell of this._cells) {
-            const cellSize = cell.getCellSize();
-            if (cellSize.w < 0) {
-                throw new Error("negative cell width");
-            }
-            w += cellSize.w;
-            h = Math.max(h, cellSize.h);
-        }
-        return { w, h };
+export class RowCell extends AbstractCell {
+    constructor(children: AbstractCell[], spacing: number = 0) {
+        let lastRight: number = 0;
+        let maxHeight: number = 0;
+        const childrenWithLayout: Array<{
+            child: AbstractCell;
+            left: number;
+            top: number;
+        }> = children.map((child) => {
+            const left: number = lastRight;
+            const { width, height } = child.getSize();
+            lastRight += width + spacing;
+            maxHeight = Math.max(maxHeight, height);
+            return { child, left, top: 0 };
+        });
+        super(lastRight, maxHeight, childrenWithLayout);
     }
 
-    toBuffer(): Promise<Buffer> {
-        throw new Error("Method not implemented.");
+    public toBuffer(): Promise<Buffer> {
+        const { width, height }: { width: number; height: number } =
+            this.getSize();
+        return sharp({
+            create: {
+                width,
+                height,
+                channels: 4,
+                background: { r: 0, g: 0, b: 0, alpha: 1 },
+            },
+        }).toBuffer();
     }
 }
