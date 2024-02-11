@@ -39,7 +39,7 @@ export class ImageCell extends AbstractCell {
             const image = sharp(this._imageFile);
             image.metadata().then((metadata: Metadata) => {
                 if (metadata.width === width && metadata.height === height) {
-                    resolve(image.toBuffer());
+                    resolve(image.png().toBuffer());
                 } else {
                     reject(
                         `size mimatch (observed ${metadata.width}x${metadata.height}, expected ${width}x${height})`

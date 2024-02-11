@@ -1,4 +1,3 @@
-import sharp from "sharp";
 import { AbstractCell } from "../abstract-cell/abstract-cell";
 
 export class RowCell extends AbstractCell {
@@ -20,39 +19,6 @@ export class RowCell extends AbstractCell {
     }
 
     public toBuffer(): Promise<Buffer> {
-        const { width, height }: { width: number; height: number } =
-            this.getSize();
-
-        const image = sharp({
-            create: {
-                width,
-                height,
-                channels: 4,
-                background: { r: 0, g: 0, b: 0, alpha: 0 },
-            },
-        });
-
-        const children: Array<AbstractCell> = this.getChildren();
-        const promises: Array<Promise<Buffer>> = children.map((child) =>
-            child.toBuffer()
-        );
-        return new Promise<Buffer>((resolve) => {
-            Promise.all(promises).then((buffers: Array<Buffer>) => {
-                const composite: Array<{
-                    input: Buffer;
-                    left: number;
-                    top: number;
-                }> = [];
-                buffers.map((buffer, index) => {
-                    const child: AbstractCell | undefined = children[index];
-                    if (child) {
-                        const { left, top } = child.getLocalPosition();
-                        composite.push({ input: buffer, left, top });
-                    }
-                });
-                image.composite(composite);
-                resolve(image.toBuffer());
-            });
-        });
+        return this._renderChildren();
     }
 }
