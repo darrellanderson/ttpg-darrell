@@ -1,5 +1,17 @@
 import sharp from "sharp";
 
+export type CellSize = {
+    width: number;
+    height: number;
+};
+
+export type CellPosition = {
+    left: number;
+    top: number;
+};
+
+export type CellChild = { child: AbstractCell; left: number; top: number };
+
 export abstract class AbstractCell {
     private readonly _width: number;
     private readonly _height: number;
@@ -15,11 +27,7 @@ export abstract class AbstractCell {
      *
      * @param children
      */
-    constructor(
-        width: number,
-        height: number,
-        children?: Array<{ child: AbstractCell; left: number; top: number }>
-    ) {
+    constructor(width: number, height: number, children?: Array<CellChild>) {
         if (width < 0 || height < 0) {
             throw new Error("negative size");
         }
@@ -38,15 +46,15 @@ export abstract class AbstractCell {
         }
     }
 
-    public getChildren(): AbstractCell[] {
+    public getChildren(): Array<AbstractCell> {
         return this._children ? [...this._children] : [];
     }
 
-    public getLocalPosition(): { left: number; top: number } {
+    public getLocalPosition(): CellPosition {
         return { left: this._localPosition.left, top: this._localPosition.top };
     }
 
-    public getGlobalPosition(): { left: number; top: number } {
+    public getGlobalPosition(): CellPosition {
         let left: number = this._localPosition.left;
         let top: number = this._localPosition.top;
         if (this._parent) {
@@ -57,7 +65,7 @@ export abstract class AbstractCell {
         return { left, top };
     }
 
-    public getSize(): { width: number; height: number } {
+    public getSize(): CellSize {
         return { width: this._width, height: this._height };
     }
 
@@ -69,8 +77,7 @@ export abstract class AbstractCell {
      * @returns
      */
     protected _renderChildren(): Promise<Buffer> {
-        const { width, height }: { width: number; height: number } =
-            this.getSize();
+        const { width, height }: CellSize = this.getSize();
 
         const image = sharp({
             create: {
