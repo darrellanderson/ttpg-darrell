@@ -46,6 +46,26 @@ export abstract class AbstractCell {
         }
     }
 
+    public getCenterUV(): { u: number; v: number } {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        let root: AbstractCell = this;
+        while (root._parent) {
+            root = root._parent;
+        }
+        const rootSize: { width: number; height: number } = root.getSize();
+
+        const thisPos: { left: number; top: number } = this.getGlobalPosition();
+        const thisSize: { width: number; height: number } = this.getSize();
+        const thisCenterPos: { left: number; top: number } = {
+            left: thisPos.left + thisSize.width / 2,
+            top: thisPos.top + thisSize.height / 2,
+        };
+        return {
+            u: thisCenterPos.left / rootSize.width,
+            v: thisCenterPos.top / rootSize.height,
+        };
+    }
+
     public getChildren(): Array<AbstractCell> {
         return this._children ? [...this._children] : [];
     }

@@ -54,3 +54,16 @@ it("child already has a parent", () => {
         new MyCell(1, 1, [{ child, left: 0, top: 0 }]);
     }).toThrow();
 });
+
+it("getCenterUV", () => {
+    const child1 = new MyCell(1, 1);
+    const child2 = new MyCell(1, 1);
+    new MyCell(2, 1, [
+        { child: child1, left: 0, top: 0 },
+        { child: child2, left: 1, top: 0 },
+    ]);
+    let uv = child1.getCenterUV();
+    expect(uv).toEqual({ u: 0.25, v: 0.5 });
+    uv = child2.getCenterUV();
+    expect(uv).toEqual({ u: 0.75, v: 0.5 });
+});
