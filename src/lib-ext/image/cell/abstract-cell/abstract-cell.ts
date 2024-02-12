@@ -10,6 +10,11 @@ export type CellPosition = {
     top: number;
 };
 
+export type UVPosition = {
+    u: number;
+    v: number;
+};
+
 export type CellChild = { child: AbstractCell; left: number; top: number };
 
 export abstract class AbstractCell {
@@ -19,6 +24,15 @@ export abstract class AbstractCell {
     private _parent: AbstractCell | undefined;
     private _localPosition = { left: 0, top: 0 };
 
+    static getMaxSize(cells: Array<AbstractCell>): CellSize {
+        const maxSize: CellSize = { width: 0, height: 0 };
+        for (const cell of cells) {
+            const size: { width: number; height: number } = cell.getSize();
+            maxSize.width = Math.max(maxSize.width, size.width);
+            maxSize.height = Math.max(maxSize.height, size.height);
+        }
+        return maxSize;
+    }
     /**
      * Constructor.
      *
@@ -46,17 +60,17 @@ export abstract class AbstractCell {
         }
     }
 
-    public getCenterUV(): { u: number; v: number } {
+    public getCenterUV(): UVPosition {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         let root: AbstractCell = this;
         while (root._parent) {
             root = root._parent;
         }
-        const rootSize: { width: number; height: number } = root.getSize();
+        const rootSize: CellSize = root.getSize();
 
-        const thisPos: { left: number; top: number } = this.getGlobalPosition();
-        const thisSize: { width: number; height: number } = this.getSize();
-        const thisCenterPos: { left: number; top: number } = {
+        const thisPos: CellPosition = this.getGlobalPosition();
+        const thisSize: CellSize = this.getSize();
+        const thisCenterPos: CellPosition = {
             left: thisPos.left + thisSize.width / 2,
             top: thisPos.top + thisSize.height / 2,
         };

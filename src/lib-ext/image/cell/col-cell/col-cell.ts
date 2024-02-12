@@ -1,23 +1,21 @@
-import { AbstractCell } from "../abstract-cell/abstract-cell";
+import { AbstractCell, CellChild } from "../abstract-cell/abstract-cell";
 
 export class ColCell extends AbstractCell {
     constructor(children: Array<AbstractCell>, spacing: number = 0) {
         let lastTop: number = 0;
         let maxWidth: number = 0;
-        const childrenWithLayout: Array<{
-            child: AbstractCell;
-            left: number;
-            top: number;
-        }> = children.map((child, index) => {
-            if (index > 0) {
-                lastTop += spacing;
+        const childrenWithLayout: Array<CellChild> = children.map(
+            (child, index) => {
+                if (index > 0) {
+                    lastTop += spacing;
+                }
+                const top: number = lastTop;
+                const { width, height } = child.getSize();
+                lastTop += height;
+                maxWidth = Math.max(maxWidth, width);
+                return { child, left: 0, top };
             }
-            const top: number = lastTop;
-            const { width, height } = child.getSize();
-            lastTop += height;
-            maxWidth = Math.max(maxWidth, width);
-            return { child, left: 0, top };
-        });
+        );
         super(maxWidth, lastTop, childrenWithLayout);
     }
 

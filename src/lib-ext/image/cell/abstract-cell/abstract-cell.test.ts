@@ -1,10 +1,18 @@
-import { AbstractCell } from "./abstract-cell";
+import { AbstractCell, CellSize, UVPosition } from "./abstract-cell";
 
 class MyCell extends AbstractCell {
     public toBuffer(): Promise<Buffer> {
         throw new Error("Method not implemented.");
     }
 }
+
+it("static getMaxSize", () => {
+    const maxSize: CellSize = AbstractCell.getMaxSize([
+        new MyCell(1, 2),
+        new MyCell(2, 1),
+    ]);
+    expect(maxSize).toEqual({ width: 2, height: 2 });
+});
 
 it("constructor/getSize", () => {
     const size: { width: number; height: number } = new MyCell(1, 2).getSize();
@@ -62,7 +70,8 @@ it("getCenterUV", () => {
         { child: child1, left: 0, top: 0 },
         { child: child2, left: 1, top: 0 },
     ]);
-    let uv = child1.getCenterUV();
+    let uv: UVPosition;
+    uv = child1.getCenterUV();
     expect(uv).toEqual({ u: 0.25, v: 0.5 });
     uv = child2.getCenterUV();
     expect(uv).toEqual({ u: 0.75, v: 0.5 });
