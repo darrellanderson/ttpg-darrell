@@ -20,7 +20,6 @@ export class SolidCell extends AbstractCell {
         const g = Number.parseInt(color.substring(2, 4), 16); // 255;
         const b = Number.parseInt(color.substring(4, 6), 16); // 255;
         this._backgroundColor = { r, g, b };
-        console.log(`XXX ${color} ${JSON.stringify(this._backgroundColor)}`);
     }
 
     public toBuffer(): Promise<Buffer> {
