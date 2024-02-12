@@ -53,3 +53,36 @@ it("verify size", async () => {
     expect(metadata.width).toEqual(WIDTH);
     expect(metadata.height).toEqual(HEIGHT);
 });
+
+it("setters", () => {
+    new ImageCell(WIDTH, HEIGHT, FILE)
+        .setAlpha(0.5)
+        .setGrayscale(true)
+        .setTint("#ff0000");
+});
+
+it("invalid alpha", () => {
+    const imageCell = new ImageCell(WIDTH, HEIGHT, FILE);
+    expect(() => {
+        imageCell.setAlpha(-1);
+    }).toThrow();
+    expect(() => {
+        imageCell.setAlpha(2);
+    }).toThrow();
+});
+
+it("invalid tint", () => {
+    const imageCell = new ImageCell(WIDTH, HEIGHT, FILE);
+    expect(() => {
+        imageCell.setTint("ff0000"); // missing #
+    }).toThrow();
+});
+
+it("toBuffer (alpha, grayscale, tint)", async () => {
+    const promise: Promise<Buffer> = new ImageCell(WIDTH, HEIGHT, FILE)
+        .setAlpha(0.9)
+        .setGrayscale(true)
+        .setTint("#ff0000")
+        .toBuffer();
+    await promise;
+});
