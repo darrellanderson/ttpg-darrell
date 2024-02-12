@@ -3,7 +3,7 @@ import { GridCell } from "./grid-cell";
 
 class MyCell extends AbstractCell {
     public toBuffer(): Promise<Buffer> {
-        return new Promise<Buffer>((resolve) => {
+        return new Promise<Buffer>(() => {
             return Buffer.from("");
         });
     }
