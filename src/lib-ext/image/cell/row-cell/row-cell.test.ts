@@ -8,11 +8,10 @@ class MyCell extends AbstractCell {
     }
 }
 
-it("constructor, getSize", () => {
-    const cellSize: { width: number; height: number } = new RowCell(
-        []
-    ).getSize();
-    expect(cellSize).toEqual({ width: 0, height: 0 });
+it("constructor, empty", () => {
+    expect(() => {
+        new RowCell([]);
+    }).toThrow();
 });
 
 it("getSize (with cells)", () => {

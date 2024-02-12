@@ -17,6 +17,13 @@ export type UVPosition = {
 
 export type CellChild = { child: AbstractCell; left: number; top: number };
 
+/**
+ * Create images from one or more cells.
+ *
+ * Fix size in the constructor, do not resize cells afterward!
+ *
+ * Cells may not be shared, they can have one one parent.
+ */
 export abstract class AbstractCell {
     private readonly _width: number;
     private readonly _height: number;
@@ -24,6 +31,12 @@ export abstract class AbstractCell {
     private _parent: AbstractCell | undefined;
     private _localPosition = { left: 0, top: 0 };
 
+    /**
+     * Calculate the max width and height of cells.
+     *
+     * @param cells
+     * @returns
+     */
     static getMaxSize(cells: Array<AbstractCell>): CellSize {
         const maxSize: CellSize = { width: 0, height: 0 };
         for (const cell of cells) {
@@ -42,7 +55,7 @@ export abstract class AbstractCell {
      * @param children
      */
     constructor(width: number, height: number, children?: Array<CellChild>) {
-        if (width < 0 || height < 0) {
+        if (width <= 0 || height <= 0) {
             throw new Error("negative size");
         }
         this._width = width;
@@ -60,6 +73,12 @@ export abstract class AbstractCell {
         }
     }
 
+    /**
+     * Get the UV [0:1] coordinates of the center of this cell
+     * with respect to the root cell size.
+     *
+     * @returns
+     */
     public getCenterUV(): UVPosition {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         let root: AbstractCell = this;
@@ -80,14 +99,30 @@ export abstract class AbstractCell {
         };
     }
 
+    /**
+     * Get children.
+     *
+     * @returns
+     */
     public getChildren(): Array<AbstractCell> {
         return this._children ? [...this._children] : [];
     }
 
+    /**
+     * Get position relative to the direct parent cell.
+     *
+     * @returns
+     */
     public getLocalPosition(): CellPosition {
         return { left: this._localPosition.left, top: this._localPosition.top };
     }
 
+    /**
+     * Get position relative to the root cell, potentially several
+     * cells outward.
+     *
+     * @returns
+     */
     public getGlobalPosition(): CellPosition {
         let left: number = this._localPosition.left;
         let top: number = this._localPosition.top;
@@ -99,10 +134,18 @@ export abstract class AbstractCell {
         return { left, top };
     }
 
+    /**
+     * Get (immutable) cell size.
+     *
+     * @returns
+     */
     public getSize(): CellSize {
         return { width: this._width, height: this._height };
     }
 
+    /**
+     * Render cell to a PNG image.
+     */
     public abstract toBuffer(): Promise<Buffer>;
 
     /**

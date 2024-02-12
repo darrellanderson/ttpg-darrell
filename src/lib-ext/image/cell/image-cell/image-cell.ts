@@ -4,7 +4,6 @@ import { AbstractCell } from "../abstract-cell/abstract-cell";
 
 /**
  * Load an image from a file.
- * Require the image size at construtor time for synchronous use.
  */
 export class ImageCell extends AbstractCell {
     private readonly _imageFile: string | undefined;

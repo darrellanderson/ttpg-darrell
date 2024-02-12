@@ -4,6 +4,9 @@ import {
     CellSize,
 } from "../abstract-cell/abstract-cell";
 
+/**
+ * Layout cells in a grid (potentially for cardsheets).
+ */
 export class GridCell extends AbstractCell {
     static readonly MAX_DIMENSION = 4096;
 
@@ -29,8 +32,16 @@ export class GridCell extends AbstractCell {
         let optLayout: { cols: number; rows: number } = { cols: -1, rows: -1 };
         let optEfficiency = 0;
 
-        for (let cols = 1; cols < cellCount; cols++) {
+        const maxCols: number = Math.floor(this.MAX_DIMENSION / cellSize.width);
+        const maxRows: number = Math.floor(
+            this.MAX_DIMENSION / cellSize.height
+        );
+
+        for (let cols = 1; cols <= maxCols; cols++) {
             const rows = Math.ceil(cellCount / cols);
+            if (rows > maxRows) {
+                continue;
+            }
             const w: number = cols * cellSize.width;
             const h: number = rows * cellSize.height;
             const pow2w: number = Math.pow(2, Math.ceil(Math.log2(w)));
@@ -49,6 +60,9 @@ export class GridCell extends AbstractCell {
         numCols: number,
         spacing: number = 0
     ) {
+        if (cells.length === 0) {
+            throw new Error("no cells");
+        }
         if (numCols <= 0) {
             throw new Error(`invalid column count "${numCols}"`);
         }

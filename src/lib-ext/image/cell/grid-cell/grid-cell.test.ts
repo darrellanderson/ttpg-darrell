@@ -1,10 +1,11 @@
-import { Widget } from "@tabletop-playground/api";
 import { AbstractCell, CellSize } from "../abstract-cell/abstract-cell";
 import { GridCell } from "./grid-cell";
 
 class MyCell extends AbstractCell {
     public toBuffer(): Promise<Buffer> {
-        throw new Error("Method not implemented.");
+        return new Promise<Buffer>((resolve) => {
+            return Buffer.from("");
+        });
     }
 }
 
@@ -19,28 +20,35 @@ it("static getOptimalLayout", () => {
     let cellSize: CellSize;
     let optLayout: { cols: number; rows: number };
 
-    cellCount = 4;
-    cellSize = { width: 250, height: 200 };
+    cellCount = 10;
+    cellSize = { width: 500, height: 750 };
     optLayout = GridCell.getOptimalLayout(cellCount, cellSize);
-    expect(optLayout).toEqual({ cols: 1, rows: 4 });
+    expect(optLayout).toEqual({ cols: 2, rows: 5 });
 
     cellCount = 21; // only 20 fit in a single column
+    cellSize = { width: 500, height: 750 };
     optLayout = GridCell.getOptimalLayout(cellCount, cellSize);
-    expect(optLayout).toEqual({ cols: 16, rows: 2 });
+    expect(optLayout).toEqual({ cols: 5, rows: 5 });
 
-    cellCount = 4;
-    cellSize = { width: 200, height: 250 };
+    cellCount = 10;
+    cellSize = { width: 750, height: 500 };
     optLayout = GridCell.getOptimalLayout(cellCount, cellSize);
-    expect(optLayout).toEqual({ cols: 4, rows: 1 });
+    expect(optLayout).toEqual({ cols: 5, rows: 2 });
 });
 
 it("constructor", () => {
-    new GridCell([], 3);
+    new GridCell([new MyCell(1, 1)], 3);
+});
+
+it("constructor (invalid cell count)", () => {
+    expect(() => {
+        new GridCell([], -3);
+    }).toThrow();
 });
 
 it("constructor (invalid column count)", () => {
     expect(() => {
-        new GridCell([], -3);
+        new GridCell([new MyCell(1, 1)], -3);
     }).toThrow();
 });
 
@@ -51,7 +59,7 @@ it("constructor (exceed max size)", () => {
 });
 
 it("toBuffer", () => {
-    new GridCell([], 1).toBuffer();
+    new GridCell([new MyCell(1, 1)], 1).toBuffer();
 });
 
 it("layout", () => {

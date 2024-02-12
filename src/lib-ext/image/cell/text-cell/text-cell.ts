@@ -1,6 +1,11 @@
 import sharp from "sharp";
 import { AbstractCell } from "../abstract-cell/abstract-cell";
 
+/**
+ * Center text in a cell.
+ *
+ * Supports custom fonts, which must be installed on the system.
+ */
 export class TextCell extends AbstractCell {
     private readonly _text: string;
     private _font: string = "Futura";
