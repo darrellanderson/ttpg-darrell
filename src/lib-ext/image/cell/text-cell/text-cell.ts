@@ -68,6 +68,6 @@ export class TextCell extends AbstractCell {
                 </text>
             </svg>`;
         const svgBuffer: Buffer = Buffer.from(svgText);
-        return sharp(svgBuffer).png().toBuffer();
+        return sharp(svgBuffer).toBuffer();
     }
 }

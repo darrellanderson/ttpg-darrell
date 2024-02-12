@@ -12,7 +12,7 @@ async function main() {
         20
     );
     const buffer = await rowCell.toBuffer();
-    sharp(buffer).png().toFile("test.png");
+    sharp(buffer).toFile("test.png");
 }
 
 main();
