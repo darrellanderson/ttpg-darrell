@@ -19,8 +19,73 @@ export class BleedCell extends AbstractCell {
         this._bleedSize = bleedSize;
     }
 
-    public toBuffer(): Promise<Buffer> {
+    private _extractAndStretch(
+        edge: "left" | "right" | "top" | "bottom"
+    ): Promise<Buffer> {
         const innerSize: CellSize = this._innerCell.getSize();
+
+        let left: number = 0;
+        let top: number = 0;
+        let srcWidth: number = 0;
+        let srcHeight: number = 0;
+        let dstWidth: number = 0;
+        let dstHeight: number = 0;
+
+        if (edge === "left" || edge === "top") {
+            left = 0;
+            top = 0;
+        } else if (edge === "right") {
+            left = innerSize.width - 1;
+            top = 0;
+        } else if (edge === "bottom") {
+            left = 0;
+            top = innerSize.height - 1;
+        } else {
+            throw new Error(`unknown edge "${edge}"`);
+        }
+
+        if (edge === "left" || edge === "right") {
+            srcWidth = 1;
+            srcHeight = innerSize.height;
+            dstWidth = this._bleedSize;
+            dstHeight = innerSize.height;
+        } else if (edge === "top" || edge === "bottom") {
+            srcWidth = innerSize.width;
+            srcHeight = 1;
+            dstWidth = innerSize.width;
+            dstHeight = this._bleedSize;
+        } else {
+            throw new Error(`unknown edge "${edge}"`);
+        }
+
+        return new Promise<Buffer>((resolve): void => {
+            this._innerCell.toBuffer().then((buffer: Buffer): void => {
+                sharp(buffer)
+                    .extract({
+                        left,
+                        top,
+                        width: srcWidth,
+                        height: srcHeight,
+                    })
+                    .png()
+                    .toBuffer()
+                    .then((buffer: Buffer): void => {
+                        sharp(buffer)
+                            .resize(dstWidth, dstHeight, {
+                                fit: "fill",
+                                kernel: "nearest",
+                            })
+                            .png()
+                            .toBuffer()
+                            .then((buffer: Buffer) => {
+                                resolve(buffer);
+                            });
+                    });
+            });
+        });
+    }
+
+    public toBuffer(): Promise<Buffer> {
         const { width, height }: CellSize = this.getSize();
         const image = sharp({
             create: {
@@ -31,101 +96,50 @@ export class BleedCell extends AbstractCell {
             },
         });
 
-        return new Promise<Buffer>((resolve) => {
-            this._innerCell.toBuffer().then((buffer: Buffer) => {
-                const inner = sharp(buffer);
+        const inner: Promise<Buffer> = this._innerCell.toBuffer();
+        const left: Promise<Buffer> = this._extractAndStretch("left");
+        const right: Promise<Buffer> = this._extractAndStretch("right");
+        const top: Promise<Buffer> = this._extractAndStretch("top");
+        const bottom: Promise<Buffer> = this._extractAndStretch("bottom");
 
-                // XXXX
-                console.log(
-                    JSON.stringify({
-                        left: 0,
-                        top: 0,
-                        width: 1,
-                        height: innerSize.height,
-                    })
-                );
-                console.log(
-                    JSON.stringify({
-                        left: innerSize.width - 1,
-                        top: 0,
-                        width: 1,
-                        height: innerSize.height,
-                    })
-                );
-                console.log(
-                    JSON.stringify({
-                        left: 0,
-                        top: 0,
-                        width: innerSize.width,
-                        height: 1,
-                    })
-                );
-                console.log(
-                    JSON.stringify({
-                        left: 0,
-                        top: innerSize.height - 1,
-                        width: innerSize.width,
-                        height: 1,
-                    })
-                );
-                const left = inner
-                    .extract({
-                        left: 0,
-                        top: 0,
-                        width: 1,
-                        height: innerSize.height,
-                    })
-                    .resize(this._bleedSize, innerSize.height, { fit: "fill" })
-                    .toBuffer();
-                const right = inner
-                    .extract({
-                        left: innerSize.width - 1,
-                        top: 0,
-                        width: 1,
-                        height: innerSize.height,
-                    })
-                    .resize(this._bleedSize, innerSize.height, { fit: "fill" })
-                    .toBuffer();
-                const top = inner
-                    .extract({
-                        left: 0,
-                        top: 0,
-                        width: innerSize.width,
-                        height: 1,
-                    })
-                    .resize(innerSize.width, this._bleedSize, { fit: "fill" })
-                    .toBuffer();
-                const bottom = inner
-                    .extract({
-                        left: 0,
-                        top: innerSize.height - 1,
-                        width: innerSize.width,
-                        height: 1,
-                    })
-                    .resize(innerSize.width, this._bleedSize, { fit: "fill" })
-                    .toBuffer();
-                console.log("__3");
-                Promise.all([left, right, top, bottom]).then(
-                    ([left, right, top, bottom]) => {
-                        console.log("__4");
-                        image.composite([
-                            { left: 0, top: this._bleedSize, input: left },
+        return new Promise<Buffer>((resolve): void => {
+            Promise.all([inner, left, right, top, bottom]).then(
+                ([inner, left, right, top, bottom]): void => {
+                    image
+                        .composite([
                             {
-                                left: innerSize.width + this._bleedSize,
+                                left: 0,
+                                top: this._bleedSize,
+                                input: left,
+                            },
+                            {
+                                left: width - this._bleedSize,
                                 top: this._bleedSize,
                                 input: right,
                             },
-                            { left: this._bleedSize, top: 0, input: top },
                             {
                                 left: this._bleedSize,
-                                top: innerSize.height + this._bleedSize,
+                                top: 0,
+                                input: top,
+                            },
+                            {
+                                left: this._bleedSize,
+                                top: height - this._bleedSize,
                                 input: bottom,
                             },
-                        ]);
-                        resolve(image.png().toBuffer());
-                    }
-                );
-            });
+                            {
+                                left: this._bleedSize,
+                                top: this._bleedSize,
+                                input: inner,
+                            },
+                        ])
+                        .png()
+                        .toBuffer()
+                        .then((buffer: Buffer): void => {
+                            resolve(buffer);
+                        });
+                }
+            );
         });
     }
 }
