@@ -38,8 +38,7 @@ it("verify size", async () => {
 
 it("setters", () => {
     new TextCell(WIDTH, HEIGHT, TEXT)
-        .setFgColor("black")
-        .setBgColor("white")
+        .setTextColor("black")
         .setFont("my-font")
         .setFontSize(19)
         .setFontStyle("my-style");

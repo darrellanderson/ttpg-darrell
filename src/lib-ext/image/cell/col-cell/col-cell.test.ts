@@ -4,7 +4,7 @@ import { TextCell } from "../text-cell/text-cell";
 
 class MyCell extends AbstractCell {
     public toBuffer(): Promise<Buffer> {
-        throw new Error("Method not implemented.");
+        return this._renderChildren();
     }
 }
 

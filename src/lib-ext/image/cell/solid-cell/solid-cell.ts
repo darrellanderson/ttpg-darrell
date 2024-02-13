@@ -31,6 +31,8 @@ export class SolidCell extends AbstractCell {
                 channels: 4,
                 background: this._backgroundColor,
             },
-        }).toBuffer();
+        })
+            .png()
+            .toBuffer();
     }
 }

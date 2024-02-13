@@ -11,21 +11,15 @@ export class TextCell extends AbstractCell {
     private _font: string = "Futura";
     private _fontStyle: string = "Regular";
     private _fontSize: number = 16;
-    private _bgColor: string = "transparent";
-    private _fgColor: string = "#000000";
+    private _textColor: string = "#000000";
 
     constructor(width: number, height: number, text: string) {
         super(width, height);
         this._text = text;
     }
 
-    public setBgColor(color: string) {
-        this._bgColor = color;
-        return this;
-    }
-
-    public setFgColor(color: string) {
-        this._fgColor = color;
+    public setTextColor(color: string) {
+        this._textColor = color;
         return this;
     }
 
@@ -54,12 +48,11 @@ export class TextCell extends AbstractCell {
                 height="${height}"
                 width="${width}"
             >
-                <rect width="100%" height="100%" fill="${this._bgColor}" /> 
                 <text
                     text-anchor="middle"
                     x="50%" y="50%"
                     dy="${dy}"
-                    fill="${this._fgColor}"
+                    fill="${this._textColor}"
                     font-size="${this._fontSize}"
                     font-family="${this._font}"
                     font-style="${this._fontStyle}"
@@ -68,6 +61,6 @@ export class TextCell extends AbstractCell {
                 </text>
             </svg>`;
         const svgBuffer: Buffer = Buffer.from(svgText);
-        return sharp(svgBuffer).toBuffer();
+        return sharp(svgBuffer).png().toBuffer();
     }
 }

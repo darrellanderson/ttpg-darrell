@@ -144,7 +144,7 @@ export abstract class AbstractCell {
     }
 
     /**
-     * Render cell to image.
+     * Render cell to PNG image.
      */
     public abstract toBuffer(): Promise<Buffer>;
 
@@ -184,7 +184,7 @@ export abstract class AbstractCell {
                     }
                 });
                 image.composite(composite);
-                resolve(image.toBuffer());
+                resolve(image.png().toBuffer());
             });
         });
     }

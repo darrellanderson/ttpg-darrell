@@ -71,7 +71,7 @@ export class ImageCell extends AbstractCell {
                     if (this._tint !== "#ffffff") {
                         image = image.tint(this._tint);
                     }
-                    resolve(image.toBuffer());
+                    resolve(image.png().toBuffer());
                 } else {
                     reject(
                         `size mimatch (observed ${metadata.width}x${metadata.height}, expected ${width}x${height})`
