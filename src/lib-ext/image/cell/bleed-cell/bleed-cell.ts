@@ -67,19 +67,14 @@ export class BleedCell extends AbstractCell {
                         width: srcWidth,
                         height: srcHeight,
                     })
+                    .resize(dstWidth, dstHeight, {
+                        fit: "fill",
+                        kernel: "nearest",
+                    })
                     .png()
                     .toBuffer()
                     .then((buffer: Buffer): void => {
-                        sharp(buffer)
-                            .resize(dstWidth, dstHeight, {
-                                fit: "fill",
-                                kernel: "nearest",
-                            })
-                            .png()
-                            .toBuffer()
-                            .then((buffer: Buffer) => {
-                                resolve(buffer);
-                            });
+                        resolve(buffer);
                     });
             });
         });
