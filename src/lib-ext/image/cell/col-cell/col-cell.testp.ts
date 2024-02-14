@@ -5,9 +5,9 @@ import { TextCell } from "../text-cell/text-cell";
 async function main() {
     const rowCell = new ColCell(
         [
-            new TextCell(20, 20, "1").setBgColor("white"),
-            new TextCell(20, 20, "2").setBgColor("white"),
-            new TextCell(20, 20, "3").setBgColor("white"),
+            new TextCell(20, 20, "1"),
+            new TextCell(20, 20, "2"),
+            new TextCell(20, 20, "3"),
         ],
         20
     );
