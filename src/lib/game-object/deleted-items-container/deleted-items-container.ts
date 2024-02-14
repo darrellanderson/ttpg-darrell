@@ -103,6 +103,9 @@ export class DeletedItemsContainer {
         }
 
         const json: string = obj.toJSONString();
+        if (json.length === 0) {
+            return; // apparently can happen if deleted by script?
+        }
         const clone: GameObject | undefined = world.createObjectFromJSON(
             json,
             [0, 0, 0]
