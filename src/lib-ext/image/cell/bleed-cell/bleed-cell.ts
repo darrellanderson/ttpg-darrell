@@ -40,8 +40,6 @@ export class BleedCell extends AbstractCell {
         } else if (edge === "bottom") {
             left = 0;
             top = innerSize.height - 1;
-        } else {
-            throw new Error(`unknown edge "${edge}"`);
         }
 
         if (edge === "left" || edge === "right") {
@@ -54,8 +52,6 @@ export class BleedCell extends AbstractCell {
             srcHeight = 1;
             dstWidth = innerSize.width;
             dstHeight = this._bleedSize;
-        } else {
-            throw new Error(`unknown edge "${edge}"`);
         }
 
         return new Promise<Buffer>((resolve): void => {

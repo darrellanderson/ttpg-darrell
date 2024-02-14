@@ -5,6 +5,12 @@ it("constructor", () => {
     new ImageSplit(Buffer.from(""), 1);
 });
 
+it("constructor (invalid size)", () => {
+    expect(() => {
+        new ImageSplit(Buffer.from(""), 0);
+    }).toThrow();
+});
+
 it("split", async () => {
     let pixelArray: Uint8ClampedArray;
 

@@ -1,13 +1,24 @@
 export class CubeModel {
-    static toModel(width: number, height:number) {}
+    getInsetForUVs(
         width: number,
         height: number
-    ): string {
-        //
-        return { width, height };
+    ): {
+        left: number;
+        top: number;
+        width: number;
+        height: number;
+    } {
+        const left: number = Math.round(width / 256);
+        const top: number = Math.round(height / 256);
+        return {
+            left,
+            top,
+            width: width - left * 2, // consistent gutter sizes
+            height: height - top * 2,
+        };
     }
 
-    oldtoModel(): string {
+    toModel(): string {
         return `v 0.5 0.5 0.5
         v 0.5 0.5 -0.5
         v -0.5 0.5 -0.5
@@ -17,11 +28,11 @@ export class CubeModel {
         v -0.5 -0.5 -0.5
         v -0.5 -0.5 0.5
         
-        # Use 1/128 bleed gutters
-        vt 0.0078125 0.0078125
-        vt 0.9921875 0.0078125
-        vt 0.9921875 0.9921875
-        vt 0.0078125 0.9921875
+        # Use 1/256 bleed gutters
+        vt 0.00390625 0.00390625
+        vt 0.99609375 0.00390625
+        vt 0.99609375 0.99609375
+        vt 0.00390625 0.99609375
         
         vn 0 1 0
         vn 1 0 0
