@@ -1,7 +1,7 @@
 import { GameObject, Player } from "@tabletop-playground/api";
 import { MockCard, MockCardDetails, MockPlayer, mockWorld } from "ttpg-mock";
 import { AbstractRightClickCard } from "./abstract-right-click-card";
-import { OnCardBecameSingletonOrDeck } from "../event/on-card-became-singleton-or-deck";
+import { OnCardBecameSingletonOrDeck } from "../../event/on-card-became-singleton-or-deck";
 
 it("constructor", () => {
     class MyClass extends AbstractRightClickCard {}

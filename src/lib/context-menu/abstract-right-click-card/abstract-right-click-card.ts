@@ -1,7 +1,7 @@
 import { GameObject, Player, Card } from "@tabletop-playground/api";
-import { OnCardBecameSingletonOrDeck } from "../event/on-card-became-singleton-or-deck";
-import { IGlobal } from "../global/i-global";
-import { NSID } from "../nsid/nsid";
+import { OnCardBecameSingletonOrDeck } from "../../event/on-card-became-singleton-or-deck";
+import { IGlobal } from "../../global/i-global";
+import { NSID } from "../../nsid/nsid";
 
 /**
  * Add a context menu item ONLY when the singleton card exists.
