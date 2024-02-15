@@ -57,7 +57,7 @@ export const CUBE_TEMPLATE = {
     Models: ["$REPLACE THIS"],
     Collision: [
         {
-            Model: "utility/unit-cube.obj",
+            Model: "$COLLISION MODEL HERE",
             Offset: {
                 X: 0,
                 Y: 0,

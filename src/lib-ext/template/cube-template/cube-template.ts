@@ -24,8 +24,9 @@ export type CubeTemplateBoundingBox = {
 
 export class CubeTemplate {
     private readonly _entries: Array<CubeTemplateEntry> = [];
-    private _name: string = "";
+    private _collider: string | undefined;
     private _guidFrom: string = "";
+    private _name: string = "";
 
     static getBoundingBox(
         entries: Array<CubeTemplateEntry>
@@ -52,8 +53,8 @@ export class CubeTemplate {
         return this;
     }
 
-    setName(name: string): this {
-        this._name = name;
+    setCollider(model: string): this {
+        this._collider = model;
         return this;
     }
 
@@ -69,6 +70,17 @@ export class CubeTemplate {
         return this;
     }
 
+    /**
+     * Template name appears in the object library.
+     *
+     * @param name
+     * @returns
+     */
+    setName(name: string): this {
+        this._name = name;
+        return this;
+    }
+
     toTemplate(): string {
         if (this._entries.length === 0) {
             throw new Error("must addEntry");
@@ -76,11 +88,20 @@ export class CubeTemplate {
         if (this._guidFrom === "") {
             throw new Error("must setGuidFrom");
         }
+        const bb = CubeTemplate.getBoundingBox(this._entries);
 
         const modelEntries: Array<object> = this._entries.map((entry) => {
             const modelEntry = JSON.parse(JSON.stringify(CUBE_SUB_TEMPLATE));
             modelEntry.Model = entry.model;
             modelEntry.Texture = entry.texture;
+            modelEntry.Offset.y =
+                -(bb.left / 2) + (entry.left ?? 0) + entry.width / 2;
+            modelEntry.Offset.x =
+                -(bb.top / 2) + (entry.top ?? 0) + entry.height / 2;
+            modelEntry.Offset.z = 0;
+            modelEntry.Scale.x = entry.width;
+            modelEntry.Scale.y = entry.height;
+            modelEntry.Scale.z = entry.depth;
             return modelEntry;
         });
 
@@ -95,6 +116,15 @@ export class CubeTemplate {
         template.GUID = guid;
         template.Name = this._name;
         template.Models = modelEntries;
+
+        if (this._collider) {
+            template.Collision[0].Model = this._collider;
+            template.Collision[0].x = bb.top - bb.bottom;
+            template.Collision[0].y = bb.right - bb.left;
+            template.Collision[0].z = bb.maxDepth;
+        } else {
+            delete template.Collision;
+        }
 
         return JSON.stringify(template);
     }

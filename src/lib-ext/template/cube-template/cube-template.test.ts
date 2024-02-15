@@ -65,7 +65,7 @@ it("toTemplate (no guid)", () => {
 });
 
 it("toTemplate", () => {
-    new CubeTemplate()
+    const template: string = new CubeTemplate()
         .addEntry({
             texture: "my-texture",
             model: "my-model",
@@ -75,4 +75,24 @@ it("toTemplate", () => {
         })
         .setGuidFrom("foo")
         .toTemplate();
+    if (template.includes("$")) {
+        throw new Error(template);
+    }
+});
+
+it("toTemplate (collider)", () => {
+    const template: string = new CubeTemplate()
+        .addEntry({
+            texture: "my-texture",
+            model: "my-model",
+            width: 1,
+            height: 1,
+            depth: 1,
+        })
+        .setCollider("my-collider")
+        .setGuidFrom("foo")
+        .toTemplate();
+    if (template.includes("$")) {
+        throw new Error(template);
+    }
 });
