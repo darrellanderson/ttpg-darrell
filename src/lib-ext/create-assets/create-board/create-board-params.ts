@@ -2,6 +2,9 @@ import { z } from "zod";
 
 export const CreateBoardParamsSchema = z
     .object({
+        // Directory containing 'assets', src file.
+        rootDir: z.string().min(1).optional(),
+
         // Relative to "assets/X/", without extension.
         assetFilename: z.string().min(1),
 

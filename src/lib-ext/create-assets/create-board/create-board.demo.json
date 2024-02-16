@@ -1,0 +1,15 @@
+{
+    "rootDir": "/tmp/create-board-demo",
+    "assetFilename": "output",
+    "preshrink": {
+        "width": 1,
+        "height": 1
+    },
+    "srcImage": "prebuild/input.jpg",
+    "templateName": "demo",
+    "topDownWorldSize": {
+        "width": 1,
+        "height": 1,
+        "depth": 0.25
+    }
+}

@@ -16,12 +16,6 @@ const args = yargs
             type: "string",
             demand: true,
         },
-        o: {
-            alias: "output assets directory",
-            descript: "output file (JSON)",
-            type: "string",
-            demand: true,
-        },
         f: {
             alias: "force",
             descript: "overwrite any existign output file?",
