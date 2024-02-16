@@ -1,5 +1,12 @@
 import { CUBE_MODEL } from "./cube-model.data";
 
+export type OffsetAndSize = {
+    left: number;
+    top: number;
+    width: number;
+    height: number;
+};
+
 export class CubeModel {
     /**
      * Given a size, calculate the inset bounds for the UV mapped space.
@@ -8,15 +15,7 @@ export class CubeModel {
      * @param height
      * @returns
      */
-    static getInsetForUVs(
-        width: number,
-        height: number
-    ): {
-        left: number;
-        top: number;
-        width: number;
-        height: number;
-    } {
+    static getInsetForUVs(width: number, height: number): OffsetAndSize {
         const left: number = Math.floor(width / 256);
         const top: number = Math.floor(height / 256);
         return {
@@ -30,10 +29,7 @@ export class CubeModel {
     /**
      * Given a size, calculate the outset bounds after applying UV gutters.
      */
-    static getOutsetForUVs(
-        width: number,
-        height: number
-    ): { left: number; top: number; width: number; height: number } {
+    static getOutsetForUVs(width: number, height: number): OffsetAndSize {
         // outer = inner * 256/254
         // left = outer - inner / 2
         const outerWidth: number = (width * 256) / 254; // non-integer

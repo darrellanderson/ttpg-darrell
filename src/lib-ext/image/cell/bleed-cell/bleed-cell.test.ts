@@ -10,8 +10,8 @@ class MyCell extends AbstractCell {
 
 it("constructor", () => {
     const innerCell = new MyCell(1, 2);
-    const bleedCell = new BleedCell(innerCell, 3);
-    expect(bleedCell.getSize()).toEqual({ width: 7, height: 8 });
+    const bleedCell = new BleedCell(innerCell, 3, 4);
+    expect(bleedCell.getSize()).toEqual({ width: 7, height: 10 });
 });
 
 it("toBuffer", async () => {
@@ -93,7 +93,7 @@ it("toBuffer", async () => {
     const squareCell = new SquareCell();
     expect(squareCell.getSize()).toEqual({ width: 2, height: 2 });
 
-    const bleedCell = new BleedCell(squareCell, 3);
+    const bleedCell = new BleedCell(squareCell, 3, 3);
     expect(bleedCell.getSize()).toEqual({ width: 8, height: 8 });
     const bleedBuffer: Buffer = await bleedCell.toBuffer();
 

@@ -7,16 +7,22 @@ import { AbstractCell, CellSize } from "../abstract-cell/abstract-cell";
  */
 export class BleedCell extends AbstractCell {
     private readonly _innerCell: AbstractCell;
-    private readonly _bleedSize: number;
+    private readonly _bleedLeftRight: number;
+    private readonly _bleedTopBottom: number;
 
-    constructor(innerCell: AbstractCell, bleedSize: number) {
+    constructor(
+        innerCell: AbstractCell,
+        bleedLeftRight: number,
+        bleedTopBottom: number
+    ) {
         const innerSize: CellSize = innerCell.getSize();
         super(
-            innerSize.width + bleedSize * 2,
-            innerSize.height + bleedSize * 2
+            innerSize.width + bleedLeftRight * 2,
+            innerSize.height + bleedTopBottom * 2
         );
         this._innerCell = innerCell;
-        this._bleedSize = bleedSize;
+        this._bleedLeftRight = bleedLeftRight;
+        this._bleedTopBottom = bleedTopBottom;
     }
 
     private _extractAndStretch(
@@ -45,13 +51,13 @@ export class BleedCell extends AbstractCell {
         if (edge === "left" || edge === "right") {
             srcWidth = 1;
             srcHeight = innerSize.height;
-            dstWidth = this._bleedSize;
+            dstWidth = this._bleedLeftRight;
             dstHeight = innerSize.height;
         } else if (edge === "top" || edge === "bottom") {
             srcWidth = innerSize.width;
             srcHeight = 1;
             dstWidth = innerSize.width;
-            dstHeight = this._bleedSize;
+            dstHeight = this._bleedTopBottom;
         }
 
         return new Promise<Buffer>((resolve): void => {
@@ -100,27 +106,27 @@ export class BleedCell extends AbstractCell {
                         .composite([
                             {
                                 left: 0,
-                                top: this._bleedSize,
+                                top: this._bleedTopBottom,
                                 input: left,
                             },
                             {
-                                left: width - this._bleedSize,
-                                top: this._bleedSize,
+                                left: width - this._bleedLeftRight,
+                                top: this._bleedTopBottom,
                                 input: right,
                             },
                             {
-                                left: this._bleedSize,
+                                left: this._bleedLeftRight,
                                 top: 0,
                                 input: top,
                             },
                             {
-                                left: this._bleedSize,
-                                top: height - this._bleedSize,
+                                left: this._bleedLeftRight,
+                                top: height - this._bleedTopBottom,
                                 input: bottom,
                             },
                             {
-                                left: this._bleedSize,
-                                top: this._bleedSize,
+                                left: this._bleedLeftRight,
+                                top: this._bleedTopBottom,
                                 input: inner,
                             },
                         ])
