@@ -5,8 +5,13 @@ it("constructor", () => {
 });
 
 it("getInsetForUVs", () => {
-    const inset = new CubeModel().getInsetForUVs(4096, 1024);
+    const inset = CubeModel.getInsetForUVs(4096, 1024);
     expect(inset).toEqual({ height: 1016, left: 16, top: 4, width: 4064 });
+});
+
+it("", () => {
+    const outset = CubeModel.getOutsetForUVs(4064, 1016);
+    expect(outset).toEqual({ height: 1024, left: 16, top: 4, width: 4096 });
 });
 
 it("toModel", () => {
