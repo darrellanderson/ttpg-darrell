@@ -7,6 +7,7 @@ import { AbstractCell } from "../../../index-ext";
 import { BleedCell } from "../../image/cell/bleed-cell/bleed-cell";
 import { BufferCell } from "../../image/cell/buffer-cell/buffer-cell";
 import { CubeModel, OffsetAndSize } from "../../model/cube-model/cube-model";
+import { CubeTemplate } from "../../template/cube-template/cube-template";
 
 /**
  * Create assets for a (potentially large) board.
@@ -27,7 +28,9 @@ export class CreateBoard {
 
     private readonly _name: string;
     private _srcImageBuffer: Buffer | undefined;
-    private _worldSize: { width: number; height: number } | undefined;
+    private _worldSize:
+        | { width: number; height: number; depth: number }
+        | undefined;
 
     constructor(name: string) {
         this._name = name;
@@ -38,8 +41,8 @@ export class CreateBoard {
         return this;
     }
 
-    setWorldSize(width: number, height: number): this {
-        this._worldSize = { width, height };
+    setWorldSize(width: number, height: number, depth: number): this {
+        this._worldSize = { width, height, depth };
         return this;
     }
 
@@ -51,7 +54,12 @@ export class CreateBoard {
             if (!this._srcImageBuffer) {
                 throw new Error("must setImage first");
             }
-            new ImageSplit(this._srcImageBuffer, CreateBoard.INSET_SIZE.width)
+            const dstFilenameWithoutExtension = this._name;
+            new ImageSplit(
+                this._srcImageBuffer,
+                CreateBoard.INSET_SIZE.width,
+                dstFilenameWithoutExtension
+            )
                 .split()
                 .then((chunks: Array<ImageSplitChunk>): void => {
                     Promise.all(
@@ -92,12 +100,32 @@ export class CreateBoard {
     toFileData(assetFilename: string): Promise<{ [key: string]: Buffer }> {
         const filenameToBuffer: { [key: string]: Buffer } = {};
 
+        // Model.
         const cubeModel = new CubeModel();
-        filenameToBuffer[path.join("assets", "Models", "uv-cube.obj")] =
-            Buffer.from(cubeModel.toModel());
+        const cubeModelFilename: string = path.join(
+            "assets",
+            "Models",
+            "uv-cube.obj"
+        );
+        filenameToBuffer[cubeModelFilename] = Buffer.from(cubeModel.toModel());
+
+        // Board template.
+        const templateFilename: string = path.join(
+            "assets",
+            "Templates",
+            `${assetFilename}.json`
+        );
+        const cubeTemplate = new CubeTemplate()
+            .setGuidFrom(assetFilename)
+            .setName(this._name);
 
         return new Promise<{ [key: string]: Buffer }>((resolve): void => {
             this._splitImage().then((chunks: Array<ImageSplitChunk>): void => {
+                if (!this._worldSize) {
+                    throw new Error("must setWorldSize");
+                }
+
+                // Image chunks.
                 for (const chunk of chunks) {
                     const filename: string = path.join(
                         "assets",
@@ -105,7 +133,23 @@ export class CreateBoard {
                         `${assetFilename}-${chunk.col}x${chunk.row}.jpg`
                     );
                     filenameToBuffer[filename] = chunk.buffer;
+
+                    cubeTemplate.addEntry({
+                        texture: chunk.filename,
+                        model: cubeModelFilename,
+                        width: chunk.uv.width * this._worldSize.width,
+                        height: chunk.uv.height * this._worldSize.height,
+                        depth: this._worldSize.depth,
+                        left: chunk.uv.left * this._worldSize.width,
+                        top: chunk.uv.top * this._worldSize.height,
+                    });
                 }
+
+                // Template.
+                filenameToBuffer[templateFilename] = Buffer.from(
+                    cubeTemplate.toTemplate()
+                );
+
                 resolve(filenameToBuffer);
             });
         });

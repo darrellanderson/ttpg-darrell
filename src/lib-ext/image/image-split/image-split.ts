@@ -1,6 +1,7 @@
 import sharp, { Metadata } from "sharp";
 
 export type ImageSplitChunk = {
+    filename: string;
     col: number;
     row: number;
     buffer: Buffer;
@@ -21,13 +22,19 @@ export type ImageSplitChunk = {
 export class ImageSplit {
     private readonly _srcBuffer: Buffer;
     private readonly _chunkSize: number;
+    private readonly _dstFilenameWithoutExtension: string;
 
-    constructor(srcBuffer: Buffer, chunkSize: number) {
+    constructor(
+        srcBuffer: Buffer,
+        chunkSize: number,
+        dstFilenameWithoutExtension: string
+    ) {
         if (chunkSize <= 0) {
             throw new Error(`invalid chunk size "${chunkSize}"`);
         }
         this._srcBuffer = srcBuffer;
         this._chunkSize = chunkSize;
+        this._dstFilenameWithoutExtension = dstFilenameWithoutExtension;
     }
 
     private _getChunk(col: number, row: number): Promise<ImageSplitChunk> {
@@ -53,6 +60,7 @@ export class ImageSplit {
                     .toBuffer()
                     .then((buffer) => {
                         resolve({
+                            filename: `${this._dstFilenameWithoutExtension}-${col}x${row}`,
                             col,
                             row,
                             buffer,
