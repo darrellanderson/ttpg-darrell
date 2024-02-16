@@ -1,26 +1,22 @@
 import sharp from "sharp";
 import { CreateBoard } from "./create-board";
+import { CreateBoardParams } from "./create-board-params";
 import { CubeModel } from "../../model/cube-model/cube-model";
 import { SolidCell } from "../../image/cell/solid-cell/solid-cell";
 
-it("constructor", () => {
-    new CreateBoard("my-name", "my-asset-filename");
-});
-
 it("toFileData", async () => {
-    const srcImageBuffer: Buffer = await new SolidCell(
-        2,
-        1,
-        "#ff0000"
-    ).toBuffer();
+    const srcImage: Buffer = await new SolidCell(2, 1, "#ff0000").toBuffer();
+
+    const params: CreateBoardParams = {
+        templateName: "my-template-name",
+        assetFilename: "my-asset-filename",
+        topDownWorldSize: { width: 200, height: 100, depth: 0.25 },
+        srcImage,
+    };
 
     const filenameToBuffer: { [key: string]: Buffer } = await new CreateBoard(
-        "my-template-name",
-        "my-asset-filename"
-    )
-        .setImage(srcImageBuffer)
-        .setWorldSize(200, 100, 0.25)
-        .toFileData();
+        params
+    ).toFileData();
 
     expect(filenameToBuffer).toBeDefined();
     expect(Object.keys(filenameToBuffer).sort()).toEqual([

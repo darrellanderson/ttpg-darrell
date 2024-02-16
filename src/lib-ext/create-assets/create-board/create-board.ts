@@ -9,6 +9,10 @@ import { BleedCell } from "../../image/cell/bleed-cell/bleed-cell";
 import { BufferCell } from "../../image/cell/buffer-cell/buffer-cell";
 import { CubeModel, OffsetAndSize } from "../../model/cube-model/cube-model";
 import { CubeTemplate } from "../../template/cube-template/cube-template";
+import {
+    CreateBoardParams,
+    CreateBoardParamsSchema,
+} from "./create-board-params";
 
 /**
  * Create assets for a (potentially large) board.
@@ -27,68 +31,65 @@ export class CreateBoard extends AbstractCreateAssets {
     private static readonly INSET_SIZE: OffsetAndSize =
         CubeModel.getInsetForUVs(4096, 4096);
 
-    private _srcImageBuffer: Buffer | undefined;
-    private _worldSize:
-        | { width: number; height: number; depth: number }
-        | undefined;
+    private readonly _params: CreateBoardParams;
 
-    constructor(templateName: string, assetFilename: string) {
-        super(templateName, assetFilename);
+    static fromParamsJson(paramsJson: Buffer): CreateBoard {
+        const params: CreateBoardParams = CreateBoardParamsSchema.parse(
+            JSON.parse(paramsJson.toString())
+        );
+        return new CreateBoard(params);
     }
 
-    setImage(srcImageBuffer: Buffer): this {
-        this._srcImageBuffer = srcImageBuffer;
-        return this;
-    }
-
-    setWorldSize(width: number, height: number, depth: number): this {
-        this._worldSize = { width, height, depth };
-        return this;
+    constructor(params: CreateBoardParams) {
+        super();
+        this._params = params;
     }
 
     _splitImage(): Promise<Array<ImageSplitChunk>> {
         if (CreateBoard.INSET_SIZE.width !== CreateBoard.INSET_SIZE.height) {
             throw new Error("inset size mismatch");
         }
-        return new Promise<Array<ImageSplitChunk>>((resolve): void => {
-            if (!this._srcImageBuffer) {
-                throw new Error("must setImage first");
-            }
-            new ImageSplit(this._srcImageBuffer, CreateBoard.INSET_SIZE.width)
-                .split()
-                .then((chunks: Array<ImageSplitChunk>): void => {
-                    Promise.all(
-                        chunks.map((chunk: ImageSplitChunk) => {
-                            const inner: AbstractCell = new BufferCell(
-                                chunk.px.width,
-                                chunk.px.height,
-                                chunk.buffer
-                            );
-                            const outset: OffsetAndSize =
-                                CubeModel.getOutsetForUVs(
-                                    chunk.px.width,
-                                    chunk.px.height
-                                );
-                            return new BleedCell(
-                                inner,
-                                outset.left,
-                                outset.top
-                            ).toBuffer();
-                        })
-                    ).then((outsetBuffers: Array<Buffer>): void => {
-                        for (let i = 0; i < chunks.length; i++) {
-                            const chunk: ImageSplitChunk | undefined =
-                                chunks[i];
-                            const outsetBuffer: Buffer | undefined =
-                                outsetBuffers[i];
-                            if (!chunk || !outsetBuffer) {
-                                throw new Error("missing");
-                            }
-                            chunk.buffer = outsetBuffer;
-                        }
-                        resolve(chunks);
-                    });
-                });
+        return new Promise<Array<ImageSplitChunk>>((resolve, reject): void => {
+            AbstractCreateAssets.getAsBuffer(this._params.srcImage).then(
+                (buffer: Buffer) => {
+                    new ImageSplit(buffer, CreateBoard.INSET_SIZE.width)
+                        .split()
+                        .then((chunks: Array<ImageSplitChunk>): void => {
+                            Promise.all(
+                                chunks.map((chunk: ImageSplitChunk) => {
+                                    const inner: AbstractCell = new BufferCell(
+                                        chunk.px.width,
+                                        chunk.px.height,
+                                        chunk.buffer
+                                    );
+                                    const outset: OffsetAndSize =
+                                        CubeModel.getOutsetForUVs(
+                                            chunk.px.width,
+                                            chunk.px.height
+                                        );
+                                    return new BleedCell(
+                                        inner,
+                                        outset.left,
+                                        outset.top
+                                    ).toBuffer();
+                                })
+                            ).then((outsetBuffers: Array<Buffer>): void => {
+                                for (let i = 0; i < chunks.length; i++) {
+                                    const chunk: ImageSplitChunk | undefined =
+                                        chunks[i];
+                                    const outsetBuffer: Buffer | undefined =
+                                        outsetBuffers[i];
+                                    if (!chunk || !outsetBuffer) {
+                                        throw new Error("missing");
+                                    }
+                                    chunk.buffer = outsetBuffer;
+                                }
+                                resolve(chunks);
+                            }, reject);
+                        }, reject);
+                },
+                reject
+            );
         });
     }
 
@@ -111,49 +112,50 @@ export class CreateBoard extends AbstractCreateAssets {
         const templateFilename: string = path.join(
             "assets",
             "Templates",
-            this.getAssetFilename(".json")
+            `${this._params.assetFilename}.json`
         );
         const cubeTemplate = new CubeTemplate()
             .setGuidFrom(templateFilename)
-            .setName(this.getTemplateName());
+            .setName(this._params.templateName);
 
-        return new Promise<{ [key: string]: Buffer }>((resolve): void => {
-            this._splitImage().then((chunks: Array<ImageSplitChunk>): void => {
-                if (!this._worldSize) {
-                    throw new Error("must setWorldSize");
-                }
+        return new Promise<{ [key: string]: Buffer }>(
+            (resolve, reject): void => {
+                this._splitImage().then(
+                    (chunks: Array<ImageSplitChunk>): void => {
+                        // Image chunks.
+                        for (const chunk of chunks) {
+                            const innerFilename: string = `${this._params.assetFilename}-${chunk.col}x${chunk.row}.jpg`;
+                            const filename: string = path.join(
+                                "assets",
+                                "Textures",
+                                innerFilename
+                            );
+                            filenameToBuffer[filename] = chunk.buffer;
 
-                // Image chunks.
-                for (const chunk of chunks) {
-                    const innerFilename: string = this.getAssetFilename(
-                        `-${chunk.col}x${chunk.row}.jpg`
-                    );
-                    const filename: string = path.join(
-                        "assets",
-                        "Textures",
-                        innerFilename
-                    );
-                    filenameToBuffer[filename] = chunk.buffer;
+                            const { width, height, depth } =
+                                this._params.topDownWorldSize;
+                            cubeTemplate.addEntry({
+                                texture: innerFilename,
+                                model: CubeModel.ASSET_FILENAME,
+                                width: chunk.uv.width * width,
+                                height: chunk.uv.height * height,
+                                depth: depth,
+                                left: chunk.uv.left * width,
+                                top: chunk.uv.top * height,
+                            });
+                        }
 
-                    cubeTemplate.addEntry({
-                        texture: innerFilename,
-                        model: CubeModel.ASSET_FILENAME,
-                        width: chunk.uv.width * this._worldSize.width,
-                        height: chunk.uv.height * this._worldSize.height,
-                        depth: this._worldSize.depth,
-                        left: chunk.uv.left * this._worldSize.width,
-                        top: chunk.uv.top * this._worldSize.height,
-                    });
-                }
+                        // Template.
+                        filenameToBuffer[templateFilename] = Buffer.from(
+                            cubeTemplate.toTemplate(),
+                            "ascii"
+                        );
 
-                // Template.
-                filenameToBuffer[templateFilename] = Buffer.from(
-                    cubeTemplate.toTemplate(),
-                    "ascii"
+                        resolve(filenameToBuffer);
+                    },
+                    reject
                 );
-
-                resolve(filenameToBuffer);
-            });
-        });
+            }
+        );
     }
 }
