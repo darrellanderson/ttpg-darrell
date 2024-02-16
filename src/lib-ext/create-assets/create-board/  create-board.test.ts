@@ -2,7 +2,7 @@ import { CreateBoard } from "./create-board";
 import { SolidCell } from "../../image/cell/solid-cell/solid-cell";
 
 it("constructor", () => {
-    new CreateBoard("my-name");
+    new CreateBoard("my-name", "my-asset-filename");
 });
 
 it("toFileData", async () => {
@@ -13,25 +13,26 @@ it("toFileData", async () => {
     ).toBuffer();
 
     const filenameToBuffer: { [key: string]: Buffer } = await new CreateBoard(
-        "my-name"
+        "my-name",
+        "my-asset-filename"
     )
         .setImage(srcImageBuffer)
         .setWorldSize(200, 100, 0.25)
-        .toFileData("my-asset-name");
+        .toFileData();
 
     expect(filenameToBuffer).toBeDefined();
     expect(Object.keys(filenameToBuffer).sort()).toEqual([
         "assets/Models/uv-cube.obj",
-        "assets/Templates/my-asset-name.json",
-        "assets/Textures/my-asset-name-0x0.jpg",
+        "assets/Templates/my-asset-filename.json",
+        "assets/Textures/my-asset-filename-0x0.jpg",
     ]);
 
     const model: string | undefined =
         filenameToBuffer["assets/Models/uv-cube.obj"]?.toString();
     const template: string | undefined =
-        filenameToBuffer["assets/Templates/my-asset-name.json"]?.toString();
+        filenameToBuffer["assets/Templates/my-asset-filename.json"]?.toString();
     const image: Buffer | undefined =
-        filenameToBuffer["assets/Textures/my-asset-name-0x0.jpg"];
+        filenameToBuffer["assets/Textures/my-asset-filename-0x0.jpg"];
 
     expect(model).toBeDefined();
     expect(template).toBeDefined();
