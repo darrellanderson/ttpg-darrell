@@ -1,3 +1,5 @@
+import fs from "fs/promises";
+
 export abstract class AbstractCreateAssets {
     private readonly _templateName: string;
     private readonly _assetFilename: string;
@@ -15,7 +17,21 @@ export abstract class AbstractCreateAssets {
         return this._assetFilename + (ext ?? "");
     }
 
-    abstract toFileData(
-        assetFilename: string
-    ): Promise<{ [key: string]: Buffer }>;
+    abstract toFileData(): Promise<{ [key: string]: Buffer }>;
+
+    writeFiles(): Promise<void> {
+        return new Promise<void>((): void => {
+            this.toFileData().then(
+                (filenameToBuffer: { [key: string]: Buffer }) => {
+                    return Promise.all(
+                        Object.entries(filenameToBuffer).map(
+                            ([filename, buffer]) => {
+                                return fs.writeFile(filename, buffer);
+                            }
+                        )
+                    );
+                }
+            );
+        });
+    }
 }

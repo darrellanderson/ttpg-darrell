@@ -102,7 +102,10 @@ export class CreateBoard extends AbstractCreateAssets {
             "Models",
             "uv-cube.obj"
         );
-        filenameToBuffer[cubeModelFilename] = Buffer.from(cubeModel.toModel());
+        filenameToBuffer[cubeModelFilename] = Buffer.from(
+            cubeModel.toModel(),
+            "ascii"
+        );
 
         // Board template.
         const templateFilename: string = path.join(
@@ -145,7 +148,8 @@ export class CreateBoard extends AbstractCreateAssets {
 
                 // Template.
                 filenameToBuffer[templateFilename] = Buffer.from(
-                    cubeTemplate.toTemplate()
+                    cubeTemplate.toTemplate(),
+                    "ascii"
                 );
 
                 resolve(filenameToBuffer);
