@@ -31,10 +31,14 @@ export class CubeTemplate {
     static getBoundingBox(
         entries: Array<CubeTemplateEntry>
     ): CubeTemplateBoundingBox {
-        let left: number = 0;
-        let right: number = 0;
-        let top: number = 0;
-        let bottom: number = 0;
+        const firstEntry: CubeTemplateEntry | undefined = entries[0];
+        if (!firstEntry) {
+            return { left: 0, top: 0, right: 0, bottom: 0, maxDepth: 0 };
+        }
+        let left: number = firstEntry.left ?? 0;
+        let right: number = firstEntry.left ?? 0; // just has to be in bounds
+        let top: number = firstEntry.top ?? 0;
+        let bottom: number = firstEntry.top ?? 0; // just has to be in bounds
         let maxDepth: number = 0;
         for (const entry of entries) {
             left = Math.min(left, entry.left ?? 0);
@@ -88,19 +92,16 @@ export class CubeTemplate {
         if (this._guidFrom === "") {
             throw new Error("must setGuidFrom");
         }
-        const bb = CubeTemplate.getBoundingBox(this._entries);
 
         const modelEntries: Array<object> = this._entries.map((entry) => {
             const modelEntry = JSON.parse(JSON.stringify(CUBE_SUB_TEMPLATE));
             modelEntry.Model = entry.model;
             modelEntry.Texture = entry.texture;
-            modelEntry.Offset.Y =
-                -(bb.left / 2) + (entry.left ?? 0) + entry.width / 2;
-            modelEntry.Offset.X =
-                -(bb.top / 2) + (entry.top ?? 0) + entry.height / 2;
+            modelEntry.Offset.Y = (entry.left ?? 0) + entry.width / 2;
+            modelEntry.Offset.X = -((entry.top ?? 0) + entry.height / 2);
             modelEntry.Offset.Z = 0;
-            modelEntry.Scale.X = entry.height;
             modelEntry.Scale.Y = entry.width;
+            modelEntry.Scale.X = entry.height;
             modelEntry.Scale.Z = entry.depth;
             return modelEntry;
         });
@@ -118,10 +119,16 @@ export class CubeTemplate {
         template.Models = modelEntries;
 
         if (this._collider) {
+            const bb = CubeTemplate.getBoundingBox(this._entries);
             template.Collision[0].Model = this._collider;
-            template.Collision[0].X = bb.top - bb.bottom;
-            template.Collision[0].Y = bb.right - bb.left;
-            template.Collision[0].Z = bb.maxDepth;
+            template.Collision[0].Offset.Y = bb.left + (bb.right - bb.left) / 2;
+            template.Collision[0].Offset.X = -(
+                bb.top +
+                (bb.bottom - bb.top) / 2
+            );
+            template.Collision[0].Scale.Y = bb.right - bb.left;
+            template.Collision[0].Scale.X = bb.bottom - bb.top;
+            template.Collision[0].Scale.Z = bb.maxDepth;
         } else {
             delete template.Collision;
         }

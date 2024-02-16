@@ -50,6 +50,6 @@ it("toFileData", async () => {
     const templateModel = templateParsed.Models[0];
     expect(templateModel.Model).toEqual(CubeModel.ASSET_FILENAME);
     expect(templateModel.Texture).toEqual("my-asset-filename-0x0.jpg");
-    expect(templateModel.Offset).toEqual({ X: 50, Y: 100, Z: 0 });
+    expect(templateModel.Offset).toEqual({ X: 0, Y: 0, Z: 0 });
     expect(templateModel.Scale).toEqual({ X: 100, Y: 200, Z: 0.25 });
 });

@@ -78,7 +78,7 @@ export const CUBE_TEMPLATE = {
     ],
     Lights: [],
     SnapPointsGlobal: false,
-    SnapPoints: [{}],
+    SnapPoints: [],
     ZoomViewDirection: {
         X: 0,
         Y: 0,

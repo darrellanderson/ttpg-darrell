@@ -1,15 +1,15 @@
 {
-    "rootDir": "/tmp/create-board-demo",
-    "assetFilename": "output",
+    "rootDir": "/Users/darrell/ttpg/_test",
+    "assetFilename": "create-board-demo",
     "preshrink": {
         "width": 1,
         "height": 1
     },
-    "srcImage": "prebuild/input.jpg",
+    "srcImage": "prebuild/create-board-demo.jpg",
     "templateName": "demo",
     "topDownWorldSize": {
-        "width": 1,
-        "height": 1,
+        "width": 84.64,
+        "height": 45.23,
         "depth": 0.25
     }
 }

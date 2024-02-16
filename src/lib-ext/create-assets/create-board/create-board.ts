@@ -143,9 +143,12 @@ export class CreateBoard extends AbstractCreateAssets {
                                 width: chunk.uv.width * width,
                                 height: chunk.uv.height * height,
                                 depth: depth,
-                                left: chunk.uv.left * width,
-                                top: chunk.uv.top * height,
+                                left: chunk.uv.left * width - width / 2,
+                                top: chunk.uv.top * height - height / 2,
                             });
+                        }
+                        if (chunks.length > 1) {
+                            cubeTemplate.setCollider(CubeModel.ASSET_FILENAME);
                         }
 
                         // Template.

@@ -69,15 +69,60 @@ it("toTemplate", () => {
         .addEntry({
             texture: "my-texture",
             model: "my-model",
-            width: 1,
-            height: 1,
+            width: 20,
+            height: 10,
             depth: 1,
+            left: 5,
+            top: 7,
         })
         .setGuidFrom("foo")
         .toTemplate();
     if (template.includes("$")) {
         throw new Error(template);
     }
+    expect(JSON.parse(template)).toEqual({
+        Type: "Generic",
+        GUID: "2C26B46B68FFC68FF99B453C1D304134",
+        Name: "",
+        Metadata: "",
+        CollisionType: "Regular",
+        Friction: 0.7,
+        Restitution: 0.3,
+        Density: 1,
+        SurfaceType: "Cardboard",
+        Roughness: 1,
+        Metallic: 0,
+        PrimaryColor: { R: 255, G: 255, B: 255 },
+        SecondaryColor: { R: 0, G: 0, B: 0 },
+        Flippable: false,
+        AutoStraighten: false,
+        ShouldSnap: false,
+        ScriptName: "",
+        Blueprint: "",
+        Models: [
+            {
+                Model: "my-model",
+                Offset: { X: -12, Y: 15, Z: 0 },
+                Scale: { X: 10, Y: 20, Z: 1 },
+                Rotation: { X: 0, Y: 0, Z: 0 },
+                Texture: "my-texture",
+                NormalMap: "",
+                ExtraMap: "",
+                ExtraMap2: "",
+                IsTransparent: false,
+                CastShadow: true,
+                IsTwoSided: false,
+                UseOverrides: true,
+                SurfaceType: "Cardboard",
+            },
+        ],
+        Lights: [],
+        SnapPointsGlobal: false,
+        SnapPoints: [],
+        ZoomViewDirection: { X: 0, Y: 0, Z: 1 },
+        GroundAccessibility: "Zoom",
+        Tags: [],
+    });
 });
 
 it("toTemplate (collider)", () => {
@@ -85,9 +130,11 @@ it("toTemplate (collider)", () => {
         .addEntry({
             texture: "my-texture",
             model: "my-model",
-            width: 1,
-            height: 1,
+            width: 20,
+            height: 10,
             depth: 1,
+            left: 5,
+            top: 7,
         })
         .setCollider("my-collider")
         .setGuidFrom("foo")
@@ -95,4 +142,68 @@ it("toTemplate (collider)", () => {
     if (template.includes("$")) {
         throw new Error(template);
     }
+    expect(JSON.parse(template)).toEqual({
+        Type: "Generic",
+        GUID: "2C26B46B68FFC68FF99B453C1D304134",
+        Name: "",
+        Metadata: "",
+        Collision: [
+            {
+                Model: "my-collider",
+                Offset: {
+                    X: -12,
+                    Y: 15,
+                    Z: 0,
+                },
+                Rotation: {
+                    X: 0,
+                    Y: 0,
+                    Z: 0,
+                },
+                Scale: {
+                    X: 10,
+                    Y: 20,
+                    Z: 1,
+                },
+                Type: "Convex",
+            },
+        ],
+        CollisionType: "Regular",
+        Friction: 0.7,
+        Restitution: 0.3,
+        Density: 1,
+        SurfaceType: "Cardboard",
+        Roughness: 1,
+        Metallic: 0,
+        PrimaryColor: { R: 255, G: 255, B: 255 },
+        SecondaryColor: { R: 0, G: 0, B: 0 },
+        Flippable: false,
+        AutoStraighten: false,
+        ShouldSnap: false,
+        ScriptName: "",
+        Blueprint: "",
+        Models: [
+            {
+                Model: "my-model",
+                Offset: { X: -12, Y: 15, Z: 0 },
+                Scale: { X: 10, Y: 20, Z: 1 },
+                Rotation: { X: 0, Y: 0, Z: 0 },
+                Texture: "my-texture",
+                NormalMap: "",
+                ExtraMap: "",
+                ExtraMap2: "",
+                IsTransparent: false,
+                CastShadow: true,
+                IsTwoSided: false,
+                UseOverrides: true,
+                SurfaceType: "Cardboard",
+            },
+        ],
+        Lights: [],
+        SnapPointsGlobal: false,
+        SnapPoints: [],
+        ZoomViewDirection: { X: 0, Y: 0, Z: 1 },
+        GroundAccessibility: "Zoom",
+        Tags: [],
+    });
 });

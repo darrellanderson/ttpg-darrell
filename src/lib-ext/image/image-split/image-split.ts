@@ -31,11 +31,11 @@ export class ImageSplit {
     }
 
     private _getChunk(col: number, row: number): Promise<ImageSplitChunk> {
-        return new Promise<ImageSplitChunk>((resolve): void => {
+        return new Promise<ImageSplitChunk>((resolve, reject): void => {
             const image = sharp(this._srcBuffer);
             image.metadata().then((metadata: Metadata) => {
-                const imgWidth: number = metadata.width ?? 0;
-                const imgHeight: number = metadata.height ?? 0;
+                const imgWidth: number = metadata.width ?? 1;
+                const imgHeight: number = metadata.height ?? 1;
 
                 const left: number = col * this._chunkSize;
                 const top: number = row * this._chunkSize;
@@ -69,13 +69,13 @@ export class ImageSplit {
                                 height: height / imgHeight,
                             },
                         });
-                    });
-            });
+                    }, reject);
+            }, reject);
         });
     }
 
     public split(): Promise<Array<ImageSplitChunk>> {
-        return new Promise<Array<ImageSplitChunk>>((resolve): void => {
+        return new Promise<Array<ImageSplitChunk>>((resolve, reject): void => {
             sharp(this._srcBuffer)
                 .metadata()
                 .then((metadata): void => {
@@ -94,9 +94,10 @@ export class ImageSplit {
                     Promise.all(promises).then(
                         (ImageSplitChunks: Array<ImageSplitChunk>): void => {
                             resolve(ImageSplitChunks);
-                        }
+                        },
+                        reject
                     );
-                });
+                }, reject);
         });
     }
 }
