@@ -15,6 +15,9 @@ export class BleedCell extends AbstractCell {
         bleedLeftRight: number,
         bleedTopBottom: number
     ) {
+        if (bleedLeftRight < 0 || bleedTopBottom < 0) {
+            throw new Error("bad bleed");
+        }
         const innerSize: CellSize = innerCell.getSize();
         super(
             innerSize.width + bleedLeftRight * 2,
@@ -62,6 +65,11 @@ export class BleedCell extends AbstractCell {
 
         return new Promise<Buffer>((resolve): void => {
             this._innerCell.toBuffer().then((buffer: Buffer): void => {
+                // Only extract/resize when non-empty area.
+                if (dstWidth === 0 || dstHeight === 0) {
+                    resolve(buffer);
+                    return;
+                }
                 sharp(buffer)
                     .extract({
                         left,
