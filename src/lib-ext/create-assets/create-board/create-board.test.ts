@@ -50,8 +50,10 @@ it("toFileData", async () => {
     const templateParsed = JSON.parse(template ?? "");
     expect(templateParsed.Name).toEqual("my-template-name");
     expect(templateParsed.Models.length).toEqual(1);
-    expect(templateParsed.Models[0].Model).toEqual(CubeModel.ASSET_FILENAME);
-    expect(templateParsed.Models[0].Texture).toEqual(
-        "my-asset-filename-0x0.jpg"
-    );
+
+    const templateModel = templateParsed.Models[0];
+    expect(templateModel.Model).toEqual(CubeModel.ASSET_FILENAME);
+    expect(templateModel.Texture).toEqual("my-asset-filename-0x0.jpg");
+    expect(templateModel.Offset).toEqual({ X: 50, Y: 100, Z: 0 });
+    expect(templateModel.Scale).toEqual({ X: 100, Y: 200, Z: 0.25 });
 });

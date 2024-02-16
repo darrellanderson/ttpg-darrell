@@ -94,14 +94,14 @@ export class CubeTemplate {
             const modelEntry = JSON.parse(JSON.stringify(CUBE_SUB_TEMPLATE));
             modelEntry.Model = entry.model;
             modelEntry.Texture = entry.texture;
-            modelEntry.Offset.y =
+            modelEntry.Offset.Y =
                 -(bb.left / 2) + (entry.left ?? 0) + entry.width / 2;
-            modelEntry.Offset.x =
+            modelEntry.Offset.X =
                 -(bb.top / 2) + (entry.top ?? 0) + entry.height / 2;
-            modelEntry.Offset.z = 0;
-            modelEntry.Scale.x = entry.width;
-            modelEntry.Scale.y = entry.height;
-            modelEntry.Scale.z = entry.depth;
+            modelEntry.Offset.Z = 0;
+            modelEntry.Scale.X = entry.height;
+            modelEntry.Scale.Y = entry.width;
+            modelEntry.Scale.Z = entry.depth;
             return modelEntry;
         });
 
@@ -119,9 +119,9 @@ export class CubeTemplate {
 
         if (this._collider) {
             template.Collision[0].Model = this._collider;
-            template.Collision[0].x = bb.top - bb.bottom;
-            template.Collision[0].y = bb.right - bb.left;
-            template.Collision[0].z = bb.maxDepth;
+            template.Collision[0].X = bb.top - bb.bottom;
+            template.Collision[0].Y = bb.right - bb.left;
+            template.Collision[0].Z = bb.maxDepth;
         } else {
             delete template.Collision;
         }
