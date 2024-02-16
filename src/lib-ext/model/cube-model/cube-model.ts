@@ -8,6 +8,8 @@ export type OffsetAndSize = {
 };
 
 export class CubeModel {
+    public static readonly ASSET_FILENAME = "uv-cube.obj";
+
     /**
      * Given a size, calculate the inset bounds for the UV mapped space.
      *

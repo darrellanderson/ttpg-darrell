@@ -100,7 +100,7 @@ export class CreateBoard extends AbstractCreateAssets {
         const cubeModelFilename: string = path.join(
             "assets",
             "Models",
-            "uv-cube.obj"
+            CubeModel.ASSET_FILENAME
         );
         filenameToBuffer[cubeModelFilename] = Buffer.from(
             cubeModel.toModel(),
@@ -137,7 +137,7 @@ export class CreateBoard extends AbstractCreateAssets {
 
                     cubeTemplate.addEntry({
                         texture: innerFilename,
-                        model: cubeModelFilename,
+                        model: CubeModel.ASSET_FILENAME,
                         width: chunk.uv.width * this._worldSize.width,
                         height: chunk.uv.height * this._worldSize.height,
                         depth: this._worldSize.depth,
