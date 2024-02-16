@@ -7,14 +7,14 @@ export type ImageSplitChunk = {
     px: {
         left: number;
         top: number;
-        right: number;
-        bottom: number;
+        width: number;
+        height: number;
     };
     uv: {
         left: number;
         top: number;
-        right: number;
-        bottom: number;
+        width: number;
+        height: number;
     };
 };
 
@@ -59,14 +59,14 @@ export class ImageSplit {
                             px: {
                                 left: left,
                                 top: top,
-                                right: left + width,
-                                bottom: top + height,
+                                width,
+                                height,
                             },
                             uv: {
                                 left: left / imgWidth,
                                 top: top / imgHeight,
-                                right: (left + width) / imgWidth,
-                                bottom: (top + height) / imgHeight,
+                                width: width / imgWidth,
+                                height: height / imgHeight,
                             },
                         });
                     });

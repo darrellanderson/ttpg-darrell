@@ -99,14 +99,14 @@ it("split", async () => {
     expect(chunk.px).toEqual({
         left: 0,
         top: 0,
-        right: 1,
-        bottom: 1,
+        width: 1,
+        height: 1,
     });
     expect(chunk.uv).toEqual({
         left: 0,
         top: 0,
-        right: 0.5,
-        bottom: 0.5,
+        width: 0.5,
+        height: 0.5,
     });
     pixelArray = new Uint8ClampedArray(
         await sharp(chunk.buffer).raw().toBuffer()
@@ -120,14 +120,14 @@ it("split", async () => {
     expect(chunk.px).toEqual({
         left: 0,
         top: 1,
-        right: 1,
-        bottom: 2,
+        width: 1,
+        height: 1,
     });
     expect(chunk.uv).toEqual({
         left: 0,
         top: 0.5,
-        right: 0.5,
-        bottom: 1,
+        width: 0.5,
+        height: 0.5,
     });
     pixelArray = new Uint8ClampedArray(
         await sharp(chunk.buffer).raw().toBuffer()
@@ -141,14 +141,14 @@ it("split", async () => {
     expect(chunk.px).toEqual({
         left: 1,
         top: 0,
-        right: 2,
-        bottom: 1,
+        width: 1,
+        height: 1,
     });
     expect(chunk.uv).toEqual({
         left: 0.5,
         top: 0,
-        right: 1,
-        bottom: 0.5,
+        width: 0.5,
+        height: 0.5,
     });
     pixelArray = new Uint8ClampedArray(
         await sharp(chunk.buffer).raw().toBuffer()
@@ -162,14 +162,14 @@ it("split", async () => {
     expect(chunk.px).toEqual({
         left: 1,
         top: 1,
-        right: 2,
-        bottom: 2,
+        width: 1,
+        height: 1,
     });
     expect(chunk.uv).toEqual({
         left: 0.5,
         top: 0.5,
-        right: 1,
-        bottom: 1,
+        width: 0.5,
+        height: 0.5,
     });
     pixelArray = new Uint8ClampedArray(
         await sharp(chunk.buffer).raw().toBuffer()
