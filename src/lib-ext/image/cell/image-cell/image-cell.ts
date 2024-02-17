@@ -1,4 +1,3 @@
-import path from "fs-extra";
 import sharp, { Metadata } from "sharp";
 import { AbstractCell } from "../abstract-cell/abstract-cell";
 
@@ -29,9 +28,6 @@ export class ImageCell extends AbstractCell {
 
     constructor(width: number, height: number, imageFile: string) {
         super(width, height);
-        if (!path.existsSync(imageFile)) {
-            throw new Error(`no file "${imageFile}"`);
-        }
         this._imageFile = imageFile;
     }
 
