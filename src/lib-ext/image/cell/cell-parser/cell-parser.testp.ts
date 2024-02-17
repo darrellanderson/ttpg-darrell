@@ -6,6 +6,7 @@ const cell: AbstractCell = new CellParser().parse({
     type: "TextCell",
     width: 600,
     height: 100,
+    font: "Academy Engraved LET",
     fontSize: 90,
     text: "my text",
 });
