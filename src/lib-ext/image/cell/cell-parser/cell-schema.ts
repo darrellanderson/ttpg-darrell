@@ -1,6 +1,8 @@
 import { z } from "zod";
 
-export const ZBaseCellSchema = z.object({ type: z.string().min(1) });
+export const ZBaseCellSchema = z
+    .object({ type: z.string().min(1) })
+    .passthrough();
 export type ZBaseCellType = z.infer<typeof ZBaseCellSchema>;
 
 export const ZBleedCellSchema = ZBaseCellSchema.extend({

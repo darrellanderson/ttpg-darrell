@@ -34,6 +34,10 @@ export class CellParser {
             return new BufferCell(width, height, buffer);
         }
 
+        if (type === "CanvasCell") {
+            //
+        }
+
         throw new Error(`bad type "${type}"`);
     }
 }
