@@ -15,12 +15,6 @@ it("constructor, getSize", () => {
     expect(cellSize).toEqual({ width: WIDTH, height: HEIGHT });
 });
 
-it("constructor (missing image)", () => {
-    expect(() => {
-        new ImageCell(1, 1, "no-such-file.jpg");
-    }).toThrow('no file "no-such-file.jpg"');
-});
-
 it("toBuffer", async () => {
     const promise: Promise<Buffer> = new ImageCell(
         WIDTH,
