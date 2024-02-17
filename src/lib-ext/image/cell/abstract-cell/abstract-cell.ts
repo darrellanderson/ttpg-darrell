@@ -17,6 +17,8 @@ export type UVPosition = {
 
 export type CellChild = { child: AbstractCell; left: number; top: number };
 
+export type CellSnapPoint = { tags: Array<string>; left: number; top: number };
+
 /**
  * Create images from one or more cells.
  *
@@ -27,7 +29,8 @@ export type CellChild = { child: AbstractCell; left: number; top: number };
 export abstract class AbstractCell {
     private readonly _width: number;
     private readonly _height: number;
-    private readonly _children: AbstractCell[] | undefined;
+    private readonly _children: Array<AbstractCell> = [];
+    private readonly _snapPoints: Array<CellSnapPoint> = [];
     private _parent: AbstractCell | undefined;
     private _localPosition = { left: 0, top: 0 };
 
@@ -61,7 +64,6 @@ export abstract class AbstractCell {
         this._width = width;
         this._height = height;
         if (children) {
-            this._children = [];
             for (const { child, left, top } of children) {
                 if (child._parent) {
                     throw new Error("child already added elsewhere");
@@ -71,6 +73,15 @@ export abstract class AbstractCell {
                 child._localPosition = { left, top };
             }
         }
+    }
+
+    addSnapPoint(tags: Array<string>, left?: number, top?: number): this {
+        this._snapPoints.push({
+            tags,
+            left: left ?? this.getSize().width / 2,
+            top: top ?? this.getSize().height / 2,
+        });
+        return this;
     }
 
     /**
@@ -132,6 +143,33 @@ export abstract class AbstractCell {
             top += parentGlobalPosition.top;
         }
         return { left, top };
+    }
+
+    public getSnapPoints(): Array<{
+        tags: Array<string>;
+        left: number;
+        top: number;
+    }> {
+        const result: Array<{
+            tags: Array<string>;
+            left: number;
+            top: number;
+        }> = [];
+
+        const { left, top } = this.getGlobalPosition();
+        for (const snapPoint of this._snapPoints) {
+            result.push({
+                tags: [...snapPoint.tags],
+                left: left + snapPoint.left,
+                top: top + snapPoint.top,
+            });
+        }
+
+        for (const child of this._children) {
+            result.push(...child.getSnapPoints());
+        }
+
+        return result;
     }
 
     /**
