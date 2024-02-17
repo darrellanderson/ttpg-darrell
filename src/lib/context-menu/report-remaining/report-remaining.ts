@@ -20,6 +20,16 @@ export class ReportRemaining implements IGlobal {
         if (identifier !== ReportRemaining._actionName) {
             return; // not this
         }
+        if (!(obj instanceof Card)) {
+            throw new Error("not card");
+        }
+        const names: Array<string> = obj
+            .getAllCardDetails()
+            .map((cardDetails): string => {
+                return cardDetails.name;
+            })
+            .sort();
+        // TODO XXX
     };
 
     constructor(cardNsidPrefix: string) {
