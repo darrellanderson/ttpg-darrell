@@ -17,7 +17,12 @@ export type UVPosition = {
 
 export type CellChild = { child: AbstractCell; left: number; top: number };
 
-export type CellSnapPoint = { tags: Array<string>; left: number; top: number };
+export type CellSnapPoint = {
+    tags?: Array<string>;
+    left?: number;
+    top?: number;
+    rotation?: number;
+};
 
 /**
  * Create images from one or more cells.
@@ -75,12 +80,8 @@ export abstract class AbstractCell {
         }
     }
 
-    addSnapPoint(tags: Array<string>, left?: number, top?: number): this {
-        this._snapPoints.push({
-            tags,
-            left: left ?? this.getSize().width / 2,
-            top: top ?? this.getSize().height / 2,
-        });
+    addSnapPoint(snapPoint: CellSnapPoint): this {
+        this._snapPoints.push(snapPoint);
         return this;
     }
 
@@ -145,23 +146,22 @@ export abstract class AbstractCell {
         return { left, top };
     }
 
-    public getSnapPoints(): Array<{
-        tags: Array<string>;
-        left: number;
-        top: number;
-    }> {
-        const result: Array<{
-            tags: Array<string>;
-            left: number;
-            top: number;
-        }> = [];
+    /**
+     * Get all snap points, rewrite to global positions.
+     *
+     * @returns
+     */
+    public getSnapPoints(): Array<CellSnapPoint> {
+        const result: Array<CellSnapPoint> = [];
 
+        const { width, height } = this.getSize();
         const { left, top } = this.getGlobalPosition();
         for (const snapPoint of this._snapPoints) {
             result.push({
-                tags: [...snapPoint.tags],
-                left: left + snapPoint.left,
-                top: top + snapPoint.top,
+                tags: [...(snapPoint.tags ?? [])],
+                left: left + (snapPoint.left ?? width / 2),
+                top: top + (snapPoint.top ?? height / 2),
+                rotation: snapPoint.rotation ?? 0,
             });
         }
 

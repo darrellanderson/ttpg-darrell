@@ -83,14 +83,18 @@ it("getCenterUV", () => {
 });
 
 it("snap points", () => {
-    const child1 = new MyCell(1, 1).addSnapPoint(["c1"]); // default center
-    const child2 = new MyCell(1, 1).addSnapPoint(["c2"], 0.2, 0.4);
+    const child1 = new MyCell(1, 1).addSnapPoint({ tags: ["c1"] }); // default center
+    const child2 = new MyCell(1, 1).addSnapPoint({
+        tags: ["c2"],
+        left: 0.2,
+        top: 0.4,
+    });
     const snapPoints: Array<CellSnapPoint> = new MyCell(2, 1, [
         { child: child1, left: 0, top: 0 },
         { child: child2, left: 1, top: 0 },
     ]).getSnapPoints();
     expect(snapPoints).toEqual([
-        { left: 0.5, tags: ["c1"], top: 0.5 },
-        { left: 1.2, tags: ["c2"], top: 0.4 },
+        { left: 0.5, tags: ["c1"], top: 0.5, rotation: 0 },
+        { left: 1.2, tags: ["c2"], top: 0.4, rotation: 0 },
     ]);
 });

@@ -36,12 +36,14 @@ export class CellParser {
         const zBaseCellType: ZBaseCell = ZBaseCellSchema.parse(jsonObject);
         const type: string = zBaseCellType.type;
 
+        let abstractCell: AbstractCell | undefined;
+
         if (type === "BleedCell") {
             const zBleedCell: ZBleedCell = ZBleedCellSchema.parse(jsonObject);
             const child: AbstractCell = this.parse(zBleedCell.child);
             const leftRight: number = zBleedCell.leftRight;
             const topBottom: number = zBleedCell.topBottom;
-            return new BleedCell(child, leftRight, topBottom);
+            abstractCell = new BleedCell(child, leftRight, topBottom);
         }
 
         if (type === "BufferCell") {
@@ -51,7 +53,7 @@ export class CellParser {
             const width: number = zBufferCell.width;
             const height: number = zBufferCell.height;
             const buffer: Buffer = Buffer.from(zBufferCell.bufferData);
-            return new BufferCell(width, height, buffer);
+            abstractCell = new BufferCell(width, height, buffer);
         }
 
         if (type === "CanvasCell") {
@@ -70,7 +72,7 @@ export class CellParser {
                     child: this.parse(childEntry.child),
                 };
             });
-            return new CanvasCell(width, height, children);
+            abstractCell = new CanvasCell(width, height, children);
         }
 
         if (type === "ColCell") {
@@ -79,7 +81,7 @@ export class CellParser {
                 (child) => this.parse(child)
             );
             const spacing: number = zColCell.spacing;
-            return new ColCell(children, spacing);
+            abstractCell = new ColCell(children, spacing);
         }
 
         if (type === "GridCell") {
@@ -89,7 +91,7 @@ export class CellParser {
             );
             const numCols: number = zGridCell.numCols;
             const spacing: number = zGridCell.spacing;
-            return new GridCell(children, numCols, spacing);
+            abstractCell = new GridCell(children, numCols, spacing);
         }
 
         if (type === "ImageCell") {
@@ -97,7 +99,7 @@ export class CellParser {
             const width: number = zImageCell.width;
             const height: number = zImageCell.height;
             const imageFile: string = zImageCell.imageFile;
-            return new ImageCell(width, height, imageFile);
+            abstractCell = new ImageCell(width, height, imageFile);
         }
 
         if (type === "RowCell") {
@@ -106,7 +108,7 @@ export class CellParser {
                 (child) => this.parse(child)
             );
             const spacing: number = zRowCell.spacing;
-            return new RowCell(children, spacing);
+            abstractCell = new RowCell(children, spacing);
         }
 
         if (type === "SolidCell") {
@@ -115,7 +117,7 @@ export class CellParser {
             const width: number = zSolidCell.width;
             const height: number = zSolidCell.height;
             const color: string = zSolidCell.color;
-            return new SolidCell(width, height, color);
+            abstractCell = new SolidCell(width, height, color);
         }
 
         if (type === "TextCell") {
@@ -140,9 +142,24 @@ export class CellParser {
             if (fontStyle) {
                 textCell.setFontStyle(fontStyle);
             }
-            return textCell;
+            abstractCell = textCell;
         }
 
-        throw new Error(`bad type "${type}"`);
+        if (!abstractCell) {
+            throw new Error(`bad type "${type}"`);
+        }
+
+        if (zBaseCellType.snapPonts) {
+            for (const snapPoint of zBaseCellType.snapPonts) {
+                abstractCell.addSnapPoint({
+                    tags: snapPoint.tags,
+                    left: snapPoint.left,
+                    top: snapPoint.top,
+                    rotation: snapPoint.rotation,
+                });
+            }
+        }
+
+        return abstractCell;
     }
 }

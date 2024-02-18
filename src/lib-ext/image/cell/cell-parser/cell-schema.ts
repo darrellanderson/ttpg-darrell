@@ -1,7 +1,19 @@
 import { z } from "zod";
 
 export const ZBaseCellSchema = z
-    .object({ type: z.string().min(1) })
+    .object({
+        type: z.string().min(1),
+        snapPonts: z
+            .array(
+                z.object({
+                    tags: z.array(z.string().min(1)).optional(),
+                    left: z.number().optional(),
+                    top: z.number().optional(),
+                    rotation: z.number().optional(),
+                })
+            )
+            .optional(),
+    })
     .passthrough();
 export type ZBaseCell = z.infer<typeof ZBaseCellSchema>;
 
