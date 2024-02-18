@@ -98,5 +98,11 @@ it("snap points", () => {
     expect(snapPoints).toEqual([
         { left: 0.5, tags: ["c1"], top: 0.5, rotation: 0 },
         { left: 1.2, tags: ["c2"], top: 0.4, rotation: 0 },
+        {
+            left: 1.5,
+            rotation: 90,
+            tags: [],
+            top: 0.5,
+        },
     ]);
 });
