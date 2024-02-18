@@ -157,8 +157,8 @@ export class CellParser {
             throw new Error(`bad type "${type}"`);
         }
 
-        if (zBaseCellType.snapPonts) {
-            for (const snapPoint of zBaseCellType.snapPonts) {
+        if (zBaseCellType.snapPoints) {
+            for (const snapPoint of zBaseCellType.snapPoints) {
                 abstractCell.addSnapPoint({
                     tags: snapPoint.tags,
                     left: snapPoint.left,

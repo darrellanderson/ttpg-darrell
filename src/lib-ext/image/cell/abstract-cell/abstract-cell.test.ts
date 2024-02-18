@@ -84,11 +84,13 @@ it("getCenterUV", () => {
 
 it("snap points", () => {
     const child1 = new MyCell(1, 1).addSnapPoint({ tags: ["c1"] }); // default center
-    const child2 = new MyCell(1, 1).addSnapPoint({
-        tags: ["c2"],
-        left: 0.2,
-        top: 0.4,
-    });
+    const child2 = new MyCell(1, 1)
+        .addSnapPoint({
+            tags: ["c2"],
+            left: 0.2,
+            top: 0.4,
+        })
+        .addSnapPoint({ rotation: 90 });
     const snapPoints: Array<CellSnapPoint> = new MyCell(2, 1, [
         { child: child1, left: 0, top: 0 },
         { child: child2, left: 1, top: 0 },

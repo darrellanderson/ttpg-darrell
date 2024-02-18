@@ -117,7 +117,7 @@ export abstract class AbstractCell {
      * @returns
      */
     public getChildren(): Array<AbstractCell> {
-        return this._children ? [...this._children] : [];
+        return [...this._children];
     }
 
     /**

@@ -3,7 +3,7 @@ import { z } from "zod";
 export const ZBaseCellSchema = z
     .object({
         type: z.string().min(1),
-        snapPonts: z
+        snapPoints: z
             .array(
                 z.object({
                     tags: z.array(z.string().min(1)).optional(),

@@ -14,6 +14,13 @@ it("constructor", () => {
     expect(bleedCell.getSize()).toEqual({ width: 7, height: 10 });
 });
 
+it("constructor (invalid)", () => {
+    const innerCell = new MyCell(1, 2);
+    expect(() => {
+        new BleedCell(innerCell, -1, 0);
+    }).toThrow();
+});
+
 it("toBuffer", async () => {
     let pixelArray: Uint8ClampedArray;
 

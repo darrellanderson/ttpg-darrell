@@ -4,6 +4,29 @@ it("constructor", () => {
     new CellParser();
 });
 
+it("invalid", () => {
+    expect(() => {
+        new CellParser().parse({ type: "nope!" });
+    }).toThrow();
+});
+
+it("snap points", () => {
+    new CellParser("my-root-dir").parse({
+        type: "BufferCell",
+        width: 1,
+        height: 1,
+        bufferData: "my-data",
+        snapPoints: [
+            {
+                left: 1,
+                top: 1,
+                tags: ["my-tag"],
+                rotation: 1,
+            },
+        ],
+    });
+});
+
 it("BleedCell", () => {
     new CellParser().parse({
         type: "BleedCell",
@@ -117,5 +140,9 @@ it("TextCell", () => {
         width: 1,
         height: 1,
         text: "my-text",
+        font: "my-font",
+        fontStyle: "my-font-style",
+        fontSize: 1,
+        textColor: "#ff0000",
     });
 });
