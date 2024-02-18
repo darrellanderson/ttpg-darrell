@@ -138,7 +138,7 @@ export class CreateBoard extends AbstractCreateAssets {
 
                             const { width, height, depth } =
                                 this._params.topDownWorldSize;
-                            cubeTemplate.addEntry({
+                            cubeTemplate.addSubCubeEntry({
                                 texture: innerFilename,
                                 model: CubeModel.ASSET_FILENAME,
                                 width: chunk.uv.width * width,

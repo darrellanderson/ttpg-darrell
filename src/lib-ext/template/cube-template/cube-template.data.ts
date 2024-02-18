@@ -26,6 +26,18 @@ export const CUBE_SUB_TEMPLATE = {
     SurfaceType: "Cardboard",
 };
 
+export const CUBE_SNAP_POINT = {
+    X: 0,
+    Y: 0,
+    Z: 0,
+    Range: 3,
+    SnapRotation: 2,
+    RotationOffset: 0,
+    Shape: 0,
+    FlipValidity: 0,
+    Tags: [],
+};
+
 export const CUBE_TEMPLATE = {
     Type: "Generic",
     GUID: "$GUID HERE",

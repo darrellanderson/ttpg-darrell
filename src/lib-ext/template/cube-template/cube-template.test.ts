@@ -33,7 +33,7 @@ it("constructor", () => {
 
 it("add/set", () => {
     new CubeTemplate()
-        .addEntry({
+        .addSubCubeEntry({
             texture: "my-texture",
             model: "my-model",
             width: 1,
@@ -53,7 +53,7 @@ it("toTemplate (no entries)", () => {
 it("toTemplate (no guid)", () => {
     expect(() => {
         new CubeTemplate()
-            .addEntry({
+            .addSubCubeEntry({
                 texture: "my-texture",
                 model: "my-model",
                 width: 1,
@@ -66,7 +66,7 @@ it("toTemplate (no guid)", () => {
 
 it("toTemplate", () => {
     const template: string = new CubeTemplate()
-        .addEntry({
+        .addSubCubeEntry({
             texture: "my-texture",
             model: "my-model",
             width: 20,
@@ -125,9 +125,9 @@ it("toTemplate", () => {
     });
 });
 
-it("toTemplate (collider)", () => {
+it("toTemplate (collider, snap point)", () => {
     const template: string = new CubeTemplate()
-        .addEntry({
+        .addSubCubeEntry({
             texture: "my-texture",
             model: "my-model",
             width: 20,
@@ -136,6 +136,9 @@ it("toTemplate (collider)", () => {
             left: 5,
             top: 7,
         })
+        .setSnapPoints([
+            { left: 1, top: 2, rotation: 3, tags: ["my-snap-point"] },
+        ])
         .setCollider("my-collider")
         .setGuidFrom("foo")
         .toTemplate();
@@ -201,7 +204,15 @@ it("toTemplate (collider)", () => {
         ],
         Lights: [],
         SnapPointsGlobal: false,
-        SnapPoints: [],
+        SnapPoints: [
+            {
+                RotationOffset: 3,
+                Tags: ["my-snap-point"],
+                X: 2,
+                Y: 1,
+                Z: 0.5,
+            },
+        ],
         ZoomViewDirection: { X: 0, Y: 0, Z: 1 },
         GroundAccessibility: "Zoom",
         Tags: [],

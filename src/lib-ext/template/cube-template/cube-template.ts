@@ -2,6 +2,7 @@ import crypto from "crypto";
 
 // Treat top-down view as width x height, depth is Z.
 import { CUBE_SUB_TEMPLATE, CUBE_TEMPLATE } from "./cube-template.data";
+import { CellSnapPoint } from "../../../index-ext";
 
 // Entries are always centered, may apply an offset.
 export type CubeTemplateEntry = {
@@ -23,10 +24,11 @@ export type CubeTemplateBoundingBox = {
 };
 
 export class CubeTemplate {
-    private readonly _entries: Array<CubeTemplateEntry> = [];
+    private readonly _subCubeEntries: Array<CubeTemplateEntry> = [];
     private _collider: string | undefined;
     private _guidFrom: string = "";
     private _name: string = "";
+    private _snapPoints: Array<CellSnapPoint> = [];
 
     static getBoundingBox(
         entries: Array<CubeTemplateEntry>
@@ -52,8 +54,8 @@ export class CubeTemplate {
 
     constructor() {}
 
-    addEntry(entry: CubeTemplateEntry): this {
-        this._entries.push(entry);
+    addSubCubeEntry(entry: CubeTemplateEntry): this {
+        this._subCubeEntries.push(entry);
         return this;
     }
 
@@ -85,26 +87,35 @@ export class CubeTemplate {
         return this;
     }
 
+    setSnapPoints(snapPoints: Array<CellSnapPoint>): this {
+        this._snapPoints = [...snapPoints];
+        return this;
+    }
+
     toTemplate(): string {
-        if (this._entries.length === 0) {
+        if (this._subCubeEntries.length === 0) {
             throw new Error("must addEntry");
         }
         if (this._guidFrom === "") {
             throw new Error("must setGuidFrom");
         }
 
-        const modelEntries: Array<object> = this._entries.map((entry) => {
-            const modelEntry = JSON.parse(JSON.stringify(CUBE_SUB_TEMPLATE));
-            modelEntry.Model = entry.model;
-            modelEntry.Texture = entry.texture;
-            modelEntry.Offset.Y = (entry.left ?? 0) + entry.width / 2;
-            modelEntry.Offset.X = -((entry.top ?? 0) + entry.height / 2);
-            modelEntry.Offset.Z = 0;
-            modelEntry.Scale.Y = entry.width;
-            modelEntry.Scale.X = entry.height;
-            modelEntry.Scale.Z = entry.depth;
-            return modelEntry;
-        });
+        const modelEntries: Array<object> = this._subCubeEntries.map(
+            (entry) => {
+                const modelEntry = JSON.parse(
+                    JSON.stringify(CUBE_SUB_TEMPLATE)
+                );
+                modelEntry.Model = entry.model;
+                modelEntry.Texture = entry.texture;
+                modelEntry.Offset.Y = (entry.left ?? 0) + entry.width / 2;
+                modelEntry.Offset.X = -((entry.top ?? 0) + entry.height / 2);
+                modelEntry.Offset.Z = 0;
+                modelEntry.Scale.Y = entry.width;
+                modelEntry.Scale.X = entry.height;
+                modelEntry.Scale.Z = entry.depth;
+                return modelEntry;
+            }
+        );
 
         const guid: string = crypto
             .createHash("sha256")
@@ -118,8 +129,21 @@ export class CubeTemplate {
         template.Name = this._name;
         template.Models = modelEntries;
 
+        const bb = CubeTemplate.getBoundingBox(this._subCubeEntries);
+
+        template.SnapPoints = this._snapPoints.map(
+            (snapPoint: CellSnapPoint) => {
+                return {
+                    Y: snapPoint.left,
+                    X: snapPoint.top,
+                    Z: bb.maxDepth / 2,
+                    RotationOffset: snapPoint.rotation,
+                    Tags: snapPoint.tags,
+                };
+            }
+        );
+
         if (this._collider) {
-            const bb = CubeTemplate.getBoundingBox(this._entries);
             template.Collision[0].Model = this._collider;
             template.Collision[0].Offset.Y = bb.left + (bb.right - bb.left) / 2;
             template.Collision[0].Offset.X = -(
