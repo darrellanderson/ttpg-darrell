@@ -5,24 +5,6 @@ import sharp from "sharp";
 export abstract class AbstractCreateAssets {
     abstract toFileData(): Promise<{ [key: string]: Buffer }>;
 
-    static getAsBuffer(
-        data: string | Buffer,
-        rootDir?: string
-    ): Promise<Buffer> {
-        return new Promise<Buffer>((resolve, reject) => {
-            if (data instanceof Buffer) {
-                resolve(data);
-            } else {
-                sharp(path.join(rootDir ?? ".", data))
-                    .png()
-                    .toBuffer()
-                    .then((buffer) => {
-                        resolve(buffer);
-                    }, reject);
-            }
-        });
-    }
-
     /**
      * Image buffers are PNG internally, re-encode as JPG if requested.
      *

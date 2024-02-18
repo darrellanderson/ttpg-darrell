@@ -1,3 +1,4 @@
+import path from "path";
 import { AbstractCell } from "../abstract-cell/abstract-cell";
 import { BleedCell } from "../bleed-cell/bleed-cell";
 import { BufferCell } from "../buffer-cell/buffer-cell";
@@ -32,6 +33,12 @@ import {
 } from "./cell-schema";
 
 export class CellParser {
+    private readonly _rootDir: string;
+
+    constructor(rootDir?: string) {
+        this._rootDir = rootDir ?? ".";
+    }
+
     parse(jsonObject: object): AbstractCell {
         const zBaseCellType: ZBaseCell = ZBaseCellSchema.parse(jsonObject);
         const type: string = zBaseCellType.type;
@@ -98,7 +105,8 @@ export class CellParser {
             const zImageCell: ZImageCell = ZImageCellSchema.parse(jsonObject);
             const width: number = zImageCell.width;
             const height: number = zImageCell.height;
-            const imageFile: string = zImageCell.imageFile;
+            let imageFile: string = zImageCell.imageFile;
+            imageFile = path.join(this._rootDir, path.normalize(imageFile));
             abstractCell = new ImageCell(width, height, imageFile);
         }
 

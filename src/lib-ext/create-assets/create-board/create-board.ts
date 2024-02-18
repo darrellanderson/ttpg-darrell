@@ -13,6 +13,7 @@ import {
     CreateBoardParams,
     CreateBoardParamsSchema,
 } from "./create-board-params";
+import { CellParser } from "../../image/cell/cell-parser/cell-parser";
 
 /**
  * Create assets for a (potentially large) board.
@@ -50,10 +51,10 @@ export class CreateBoard extends AbstractCreateAssets {
             throw new Error("inset size mismatch");
         }
         return new Promise<Array<ImageSplitChunk>>((resolve, reject): void => {
-            AbstractCreateAssets.getAsBuffer(
-                this._params.srcImage,
+            const abstractCell: AbstractCell = new CellParser(
                 this._params.rootDir
-            ).then((buffer: Buffer) => {
+            ).parse(this._params.srcImage);
+            abstractCell.toBuffer().then((buffer: Buffer) => {
                 new ImageSplit(buffer, CreateBoard.INSET_SIZE.width)
                     .split()
                     .then((chunks: Array<ImageSplitChunk>): void => {

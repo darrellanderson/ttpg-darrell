@@ -2,10 +2,15 @@ import sharp from "sharp";
 import { CreateBoard } from "./create-board";
 import { CreateBoardParams } from "./create-board-params";
 import { CubeModel } from "../../model/cube-model/cube-model";
-import { SolidCell } from "../../image/cell/solid-cell/solid-cell";
+import { ZSolidCell } from "../../image/cell/cell-parser/cell-schema";
 
 it("toFileData", async () => {
-    const srcImage: Buffer = await new SolidCell(2, 1, "#ff0000").toBuffer();
+    const srcImage: ZSolidCell = {
+        type: "SolidCell",
+        width: 2,
+        height: 1,
+        color: "#ff0000",
+    };
 
     const params: CreateBoardParams = {
         templateName: "my-template-name",

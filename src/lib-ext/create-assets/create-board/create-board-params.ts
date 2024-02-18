@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ZBaseCellSchema } from "../../image/cell/cell-parser/cell-schema";
 
 export const CreateBoardParamsSchema = z
     .object({
@@ -16,7 +17,7 @@ export const CreateBoardParamsSchema = z
             .optional(),
 
         // Original board image (filename or buffer).
-        srcImage: z.union([z.string().min(1), z.instanceof(Buffer)]),
+        srcImage: ZBaseCellSchema,
 
         // Name in object library.
         templateName: z.string().min(1),
