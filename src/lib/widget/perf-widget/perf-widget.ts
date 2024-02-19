@@ -12,7 +12,7 @@ import {
 } from "@tabletop-playground/api";
 import { Perf, PerfReport } from "../../perf/perf";
 import { SvgSparkline } from "../../svg/svg-sparkline";
-import { UiVisibility } from "../../ui-visibility/ui-visibility";
+import { UiVisibility } from "../../ui/ui-visibility/ui-visibility";
 
 import { PerfWidgetLocaleData } from "./perf-widget-locale.data";
 import { locale } from "../../locale/locale";

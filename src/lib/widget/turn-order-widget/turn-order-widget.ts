@@ -13,7 +13,7 @@ import {
     TurnOrderWidgetDefaults,
     TurnOrderWidgetParams,
 } from "./turn-order-widget-params";
-import { UiVisibility } from "../../ui-visibility/ui-visibility";
+import { UiVisibility } from "../../ui/ui-visibility/ui-visibility";
 
 /**
  * Display turn order, update when turn order changes.

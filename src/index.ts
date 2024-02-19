@@ -36,7 +36,7 @@ export * from "./lib/shuffle/shuffle";
 export * from "./lib/spawn/spawn";
 export * from "./lib/svg/svg-sparkline";
 export * from "./lib/turn-order/turn-order";
-export * from "./lib/ui-visibility/ui-visibility";
+export * from "./lib/ui/ui-visibility/ui-visibility";
 export * from "./lib/whisper-reporter/whisper-reporter-locale.data";
 export * from "./lib/whisper-reporter/whisper-reporter";
 export * from "./lib/widget/confirm-button/confirm-button";
