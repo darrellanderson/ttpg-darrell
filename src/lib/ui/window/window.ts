@@ -10,4 +10,14 @@ export class Window {
     constructor(params: WindowParams) {
         this._params = params;
     }
+
+    attach(): this {
+        // TODO XXX
+        return this;
+    }
+
+    detach(): this {
+        // TODO XXX
+        return this;
+    }
 }
