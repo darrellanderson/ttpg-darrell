@@ -22,16 +22,22 @@ export type WindowParams = {
         height: number;
     };
 
-    screenAnchor?: {
-        u?: number;
-        v?: number;
-        x: number;
-        y: number;
+    screen?: {
+        anchor: {
+            x: number;
+            y: number;
+        };
+        pos: {
+            u: number;
+            v: number;
+        };
     };
 
-    worldAnchor?: {
-        u?: number;
-        v?: number;
+    world?: {
+        anchor: {
+            x: number;
+            y: number;
+        };
         pos: [x: number, y: number, z: number] | Vector;
         rot?: [pitch: number, yaw: number, roll: number] | Rotator;
     };

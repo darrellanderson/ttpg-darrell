@@ -1,4 +1,5 @@
 import {
+    Border,
     HorizontalBox,
     ImageButton,
     LayoutBox,
@@ -6,7 +7,9 @@ import {
     ScreenUIElement,
     Text,
     UIElement,
+    VerticalBox,
     Widget,
+    world,
 } from "@tabletop-playground/api";
 import { WINDOW_BUTTON_ASSET, WindowParams } from "./window-params";
 
@@ -161,12 +164,42 @@ export class PlayerWindow {
             titleBarPanel.addChild(button, 0);
         }
 
-        return titleBar;
+        const window: VerticalBox = new VerticalBox()
+            .setChildDistance(padding)
+            .addChild(titleBar);
+        if (!this._collapsed) {
+            const spacer: Widget = new LayoutBox()
+                .setOverrideHeight(padding)
+                .setChild(new Border().setColor([0, 0, 0, 0]));
+            const child: Widget = this._params.createWidget(this._scale);
+            const childPadded = new LayoutBox()
+                .setPadding(padding, padding, padding, padding)
+                .setChild(child);
+            window.addChild(spacer).addChild(childPadded);
+        }
+
+        return new Border().setChild(window);
     }
 
-    attach(): void {}
+    attach(): void {
+        if (this._target === "screen") {
+            const ui = new ScreenUIElement();
+            ui.anchorX = this._params.screenAnchor?.x || 0;
+            ui.anchorY = this._params.screenAnchor?.y || 0;
+            if (this._params.screenAnchor?.u) world.addScreenUI(ui);
+        } else {
+            // TODO XXX
+        }
+    }
 
     detach(): void {
-        // TODO XXX
+        if (this._screenUi) {
+            world.removeScreenUIElement(this._screenUi);
+            this._screenUi = undefined;
+        }
+        if (this._worldUi) {
+            world.removeUIElement(this._worldUi);
+            this._worldUi = undefined;
+        }
     }
 }
