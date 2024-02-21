@@ -96,6 +96,7 @@ export class PlayerWindow {
     constructor(params: WindowParams, playerSlot: number) {
         this._params = params;
         this._playerSlot = playerSlot;
+        this._target = params.defaultTarget ?? "screen";
     }
 
     createWidget(): Widget {
@@ -184,7 +185,7 @@ export class PlayerWindow {
         return new Border().setChild(window);
     }
 
-    attach(): void {
+    attach(): this {
         if (this._target === "screen") {
             const ui = new ScreenUIElement();
             this._screenUi = ui;
@@ -221,6 +222,8 @@ export class PlayerWindow {
                 ui.position = new Vector(x, y, z);
             } else if (this._params.world?.pos) {
                 ui.position = this._params.world.pos;
+            } else {
+                ui.position = new Vector(0, 0, world.getTableHeight() + 3);
             }
 
             if (Array.isArray(this._params.world?.rot)) {
@@ -232,6 +235,8 @@ export class PlayerWindow {
                 ui.rotation = new Rotator(pitch, yaw, roll);
             } else if (this._params.world?.rot) {
                 ui.rotation = this._params.world.rot;
+            } else {
+                ui.rotation = new Rotator(0, 0, 0);
             }
 
             ui.width = this._params.size.width;
@@ -245,9 +250,10 @@ export class PlayerWindow {
 
             world.addUI(ui);
         }
+        return this;
     }
 
-    detach(): void {
+    detach(): this {
         if (this._screenUi) {
             world.removeScreenUIElement(this._screenUi);
             this._screenUi = undefined;
@@ -256,5 +262,6 @@ export class PlayerWindow {
             world.removeUIElement(this._worldUi);
             this._worldUi = undefined;
         }
+        return this;
     }
 }

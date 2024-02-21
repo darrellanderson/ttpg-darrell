@@ -22,6 +22,8 @@ export type WindowParams = {
         height: number;
     };
 
+    defaultTarget?: "screen" | "world";
+
     screen?: {
         anchor: {
             x: number;

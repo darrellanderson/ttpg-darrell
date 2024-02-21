@@ -1,5 +1,6 @@
 import { LayoutBox, Widget } from "@tabletop-playground/api";
 import { Window } from "./window";
+import { WindowParams } from "./window-params";
 
 it("constructor", () => {
     new Window({
