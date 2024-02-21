@@ -164,6 +164,7 @@ export class CellParser {
                     left: snapPoint.left,
                     top: snapPoint.top,
                     rotation: snapPoint.rotation,
+                    range: snapPoint.range,
                 });
             }
         }

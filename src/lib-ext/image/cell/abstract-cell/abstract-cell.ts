@@ -22,6 +22,7 @@ export type CellSnapPoint = {
     left?: number;
     top?: number;
     rotation?: number;
+    range?: number;
 };
 
 /**

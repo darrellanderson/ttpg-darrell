@@ -17,6 +17,7 @@ import {
     world,
 } from "@tabletop-playground/api";
 import { WINDOW_BUTTON_ASSET, WindowParams } from "./window-params";
+import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate";
 
 const packageId = refPackageId;
 
@@ -34,11 +35,16 @@ export class PlayerWindow {
     private _screenUi: ScreenUIElement | undefined;
     private _worldUi: UIElement | undefined;
 
+    public readonly onStateChanged = new TriggerableMulticastDelegate<
+        () => void
+    >();
+
     private readonly _onClickClose: (
         button: ImageButton,
         player: Player
     ) => void = (): void => {
         this.detach();
+        this.onStateChanged.trigger();
     };
 
     private readonly _onClickCollapse: (
@@ -48,6 +54,7 @@ export class PlayerWindow {
         this.detach();
         this._collapsed = true;
         this.attach();
+        this.onStateChanged.trigger();
     };
 
     private readonly _onClickExpand: (
@@ -57,6 +64,7 @@ export class PlayerWindow {
         this.detach();
         this._collapsed = false;
         this.attach();
+        this.onStateChanged.trigger();
     };
 
     private readonly _onClickGrow: (
@@ -67,6 +75,7 @@ export class PlayerWindow {
         this._scale += PlayerWindow.SCALE_DELTA;
         this._scale = Math.min(this._scale, 3);
         this.attach();
+        this.onStateChanged.trigger();
     };
 
     private readonly _onClickShrink: (
@@ -77,6 +86,7 @@ export class PlayerWindow {
         this._scale -= PlayerWindow.SCALE_DELTA;
         this._scale = Math.max(this._scale, 0.3);
         this.attach();
+        this.onStateChanged.trigger();
     };
 
     private readonly _onClickToScreen: (
@@ -86,6 +96,7 @@ export class PlayerWindow {
         this.detach();
         this._target = "screen";
         this.attach();
+        this.onStateChanged.trigger();
     };
 
     private readonly _onClickToWorld: (
@@ -95,6 +106,7 @@ export class PlayerWindow {
         this.detach();
         this._target = "world";
         this.attach();
+        this.onStateChanged.trigger();
     };
 
     constructor(params: WindowParams, playerSlot: number) {
@@ -222,6 +234,14 @@ export class PlayerWindow {
     }
 
     attach(): this {
+        // Screen UI does not exist for VR players.
+        const player: Player | undefined = world.getPlayerBySlot(
+            this._playerSlot
+        );
+        if (player?.isUsingVR()) {
+            this._target = "world";
+        }
+
         const { width, height } = this.getLayoutSizes();
 
         if (this._target === "screen") {

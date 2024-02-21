@@ -206,7 +206,11 @@ it("toTemplate (collider, snap point)", () => {
         SnapPointsGlobal: false,
         SnapPoints: [
             {
+                FlipValidity: 0,
+                Range: 3,
                 RotationOffset: 3,
+                Shape: 0,
+                SnapRotation: 2,
                 Tags: ["my-snap-point"],
                 X: 2,
                 Y: 1,

@@ -10,6 +10,7 @@ export const ZBaseCellSchema = z
                     left: z.number().optional(),
                     top: z.number().optional(),
                     rotation: z.number().optional(),
+                    range: z.number().optional(),
                 })
             )
             .optional(),

@@ -7,9 +7,16 @@
     },
     "srcImage": {
         "type": "ImageCell",
-        "width": 100,
-        "height": 100,
-        "imageFile": "prebuild/create-board-demo.jpg"
+        "width": 9283,
+        "height": 4961,
+        "imageFile": "prebuild/create-board-demo.jpg",
+        "snapPoints": [
+            {
+                "tags": ["test"],
+                "left": 100,
+                "top": 100
+            }
+        ]
     },
     "templateName": "demo",
     "topDownWorldSize": {

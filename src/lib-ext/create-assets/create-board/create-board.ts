@@ -3,7 +3,7 @@ import {
     ImageSplit,
     ImageSplitChunk,
 } from "../../image/image-split/image-split";
-import { AbstractCell } from "../../../index-ext";
+import { AbstractCell, CellSnapPoint } from "../../../index-ext";
 import { AbstractCreateAssets } from "../abstract-create-assets/abstract-create-assets";
 import { BleedCell } from "../../image/cell/bleed-cell/bleed-cell";
 import { BufferCell } from "../../image/cell/buffer-cell/buffer-cell";
@@ -33,6 +33,7 @@ export class CreateBoard extends AbstractCreateAssets {
         CubeModel.getInsetForUVs(4096, 4096);
 
     private readonly _params: CreateBoardParams;
+    private readonly _srcImageCell: AbstractCell;
 
     static fromParamsJson(paramsJson: Buffer): CreateBoard {
         const params: CreateBoardParams = CreateBoardParamsSchema.parse(
@@ -44,6 +45,9 @@ export class CreateBoard extends AbstractCreateAssets {
     constructor(params: CreateBoardParams) {
         super();
         this._params = params;
+        this._srcImageCell = new CellParser(this._params.rootDir).parse(
+            this._params.srcImage
+        );
     }
 
     _splitImage(): Promise<Array<ImageSplitChunk>> {
@@ -51,10 +55,7 @@ export class CreateBoard extends AbstractCreateAssets {
             throw new Error("inset size mismatch");
         }
         return new Promise<Array<ImageSplitChunk>>((resolve, reject): void => {
-            const abstractCell: AbstractCell = new CellParser(
-                this._params.rootDir
-            ).parse(this._params.srcImage);
-            abstractCell.toBuffer().then((buffer: Buffer) => {
+            this._srcImageCell.toBuffer().then((buffer: Buffer) => {
                 new ImageSplit(buffer, CreateBoard.INSET_SIZE.width)
                     .split()
                     .then((chunks: Array<ImageSplitChunk>): void => {
@@ -121,6 +122,34 @@ export class CreateBoard extends AbstractCreateAssets {
             .setGuidFrom(templateFilename)
             .setName(this._params.templateName);
 
+        // Snap points.
+        const imgSize: { width: number; height: number } =
+            this._srcImageCell.getSize();
+        const worldSize: { width: number; height: number; depth: number } =
+            this._params.topDownWorldSize;
+        const imgSpaceSnapPoints: Array<CellSnapPoint> =
+            this._srcImageCell.getSnapPoints();
+        const worldSpaceSnapPoints: Array<CellSnapPoint> =
+            imgSpaceSnapPoints.map(
+                (snapPoint: CellSnapPoint): CellSnapPoint => {
+                    // Convert to world dimensions.
+                    snapPoint.left =
+                        ((snapPoint.left ?? 0) / imgSize.width) *
+                        worldSize.width;
+                    snapPoint.top =
+                        ((snapPoint.top ?? 0) / imgSize.height) *
+                        worldSize.height;
+                    // Shift to origin being object center.
+                    snapPoint.left =
+                        (snapPoint.left ?? 0) - worldSize.width / 2;
+                    snapPoint.top = worldSize.height / 2 - (snapPoint.top ?? 0);
+
+                    return snapPoint;
+                }
+            );
+        cubeTemplate.setSnapPoints(worldSpaceSnapPoints);
+
+        // Image chunks.
         return new Promise<{ [key: string]: Buffer }>(
             (resolve, reject): void => {
                 this._splitImage().then(

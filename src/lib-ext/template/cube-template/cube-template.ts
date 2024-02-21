@@ -1,7 +1,11 @@
 import crypto from "crypto";
 
 // Treat top-down view as width x height, depth is Z.
-import { CUBE_SUB_TEMPLATE, CUBE_TEMPLATE } from "./cube-template.data";
+import {
+    CUBE_SNAP_POINT,
+    CUBE_SUB_TEMPLATE,
+    CUBE_TEMPLATE,
+} from "./cube-template.data";
 import { CellSnapPoint } from "../../../index-ext";
 
 // Entries are always centered, may apply an offset.
@@ -133,13 +137,15 @@ export class CubeTemplate {
 
         template.SnapPoints = this._snapPoints.map(
             (snapPoint: CellSnapPoint) => {
-                return {
-                    Y: snapPoint.left,
-                    X: snapPoint.top,
-                    Z: bb.maxDepth / 2,
-                    RotationOffset: snapPoint.rotation,
-                    Tags: snapPoint.tags,
-                };
+                const templateSnapPoint = JSON.parse(
+                    JSON.stringify(CUBE_SNAP_POINT)
+                );
+                templateSnapPoint.Y = snapPoint.left ?? 0;
+                templateSnapPoint.X = snapPoint.top ?? 0;
+                templateSnapPoint.Z = bb.maxDepth / 2 ?? 0;
+                templateSnapPoint.RotationOffset = snapPoint.rotation ?? 0;
+                templateSnapPoint.Tags = snapPoint.tags ?? [];
+                return templateSnapPoint;
             }
         );
 
@@ -157,6 +163,6 @@ export class CubeTemplate {
             delete template.Collision;
         }
 
-        return JSON.stringify(template);
+        return JSON.stringify(template, null, 4);
     }
 }
