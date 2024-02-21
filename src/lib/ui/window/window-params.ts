@@ -1,13 +1,13 @@
 import { Rotator, Vector, Widget } from "@tabletop-playground/api";
 
 export const WINDOW_BUTTON_ASSET = {
-    CLOSE: "ui/window/close.png",
-    COLLAPSE: "ui/window/collapse.png",
-    EXPAND: "ui/window/expand.png",
-    GROW: "ui/window/grow.png",
-    SHRINK: "ui/window/shrink.png",
-    TO_SCREEN: "ui/window/to-screen.png",
-    TO_WORLD: "ui/window/to-window.png",
+    CLOSE: "ui/window/close.jpg",
+    COLLAPSE: "ui/window/collapse.jpg",
+    EXPAND: "ui/window/expand.jpg",
+    GROW: "ui/window/grow.jpg",
+    SHRINK: "ui/window/shrink.jpg",
+    TO_SCREEN: "ui/window/to-screen.jpg",
+    TO_WORLD: "ui/window/to-world.jpg",
 } as const;
 
 export type WindowParams = {

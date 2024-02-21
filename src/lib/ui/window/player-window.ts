@@ -1,5 +1,6 @@
 import {
     Border,
+    Canvas,
     HorizontalBox,
     ImageButton,
     LayoutBox,
@@ -10,15 +11,18 @@ import {
     Text,
     UIElement,
     Vector,
-    VerticalBox,
+    VerticalAlignment,
     Widget,
+    refPackageId,
     world,
 } from "@tabletop-playground/api";
 import { WINDOW_BUTTON_ASSET, WindowParams } from "./window-params";
 
+const packageId = refPackageId;
+
 export class PlayerWindow {
     private static SCALE_DELTA = 0.1;
-    private static TITLE_HEIGHT = 20;
+    private static TITLE_HEIGHT = 30;
 
     private readonly _params: WindowParams;
     private readonly _playerSlot: number;
@@ -99,32 +103,57 @@ export class PlayerWindow {
         this._target = params.defaultTarget ?? "screen";
     }
 
-    createWidget(): Widget {
-        const padding = Math.round(PlayerWindow.TITLE_HEIGHT * 0.1);
-        const buttonSize = PlayerWindow.TITLE_HEIGHT - padding * 2;
-        const fontSize = Math.round(buttonSize * 0.9);
-        const spacing = padding * 2;
+    private getLayoutSizes(): {
+        titleHeight: number;
+        spacerHeight: number;
+        width: number;
+        height: number;
+    } {
+        const titleHeight = Math.ceil(PlayerWindow.TITLE_HEIGHT * this._scale);
+        const spacerHeight = Math.ceil(titleHeight * 0.1);
+        const width = Math.ceil(this._params.size.width * this._scale);
+        const height =
+            titleHeight +
+            (this._collapsed
+                ? 0
+                : spacerHeight +
+                  Math.ceil(this._params.size.height * this._scale));
+        return { titleHeight, spacerHeight, width, height };
+    }
 
-        const titleBarPanel: HorizontalBox =
-            new HorizontalBox().setChildDistance(spacing);
+    createWidget(): Widget {
+        const { titleHeight, spacerHeight, width, height } =
+            this.getLayoutSizes();
+        const padding = spacerHeight * 2;
+        const buttonSize = titleHeight - padding * 2;
+        const fontSize = buttonSize * 0.6;
+
+        const titleBarPanel: HorizontalBox = new HorizontalBox()
+            .setChildDistance(padding / 2)
+            .setVerticalAlignment(VerticalAlignment.Center);
         const titleBar: Widget = new LayoutBox()
-            .setPadding(padding, padding, padding, padding)
+            .setOverrideHeight(titleHeight)
+            .setPadding(padding, padding, 0, 0)
             .setChild(titleBarPanel);
 
         const title: Text = new Text()
+            .setBold(true)
             .setFontSize(fontSize)
             .setText(this._params.title ?? "");
-        titleBarPanel.addChild(title, 1);
+        const titleBox: Widget = new LayoutBox()
+            .setPadding(0, 0, -padding, 0)
+            .setChild(title);
+        titleBarPanel.addChild(titleBox, 1);
 
         let button: ImageButton = new ImageButton()
             .setImageSize(buttonSize, buttonSize)
-            .setImage(WINDOW_BUTTON_ASSET.SHRINK);
+            .setImage(WINDOW_BUTTON_ASSET.SHRINK, packageId);
         button.onClicked.add(this._onClickShrink);
         titleBarPanel.addChild(button, 0);
 
         button = new ImageButton()
             .setImageSize(buttonSize, buttonSize)
-            .setImage(WINDOW_BUTTON_ASSET.GROW);
+            .setImage(WINDOW_BUTTON_ASSET.GROW, packageId);
         button.onClicked.add(this._onClickGrow);
         titleBarPanel.addChild(button, 0);
 
@@ -139,7 +168,7 @@ export class PlayerWindow {
                     : this._onClickToScreen;
             const button: ImageButton = new ImageButton()
                 .setImageSize(buttonSize, buttonSize)
-                .setImage(image);
+                .setImage(image, packageId);
             button.onClicked.add(onClick);
             titleBarPanel.addChild(button, 0);
         }
@@ -153,7 +182,7 @@ export class PlayerWindow {
                 : this._onClickCollapse;
             const button: ImageButton = new ImageButton()
                 .setImageSize(buttonSize, buttonSize)
-                .setImage(image);
+                .setImage(image, packageId);
             button.onClicked.add(onClick);
             titleBarPanel.addChild(button, 0);
         }
@@ -163,29 +192,38 @@ export class PlayerWindow {
             const onClick = this._onClickClose;
             const button: ImageButton = new ImageButton()
                 .setImageSize(buttonSize, buttonSize)
-                .setImage(image);
+                .setImage(image, packageId);
             button.onClicked.add(onClick);
             titleBarPanel.addChild(button, 0);
         }
 
-        const window: VerticalBox = new VerticalBox()
-            .setChildDistance(padding)
-            .addChild(titleBar);
+        const spacer = new Border().setColor([0, 0, 0, 0]);
+        const child: Widget = this._params.createWidget(this._scale);
+        const window: Canvas = new Canvas()
+            .addChild(new Border(), 0, 0, width, height)
+            .addChild(titleBar, 0, 0, width, titleHeight);
         if (!this._collapsed) {
-            const spacer: Widget = new LayoutBox()
-                .setOverrideHeight(padding)
-                .setChild(new Border().setColor([0, 0, 0, 0]));
-            const child: Widget = this._params.createWidget(this._scale);
-            const childPadded = new LayoutBox()
-                .setPadding(padding, padding, padding, padding)
-                .setChild(child);
-            window.addChild(spacer).addChild(childPadded);
+            window
+                .addChild(spacer, 0, titleHeight, width, spacerHeight)
+                .addChild(
+                    child,
+                    0,
+                    titleHeight + spacerHeight,
+                    width,
+                    height - titleHeight - spacerHeight
+                );
         }
+        const windowBox = new LayoutBox()
+            .setOverrideWidth(width)
+            .setOverrideHeight(height)
+            .setChild(window);
 
-        return new Border().setChild(window);
+        return windowBox;
     }
 
     attach(): this {
+        const { width, height } = this.getLayoutSizes();
+
         if (this._target === "screen") {
             const ui = new ScreenUIElement();
             this._screenUi = ui;
@@ -200,8 +238,8 @@ export class PlayerWindow {
 
             ui.relativeWidth = false;
             ui.relativeHeight = false;
-            ui.width = this._params.size.width;
-            ui.height = this._params.size.height;
+            ui.width = width;
+            ui.height = height;
 
             ui.players = new PlayerPermission().setPlayerSlots([
                 this._playerSlot,
@@ -239,8 +277,8 @@ export class PlayerWindow {
                 ui.rotation = new Rotator(0, 0, 0);
             }
 
-            ui.width = this._params.size.width;
-            ui.height = this._params.size.height;
+            ui.width = width;
+            ui.height = height;
             ui.useWidgetSize = false;
 
             ui.players = new PlayerPermission().setPlayerSlots([
