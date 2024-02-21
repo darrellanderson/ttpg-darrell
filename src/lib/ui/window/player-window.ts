@@ -4,9 +4,12 @@ import {
     ImageButton,
     LayoutBox,
     Player,
+    PlayerPermission,
+    Rotator,
     ScreenUIElement,
     Text,
     UIElement,
+    Vector,
     VerticalBox,
     Widget,
     world,
@@ -95,7 +98,7 @@ export class PlayerWindow {
         this._playerSlot = playerSlot;
     }
 
-    createWidger(): Widget {
+    createWidget(): Widget {
         const padding = Math.round(PlayerWindow.TITLE_HEIGHT * 0.1);
         const buttonSize = PlayerWindow.TITLE_HEIGHT - padding * 2;
         const fontSize = Math.round(buttonSize * 0.9);
@@ -184,11 +187,63 @@ export class PlayerWindow {
     attach(): void {
         if (this._target === "screen") {
             const ui = new ScreenUIElement();
-            ui.anchorX = this._params.screenAnchor?.x || 0;
-            ui.anchorY = this._params.screenAnchor?.y || 0;
-            if (this._params.screenAnchor?.u) world.addScreenUI(ui);
+            this._screenUi = ui;
+
+            ui.anchorX = this._params.screen?.anchor.x || 0.5;
+            ui.anchorY = this._params.screen?.anchor.y || 0.5;
+
+            ui.relativePositionX = true;
+            ui.relativePositionY = true;
+            ui.positionX = this._params.screen?.pos.u ?? 0;
+            ui.positionY = this._params.screen?.pos.v ?? 0;
+
+            ui.relativeWidth = false;
+            ui.relativeHeight = false;
+            ui.width = this._params.size.width;
+            ui.height = this._params.size.height;
+
+            ui.players = new PlayerPermission().setPlayerSlots([
+                this._playerSlot,
+            ]);
+            ui.widget = this.createWidget();
+
+            world.addScreenUI(ui);
         } else {
-            // TODO XXX
+            const ui = new UIElement();
+            this._worldUi = ui;
+
+            ui.anchorX = this._params.world?.anchor.x ?? 0.5;
+            ui.anchorY = this._params.world?.anchor.y ?? 0.5;
+
+            if (Array.isArray(this._params.world?.pos)) {
+                const [x, y, z]: [x: number, y: number, z: number] =
+                    this._params.world.pos;
+                ui.position = new Vector(x, y, z);
+            } else if (this._params.world?.pos) {
+                ui.position = this._params.world.pos;
+            }
+
+            if (Array.isArray(this._params.world?.rot)) {
+                const [pitch, yaw, roll]: [
+                    pitch: number,
+                    yaw: number,
+                    roll: number,
+                ] = this._params.world.rot;
+                ui.rotation = new Rotator(pitch, yaw, roll);
+            } else if (this._params.world?.rot) {
+                ui.rotation = this._params.world.rot;
+            }
+
+            ui.width = this._params.size.width;
+            ui.height = this._params.size.height;
+            ui.useWidgetSize = false;
+
+            ui.players = new PlayerPermission().setPlayerSlots([
+                this._playerSlot,
+            ]);
+            ui.widget = this.createWidget();
+
+            world.addUI(ui);
         }
     }
 
