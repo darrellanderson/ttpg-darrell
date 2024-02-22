@@ -1,5 +1,5 @@
 import { world } from "@tabletop-playground/api";
-import { NamedspacedId } from "../namespace-id/namespace-id";
+import { NamespacedId } from "../namespace-id/namespace-id";
 import { TriggerableMulticastDelegate } from "../event/triggerable-multicast-delegate";
 import { z } from "zod";
 
@@ -31,10 +31,10 @@ export class TurnOrder {
         new TriggerableMulticastDelegate<(turnOrder: TurnOrder) => void>();
 
     private static readonly _idToTurnOrder: {
-        [key: NamedspacedId]: TurnOrder;
+        [key: NamespacedId]: TurnOrder;
     } = {};
 
-    private readonly _savedDataKey: NamedspacedId;
+    private readonly _savedDataKey: NamespacedId;
     private readonly _passed: Set<PlayerSlot> = new Set();
     private readonly _eliminated: Set<PlayerSlot> = new Set();
 
@@ -44,7 +44,7 @@ export class TurnOrder {
     private _snake: boolean = false;
     private _snakeNeedsAnotherTurn: boolean = false;
 
-    static getInstance(savedDataKey: NamedspacedId): TurnOrder {
+    static getInstance(savedDataKey: NamespacedId): TurnOrder {
         let turnOrder: TurnOrder | undefined =
             TurnOrder._idToTurnOrder[savedDataKey];
         if (!turnOrder) {
@@ -60,12 +60,12 @@ export class TurnOrder {
      *
      * @param savedDataKey
      */
-    constructor(savedDataKey: NamedspacedId) {
+    constructor(savedDataKey: NamespacedId) {
         this._savedDataKey = savedDataKey;
         this._restoreState();
     }
 
-    getId(): NamedspacedId {
+    getId(): NamespacedId {
         return this._savedDataKey;
     }
 

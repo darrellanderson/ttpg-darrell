@@ -278,6 +278,8 @@ export class PlayerWindow {
     }
 
     attach(): this {
+        this.detach();
+
         // Screen UI does not exist for VR players.
         const player: Player | undefined = world.getPlayerBySlot(
             this._playerSlot

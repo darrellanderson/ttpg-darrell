@@ -22,16 +22,6 @@ const playerSlots: Array<number> = world
     .getAllPlayers()
     .map((player) => player.getSlot());
 
-const window = new Window(params, playerSlots);
+const window = new Window(params, playerSlots, "@window/testp");
 
-const key = "window-key";
-window.onStateChanged.add(() => {
-    const state: string = window.getState();
-    world.setSavedData(state, key);
-});
-const state: string = world.getSavedData(key);
-if (state && state.length > 0) {
-    window.applyState(state);
-} else {
-    window.attach();
-}
+window.attach();

@@ -1,4 +1,6 @@
+import { world } from "@tabletop-playground/api";
 import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate";
+import { NamespacedId } from "../../namespace-id/namespace-id";
 import { PlayerWindow } from "./player-window";
 import { WindowParams } from "./window-params";
 
@@ -40,14 +42,35 @@ export class Window {
         }
     }
 
-    constructor(params: WindowParams, playerSlots: Array<number>) {
+    constructor(
+        params: WindowParams,
+        playerSlots: Array<number>,
+        persistenceKey?: NamespacedId
+    ) {
+        // Create (unattached) per-player windows.
         this._playerWindows = playerSlots.map(
             (playerSlot) => new PlayerWindow(params, playerSlot)
         );
+
+        // Listen for per-player window changes, escalate to our event.
         for (const playerWindow of this._playerWindows) {
             playerWindow.onStateChanged.add(() => {
                 this.onStateChanged.trigger();
             });
+        }
+
+        if (persistenceKey) {
+            // Save persistent data on state change.
+            this.onStateChanged.add(() => {
+                const state: string = this.getState();
+                world.setSavedData(state, persistenceKey);
+            });
+
+            // Apply any persistent data.
+            const state: string = world.getSavedData(persistenceKey);
+            if (state && state.length > 0) {
+                this.applyState(state);
+            }
         }
     }
 
