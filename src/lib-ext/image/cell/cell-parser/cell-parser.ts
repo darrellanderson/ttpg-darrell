@@ -1,5 +1,5 @@
 import path from "path";
-import { AbstractCell } from "../abstract-cell/abstract-cell";
+import { AbstractCell, CellSnapPoint } from "../abstract-cell/abstract-cell";
 import { BleedCell } from "../bleed-cell/bleed-cell";
 import { BufferCell } from "../buffer-cell/buffer-cell";
 import { CanvasCell } from "../canvas-cell/canvas-cell";
@@ -158,14 +158,38 @@ export class CellParser {
         }
 
         if (zBaseCellType.snapPoints) {
+            let prev: CellSnapPoint | undefined = undefined;
             for (const snapPoint of zBaseCellType.snapPoints) {
-                abstractCell.addSnapPoint({
+                if (snapPoint.createCountToPrev) {
+                    if (!prev) {
+                        throw new Error("no prev");
+                    }
+                    // Interpoate N points from prev to this.
+                    // Prev (index 0) was already added, last will be added after.
+                    const dWidth: number =
+                        (snapPoint.left ?? 0) - (prev.left ?? 0);
+                    const dHeight: number =
+                        (snapPoint.top ?? 0) - (prev.top ?? 0);
+                    for (let i = 1; i < snapPoint.createCountToPrev; i++) {
+                        const d: number = i / snapPoint.createCountToPrev;
+                        abstractCell.addSnapPoint({
+                            tags: snapPoint.tags,
+                            left: (prev.left ?? 0) + dWidth * d,
+                            top: (prev.top ?? 0) + dHeight * d,
+                            rotation: snapPoint.rotation,
+                            range: snapPoint.range,
+                        });
+                    }
+                }
+                const cellSnapPoint: CellSnapPoint = {
                     tags: snapPoint.tags,
                     left: snapPoint.left,
                     top: snapPoint.top,
                     rotation: snapPoint.rotation,
                     range: snapPoint.range,
-                });
+                };
+                abstractCell.addSnapPoint(cellSnapPoint);
+                prev = cellSnapPoint;
             }
         }
 

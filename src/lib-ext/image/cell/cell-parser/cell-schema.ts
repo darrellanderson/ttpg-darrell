@@ -11,6 +11,7 @@ export const ZBaseCellSchema = z
                     top: z.number().optional(),
                     rotation: z.number().optional(),
                     range: z.number().optional(),
+                    createCountToPrev: z.number().optional(), // interpolate N new points between
                 })
             )
             .optional(),

@@ -11,10 +11,248 @@
         "height": 4961,
         "imageFile": "prebuild/create-board-demo.jpg",
         "snapPoints": [
+            { "tags": ["score"], "left": 320, "top": 4829 },
             {
-                "tags": ["test"],
-                "left": 100,
-                "top": 100
+                "tags": ["score"],
+                "left": 9142,
+                "top": 4829,
+                "createCountToPrev": 50
+            },
+            {
+                "tags": ["card.action", "card.action.discard"],
+                "left": 595,
+                "top": 464,
+                "rotation": -90
+            },
+            {
+                "tags": ["card.action"],
+                "left": 571,
+                "top": 3579,
+                "rotation": -90
+            },
+            {
+                "tags": ["ambition-marker"],
+                "left": 8295,
+                "top": 748,
+                "rotation": 0
+            },
+            {
+                "tags": ["ambition-marker"],
+                "left": 8655,
+                "top": 747,
+                "rotation": 0
+            },
+            {
+                "tags": ["ambition-marker"],
+                "left": 9012,
+                "top": 745,
+                "rotation": 0
+            },
+            {
+                "tags": ["chapter-marker"],
+                "left": 8164,
+                "top": 4547,
+                "rotation": 0
+            },
+            {
+                "tags": ["chapter-marker"],
+                "left": 8409,
+                "top": 4551,
+                "rotation": 0
+            },
+            {
+                "tags": ["chapter-marker"],
+                "left": 8652,
+                "top": 4548,
+                "rotation": 0
+            },
+            {
+                "tags": ["chapter-marker"],
+                "left": 8896,
+                "top": 4548,
+                "rotation": 0
+            },
+            {
+                "tags": ["chapter-marker"],
+                "left": 9135,
+                "top": 4548,
+                "rotation": 0
+            },
+            {
+                "tags": ["zero-marker"],
+                "left": 584,
+                "top": 4245,
+                "rotation": 0
+            },
+            { "tags": ["building"], "left": 4087, "top": 627, "rotation": 0 },
+            { "tags": ["building"], "left": 4395, "top": 485, "rotation": 0 },
+            { "tags": ["building"], "left": 5109, "top": 598, "rotation": 0 },
+            { "tags": ["building"], "left": 5940, "top": 421, "rotation": 0 },
+            { "tags": ["building"], "left": 6213, "top": 639, "rotation": 0 },
+            { "tags": ["building"], "left": 6650, "top": 1208, "rotation": 0 },
+            { "tags": ["building"], "left": 7426, "top": 1680, "rotation": 0 },
+            { "tags": ["building"], "left": 6936, "top": 2379, "rotation": 0 },
+            { "tags": ["building"], "left": 7212, "top": 2529, "rotation": 0 },
+            { "tags": ["building"], "left": 7121, "top": 3029, "rotation": 0 },
+            { "tags": ["building"], "left": 6209, "top": 3353, "rotation": 0 },
+            { "tags": ["building"], "left": 6431, "top": 4125, "rotation": 0 },
+            { "tags": ["building"], "left": 6169, "top": 4324, "rotation": 0 },
+            { "tags": ["building"], "left": 5368, "top": 4224, "rotation": 0 },
+            { "tags": ["building"], "left": 5095, "top": 4021, "rotation": 0 },
+            { "tags": ["building"], "left": 4370, "top": 4451, "rotation": 0 },
+            { "tags": ["building"], "left": 4108, "top": 4259, "rotation": 0 },
+            { "tags": ["building"], "left": 3347, "top": 4042, "rotation": 0 },
+            { "tags": ["building"], "left": 1955, "top": 3917, "rotation": 0 },
+            { "tags": ["building"], "left": 2434, "top": 2965, "rotation": 0 },
+            { "tags": ["building"], "left": 1868, "top": 2365, "rotation": 0 },
+            { "tags": ["building"], "left": 1607, "top": 2563, "rotation": 0 },
+            { "tags": ["building"], "left": 2428, "top": 1850, "rotation": 0 },
+            { "tags": ["building"], "left": 2075, "top": 1069, "rotation": 0 },
+            { "tags": ["building"], "left": 2335, "top": 865, "rotation": 0 },
+            { "tags": ["building"], "left": 3090, "top": 635, "rotation": 0 },
+            {
+                "tags": ["path-marker", "cluster-1"],
+                "left": 4803,
+                "top": 1419,
+                "rotation": 10
+            },
+            {
+                "tags": ["path-marker", "cluster-2"],
+                "left": 5667,
+                "top": 2104,
+                "rotation": 70
+            },
+            {
+                "tags": ["path-marker", "cluster-3"],
+                "left": 5516,
+                "top": 2960,
+                "rotation": 130
+            },
+            {
+                "tags": ["path-marker", "cluster-4"],
+                "left": 4434,
+                "top": 3336,
+                "rotation": -168
+            },
+            {
+                "tags": ["path-marker", "cluster-5"],
+                "left": 3624,
+                "top": 2672,
+                "rotation": -113.2
+            },
+            {
+                "tags": ["path-marker", "cluster-6"],
+                "left": 3723,
+                "top": 1856,
+                "rotation": -55
+            },
+            {
+                "tags": ["out-of-play-marker", "cluster-1"],
+                "left": 4353,
+                "top": 590,
+                "rotation": -60
+            },
+            {
+                "tags": ["out-of-play-marker", "cluster-1"],
+                "left": 5225,
+                "top": 670,
+                "rotation": -60
+            },
+            {
+                "tags": ["cluster-1", "out-of-play-marker"],
+                "left": 6016,
+                "top": 544,
+                "rotation": -60
+            },
+            {
+                "tags": ["out-of-play-marker", "cluster-2"],
+                "left": 6628,
+                "top": 1161,
+                "rotation": -60
+            },
+            {
+                "tags": ["cluster-2", "out-of-play-marker"],
+                "left": 7312,
+                "top": 1684,
+                "rotation": -60
+            },
+            {
+                "tags": ["cluster-2", "out-of-play-marker"],
+                "left": 6983,
+                "top": 2447,
+                "rotation": -60
+            },
+            {
+                "tags": ["out-of-play-marker", "cluster-3"],
+                "left": 7088,
+                "top": 3146,
+                "rotation": -60
+            },
+            {
+                "tags": ["cluster-3", "out-of-play-marker"],
+                "left": 6232,
+                "top": 3447,
+                "rotation": -60
+            },
+            {
+                "tags": ["out-of-play-marker", "cluster-3"],
+                "left": 6198,
+                "top": 4140,
+                "rotation": -60
+            },
+            {
+                "tags": ["out-of-play-marker", "cluster-4"],
+                "left": 5239,
+                "top": 4153,
+                "rotation": -60
+            },
+            {
+                "tags": ["cluster-4", "out-of-play-marker"],
+                "left": 4331,
+                "top": 4186,
+                "rotation": -60
+            },
+            {
+                "tags": ["out-of-play-marker", "cluster-4"],
+                "left": 3475,
+                "top": 4027,
+                "rotation": -60
+            },
+            {
+                "tags": ["out-of-play-marker", "cluster-5"],
+                "left": 2126,
+                "top": 3851,
+                "rotation": -60
+            },
+            {
+                "tags": ["cluster-5", "out-of-play-marker"],
+                "left": 2574,
+                "top": 2946,
+                "rotation": -60
+            },
+            {
+                "tags": ["cluster-5", "out-of-play-marker"],
+                "left": 1860,
+                "top": 2326,
+                "rotation": -60
+            },
+            {
+                "tags": ["out-of-play-marker", "cluster-6"],
+                "left": 2518,
+                "top": 1791,
+                "rotation": -60
+            },
+            {
+                "tags": ["cluster-6", "out-of-play-marker"],
+                "left": 2335,
+                "top": 1004,
+                "rotation": -60
+            },
+            {
+                "tags": ["cluster-6", "out-of-play-marker"],
+                "left": 3235,
+                "top": 713,
+                "rotation": -60
             }
         ]
     },
