@@ -1,4 +1,4 @@
-import { IGlobal } from "../global/i-global";
+import { IGlobal } from "../../global/i-global";
 
 /**
  * Monitor given decks expecting no NSID (metadata) repeats.
