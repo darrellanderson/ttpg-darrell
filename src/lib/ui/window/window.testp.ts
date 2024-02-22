@@ -1,4 +1,4 @@
-import { Text, Widget, world } from "@tabletop-playground/api";
+import { Border, Text, Widget, world } from "@tabletop-playground/api";
 import { WindowParams } from "./window-params";
 import { Window } from "./window";
 
@@ -13,7 +13,8 @@ const params: WindowParams = {
         pos: { u: 0.5, v: 0.5 },
     },
     createWidget: (scale: number): Widget => {
-        return new Text().setFontSize(scale * 10).setText("World");
+        const text = new Text().setFontSize(scale * 50).setText("World");
+        return new Border().setColor([1, 0, 0, 0.2]).setChild(text);
     },
 };
 

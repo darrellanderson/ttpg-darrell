@@ -144,7 +144,7 @@ export class PlayerWindow {
         const { titleHeight, spacerHeight, padding, width, height } =
             this.getLayoutSizes();
         const buttonSize = titleHeight - padding;
-        const fontSize = titleHeight * 0.7;
+        const fontSize = titleHeight * 0.8;
 
         const titleBarPanel: HorizontalBox = new HorizontalBox()
             .setChildDistance(padding)
@@ -218,7 +218,7 @@ export class PlayerWindow {
             .addChild(
                 title,
                 padding,
-                padding * 0.25,
+                -padding * 0.5,
                 width,
                 titleHeight + padding * 2
             )
