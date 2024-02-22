@@ -33,7 +33,7 @@ export class BugCardHolderAssignment implements IGlobal {
                 );
             if (cardHolder && player.getHandHolder() !== cardHolder) {
                 const msg: string = `BugCardHolderAssignment: re-attached for slot ${playerSlot}`;
-                console.group(msg);
+                console.log(msg);
                 ErrorHandler.onError.trigger(msg);
                 player.setHandHolder(cardHolder);
             }
