@@ -22,8 +22,9 @@ import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-
 const packageId = refPackageId;
 
 export class PlayerWindow {
-    private static SCALE_DELTA = 0.1;
-    private static TITLE_HEIGHT = 30;
+    private static readonly WORLD_SCALE_DELTA = 0.1;
+    private static readonly TITLE_HEIGHT = 30;
+    private static readonly WORLD_SCALE = 2;
 
     private readonly _params: WindowParams;
     private readonly _playerSlot: number;
@@ -72,7 +73,7 @@ export class PlayerWindow {
         player: Player
     ) => void = (): void => {
         this.detach();
-        this._scale += PlayerWindow.SCALE_DELTA;
+        this._scale += PlayerWindow.WORLD_SCALE_DELTA;
         this._scale = Math.min(this._scale, 3);
         this.attach();
         this.onStateChanged.trigger();
@@ -83,7 +84,7 @@ export class PlayerWindow {
         player: Player
     ) => void = (): void => {
         this.detach();
-        this._scale -= PlayerWindow.SCALE_DELTA;
+        this._scale -= PlayerWindow.WORLD_SCALE_DELTA;
         this._scale = Math.max(this._scale, 0.3);
         this.attach();
         this.onStateChanged.trigger();
@@ -118,44 +119,42 @@ export class PlayerWindow {
     private getLayoutSizes(): {
         titleHeight: number;
         spacerHeight: number;
+        padding: number;
         width: number;
         height: number;
     } {
-        const titleHeight = Math.ceil(PlayerWindow.TITLE_HEIGHT * this._scale);
+        const scale: number =
+            this._scale *
+            (this._target === "screen" ? 1 : PlayerWindow.WORLD_SCALE);
+        const titleHeight = Math.ceil(PlayerWindow.TITLE_HEIGHT * scale);
         const spacerHeight = Math.ceil(titleHeight * 0.1);
-        const width = Math.ceil(this._params.size.width * this._scale);
+        const padding = spacerHeight * 2;
+        const width = Math.ceil(this._params.size.width * scale) + padding * 2;
         const height =
             titleHeight +
             (this._collapsed
                 ? 0
                 : spacerHeight +
-                  Math.ceil(this._params.size.height * this._scale));
-        return { titleHeight, spacerHeight, width, height };
+                  Math.ceil(this._params.size.height * scale + padding * 2)) +
+            padding * 2; // pad top, below title, below spacer, bottom
+        return { titleHeight, spacerHeight, padding, width, height };
     }
 
     createWidget(): Widget {
-        const { titleHeight, spacerHeight, width, height } =
+        const { titleHeight, spacerHeight, padding, width, height } =
             this.getLayoutSizes();
-        const padding = spacerHeight * 2;
-        const buttonSize = titleHeight - padding * 2;
-        const fontSize = buttonSize * 0.6;
+        const buttonSize = titleHeight - padding;
+        const fontSize = titleHeight * 0.7;
 
         const titleBarPanel: HorizontalBox = new HorizontalBox()
-            .setChildDistance(padding / 2)
+            .setChildDistance(padding)
             .setVerticalAlignment(VerticalAlignment.Center);
-        const titleBar: Widget = new LayoutBox()
-            .setOverrideHeight(titleHeight)
-            .setPadding(padding, padding, 0, 0)
-            .setChild(titleBarPanel);
 
         const title: Text = new Text()
             .setBold(true)
             .setFontSize(fontSize)
             .setText(this._params.title ?? "");
-        const titleBox: Widget = new LayoutBox()
-            .setPadding(0, 0, -padding, 0)
-            .setChild(title);
-        titleBarPanel.addChild(titleBox, 1);
+        titleBarPanel.addChild(new Widget(), 1);
 
         let button: ImageButton = new ImageButton()
             .setImageSize(buttonSize, buttonSize)
@@ -210,19 +209,41 @@ export class PlayerWindow {
         }
 
         const spacer = new Border().setColor([0, 0, 0, 0]);
-        const child: Widget = this._params.createWidget(this._scale);
+        const child: Widget = this._params.createWidget(
+            this._scale *
+                (this._target === "screen" ? 1 : PlayerWindow.WORLD_SCALE)
+        );
         const window: Canvas = new Canvas()
             .addChild(new Border(), 0, 0, width, height)
-            .addChild(titleBar, 0, 0, width, titleHeight);
+            .addChild(
+                title,
+                padding,
+                padding * 0.25,
+                width,
+                titleHeight + padding * 2
+            )
+            .addChild(
+                titleBarPanel,
+                padding,
+                0,
+                width - padding * 2,
+                titleHeight + padding * 2
+            );
         if (!this._collapsed) {
             window
-                .addChild(spacer, 0, titleHeight, width, spacerHeight)
+                .addChild(
+                    spacer,
+                    0,
+                    titleHeight + padding * 2,
+                    width,
+                    spacerHeight
+                )
                 .addChild(
                     child,
-                    0,
-                    titleHeight + spacerHeight,
-                    width,
-                    height - titleHeight - spacerHeight
+                    padding,
+                    titleHeight + spacerHeight + padding * 3,
+                    width - padding * 2,
+                    height - titleHeight - spacerHeight - padding * 4
                 );
         }
         const windowBox = new LayoutBox()
@@ -297,6 +318,7 @@ export class PlayerWindow {
                 ui.rotation = new Rotator(0, 0, 0);
             }
 
+            ui.scale = 1 / PlayerWindow.WORLD_SCALE;
             ui.width = width;
             ui.height = height;
             ui.useWidgetSize = false;
