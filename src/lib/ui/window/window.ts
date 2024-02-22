@@ -16,6 +16,30 @@ export class Window {
         () => void
     >();
 
+    public getState(): string {
+        const playerSlotToState: { [key: number]: string } = {};
+        for (const playerWindow of this._playerWindows) {
+            const playerSlot: number = playerWindow.getPlayerSlot();
+            const state: string = playerWindow.getState();
+            playerSlotToState[playerSlot] = state;
+        }
+        return JSON.stringify(playerSlotToState);
+    }
+
+    public applyState(state: string): void {
+        if (state.length === 0) {
+            return;
+        }
+        const playerSlotToState: { [key: number]: string } = JSON.parse(state);
+        for (const playerWindow of this._playerWindows) {
+            const playerSlot: number = playerWindow.getPlayerSlot();
+            const state: string | undefined = playerSlotToState[playerSlot];
+            if (state) {
+                playerWindow.applyState(state);
+            }
+        }
+    }
+
     constructor(params: WindowParams, playerSlots: Array<number>) {
         this._playerWindows = playerSlots.map(
             (playerSlot) => new PlayerWindow(params, playerSlot)

@@ -40,6 +40,25 @@ export class PlayerWindow {
         () => void
     >();
 
+    public getState(): string {
+        return JSON.stringify({
+            scale: this._scale,
+            target: this._target,
+            collapsed: this._collapsed,
+            attached: this._screenUi || this._worldUi ? true : false,
+        });
+    }
+
+    public applyState(state: string): void {
+        const parsed = JSON.parse(state);
+        this._scale = parsed.scale;
+        this._target = parsed.target;
+        this._collapsed = parsed.collapsed;
+        if (parsed.attached) {
+            this.attach();
+        }
+    }
+
     private readonly _onClickClose: (
         button: ImageButton,
         player: Player
@@ -114,6 +133,10 @@ export class PlayerWindow {
         this._params = params;
         this._playerSlot = playerSlot;
         this._target = params.defaultTarget ?? "screen";
+    }
+
+    getPlayerSlot(): number {
+        return this._playerSlot;
     }
 
     private getLayoutSizes(): {
