@@ -21,6 +21,10 @@ import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-
 
 const packageId = refPackageId;
 
+/**
+ * Window shown to a single player.  Player can grow/shrink, collapse, or warp
+ * between screen space and world space (VR players only get world).
+ */
 export class PlayerWindow {
     private static readonly WORLD_SCALE_DELTA = 0.1;
     private static readonly TITLE_HEIGHT = 30;
@@ -39,25 +43,6 @@ export class PlayerWindow {
     public readonly onStateChanged = new TriggerableMulticastDelegate<
         () => void
     >();
-
-    public getState(): string {
-        return JSON.stringify({
-            scale: this._scale,
-            target: this._target,
-            collapsed: this._collapsed,
-            attached: this._screenUi || this._worldUi ? true : false,
-        });
-    }
-
-    public applyState(state: string): void {
-        const parsed = JSON.parse(state);
-        this._scale = parsed.scale;
-        this._target = parsed.target;
-        this._collapsed = parsed.collapsed;
-        if (parsed.attached) {
-            this.attach();
-        }
-    }
 
     private readonly _onClickClose: (
         button: ImageButton,
@@ -135,11 +120,30 @@ export class PlayerWindow {
         this._target = params.defaultTarget ?? "screen";
     }
 
-    getPlayerSlot(): number {
+    public getState(): string {
+        return JSON.stringify({
+            scale: this._scale,
+            target: this._target,
+            collapsed: this._collapsed,
+            attached: this._screenUi || this._worldUi ? true : false,
+        });
+    }
+
+    public applyState(state: string): void {
+        const parsed = JSON.parse(state);
+        this._scale = parsed.scale;
+        this._target = parsed.target;
+        this._collapsed = parsed.collapsed;
+        if (parsed.attached) {
+            this.attach();
+        }
+    }
+
+    public getPlayerSlot(): number {
         return this._playerSlot;
     }
 
-    private getLayoutSizes(): {
+    private _getLayoutSizes(): {
         titleHeight: number;
         spacerHeight: number;
         padding: number;
@@ -163,9 +167,9 @@ export class PlayerWindow {
         return { titleHeight, spacerHeight, padding, width, height };
     }
 
-    createWidget(): Widget {
+    public _createWidget(): Widget {
         const { titleHeight, spacerHeight, padding, width, height } =
-            this.getLayoutSizes();
+            this._getLayoutSizes();
         const buttonSize = titleHeight - padding;
         const fontSize = titleHeight * 0.8;
 
@@ -277,7 +281,7 @@ export class PlayerWindow {
         return windowBox;
     }
 
-    attach(): this {
+    public attach(): this {
         this.detach();
 
         // Screen UI does not exist for VR players.
@@ -288,7 +292,7 @@ export class PlayerWindow {
             this._target = "world";
         }
 
-        const { width, height } = this.getLayoutSizes();
+        const { width, height } = this._getLayoutSizes();
 
         if (this._target === "screen") {
             const ui = new ScreenUIElement();
@@ -310,7 +314,7 @@ export class PlayerWindow {
             ui.players = new PlayerPermission().setPlayerSlots([
                 this._playerSlot,
             ]);
-            ui.widget = this.createWidget();
+            ui.widget = this._createWidget();
 
             world.addScreenUI(ui);
         } else {
@@ -351,14 +355,14 @@ export class PlayerWindow {
             ui.players = new PlayerPermission().setPlayerSlots([
                 this._playerSlot,
             ]);
-            ui.widget = this.createWidget();
+            ui.widget = this._createWidget();
 
             world.addUI(ui);
         }
         return this;
     }
 
-    detach(): this {
+    public detach(): this {
         if (this._screenUi) {
             world.removeScreenUIElement(this._screenUi);
             this._screenUi = undefined;

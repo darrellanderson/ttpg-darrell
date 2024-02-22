@@ -139,6 +139,6 @@ it("click", () => {
             mockButton._clickAsPlayer(clickingPlayer);
         }
     };
-    clickAll(playerWindow.createWidget());
-    clickAll(playerWindow.createWidget()); // collapse vs expand, etc
+    clickAll(playerWindow._createWidget());
+    clickAll(playerWindow._createWidget()); // collapse vs expand, etc
 });
