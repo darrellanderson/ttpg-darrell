@@ -53,6 +53,8 @@ it("spawnOrThrow", () => {
     expect(() => {
         Spawn.spawnOrThrow("no-such-nsid", [0, 0, 0]);
     }).toThrow();
+
+    jest.restoreAllMocks();
 });
 
 it("spawnMergeDecks", () => {

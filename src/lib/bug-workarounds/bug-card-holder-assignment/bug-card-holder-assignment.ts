@@ -10,18 +10,26 @@ import { ErrorHandler } from "../../error-handler/error-handler";
 export class BugCardHolderAssignment implements IGlobal {
     private readonly _find = new Find();
     private readonly _cardHolderNsid: string;
+    private _intervalHandle: unknown | undefined;
 
     constructor(cardHolderNsid: string) {
         this._cardHolderNsid = cardHolderNsid;
     }
 
     init(): void {
-        setInterval(() => {
+        this._intervalHandle = setInterval(() => {
             this._run();
         }, 1000);
     }
 
-    private _run(): void {
+    destroy(): void {
+        if (this._intervalHandle !== undefined) {
+            clearInterval(this._intervalHandle);
+            this._intervalHandle = undefined;
+        }
+    }
+
+    _run(): void {
         for (const player of world.getAllPlayers()) {
             const playerSlot: number = player.getSlot();
             const skipContained = true;
@@ -32,10 +40,10 @@ export class BugCardHolderAssignment implements IGlobal {
                     skipContained
                 );
             if (cardHolder && player.getHandHolder() !== cardHolder) {
+                player.setHandHolder(cardHolder);
                 const msg: string = `BugCardHolderAssignment: re-attached for slot ${playerSlot}`;
                 console.log(msg);
                 ErrorHandler.onError.trigger(msg);
-                player.setHandHolder(cardHolder);
             }
         }
     }
