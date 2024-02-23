@@ -12,6 +12,20 @@ class MyAbstractCreateAssets extends AbstractCreateAssets {
     }
 }
 
+it("static encodeOutputBuffer", async () => {
+    const filename = "test.jpg";
+    let buffer: Buffer = await new SolidCell(1, 1, "#ff0000").toBuffer();
+    buffer = await AbstractCreateAssets.encodeOutputBuffer(filename, buffer);
+    expect(buffer).toBeDefined();
+});
+
+it("static encodeOutputBuffer (png)", async () => {
+    const filename = "test.png";
+    let buffer: Buffer = await new SolidCell(1, 1, "#ff0000").toBuffer();
+    buffer = await AbstractCreateAssets.encodeOutputBuffer(filename, buffer);
+    expect(buffer).toBeDefined();
+});
+
 it("jpg", async () => {
     const png: Buffer = await new SolidCell(1, 1, "#ff0000").toBuffer();
     expect(png.at(0)).toEqual(0x89);
