@@ -42,7 +42,7 @@ export class BugUniqueCards implements IGlobal {
             deck,
             (nsid: string): boolean => {
                 // Return true to remove.
-                if (seen.has(nsid)) {
+                if (nsid.length > 0 && seen.has(nsid)) {
                     return true;
                 }
                 seen.add(nsid);

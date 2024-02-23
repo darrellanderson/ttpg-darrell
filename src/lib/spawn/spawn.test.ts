@@ -97,6 +97,8 @@ it("spawnMergeDecks", () => {
 });
 
 it("spawnMergedDecksOrThrow", () => {
+    jest.spyOn(console, "log").mockImplementation(() => {});
+
     mockWorld._reset({
         _templateIdToMockGameObjectParams: {
             template1: {
@@ -135,6 +137,8 @@ it("spawnMergedDecksOrThrow", () => {
     expect(() => {
         Spawn.spawnMergeDecksOrThrow(["no-such-nsid"]);
     }).toThrow();
+
+    jest.restoreAllMocks();
 });
 
 it("spawnMergeDecks (empty list)", () => {
