@@ -8,14 +8,15 @@ it("init", () => {
 });
 
 it("process", () => {
-    new BugUniqueCards().init();
     jest.spyOn(console, "log").mockImplementation(() => {});
 
     const cardDetails: CardDetails = new MockCardDetails({ metadata: "my-1" });
     const deck: MockCard = new MockCard({
         cardDetails: [cardDetails],
     });
-    mockWorld._reset({ gameObjects: [] });
+    mockWorld._reset({ gameObjects: [deck] });
+
+    new BugUniqueCards().init();
 
     let lastError: string = "";
     ErrorHandler.onError.add((error: string): void => {

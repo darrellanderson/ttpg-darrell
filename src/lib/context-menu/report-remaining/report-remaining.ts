@@ -7,6 +7,7 @@ import {
 } from "@tabletop-playground/api";
 import { IGlobal } from "../../global/i-global";
 import { NSID } from "../../nsid/nsid";
+import { Broadcast } from "../../broadcast/broadcast";
 
 export class ReportRemaining implements IGlobal {
     private static readonly _actionName: string = "* Report remaining";
@@ -27,9 +28,21 @@ export class ReportRemaining implements IGlobal {
             .getAllCardDetails()
             .map((cardDetails): string => {
                 return cardDetails.name;
-            })
-            .sort();
-        // TODO XXX
+            });
+        const nameToCount: { [key: string]: number } = {};
+        for (const name of names) {
+            nameToCount[name] = (nameToCount[name] ?? 0) + 1;
+        }
+        const nameCountArray: Array<string> = Object.keys(nameToCount)
+            .sort()
+            .map((name: string): string => {
+                const count: number = nameToCount[name] ?? 0;
+                if (count > 1) {
+                    return `${name} (${count})`;
+                }
+                return name;
+            });
+        Broadcast.chatOne(player, `remaining: ${nameCountArray.join(", ")}`);
     };
 
     constructor(cardNsidPrefix: string) {
