@@ -1,4 +1,10 @@
-import { MockCard, MockCardDetails, MockPlayer, mockWorld } from "ttpg-mock";
+import {
+    MockCard,
+    MockCardDetails,
+    MockGameObject,
+    MockPlayer,
+    mockWorld,
+} from "ttpg-mock";
 import { ReportRemaining } from "./report-remaining";
 import { CardDetails, Player } from "@tabletop-playground/api";
 import { Broadcast } from "../../broadcast/broadcast";
@@ -34,4 +40,8 @@ it("customActionHandler", () => {
 
     deck._customActionAsPlayer(player, identifier);
     expect(Broadcast.lastMessage).toEqual("remaining: name1 (3), name2 (2)");
+
+    // Test coverage.
+    deck._customActionAsPlayer(player, "wrong");
+    new MockGameObject()._customActionAsPlayer(player, identifier);
 });
