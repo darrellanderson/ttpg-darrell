@@ -25,7 +25,7 @@ it("broken holder", () => {
     expect(player.getHandHolder()).toBeUndefined();
 
     const bcha = new BugCardHolderAssignment(nsid);
-    bcha._run();
+    bcha._intervalRunnable();
 
     expect(player.getHandHolder()).toBeDefined();
     expect(player.getHandHolder()).toBe(cardHolder);

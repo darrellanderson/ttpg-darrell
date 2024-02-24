@@ -27,6 +27,52 @@ it("snap points", () => {
     });
 });
 
+it("snap points (createCountToPrev)", () => {
+    new CellParser("my-root-dir").parse({
+        type: "BufferCell",
+        width: 1,
+        height: 1,
+        bufferData: "my-data",
+        snapPoints: [
+            {
+                left: 1,
+                top: 1,
+                tags: ["my-tag"],
+                rotation: 1,
+            },
+            {
+                createCountToPrev: 3,
+                left: 3,
+                top: 1,
+                tags: ["my-tag"],
+                rotation: 1,
+            },
+        ],
+    });
+});
+
+it("snap points (createCountToPrev, no prev)", () => {
+    const data = {
+        type: "BufferCell",
+        width: 1,
+        height: 1,
+        bufferData: "my-data",
+        snapPoints: [
+            {
+                createCountToPrev: 3,
+                left: 1,
+                top: 1,
+                tags: ["my-tag"],
+                rotation: 1,
+            },
+        ],
+    };
+
+    expect(() => {
+        new CellParser("my-root-dir").parse(data);
+    }).toThrow();
+});
+
 it("BleedCell", () => {
     new CellParser().parse({
         type: "BleedCell",

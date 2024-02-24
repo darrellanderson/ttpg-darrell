@@ -12,24 +12,26 @@ export class BugCardHolderAssignment implements IGlobal {
     private readonly _cardHolderNsid: string;
     private _intervalHandle: unknown | undefined;
 
+    public readonly _intervalRunnable = () => {
+        this._run();
+    };
+
     constructor(cardHolderNsid: string) {
         this._cardHolderNsid = cardHolderNsid;
     }
 
-    init(): void {
-        this._intervalHandle = setInterval(() => {
-            this._run();
-        }, 1000);
+    public init(): void {
+        this._intervalHandle = setInterval(this._intervalRunnable, 1000);
     }
 
-    destroy(): void {
+    public destroy(): void {
         if (this._intervalHandle !== undefined) {
             clearInterval(this._intervalHandle);
             this._intervalHandle = undefined;
         }
     }
 
-    _run(): void {
+    private _run(): void {
         for (const player of world.getAllPlayers()) {
             const playerSlot: number = player.getSlot();
             const skipContained = true;
