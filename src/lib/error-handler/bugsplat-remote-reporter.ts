@@ -17,6 +17,9 @@ export class BugSplatRemoteReporter implements IGlobal {
     private readonly _appName: string;
     private readonly _appVersion: string;
 
+    // Only report on first error (in case it spams hard).
+    private readonly _seen: Set<string> = new Set<string>();
+
     constructor(params: BugSplatRemoteReporterParams) {
         this._database = params.database;
         this._appName = params.appName;
@@ -30,6 +33,11 @@ export class BugSplatRemoteReporter implements IGlobal {
     }
 
     onError(error: string): void {
+        if (this._seen.has(error)) {
+            return; // only send once
+        }
+        this._seen.add(error);
+
         const onSuccess = () => {};
         const onError = () => {};
         this.sendError(error).then(onSuccess, onError);
