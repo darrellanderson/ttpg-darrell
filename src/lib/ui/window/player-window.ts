@@ -18,6 +18,7 @@ import {
 } from "@tabletop-playground/api";
 import { WINDOW_BUTTON_ASSET, WindowParams } from "./window-params";
 import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate";
+import { ThrottleClickHandler } from "../../event/throttle-click-handler";
 
 const packageId = refPackageId;
 
@@ -47,72 +48,72 @@ export class PlayerWindow {
     private readonly _onClickClose: (
         button: ImageButton,
         player: Player
-    ) => void = (): void => {
+    ) => void = new ThrottleClickHandler<ImageButton>((): void => {
         this.detach();
         this.onStateChanged.trigger();
-    };
+    }).get();
 
     private readonly _onClickCollapse: (
         button: ImageButton,
         player: Player
-    ) => void = (): void => {
+    ) => void = new ThrottleClickHandler<ImageButton>((): void => {
         this.detach();
         this._collapsed = true;
         this.attach();
         this.onStateChanged.trigger();
-    };
+    }).get();
 
     private readonly _onClickExpand: (
         button: ImageButton,
         player: Player
-    ) => void = (): void => {
+    ) => void = new ThrottleClickHandler<ImageButton>((): void => {
         this.detach();
         this._collapsed = false;
         this.attach();
         this.onStateChanged.trigger();
-    };
+    }).get();
 
     private readonly _onClickGrow: (
         button: ImageButton,
         player: Player
-    ) => void = (): void => {
+    ) => void = new ThrottleClickHandler<ImageButton>((): void => {
         this.detach();
         this._scale += PlayerWindow.WORLD_SCALE_DELTA;
         this._scale = Math.min(this._scale, 3);
         this.attach();
         this.onStateChanged.trigger();
-    };
+    }).get();
 
     private readonly _onClickShrink: (
         button: ImageButton,
         player: Player
-    ) => void = (): void => {
+    ) => void = new ThrottleClickHandler<ImageButton>((): void => {
         this.detach();
         this._scale -= PlayerWindow.WORLD_SCALE_DELTA;
         this._scale = Math.max(this._scale, 0.3);
         this.attach();
         this.onStateChanged.trigger();
-    };
+    }).get();
 
     private readonly _onClickToScreen: (
         button: ImageButton,
         player: Player
-    ) => void = (): void => {
+    ) => void = new ThrottleClickHandler<ImageButton>((): void => {
         this.detach();
         this._target = "screen";
         this.attach();
         this.onStateChanged.trigger();
-    };
+    }).get();
 
     private readonly _onClickToWorld: (
         button: ImageButton,
         player: Player
-    ) => void = (): void => {
+    ) => void = new ThrottleClickHandler<ImageButton>((): void => {
         this.detach();
         this._target = "world";
         this.attach();
         this.onStateChanged.trigger();
-    };
+    }).get();
 
     constructor(params: WindowParams, playerSlot: number) {
         this._params = params;
@@ -245,7 +246,7 @@ export class PlayerWindow {
             .addChild(
                 title,
                 padding,
-                -padding * 0.5,
+                -padding * 0.1,
                 width,
                 titleHeight + padding * 2
             )
@@ -298,8 +299,8 @@ export class PlayerWindow {
             const ui = new ScreenUIElement();
             this._screenUi = ui;
 
-            ui.anchorX = this._params.screen?.anchor.x || 0.5;
-            ui.anchorY = this._params.screen?.anchor.y || 0.5;
+            ui.anchorX = this._params.screen?.anchor.x ?? 0.5;
+            ui.anchorY = this._params.screen?.anchor.y ?? 0.5;
 
             ui.relativePositionX = true;
             ui.relativePositionY = true;

@@ -38,6 +38,7 @@ export const CUBE_SNAP_POINT = {
     Tags: [],
 };
 
+// Bounciness is "Restitution"
 export const CUBE_TEMPLATE = {
     Type: "Generic",
     GUID: "$GUID HERE",
@@ -45,7 +46,7 @@ export const CUBE_TEMPLATE = {
     Metadata: "",
     CollisionType: "Regular",
     Friction: 0.7,
-    Restitution: 0.3,
+    Restitution: 0.1,
     Density: 1,
     SurfaceType: "Cardboard",
 

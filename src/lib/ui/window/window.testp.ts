@@ -9,8 +9,8 @@ const params: WindowParams = {
         height: 400,
     },
     screen: {
-        anchor: { x: 0.5, y: 0.5 },
-        pos: { u: 0.5, v: 0.5 },
+        anchor: { x: 0.5, y: 0 },
+        pos: { u: 0.5, v: 0.1 },
     },
     createWidget: (scale: number): Widget => {
         const text = new Text().setFontSize(scale * 50).setText("World");

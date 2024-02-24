@@ -1,7 +1,7 @@
 import { Player } from "@tabletop-playground/api";
 
 export class ThrottleClickHandler<T> {
-    public static readonly THROTTLE_MSECS = 500;
+    public static readonly THROTTLE_MSECS = 200;
 
     private readonly _playerSlotToLastClickMsecs: { [key: number]: number } =
         {};
