@@ -1,4 +1,4 @@
-import { ErrorBatcher } from "../error-handler/error-batcher";
+import { ErrorBatcher } from "../../error-handler/error-batcher";
 
 /**
  * Lookalike for TTPG's MulticastDelegate, but with a trigger method.

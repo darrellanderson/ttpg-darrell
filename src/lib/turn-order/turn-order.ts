@@ -1,6 +1,6 @@
 import { world } from "@tabletop-playground/api";
 import { NamespacedId } from "../namespace-id/namespace-id";
-import { TriggerableMulticastDelegate } from "../event/triggerable-multicast-delegate";
+import { TriggerableMulticastDelegate } from "../event/triggerable-multicast-delegate/triggerable-multicast-delegate";
 import { z } from "zod";
 
 export type Direction = "forward" | "reverse" | "snake";

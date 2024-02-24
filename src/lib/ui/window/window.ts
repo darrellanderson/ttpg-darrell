@@ -1,5 +1,5 @@
 import { world } from "@tabletop-playground/api";
-import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate";
+import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate/triggerable-multicast-delegate";
 import { NamespacedId } from "../../namespace-id/namespace-id";
 import { PlayerWindow } from "./player-window";
 import { WindowParams } from "./window-params";

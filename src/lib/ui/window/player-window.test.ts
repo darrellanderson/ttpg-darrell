@@ -1,7 +1,9 @@
 import {
     Border,
+    Canvas,
     ImageButton,
     Panel,
+    Player,
     Rotator,
     Text,
     Vector,
@@ -124,9 +126,15 @@ it("click", () => {
     const playerSlot: number = 7;
     const playerWindow: PlayerWindow = new PlayerWindow(params, playerSlot);
 
+    const clickingPlayer: Player = new MockPlayer();
     const clickAll = (widget: Widget | undefined) => {
         if (widget instanceof Panel) {
             for (const child of widget.getAllChildren()) {
+                clickAll(child);
+            }
+        }
+        if (widget instanceof Canvas) {
+            for (const child of widget.getChildren()) {
                 clickAll(child);
             }
         } else if (widget instanceof Border) {
@@ -135,10 +143,10 @@ it("click", () => {
             clickAll(widget.getChild());
         } else if (widget instanceof ImageButton) {
             const mockButton = widget as MockImageButton;
-            const clickingPlayer = new MockPlayer();
             mockButton._clickAsPlayer(clickingPlayer);
         }
     };
+
     clickAll(playerWindow._createWidget());
     clickAll(playerWindow._createWidget()); // collapse vs expand, etc
 });

@@ -1,7 +1,7 @@
 import { Card } from "@tabletop-playground/api";
 import { AbstractRightClickDeck } from "./abstract-right-click-deck";
 import { MockCard, MockCardDetails, MockPlayer, mockWorld } from "ttpg-mock";
-import { OnCardBecameSingletonOrDeck } from "../../event/on-card-became-singleton-or-deck";
+import { OnCardBecameSingletonOrDeck } from "../../event/on-card-became-singleton-or-deck/on-card-became-singleton-or-deck";
 
 it("constructor", () => {
     class MyClass extends AbstractRightClickDeck {}

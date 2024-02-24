@@ -17,8 +17,8 @@ import {
     world,
 } from "@tabletop-playground/api";
 import { WINDOW_BUTTON_ASSET, WindowParams } from "./window-params";
-import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate";
-import { ThrottleClickHandler } from "../../event/throttle-click-handler";
+import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate/triggerable-multicast-delegate";
+import { ThrottleClickHandler } from "../../event/throttle-click-handler/throttle-click-handler";
 
 const packageId = refPackageId;
 

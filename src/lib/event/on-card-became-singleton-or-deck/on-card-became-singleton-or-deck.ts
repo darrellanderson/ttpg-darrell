@@ -22,9 +22,9 @@ import {
     globalEvents,
     world,
 } from "@tabletop-playground/api";
-import { TriggerableMulticastDelegate } from "./triggerable-multicast-delegate";
-import { IGlobal } from "../global/i-global";
-import { NSID } from "../nsid/nsid";
+import { TriggerableMulticastDelegate } from "../triggerable-multicast-delegate/triggerable-multicast-delegate";
+import { IGlobal } from "../../global/i-global";
+import { NSID } from "../../nsid/nsid";
 
 export class OnCardBecameSingletonOrDeck implements IGlobal {
     public static readonly onSingletonCardCreated =

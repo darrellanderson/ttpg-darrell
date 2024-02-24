@@ -1,6 +1,6 @@
 import { Card } from "@tabletop-playground/api";
 import { OnCardBecameSingletonOrDeck } from "./on-card-became-singleton-or-deck";
-import { NSID } from "../nsid/nsid";
+import { NSID } from "../../nsid/nsid";
 
 console.log("OnCardBecameSingletonOrDeck reporter");
 

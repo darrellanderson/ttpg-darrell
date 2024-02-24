@@ -5,7 +5,7 @@ import {
     VerticalAlignment,
     world,
 } from "@tabletop-playground/api";
-import { TriggerableMulticastDelegate } from "../event/triggerable-multicast-delegate";
+import { TriggerableMulticastDelegate } from "../event/triggerable-multicast-delegate/triggerable-multicast-delegate";
 
 export type LayoutObjectsSize = {
     w: number;

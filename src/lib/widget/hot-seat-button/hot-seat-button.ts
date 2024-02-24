@@ -14,7 +14,7 @@ import { TurnOrder } from "../../turn-order/turn-order";
 
 import { HotSeatLocaleData } from "./hot-seat-locale.data";
 import { LeaveSeat } from "../../context-menu/leave-seat";
-import { ThrottleClickHandler } from "../../event/throttle-click-handler";
+import { ThrottleClickHandler } from "../../event/throttle-click-handler/throttle-click-handler";
 locale.inject(HotSeatLocaleData);
 
 export type HotSeatButtonParams = {
