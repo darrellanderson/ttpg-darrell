@@ -1,17 +1,7 @@
-import {
-    Border,
-    Canvas,
-    ImageButton,
-    Panel,
-    Player,
-    Rotator,
-    Text,
-    Vector,
-    Widget,
-} from "@tabletop-playground/api";
+import { Rotator, Text, Vector, Widget } from "@tabletop-playground/api";
+import { clickAll } from "../../jest-util/click-all/click-all";
 import { WindowParams } from "./window-params";
 import { PlayerWindow } from "./player-window";
-import { LayoutBox, MockImageButton, MockPlayer } from "ttpg-mock";
 
 it("attach/detach (screen, defaults)", () => {
     const params: WindowParams = {
@@ -125,27 +115,6 @@ it("click", () => {
     };
     const playerSlot: number = 7;
     const playerWindow: PlayerWindow = new PlayerWindow(params, playerSlot);
-
-    const clickingPlayer: Player = new MockPlayer();
-    const clickAll = (widget: Widget | undefined) => {
-        if (widget instanceof Panel) {
-            for (const child of widget.getAllChildren()) {
-                clickAll(child);
-            }
-        }
-        if (widget instanceof Canvas) {
-            for (const child of widget.getChildren()) {
-                clickAll(child);
-            }
-        } else if (widget instanceof Border) {
-            clickAll(widget.getChild());
-        } else if (widget instanceof LayoutBox) {
-            clickAll(widget.getChild());
-        } else if (widget instanceof ImageButton) {
-            const mockButton = widget as MockImageButton;
-            mockButton._clickAsPlayer(clickingPlayer);
-        }
-    };
 
     clickAll(playerWindow._createWidget());
     clickAll(playerWindow._createWidget()); // collapse vs expand, etc

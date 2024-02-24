@@ -11,6 +11,7 @@ import {
     Panel,
     Widget,
 } from "@tabletop-playground/api";
+import { clickAll } from "../../jest-util/click-all/click-all";
 
 it("constructor", () => {
     const turnOrder = new TurnOrder("@test/test");
@@ -57,22 +58,6 @@ it("createWidget (optional items)", () => {
         playerSlot
     );
     const widget = turnClickedWidget.getWidget();
-
-    const clickAll = (widget: Widget | undefined) => {
-        if (widget instanceof Panel) {
-            for (const child of widget.getAllChildren()) {
-                clickAll(child);
-            }
-        } else if (widget instanceof LayoutBox) {
-            clickAll(widget.getChild());
-        } else if (widget instanceof Border) {
-            clickAll(widget.getChild());
-        } else if (widget instanceof Button) {
-            const mockButton = widget as MockButton;
-            const clickingPlayer = new MockPlayer();
-            mockButton._clickAsPlayer(clickingPlayer);
-        }
-    };
     clickAll(widget);
 });
 

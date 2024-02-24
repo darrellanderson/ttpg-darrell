@@ -9,6 +9,7 @@ import { TurnEntryWart } from "./turn-entry-wart";
 import { TurnEntryWidget } from "./turn-entry-widget";
 import { TurnOrder } from "../../turn-order/turn-order";
 import { TurnOrderWidgetParams } from "./turn-order-widget-params";
+import { clickAll } from "../../jest-util/click-all/click-all";
 
 it("computeFontSize", () => {
     const value: number = TurnEntryWidget.computeFontSize(100);
@@ -120,19 +121,5 @@ it("click", () => {
     const turnEntryWidget = new TurnEntryWidget(params);
     const turnOrder = new TurnOrder("@test/test");
     turnEntryWidget.update(turnOrder, 1);
-
-    const clickAll = (widget: Widget | undefined) => {
-        if (widget instanceof Canvas) {
-            for (const child of widget.getChildren()) {
-                clickAll(child);
-            }
-        } else if (widget instanceof LayoutBox) {
-            clickAll(widget.getChild());
-        } else if (widget instanceof ContentButton) {
-            const mockButton = widget as MockContentButton;
-            const clickingPlayer = new MockPlayer();
-            mockButton._clickAsPlayer(clickingPlayer);
-        }
-    };
     clickAll(turnEntryWidget.getWidget());
 });
