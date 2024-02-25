@@ -53,27 +53,20 @@ export class ImageCell extends AbstractCell {
     }
 
     public toBuffer(): Promise<Buffer> {
-        return new Promise<Buffer>((resolve, reject) => {
+        return new Promise<Buffer>((resolve) => {
             const { width, height } = this.getSize();
             let image = sharp(this._imageFile);
-            image.metadata().then((metadata: Metadata) => {
-                if (metadata.width === width && metadata.height === height) {
-                    if (this._alpha < 1) {
-                        image = image.ensureAlpha(this._alpha);
-                    }
-                    if (this._grayscale) {
-                        image = image.grayscale(true);
-                    }
-                    if (this._tint !== "#ffffff") {
-                        image = image.tint(this._tint);
-                    }
-                    resolve(image.png().toBuffer());
-                } else {
-                    reject(
-                        `size mimatch (observed ${metadata.width}x${metadata.height}, expected ${width}x${height})`
-                    );
-                }
-            });
+            image = image.resize(width, height);
+            if (this._alpha < 1) {
+                image = image.ensureAlpha(this._alpha);
+            }
+            if (this._grayscale) {
+                image = image.grayscale(true);
+            }
+            if (this._tint !== "#ffffff") {
+                image = image.tint(this._tint);
+            }
+            resolve(image.png().toBuffer());
         });
     }
 }

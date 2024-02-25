@@ -26,13 +26,10 @@ it("toBuffer", async () => {
 });
 
 it("toBuffer (size mismatch)", async () => {
-    const promise: Promise<Buffer> = new ImageCell(1, 2, FILE).toBuffer();
-    let error: string | undefined;
-    const buffer: Buffer | void = await promise.catch((e) => {
-        error = e;
-    });
-    expect(buffer).not.toBeInstanceOf(Buffer);
-    expect(error).toEqual("size mimatch (observed 54x64, expected 1x2)");
+    const buffer = await new ImageCell(1, 2, FILE).toBuffer();
+    const metadata = await sharp(buffer).metadata();
+    expect(metadata.width).toEqual(1); // resized
+    expect(metadata.height).toEqual(2);
 });
 
 it("static from", async () => {
