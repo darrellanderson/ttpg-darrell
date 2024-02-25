@@ -32,6 +32,7 @@ export class CubeTemplate {
     private _collider: string | undefined;
     private _guidFrom: string = "";
     private _name: string = "";
+    private _metadata: string = "";
     private _snapPoints: Array<CellSnapPoint> = [];
 
     static getBoundingBox(
@@ -91,6 +92,11 @@ export class CubeTemplate {
         return this;
     }
 
+    setMetadata(metadata: string): this {
+        this._metadata = metadata;
+        return this;
+    }
+
     setSnapPoints(snapPoints: Array<CellSnapPoint>): this {
         this._snapPoints = [...snapPoints];
         return this;
@@ -131,6 +137,7 @@ export class CubeTemplate {
         const template = JSON.parse(JSON.stringify(CUBE_TEMPLATE));
         template.GUID = guid;
         template.Name = this._name;
+        template.Metadata = this._metadata;
         template.Models = modelEntries;
 
         const bb = CubeTemplate.getBoundingBox(this._subCubeEntries);

@@ -76,6 +76,8 @@ it("toTemplate", () => {
             top: 7,
         })
         .setGuidFrom("foo")
+        .setName("my-name")
+        .setMetadata("my-metadata")
         .toTemplate();
     if (template.includes("$")) {
         throw new Error(template);
@@ -83,8 +85,8 @@ it("toTemplate", () => {
     expect(JSON.parse(template)).toEqual({
         Type: "Generic",
         GUID: "2C26B46B68FFC68FF99B453C1D304134",
-        Name: "",
-        Metadata: "",
+        Name: "my-name",
+        Metadata: "my-metadata",
         CollisionType: "Regular",
         Friction: 0.7,
         Restitution: 0.1,

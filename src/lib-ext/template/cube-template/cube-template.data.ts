@@ -24,7 +24,7 @@ export const CUBE_SUB_TEMPLATE = {
     IsTwoSided: false,
     UseOverrides: true,
     SurfaceType: "Cardboard",
-};
+} as const;
 
 export const CUBE_SNAP_POINT = {
     X: 0,
@@ -36,7 +36,7 @@ export const CUBE_SNAP_POINT = {
     Shape: 0,
     FlipValidity: 0,
     Tags: [],
-};
+} as const;
 
 // Bounciness is "Restitution"
 export const CUBE_TEMPLATE = {
@@ -99,4 +99,4 @@ export const CUBE_TEMPLATE = {
     },
     GroundAccessibility: "Zoom",
     Tags: [],
-};
+} as const;
