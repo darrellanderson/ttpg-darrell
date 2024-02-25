@@ -5,14 +5,16 @@ export const ZBaseCellSchema = z
         type: z.string().min(1),
         snapPoints: z
             .array(
-                z.object({
-                    tags: z.array(z.string().min(1)).optional(),
-                    left: z.number().optional(),
-                    top: z.number().optional(),
-                    rotation: z.number().optional(),
-                    range: z.number().optional(),
-                    createCountToPrev: z.number().optional(), // interpolate N new points between
-                })
+                z
+                    .object({
+                        tags: z.array(z.string().min(1)).optional(),
+                        left: z.number().optional(),
+                        top: z.number().optional(),
+                        rotation: z.number().optional(),
+                        range: z.number().optional(),
+                        createCountToPrev: z.number().optional(), // interpolate N new points between
+                    })
+                    .strict()
             )
             .optional(),
     })
@@ -35,33 +37,41 @@ export const ZBufferCellSchema = ZBaseCellSchema.extend({
 }).strict();
 export type ZBufferCell = z.infer<typeof ZBufferCellSchema>;
 
-export const ZCanvasCellSchema = z.object({
-    type: z.literal("CanvasCell"),
-    width: z.number().positive(),
-    height: z.number().positive(),
-    children: z.array(
-        z.object({
-            left: z.number(),
-            top: z.number(),
-            child: ZBaseCellSchema,
-        })
-    ),
-});
+export const ZCanvasCellSchema = z
+    .object({
+        type: z.literal("CanvasCell"),
+        width: z.number().positive(),
+        height: z.number().positive(),
+        children: z.array(
+            z
+                .object({
+                    left: z.number(),
+                    top: z.number(),
+                    child: ZBaseCellSchema,
+                })
+                .strict()
+        ),
+    })
+    .strict();
 export type ZCanvasCell = z.infer<typeof ZCanvasCellSchema>;
 
-export const ZColCellSchema = z.object({
-    type: z.literal("ColCell"),
-    children: z.array(ZBaseCellSchema),
-    spacing: z.number(),
-});
+export const ZColCellSchema = z
+    .object({
+        type: z.literal("ColCell"),
+        children: z.array(ZBaseCellSchema),
+        spacing: z.number(),
+    })
+    .strict();
 export type ZColCell = z.infer<typeof ZColCellSchema>;
 
-export const ZGridCellSchema = z.object({
-    type: z.literal("GridCell"),
-    children: z.array(ZBaseCellSchema),
-    numCols: z.number().positive(),
-    spacing: z.number(),
-});
+export const ZGridCellSchema = z
+    .object({
+        type: z.literal("GridCell"),
+        children: z.array(ZBaseCellSchema),
+        numCols: z.number().positive(),
+        spacing: z.number(),
+    })
+    .strict();
 export type ZGridCell = z.infer<typeof ZGridCellSchema>;
 
 export const ZImageCellSchema = ZBaseCellSchema.extend({
@@ -72,11 +82,13 @@ export const ZImageCellSchema = ZBaseCellSchema.extend({
 }).strict();
 export type ZImageCell = z.infer<typeof ZImageCellSchema>;
 
-export const ZRowCellSchema = z.object({
-    type: z.literal("RowCell"),
-    children: z.array(ZBaseCellSchema),
-    spacing: z.number(),
-});
+export const ZRowCellSchema = z
+    .object({
+        type: z.literal("RowCell"),
+        children: z.array(ZBaseCellSchema),
+        spacing: z.number(),
+    })
+    .strict();
 export type ZRowCell = z.infer<typeof ZRowCellSchema>;
 
 export const ZSolidCellSchema = ZBaseCellSchema.extend({
