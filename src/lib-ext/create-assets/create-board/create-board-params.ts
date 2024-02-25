@@ -14,6 +14,7 @@ export const CreateBoardParamsSchema = z
                 width: z.number().positive(),
                 height: z.number().positive(),
             })
+            .strict()
             .optional(),
 
         // Original board image (filename or buffer).
@@ -25,11 +26,13 @@ export const CreateBoardParamsSchema = z
         // Size from a "looking from the top, down" perspective.
         // Width and height are the XY plane, depth is Z.
         // Prefer this over XYZ because TTPGs coordinate system flips X/Y.
-        topDownWorldSize: z.object({
-            width: z.number().positive(), // TTPG Y
-            height: z.number().positive(), // TTPG X
-            depth: z.number().positive(), // TTPG Z
-        }),
+        topDownWorldSize: z
+            .object({
+                width: z.number().positive(), // TTPG Y
+                height: z.number().positive(), // TTPG X
+                depth: z.number().positive(), // TTPG Z
+            })
+            .strict(),
     })
     .strict();
 

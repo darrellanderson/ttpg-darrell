@@ -2,8 +2,8 @@
     "rootDir": "/Users/darrell/ttpg/_test",
     "assetFilename": "create-board-demo",
     "preshrink": {
-        "width": 1,
-        "height": 1
+        "width": 7754,
+        "height": 4096
     },
     "srcImage": {
         "type": "ImageCell",

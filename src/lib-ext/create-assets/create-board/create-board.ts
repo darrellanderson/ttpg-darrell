@@ -14,6 +14,7 @@ import {
     CreateBoardParamsSchema,
 } from "./create-board-params";
 import { CellParser } from "../../image/cell/cell-parser/cell-parser";
+import { ResizeCell } from "../../image/cell/resize-cell/resize-cell";
 
 /**
  * Create assets for a (potentially large) board.
@@ -33,7 +34,7 @@ export class CreateBoard extends AbstractCreateAssets {
         CubeModel.getInsetForUVs(4096, 4096);
 
     private readonly _params: CreateBoardParams;
-    private readonly _srcImageCell: AbstractCell;
+    private _srcImageCell: AbstractCell;
 
     static fromParamsJson(paramsJson: Buffer): CreateBoard {
         const params: CreateBoardParams = CreateBoardParamsSchema.parse(
@@ -48,6 +49,21 @@ export class CreateBoard extends AbstractCreateAssets {
         this._srcImageCell = new CellParser(this._params.rootDir).parse(
             this._params.srcImage
         );
+
+        // Resize image, shrink a little more to account for UV bleed edges.
+        if (this._params.preshrink) {
+            const size: { width: number; height: number } =
+                CubeModel.getInsetForUVs(
+                    this._params.preshrink.width,
+                    this._params.preshrink.height
+                );
+            console.log(`preshrink: ${size.width}x${size.height}`);
+            this._srcImageCell = new ResizeCell(
+                size.width,
+                size.height,
+                this._srcImageCell
+            );
+        }
     }
 
     _splitImage(): Promise<Array<ImageSplitChunk>> {

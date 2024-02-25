@@ -29,7 +29,7 @@ export class ResizeCell extends AbstractCell {
             this._innerCell.toBuffer().then((buffer: Buffer): void => {
                 const { width, height } = this.getSize();
                 sharp(buffer)
-                    .resize(width, height)
+                    .resize(width, height, { fit: "fill" })
                     .png()
                     .toBuffer()
                     .then((buffer: Buffer): void => {

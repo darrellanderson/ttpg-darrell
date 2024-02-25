@@ -1,6 +1,8 @@
+import path from "path";
 import { CellSize, GridCell, ImageCell } from "../../../index-ext";
 import { AbstractCreateAssets } from "../abstract-create-assets/abstract-create-assets";
 import { CreateCardsheetParams } from "./create-cardsheet-params";
+import { CardsheetTemplate } from "../../template/cardsheet-template/cardsheet-template";
 
 export class CreateCardsheet extends AbstractCreateAssets {
     private readonly _params: CreateCardsheetParams;
@@ -14,7 +16,11 @@ export class CreateCardsheet extends AbstractCreateAssets {
         return new Promise<Array<ImageCell>>((resolve, reject) => {
             Promise.all(
                 this._params.cards.map((card) => {
-                    return ImageCell.from(card.imageFile);
+                    return new ImageCell(
+                        this._params.cardPixelSize.width,
+                        this._params.cardPixelSize.height,
+                        card.imageFile
+                    );
                 })
             ).then((cells: Array<ImageCell>) => {
                 resolve(cells);
@@ -52,6 +58,13 @@ export class CreateCardsheet extends AbstractCreateAssets {
         });
     }
 
+    /**
+     * Divide cards into per-sheet sets, call _createCardSheet to create each.
+     *
+     * @param imageCells
+     * @param fileData
+     * @returns
+     */
     private _createCardSheets(
         imageCells: Array<ImageCell>,
         fileData: { [key: string]: Buffer }
@@ -75,7 +88,8 @@ export class CreateCardsheet extends AbstractCreateAssets {
 
             const promise: Promise<void> = this._createCardSheet(
                 sheetImageCells,
-                fileData
+                fileData,
+                i
             );
             promises.push(promise);
         }
@@ -88,12 +102,48 @@ export class CreateCardsheet extends AbstractCreateAssets {
 
     private _createCardSheet(
         imageCells: Array<ImageCell>,
-        fileData: { [key: string]: Buffer }
+        fileData: { [key: string]: Buffer },
+        sheetIndex: number
     ): Promise<void> {
         const maxCardSize: CellSize = GridCell.getMaxSize(imageCells);
         const layout: { cols: number; rows: number } =
             GridCell.getOptimalLayout(imageCells.length, maxCardSize);
         const sheetCell = new GridCell(imageCells, layout.cols, layout.rows);
-        return new Promise<void>((resolve, reject) => {});
+
+        // Get sheet image buffer.
+        const sheetImageFileName: string = path.join(
+            this._params.rootDir ?? ".",
+            "Textures",
+            `${this._params.assetFilename}.${sheetIndex}.jpg`
+        );
+        const sheetImageBufferPromise: Promise<void> = new Promise<void>(
+            (resolve, reject) => {
+                sheetCell.toBuffer().then((buffer: Buffer) => {
+                    fileData[sheetImageFileName] = buffer;
+                    resolve();
+                }, reject);
+            }
+        );
+
+        // Create sheet template.
+        const sheetTemplate: CardsheetTemplate = new CardsheetTemplate();
+        // TODO XXX
+
+        // Get sheet template. buffer
+        const sheetTemplateFileName: string = path.join(
+            this._params.rootDir ?? ".",
+            "Templates",
+            `${this._params.assetFilename}.${sheetIndex}.json`
+        );
+        fileData[sheetTemplateFileName] = Buffer.from(
+            sheetTemplate.toTemplate()
+        );
+
+        const promises: Array<Promise<void>> = [sheetImageBufferPromise];
+        return new Promise<void>((resolve, reject) => {
+            Promise.all(promises).then(() => {
+                resolve();
+            }, reject);
+        });
     }
 }
