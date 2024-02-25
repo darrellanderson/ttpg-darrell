@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ZBaseCellSchema } from "../../../index-ext";
 
 export const CreateCardsheetParamsSchema = z
     .object({
@@ -28,7 +29,7 @@ export const CreateCardsheetParamsSchema = z
         cards: z.array(
             z
                 .object({
-                    imageFile: z.string(),
+                    imageFile: z.union([z.string(), ZBaseCellSchema]),
                     name: z.string().optional(),
                     metadata: z.string().optional(),
                     tags: z.array(z.string()).optional(),

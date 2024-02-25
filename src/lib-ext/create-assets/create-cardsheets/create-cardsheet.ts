@@ -1,5 +1,11 @@
 import path from "path";
-import { CellSize, GridCell, ImageCell } from "../../../index-ext";
+import {
+    AbstractCell,
+    CellParser,
+    CellSize,
+    GridCell,
+    ImageCell,
+} from "../../../index-ext";
 import { AbstractCreateAssets } from "../abstract-create-assets/abstract-create-assets";
 import { CreateCardsheetParams } from "./create-cardsheet-params";
 import { CardsheetTemplate } from "../../template/cardsheet-template/cardsheet-template";
@@ -12,50 +18,30 @@ export class CreateCardsheet extends AbstractCreateAssets {
         this._params = params;
     }
 
-    private _getCardCells(): Promise<Array<ImageCell>> {
-        return new Promise<Array<ImageCell>>((resolve, reject) => {
-            Promise.all(
-                this._params.cards.map((card) => {
-                    return new ImageCell(
-                        this._params.cardPixelSize.width,
-                        this._params.cardPixelSize.height,
-                        card.imageFile
-                    );
-                })
-            ).then((cells: Array<ImageCell>) => {
-                resolve(cells);
-            }, reject);
+    private _getCardCells(): Array<AbstractCell> {
+        return this._params.cards.map((card): AbstractCell => {
+            if (typeof card.imageFile === "string") {
+                return new ImageCell(
+                    this._params.cardPixelSize.width,
+                    this._params.cardPixelSize.height,
+                    card.imageFile
+                );
+            } else {
+                return new CellParser().parse(card.imageFile);
+            }
         });
     }
 
     toFileData(): Promise<{ [key: string]: Buffer }> {
-        return new Promise<{ [key: string]: Buffer }>((resolve, reject) => {
-            this._getCardCells().then((imageCells: Array<ImageCell>) => {
-                const maxCardSize: CellSize = GridCell.getMaxSize(imageCells);
-                const maxCardsPerSheet: number =
-                    GridCell.getMaxCellCount(maxCardSize);
-                const numCardsheets: number = Math.ceil(
-                    imageCells.length / maxCardsPerSheet
-                );
-                for (let i = 0; i < numCardsheets; i++) {
-                    const start: number = i * maxCardsPerSheet;
-                    const end: number = Math.min(
-                        start + maxCardsPerSheet,
-                        imageCells.length
-                    );
-                    const sheetImageCells: Array<ImageCell> = imageCells.slice(
-                        start,
-                        end
-                    );
-                    const layout: { cols: number; rows: number } =
-                        GridCell.getOptimalLayout(
-                            sheetImageCells.length,
-                            maxCardSize
-                        );
-                    new GridCell(sheetImageCells, layout.cols, layout.rows);
-                }
-            }, reject);
-        });
+        const cardCells: Array<AbstractCell> = this._getCardCells();
+        const fileData: { [key: string]: Buffer } = {};
+        return new Promise<{ [key: string]: Buffer }>(
+            (resolve, reject): void => {
+                this._createCardSheets(cardCells, fileData).then(() => {
+                    resolve(fileData);
+                }, reject);
+            }
+        );
     }
 
     /**
@@ -66,28 +52,28 @@ export class CreateCardsheet extends AbstractCreateAssets {
      * @returns
      */
     private _createCardSheets(
-        imageCells: Array<ImageCell>,
+        cardCells: Array<AbstractCell>,
         fileData: { [key: string]: Buffer }
     ): Promise<void> {
-        const maxCardSize: CellSize = GridCell.getMaxSize(imageCells);
+        const maxCardSize: CellSize = GridCell.getMaxSize(cardCells);
         const maxCardsPerSheet: number = GridCell.getMaxCellCount(maxCardSize);
         const numCardsheets: number = Math.ceil(
-            imageCells.length / maxCardsPerSheet
+            cardCells.length / maxCardsPerSheet
         );
         const promises: Array<Promise<void>> = [];
         for (let i = 0; i < numCardsheets; i++) {
             const start: number = i * maxCardsPerSheet;
             const end: number = Math.min(
                 start + maxCardsPerSheet,
-                imageCells.length
+                cardCells.length
             );
-            const sheetImageCells: Array<ImageCell> = imageCells.slice(
+            const sheetCardCells: Array<AbstractCell> = cardCells.slice(
                 start,
                 end
             );
 
             const promise: Promise<void> = this._createCardSheet(
-                sheetImageCells,
+                sheetCardCells,
                 fileData,
                 i
             );
@@ -101,14 +87,14 @@ export class CreateCardsheet extends AbstractCreateAssets {
     }
 
     private _createCardSheet(
-        imageCells: Array<ImageCell>,
+        cardCells: Array<AbstractCell>,
         fileData: { [key: string]: Buffer },
         sheetIndex: number
     ): Promise<void> {
-        const maxCardSize: CellSize = GridCell.getMaxSize(imageCells);
+        const maxCardSize: CellSize = GridCell.getMaxSize(cardCells);
         const layout: { cols: number; rows: number } =
-            GridCell.getOptimalLayout(imageCells.length, maxCardSize);
-        const sheetCell = new GridCell(imageCells, layout.cols, layout.rows);
+            GridCell.getOptimalLayout(cardCells.length, maxCardSize);
+        const sheetCell = new GridCell(cardCells, layout.cols, layout.rows);
 
         // Get sheet image buffer.
         const sheetImageFileName: string = path.join(
@@ -127,7 +113,7 @@ export class CreateCardsheet extends AbstractCreateAssets {
 
         // Create sheet template.
         const sheetTemplate: CardsheetTemplate = new CardsheetTemplate();
-        // TODO XXX
+        // TODO XXX FILL IN TEMPLATE
 
         // Get sheet template. buffer
         const sheetTemplateFileName: string = path.join(
