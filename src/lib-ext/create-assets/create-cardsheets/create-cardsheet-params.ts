@@ -29,7 +29,8 @@ export const CreateCardsheetParamsSchema = z
         cards: z.array(
             z
                 .object({
-                    imageFile: z.union([z.string(), ZBaseCellSchema]),
+                    face: z.union([z.string(), ZBaseCellSchema]),
+                    back: z.union([z.string(), ZBaseCellSchema]).optional(),
                     name: z.string().optional(),
                     metadata: z.string().optional(),
                     tags: z.array(z.string()).optional(),
@@ -37,7 +38,7 @@ export const CreateCardsheetParamsSchema = z
                 .strict()
         ),
 
-        //back: z.union([z.string(), ZBaseCellSchema]),
+        back: z.union([z.string(), ZBaseCellSchema]).optional(),
     })
     .strict();
 

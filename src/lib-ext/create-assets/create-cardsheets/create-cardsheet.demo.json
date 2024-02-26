@@ -6,7 +6,7 @@
     "cardSizeWorld": { "width": 4.2, "height": 6.3 },
     "cards": [
         {
-            "imageFile": {
+            "face": {
                 "type": "SolidCell",
                 "width": 10,
                 "height": 10,
@@ -14,7 +14,7 @@
             }
         },
         {
-            "imageFile": {
+            "face": {
                 "type": "SolidCell",
                 "width": 10,
                 "height": 10,
@@ -22,12 +22,18 @@
             }
         },
         {
-            "imageFile": {
+            "face": {
                 "type": "SolidCell",
                 "width": 10,
                 "height": 10,
                 "color": "#0000ff"
             }
         }
-    ]
+    ],
+    "back": {
+        "type": "SolidCell",
+        "width": 10,
+        "height": 10,
+        "color": "#ffff00"
+    }
 }
