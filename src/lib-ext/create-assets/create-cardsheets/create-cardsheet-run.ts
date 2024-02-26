@@ -6,7 +6,7 @@
 
 import * as fs from "fs-extra";
 import * as yargs from "yargs";
-import { CreateBoard } from "./create-board";
+import { CreateCardsheet } from "./create-cardsheet";
 
 const args = yargs
     .options({
@@ -26,7 +26,7 @@ const args = yargs
 
 async function main() {
     const paramsJson: Buffer = fs.readFileSync(args.i);
-    await CreateBoard.fromParamsJson(paramsJson).writeFiles();
+    await CreateCardsheet.fromParamsJson(paramsJson).writeFiles();
 }
 
 main();

@@ -31,6 +31,7 @@ export abstract class AbstractCreateAssets {
     }
 
     static writeOneFile(filename: string, buffer: Buffer): Promise<void> {
+        console.log(`CreateAssets: writing "${filename}"`);
         return new Promise<void>((resolve, reject) => {
             AbstractCreateAssets.encodeOutputBuffer(filename, buffer).then(
                 (buffer: Buffer): void => {

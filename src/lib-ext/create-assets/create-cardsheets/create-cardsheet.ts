@@ -7,12 +7,24 @@ import {
     ImageCell,
 } from "../../../index-ext";
 import { AbstractCreateAssets } from "../abstract-create-assets/abstract-create-assets";
-import { CreateCardsheetParams } from "./create-cardsheet-params";
-import { CardsheetTemplate } from "../../template/cardsheet-template/cardsheet-template";
+import {
+    CreateCardsheetParams,
+    CreateCardsheetParamsSchema,
+} from "./create-cardsheet-params";
+import {
+    CardEntry,
+    CardsheetTemplate,
+} from "../../template/cardsheet-template/cardsheet-template";
 
 export class CreateCardsheet extends AbstractCreateAssets {
     private readonly _params: CreateCardsheetParams;
 
+    static fromParamsJson(paramsJson: Buffer): CreateCardsheet {
+        const params: CreateCardsheetParams = CreateCardsheetParamsSchema.parse(
+            JSON.parse(paramsJson.toString())
+        );
+        return new CreateCardsheet(params);
+    }
     constructor(params: CreateCardsheetParams) {
         super();
         this._params = params;
@@ -22,8 +34,8 @@ export class CreateCardsheet extends AbstractCreateAssets {
         return this._params.cards.map((card): AbstractCell => {
             if (typeof card.imageFile === "string") {
                 return new ImageCell(
-                    this._params.cardPixelSize.width,
-                    this._params.cardPixelSize.height,
+                    this._params.cardSizePixel.width,
+                    this._params.cardSizePixel.height,
                     card.imageFile
                 );
             } else {
@@ -67,13 +79,19 @@ export class CreateCardsheet extends AbstractCreateAssets {
                 start + maxCardsPerSheet,
                 cardCells.length
             );
+
             const sheetCardCells: Array<AbstractCell> = cardCells.slice(
+                start,
+                end
+            );
+            const sheetCardEntries: Array<CardEntry> = this._params.cards.slice(
                 start,
                 end
             );
 
             const promise: Promise<void> = this._createCardSheet(
                 sheetCardCells,
+                sheetCardEntries,
                 fileData,
                 i
             );
@@ -88,6 +106,7 @@ export class CreateCardsheet extends AbstractCreateAssets {
 
     private _createCardSheet(
         cardCells: Array<AbstractCell>,
+        cardEntries: Array<CardEntry>,
         fileData: { [key: string]: Buffer },
         sheetIndex: number
     ): Promise<void> {
@@ -97,10 +116,12 @@ export class CreateCardsheet extends AbstractCreateAssets {
         const sheetCell = new GridCell(cardCells, layout.cols, layout.rows);
 
         // Get sheet image buffer.
+        const localSheetImageFileName: string = `${this._params.assetFilename}.${sheetIndex}.jpg`;
         const sheetImageFileName: string = path.join(
             this._params.rootDir ?? ".",
+            "assets",
             "Textures",
-            `${this._params.assetFilename}.${sheetIndex}.jpg`
+            localSheetImageFileName
         );
         const sheetImageBufferPromise: Promise<void> = new Promise<void>(
             (resolve, reject) => {
@@ -112,12 +133,24 @@ export class CreateCardsheet extends AbstractCreateAssets {
         );
 
         // Create sheet template.
-        const sheetTemplate: CardsheetTemplate = new CardsheetTemplate();
-        // TODO XXX FILL IN TEMPLATE
+        const sheetTemplate: CardsheetTemplate = new CardsheetTemplate()
+            .setCardSizeWorld(
+                this._params.cardSizeWorld.width,
+                this._params.cardSizeWorld.height
+            )
+            .setGuidFrom(`${this._params.assetFilename}.${sheetIndex}`)
+            .setMetadata(this._params.deckMetadata ?? "")
+            .setName(this._params.templateName ?? "")
+            .setNumColsAndRows(layout.cols, layout.rows)
+            .setTextures(localSheetImageFileName, "nope");
+        for (const cardEntry of cardEntries) {
+            sheetTemplate.addCard(cardEntry);
+        }
 
         // Get sheet template. buffer
         const sheetTemplateFileName: string = path.join(
             this._params.rootDir ?? ".",
+            "assets",
             "Templates",
             `${this._params.assetFilename}.${sheetIndex}.json`
         );

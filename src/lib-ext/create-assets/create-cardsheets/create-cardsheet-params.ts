@@ -12,13 +12,13 @@ export const CreateCardsheetParamsSchema = z
         // Name in object library.
         templateName: z.string().min(1),
 
-        cardPixelSize: z
+        cardSizePixel: z
             .object({
                 width: z.number().positive(),
                 height: z.number().positive(),
             })
             .strict(),
-        cardWorldSize: z
+        cardSizeWorld: z
             .object({
                 width: z.number().positive(),
                 height: z.number().positive(),
@@ -36,6 +36,8 @@ export const CreateCardsheetParamsSchema = z
                 })
                 .strict()
         ),
+
+        //back: z.union([z.string(), ZBaseCellSchema]),
     })
     .strict();
 

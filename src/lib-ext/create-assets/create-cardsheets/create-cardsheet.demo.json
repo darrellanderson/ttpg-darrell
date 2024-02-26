@@ -1,0 +1,33 @@
+{
+    "rootDir": "/Users/darrell/ttpg/_test",
+    "assetFilename": "create-cardsheet-demo",
+    "templateName": "my-template-name",
+    "cardSizePixel": { "width": 500, "height": 750 },
+    "cardSizeWorld": { "width": 4.2, "height": 6.3 },
+    "cards": [
+        {
+            "imageFile": {
+                "type": "SolidCell",
+                "width": 1,
+                "height": 1,
+                "color": "#ff0000"
+            }
+        },
+        {
+            "imageFile": {
+                "type": "SolidCell",
+                "width": 1,
+                "height": 1,
+                "color": "#00ff00"
+            }
+        },
+        {
+            "imageFile": {
+                "type": "SolidCell",
+                "width": 1,
+                "height": 1,
+                "color": "#0000ff"
+            }
+        }
+    ]
+}
