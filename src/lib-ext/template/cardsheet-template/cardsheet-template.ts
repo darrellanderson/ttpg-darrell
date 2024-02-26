@@ -13,6 +13,7 @@ export class CardsheetTemplate {
     private _metadata: string = "";
     private _textureFront: string = "";
     private _textureBack: string = "";
+    private _backIndex: number = 0;
     private _numCols: number = 0;
     private _numRows: number = 0;
     private _cardWidth: number = 0;
@@ -49,9 +50,10 @@ export class CardsheetTemplate {
         return this;
     }
 
-    setTextures(front: string, back: string): this {
+    setTextures(front: string, back: string, backIndex: number): this {
         this._textureFront = front;
         this._textureBack = back;
+        this._backIndex = backIndex;
         return this;
     }
 
@@ -103,6 +105,7 @@ export class CardsheetTemplate {
         template.GUID = guid;
         template.FrontTexture = this._textureFront;
         template.BackTexture = this._textureBack;
+        template.BackIndex = this._backIndex;
         template.NumHorizontal = this._numCols;
         template.NumVertical = this._numRows;
         template.Width = this._cardWidth;

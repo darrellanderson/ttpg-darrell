@@ -34,6 +34,7 @@ type SheetPlan = {
 export class CreateCardsheet extends AbstractCreateAssets {
     private readonly _params: CreateCardsheetParams;
     private readonly _sheetPlan: Array<SheetPlan>;
+    private readonly _sharedBackFilenameRelativeToAssets: string;
     private readonly _fileData: { [key: string]: Buffer } = {};
 
     static fromParamsJson(paramsJson: Buffer): CreateCardsheet {
@@ -46,35 +47,84 @@ export class CreateCardsheet extends AbstractCreateAssets {
         super();
         this._params = params;
         this._sheetPlan = this._getSheetPlan();
+        this._sharedBackFilenameRelativeToAssets = `${params.assetFilename}.back.jpg`;
     }
 
+    clean(): Promise<void> {
+        const promises: Array<Promise<void>> = [];
+
+        promises.push(
+            AbstractCreateAssets.cleanByFilePrefix(
+                path.join(this._params.rootDir ?? ".", "assets", "Textures"),
+                this._params.assetFilename
+            ),
+            AbstractCreateAssets.cleanByFilePrefix(
+                path.join(this._params.rootDir ?? ".", "assets", "Templates"),
+                this._params.assetFilename
+            )
+        );
+
+        return new Promise<void>((resolve, reject) => {
+            Promise.all(promises).then(() => {
+                resolve();
+            }, reject);
+        });
+    }
+
+    /**
+     * Create a single cell from image data (either a filename, or a ZCell schema).
+     *
+     * @param imageData
+     * @returns
+     */
+    private _getCardCell(imageData: string | ZBaseCell | undefined) {
+        if (typeof imageData === "string") {
+            const srcFilename = path.join(
+                this._params.rootDir ?? ".",
+                imageData
+            );
+            return new ImageCell(
+                this._params.cardSizePixel.width,
+                this._params.cardSizePixel.height,
+                srcFilename
+            );
+        } else if (imageData) {
+            const cardCell = new CellParser().parse(imageData);
+            return new ResizeCell(
+                this._params.cardSizePixel.width,
+                this._params.cardSizePixel.height,
+                cardCell
+            );
+        } else {
+            throw new Error(`missing image`);
+        }
+    }
+
+    /**
+     * Create (with potential resize) card cells.
+     * It is better to use cells than PNG Buffer because we can leverage
+     * GridCell to merge them into cardsheets later.
+     *
+     * @param cardSide
+     * @returns
+     */
     private _getCardCells(cardSide: CardSide): Array<AbstractCell> {
         if (cardSide === "back" && this._params.back) {
             return []; // using a shared back, not separate back for each card
         }
 
-        return this._params.cards.map((card): AbstractCell => {
-            const imageFile: string | ZBaseCell | undefined =
-                cardSide === "face" ? card.face : card.back;
-            if (typeof imageFile === "string") {
-                return new ImageCell(
-                    this._params.cardSizePixel.width,
-                    this._params.cardSizePixel.height,
-                    imageFile
-                );
-            } else if (imageFile) {
-                const cardCell = new CellParser().parse(imageFile);
-                return new ResizeCell(
-                    this._params.cardSizePixel.width,
-                    this._params.cardSizePixel.height,
-                    cardCell
-                );
-            } else {
-                throw new Error(`missing image ("${cardSide}")`);
-            }
+        return this._params.cards.map((cardEntry): AbstractCell => {
+            const imageData: string | ZBaseCell | undefined =
+                cardSide === "face" ? cardEntry.face : cardEntry.back;
+            return this._getCardCell(imageData);
         });
     }
 
+    /**
+     * Organize cards into one or more sheets (possible overflow due to size limits).
+     *
+     * @returns
+     */
     private _getSheetPlan(): Array<SheetPlan> {
         const result: Array<SheetPlan> = [];
 
@@ -115,6 +165,7 @@ export class CreateCardsheet extends AbstractCreateAssets {
         const promises: Array<Promise<void>> = [];
 
         // Create cardsheets, front and if per-card, back.
+        // Store results in internal _fileData.
         for (const sheetPlan of this._sheetPlan) {
             promises.push(this._createCardSheet(sheetPlan, "face"));
             if (this._params.back === undefined) {
@@ -122,7 +173,13 @@ export class CreateCardsheet extends AbstractCreateAssets {
             }
         }
 
+        // If using a shared back image create set it up.
+        if (this._params.back) {
+            promises.push(this._createSharedBack());
+        }
+
         // Create templates.
+        // Store results in internal _fileData.
         for (const sheetPlan of this._sheetPlan) {
             this._createDeckTemplate(sheetPlan);
         }
@@ -134,6 +191,17 @@ export class CreateCardsheet extends AbstractCreateAssets {
         });
     }
 
+    /**
+     * Generage the cardsheet image(s) for a single cardsheet, always face and
+     * optionally back if using a different image for each card back (shared
+     * back is created via a different path).
+     *
+     * If the sheet is split up, this just generates one entry.
+     *
+     * @param sheetPlan
+     * @param cardSide
+     * @returns
+     */
     private _createCardSheet(
         sheetPlan: SheetPlan,
         cardSide: CardSide
@@ -142,7 +210,7 @@ export class CreateCardsheet extends AbstractCreateAssets {
             cardSide === "face"
                 ? sheetPlan.faceFilenameRelativeToAssetsTextures
                 : sheetPlan.backFilenameRelativeToAssetsTextures;
-        const filename: string = path.join(
+        const dstFilename: string = path.join(
             this._params.rootDir ?? ".",
             "assets",
             "Textures",
@@ -154,19 +222,62 @@ export class CreateCardsheet extends AbstractCreateAssets {
         const gridCell = new GridCell(cells, sheetPlan.cols, spacing);
         return new Promise<void>((resolve, reject): void => {
             gridCell.toBuffer().then((buffer: Buffer) => {
-                this._fileData[filename] = buffer;
+                this._fileData[dstFilename] = buffer;
                 resolve();
             }, reject);
         });
     }
 
+    /**
+     * If using a shared back (single card), create it.
+     *
+     * @returns
+     */
+    private _createSharedBack(): Promise<void> {
+        if (!this._params.back) {
+            throw new Error("missing shared back");
+        }
+        const cell: AbstractCell = this._getCardCell(this._params.back);
+        const dstFilename: string = path.join(
+            this._params.rootDir ?? ".",
+            "assets",
+            "Textures",
+            this._sharedBackFilenameRelativeToAssets
+        );
+        return new Promise<void>((resolve, reject) => {
+            cell.toBuffer().then((buffer: Buffer): void => {
+                this._fileData[dstFilename] = buffer;
+                resolve();
+            }, reject);
+        });
+    }
+
+    /**
+     * Generate the template for a single cardsheet.
+     *
+     * If the sheet is split up, this just generates one entry.
+     *
+     * @param sheetPlan
+     */
     private _createDeckTemplate(sheetPlan: SheetPlan): void {
-        const filename: string = path.join(
+        const dstFilename: string = path.join(
             this._params.rootDir ?? ".",
             "assets",
             "Templates",
             sheetPlan.templateFilenameRelativeToAssetsTemplates
         );
+
+        let backIndex: number = 0;
+        let backTexture: string = "";
+        if (this._params.back) {
+            // shared back
+            backIndex = -2;
+            backTexture = this._sharedBackFilenameRelativeToAssets;
+        } else {
+            // different back for each card
+            backIndex = -3;
+            backTexture = sheetPlan.backFilenameRelativeToAssetsTextures;
+        }
 
         const sheetTemplate: CardsheetTemplate = new CardsheetTemplate()
             .setCardSizeWorld(
@@ -179,14 +290,13 @@ export class CreateCardsheet extends AbstractCreateAssets {
             .setNumColsAndRows(sheetPlan.cols, sheetPlan.rows)
             .setTextures(
                 sheetPlan.faceFilenameRelativeToAssetsTextures,
-                sheetPlan.backFilenameRelativeToAssetsTextures
+                backTexture,
+                backIndex
             );
         for (const cardEntry of sheetPlan.cardEntries) {
             sheetTemplate.addCard(cardEntry);
         }
 
-        // TODO SHARED BACK
-
-        this._fileData[filename] = Buffer.from(sheetTemplate.toTemplate());
+        this._fileData[dstFilename] = Buffer.from(sheetTemplate.toTemplate());
     }
 }

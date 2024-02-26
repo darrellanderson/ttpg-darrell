@@ -11,7 +11,7 @@ it("toTemplate", () => {
         .setMetadata("my-metadata")
         .setCardSizeWorld(3, 4)
         .setNumColsAndRows(1, 2)
-        .setTextures("my-front-texture", "my-back-textures")
+        .setTextures("my-front-texture", "my-back-textures", -3)
         .addCard({
             name: "my-card-name",
             metadata: "my-card-metadata",
@@ -57,7 +57,7 @@ it("toTemplate", () => {
         FrontTexture: "my-front-texture",
         BackTexture: "my-back-textures",
         HiddenTexture: "",
-        BackIndex: "$BACK_INDEX",
+        BackIndex: -3,
         HiddenIndex: -1,
         NumHorizontal: 1,
         NumVertical: 2,

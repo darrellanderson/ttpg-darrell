@@ -26,7 +26,9 @@ const args = yargs
 
 async function main() {
     const paramsJson: Buffer = fs.readFileSync(args.i);
-    await CreateCardsheet.fromParamsJson(paramsJson).writeFiles();
+    const createCardSheet = CreateCardsheet.fromParamsJson(paramsJson);
+    await createCardSheet.clean();
+    await createCardSheet.writeFiles();
 }
 
 main();

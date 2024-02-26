@@ -66,6 +66,27 @@ export class CreateBoard extends AbstractCreateAssets {
         }
     }
 
+    clean(): Promise<void> {
+        const promises: Array<Promise<void>> = [];
+
+        promises.push(
+            AbstractCreateAssets.cleanByFilePrefix(
+                path.join(this._params.rootDir ?? ".", "assets", "Textures"),
+                this._params.assetFilename
+            ),
+            AbstractCreateAssets.cleanByFilePrefix(
+                path.join(this._params.rootDir ?? ".", "assets", "Templates"),
+                this._params.assetFilename
+            )
+        );
+
+        return new Promise<void>((resolve, reject) => {
+            Promise.all(promises).then(() => {
+                resolve();
+            }, reject);
+        });
+    }
+
     _splitImage(): Promise<Array<ImageSplitChunk>> {
         if (CreateBoard.INSET_SIZE.width !== CreateBoard.INSET_SIZE.height) {
             throw new Error("inset size mismatch");

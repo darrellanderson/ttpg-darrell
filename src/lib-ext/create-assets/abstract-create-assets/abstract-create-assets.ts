@@ -1,9 +1,40 @@
+import { Stats } from "fs";
 import fs from "fs/promises";
 import path from "path";
 import sharp from "sharp";
 
 export abstract class AbstractCreateAssets {
     abstract toFileData(): Promise<{ [key: string]: Buffer }>;
+
+    static cleanByFilePrefix(
+        dir: string,
+        filenamePrefix: string
+    ): Promise<void> {
+        return new Promise<void>((resolve, reject) => {
+            fs.stat(dir).then((stats: Stats) => {
+                if (stats.isDirectory()) {
+                    fs.readdir(dir).then((filenames: Array<string>) => {
+                        const promises: Array<Promise<void>> = [];
+                        for (const filename of filenames) {
+                            if (filename.startsWith(filenamePrefix)) {
+                                const pathFile: string = path.join(
+                                    dir,
+                                    filename
+                                );
+                                console.log(
+                                    `CreateAssets.clean: removing "${pathFile}"`
+                                );
+                                promises.push(fs.rm(pathFile));
+                            }
+                        }
+                        Promise.all(promises).then(() => {
+                            resolve();
+                        }, reject);
+                    }, reject);
+                }
+            }, reject);
+        });
+    }
 
     /**
      * Image buffers are PNG internally, re-encode as JPG if requested.

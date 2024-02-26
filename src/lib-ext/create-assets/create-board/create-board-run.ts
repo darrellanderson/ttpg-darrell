@@ -26,7 +26,9 @@ const args = yargs
 
 async function main() {
     const paramsJson: Buffer = fs.readFileSync(args.i);
-    await CreateBoard.fromParamsJson(paramsJson).writeFiles();
+    const createBoard = CreateBoard.fromParamsJson(paramsJson);
+    await createBoard.clean();
+    await createBoard.writeFiles();
 }
 
 main();

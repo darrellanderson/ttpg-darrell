@@ -6,6 +6,9 @@
     "cardSizeWorld": { "width": 4.2, "height": 6.3 },
     "cards": [
         {
+            "name": "Red",
+            "metadata": "card.red",
+            "tags": ["my-card"],
             "face": {
                 "type": "SolidCell",
                 "width": 10,

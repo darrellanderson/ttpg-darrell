@@ -37,7 +37,7 @@ export const CARDSHEET_TEMPLATE = {
     FrontTexture: "$CARDSHEET_FACE_FILENAME",
     BackTexture: "$CARDSHEET_BACK_FILENAME",
     HiddenTexture: "",
-    BackIndex: "$BACK_INDEX",
+    BackIndex: "$BACK_INDEX", // 0 : same file (last card?), -1 : same as front, -2 : shared single card, stored in BackTexture, -3 : indexed back sheet, stored in BackTexture.
     HiddenIndex: -1, // 0 = use front, -1 = blur, -2 = separate file, -3 = use back
     NumHorizontal: 0, //"$NUM_COLS",
     NumVertical: 0, //"$NUM_ROWS",
