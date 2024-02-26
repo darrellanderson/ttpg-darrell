@@ -8,24 +8,24 @@
         {
             "imageFile": {
                 "type": "SolidCell",
-                "width": 1,
-                "height": 1,
+                "width": 10,
+                "height": 10,
                 "color": "#ff0000"
             }
         },
         {
             "imageFile": {
                 "type": "SolidCell",
-                "width": 1,
-                "height": 1,
+                "width": 10,
+                "height": 10,
                 "color": "#00ff00"
             }
         },
         {
             "imageFile": {
                 "type": "SolidCell",
-                "width": 1,
-                "height": 1,
+                "width": 10,
+                "height": 10,
                 "color": "#0000ff"
             }
         }

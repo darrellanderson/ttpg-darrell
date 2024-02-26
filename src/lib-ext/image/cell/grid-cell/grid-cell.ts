@@ -32,12 +32,16 @@ export class GridCell extends AbstractCell {
         let optLayout: { cols: number; rows: number } = { cols: -1, rows: -1 };
         let optEfficiency = 0;
 
-        const maxCols: number = Math.floor(this.MAX_DIMENSION / cellSize.width);
-        const maxRows: number = Math.floor(
+        const absoluteMaxCols: number = Math.floor(
+            this.MAX_DIMENSION / cellSize.width
+        );
+        const absoluteMaxRows: number = Math.floor(
             this.MAX_DIMENSION / cellSize.height
         );
 
+        const maxCols = Math.min(absoluteMaxCols, cellCount);
         for (let cols = 1; cols <= maxCols; cols++) {
+            const maxRows = Math.min(absoluteMaxRows, cellCount);
             const rows = Math.ceil(cellCount / cols);
             if (rows > maxRows) {
                 continue;

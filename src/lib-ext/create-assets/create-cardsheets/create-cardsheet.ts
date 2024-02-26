@@ -15,6 +15,7 @@ import {
     CardEntry,
     CardsheetTemplate,
 } from "../../template/cardsheet-template/cardsheet-template";
+import { ResizeCell } from "../../image/cell/resize-cell/resize-cell";
 
 export class CreateCardsheet extends AbstractCreateAssets {
     private readonly _params: CreateCardsheetParams;
@@ -39,7 +40,12 @@ export class CreateCardsheet extends AbstractCreateAssets {
                     card.imageFile
                 );
             } else {
-                return new CellParser().parse(card.imageFile);
+                const cardCell = new CellParser().parse(card.imageFile);
+                return new ResizeCell(
+                    this._params.cardSizePixel.width,
+                    this._params.cardSizePixel.height,
+                    cardCell
+                );
             }
         });
     }
@@ -113,7 +119,8 @@ export class CreateCardsheet extends AbstractCreateAssets {
         const maxCardSize: CellSize = GridCell.getMaxSize(cardCells);
         const layout: { cols: number; rows: number } =
             GridCell.getOptimalLayout(cardCells.length, maxCardSize);
-        const sheetCell = new GridCell(cardCells, layout.cols, layout.rows);
+        const spacing: number = 0;
+        const sheetCell = new GridCell(cardCells, layout.cols, spacing);
 
         // Get sheet image buffer.
         const localSheetImageFileName: string = `${this._params.assetFilename}.${sheetIndex}.jpg`;
