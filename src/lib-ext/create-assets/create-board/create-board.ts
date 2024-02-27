@@ -57,7 +57,6 @@ export class CreateBoard extends AbstractCreateAssets {
                     this._params.preshrink.width,
                     this._params.preshrink.height
                 );
-            console.log(`preshrink: ${size.width}x${size.height}`);
             this._srcImageCell = new ResizeCell(
                 size.width,
                 size.height,

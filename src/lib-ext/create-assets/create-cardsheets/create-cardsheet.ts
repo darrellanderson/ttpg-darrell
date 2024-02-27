@@ -43,6 +43,7 @@ export class CreateCardsheet extends AbstractCreateAssets {
         );
         return new CreateCardsheet(params);
     }
+
     constructor(params: CreateCardsheetParams) {
         super();
         this._params = params;
