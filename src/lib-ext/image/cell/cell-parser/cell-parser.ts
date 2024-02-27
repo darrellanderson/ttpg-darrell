@@ -106,8 +106,15 @@ export class CellParser {
             const width: number = zImageCell.width;
             const height: number = zImageCell.height;
             let imageFile: string = zImageCell.imageFile;
+            const alpha: number = zImageCell.alpha ?? 1;
+            const grayscale: boolean = zImageCell.grayscale ?? false;
+            const tint: string = zImageCell.tint ?? "#ffffff";
+
             imageFile = path.join(this._rootDir, path.normalize(imageFile));
-            abstractCell = new ImageCell(width, height, imageFile);
+            abstractCell = new ImageCell(width, height, imageFile)
+                .setAlpha(alpha)
+                .setGrayscale(grayscale)
+                .setTint(tint);
         }
 
         if (type === "RowCell") {

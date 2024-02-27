@@ -79,6 +79,9 @@ export const ZImageCellSchema = ZBaseCellSchema.extend({
     width: z.number().positive(),
     height: z.number().positive(),
     imageFile: z.string(),
+    alpha: z.number().optional(),
+    grayscale: z.boolean().optional(),
+    tint: z.string().optional(),
 }).strict();
 export type ZImageCell = z.infer<typeof ZImageCellSchema>;
 
