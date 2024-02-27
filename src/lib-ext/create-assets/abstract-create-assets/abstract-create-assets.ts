@@ -32,7 +32,7 @@ export abstract class AbstractCreateAssets {
                         }, reject);
                     }, reject);
                 }
-            }, reject);
+            }, resolve); // yuck.  "resolve" since stat throws if missing.
         });
     }
 

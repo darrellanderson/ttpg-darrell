@@ -4,6 +4,40 @@ import { CreateBoardParams } from "./create-board-params";
 import { CubeModel } from "../../model/cube-model/cube-model";
 import { ZSolidCell } from "../../image/cell/cell-parser/cell-schema";
 
+it("fromParamsJson", () => {
+    const paramsJson: Buffer = Buffer.from(
+        JSON.stringify({
+            templateName: "my-template-name",
+            assetFilename: "my-asset-filename",
+            topDownWorldSize: { width: 200, height: 100, depth: 0.25 },
+            srcImage: {
+                type: "SolidCell",
+                width: 2,
+                height: 1,
+                color: "#ff0000",
+            },
+            preshrink: { width: 100, height: 100 },
+        })
+    );
+    CreateBoard.fromParamsJson(paramsJson);
+});
+
+it("clean", async () => {
+    const createBoard = new CreateBoard({
+        templateName: "my-template-name",
+        assetFilename: "my-asset-filename-that-does-not-exist",
+        topDownWorldSize: { width: 200, height: 100, depth: 0.25 },
+        srcImage: {
+            type: "SolidCell",
+            width: 2,
+            height: 1,
+            color: "#ff0000",
+        },
+        preshrink: { width: 100, height: 100 },
+    });
+    await createBoard.clean();
+});
+
 it("toFileData", async () => {
     const srcImage: ZSolidCell = {
         type: "SolidCell",
