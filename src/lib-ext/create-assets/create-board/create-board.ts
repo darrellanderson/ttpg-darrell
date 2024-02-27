@@ -156,7 +156,8 @@ export class CreateBoard extends AbstractCreateAssets {
         );
         const cubeTemplate = new CubeTemplate()
             .setGuidFrom(templateFilename)
-            .setName(this._params.templateName);
+            .setName(this._params.templateName)
+            .setMetadata(this._params.templateMetadata ?? "");
 
         // Snap points.
         const imgSize: { width: number; height: number } =

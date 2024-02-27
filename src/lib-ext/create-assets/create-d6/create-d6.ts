@@ -86,19 +86,22 @@ export class CreateD6 extends AbstractCreateAssets {
     toFileData(): Promise<{ [key: string]: Buffer }> {
         const fileData: { [key: string]: Buffer } = {};
 
-        const imageCell: Promise<Buffer> = this._createD6Image();
+        const texturePathRelativeToAssetsTextures: string = `${this._params.assetFilename}.png`;
         const imageTextureFile: string = path.join(
             this._params.rootDir ?? ".",
             "assets",
             "Textures",
-            `${this._params.assetFilename}.png`
+            texturePathRelativeToAssetsTextures
         );
+        const imageCell: Promise<Buffer> = this._createD6Image();
 
         const d6template: D6Template = new D6Template()
-            .setGuidFrom("")
-            .setMetadata("")
-            .setName("")
-            .setTexturePathRelativeToAssetsTextures("");
+            .setGuidFrom(this._params.assetFilename)
+            .setMetadata(this._params.templateMetadata ?? "")
+            .setName(this._params.templateName)
+            .setTexturePathRelativeToAssetsTextures(
+                texturePathRelativeToAssetsTextures
+            );
         for (let i = 0; i < 6; i++) {
             const face = this._params.faces[i];
             if (face?.metadata) {
@@ -115,7 +118,7 @@ export class CreateD6 extends AbstractCreateAssets {
                 "Templates",
                 `${this._params.assetFilename}.json`
             )
-        ];
+        ] = Buffer.from(d6template.toTemplate());
 
         return new Promise<{ [key: string]: Buffer }>((resolve, reject) => {
             imageCell.then((buffer: Buffer) => {

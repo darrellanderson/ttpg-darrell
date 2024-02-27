@@ -11,6 +11,7 @@ export const CreateCardsheetParamsSchema = z
 
         // Name in object library.
         templateName: z.string().min(1),
+        deckMetadata: z.string().optional(),
 
         cardSizePixel: z
             .object({
@@ -24,7 +25,6 @@ export const CreateCardsheetParamsSchema = z
                 height: z.number().positive(),
             })
             .strict(),
-        deckMetadata: z.string().optional(),
 
         cards: z.array(
             z

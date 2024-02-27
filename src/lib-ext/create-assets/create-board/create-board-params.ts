@@ -22,6 +22,7 @@ export const CreateBoardParamsSchema = z
 
         // Name in object library.
         templateName: z.string().min(1),
+        templateMetadata: z.string().optional(),
 
         // Size from a "looking from the top, down" perspective.
         // Width and height are the XY plane, depth is Z.

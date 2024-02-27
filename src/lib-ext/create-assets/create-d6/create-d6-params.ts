@@ -18,6 +18,7 @@ export const CreateD6ParamsSchema = z
 
         // Name in object library.
         templateName: z.string().min(1),
+        templateMetadata: z.string().optional(),
 
         faces: z.array(
             z
