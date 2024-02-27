@@ -7,8 +7,8 @@ it("constructor", () => {
 it("toTemplate", () => {
     const template: string = new CardsheetTemplate()
         .setGuidFrom("my-file-path")
-        .setName("my-name")
-        .setMetadata("my-metadata")
+        .setTemplateName("my-name")
+        .setTemplateMetadata("my-metadata")
         .setCardSizeWorld(3, 4)
         .setNumColsAndRows(1, 2)
         .setTextures("my-front-texture", "my-back-textures", -3)

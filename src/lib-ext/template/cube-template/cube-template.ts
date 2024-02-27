@@ -1,5 +1,3 @@
-import crypto from "crypto";
-
 // Treat top-down view as width x height, depth is Z.
 import {
     CUBE_SNAP_POINT,
@@ -7,6 +5,7 @@ import {
     CUBE_TEMPLATE,
 } from "./cube-template.data";
 import { CellSnapPoint } from "../../../index-ext";
+import { AbstractTemplate } from "../abstract-template/abstract-template";
 
 // Entries are always centered, may apply an offset.
 export type CubeTemplateEntry = {
@@ -27,12 +26,9 @@ export type CubeTemplateBoundingBox = {
     maxDepth: number; // Z dimension
 };
 
-export class CubeTemplate {
+export class CubeTemplate extends AbstractTemplate {
     private readonly _subCubeEntries: Array<CubeTemplateEntry> = [];
     private _collider: string | undefined;
-    private _guidFrom: string = "";
-    private _name: string = "";
-    private _metadata: string = "";
     private _snapPoints: Array<CellSnapPoint> = [];
 
     static getBoundingBox(
@@ -57,7 +53,9 @@ export class CubeTemplate {
         return { left, top, right, bottom, maxDepth };
     }
 
-    constructor() {}
+    constructor() {
+        super();
+    }
 
     addSubCubeEntry(entry: CubeTemplateEntry): this {
         this._subCubeEntries.push(entry);
@@ -69,34 +67,6 @@ export class CubeTemplate {
         return this;
     }
 
-    /**
-     * Create a deterministic GUID from this string.
-     * Suggest using the template file path for uniqueness.
-     *
-     * @param guidFrom
-     * @returns
-     */
-    setGuidFrom(guidFrom: string): this {
-        this._guidFrom = guidFrom;
-        return this;
-    }
-
-    /**
-     * Template name appears in the object library.
-     *
-     * @param name
-     * @returns
-     */
-    setName(name: string): this {
-        this._name = name;
-        return this;
-    }
-
-    setMetadata(metadata: string): this {
-        this._metadata = metadata;
-        return this;
-    }
-
     setSnapPoints(snapPoints: Array<CellSnapPoint>): this {
         this._snapPoints = [...snapPoints];
         return this;
@@ -105,9 +75,6 @@ export class CubeTemplate {
     toTemplate(): string {
         if (this._subCubeEntries.length === 0) {
             throw new Error("must addEntry");
-        }
-        if (this._guidFrom === "") {
-            throw new Error("must setGuidFrom");
         }
 
         const modelEntries: Array<object> = this._subCubeEntries.map(
@@ -127,17 +94,7 @@ export class CubeTemplate {
             }
         );
 
-        const guid: string = crypto
-            .createHash("sha256")
-            .update(this._guidFrom)
-            .digest("hex")
-            .substring(0, 32)
-            .toUpperCase();
-
-        const template = JSON.parse(JSON.stringify(CUBE_TEMPLATE));
-        template.GUID = guid;
-        template.Name = this._name;
-        template.Metadata = this._metadata;
+        const template = this.copyAndFillBasicFields(CUBE_TEMPLATE);
         template.Models = modelEntries;
 
         const bb = CubeTemplate.getBoundingBox(this._subCubeEntries);

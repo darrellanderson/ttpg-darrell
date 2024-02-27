@@ -97,8 +97,8 @@ export class CreateD6 extends AbstractCreateAssets {
 
         const d6template: D6Template = new D6Template()
             .setGuidFrom(this._params.assetFilename)
-            .setMetadata(this._params.templateMetadata ?? "")
-            .setName(this._params.templateName)
+            .setTemplateMetadata(this._params.templateMetadata ?? "")
+            .setTemplateName(this._params.templateName)
             .setTexturePathRelativeToAssetsTextures(
                 texturePathRelativeToAssetsTextures
             );

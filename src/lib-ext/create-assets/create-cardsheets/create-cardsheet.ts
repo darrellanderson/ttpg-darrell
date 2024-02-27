@@ -286,8 +286,8 @@ export class CreateCardsheet extends AbstractCreateAssets {
                 this._params.cardSizeWorld.height
             )
             .setGuidFrom(sheetPlan.templateFilenameRelativeToAssetsTemplates)
-            .setMetadata(this._params.deckMetadata ?? "")
-            .setName(this._params.templateName ?? "")
+            .setTemplateMetadata(this._params.deckMetadata ?? "")
+            .setTemplateName(this._params.templateName ?? "")
             .setNumColsAndRows(sheetPlan.cols, sheetPlan.rows)
             .setTextures(
                 sheetPlan.faceFilenameRelativeToAssetsTextures,

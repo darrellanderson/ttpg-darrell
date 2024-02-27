@@ -1,5 +1,5 @@
-import crypto from "crypto";
 import { CARDSHEET_TEMPLATE } from "./cardsheet-template.data";
+import { AbstractTemplate } from "../abstract-template/abstract-template";
 
 export type CardEntry = {
     name?: string;
@@ -7,10 +7,7 @@ export type CardEntry = {
     tags?: Array<string>;
 };
 
-export class CardsheetTemplate {
-    private _guidFrom: string = "";
-    private _name: string = "";
-    private _metadata: string = "";
+export class CardsheetTemplate extends AbstractTemplate {
     private _textureFront: string = "";
     private _textureBack: string = "";
     private _backIndex: number = 0;
@@ -20,34 +17,8 @@ export class CardsheetTemplate {
     private _cardHeight: number = 0;
     private readonly _cards: Array<CardEntry> = [];
 
-    constructor() {}
-
-    /**
-     * Create a deterministic GUID from this string.
-     * Suggest using the template file path for uniqueness.
-     *
-     * @param guidFrom
-     * @returns
-     */
-    setGuidFrom(guidFrom: string): this {
-        this._guidFrom = guidFrom;
-        return this;
-    }
-
-    /**
-     * Template name appears in the object library.
-     *
-     * @param name
-     * @returns
-     */
-    setName(name: string): this {
-        this._name = name;
-        return this;
-    }
-
-    setMetadata(metadata: string): this {
-        this._metadata = metadata;
-        return this;
+    constructor() {
+        super();
     }
 
     setTextures(front: string, back: string, backIndex: number): this {
@@ -75,9 +46,6 @@ export class CardsheetTemplate {
     }
 
     toTemplate(): string {
-        if (this._guidFrom.length === 0) {
-            throw new Error("must setGuidFrom");
-        }
         if (this._textureFront.length === 0 || this._textureBack.length === 0) {
             throw new Error("must setTextures");
         }
@@ -91,18 +59,8 @@ export class CardsheetTemplate {
             throw new Error("must addEntry");
         }
 
-        const template = JSON.parse(JSON.stringify(CARDSHEET_TEMPLATE));
+        const template = this.copyAndFillBasicFields(CARDSHEET_TEMPLATE);
 
-        const guid: string = crypto
-            .createHash("sha256")
-            .update(this._guidFrom)
-            .digest("hex")
-            .substring(0, 32)
-            .toUpperCase();
-
-        template.Name = this._name;
-        template.Metadata = this._metadata;
-        template.GUID = guid;
         template.FrontTexture = this._textureFront;
         template.BackTexture = this._textureBack;
         template.BackIndex = this._backIndex;

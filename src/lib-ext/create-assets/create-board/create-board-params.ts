@@ -17,12 +17,15 @@ export const CreateBoardParamsSchema = z
             .strict()
             .optional(),
 
-        // Original board image (filename or buffer).
+        scriptName: z.string().optional(),
+
+        // Original board image, may have snap points.
         srcImage: ZBaseCellSchema,
+
+        templateMetadata: z.string().optional(),
 
         // Name in object library.
         templateName: z.string().min(1),
-        templateMetadata: z.string().optional(),
 
         // Size from a "looking from the top, down" perspective.
         // Width and height are the XY plane, depth is Z.

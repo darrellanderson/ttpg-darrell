@@ -7,8 +7,8 @@ it("constructor", () => {
 it("setters", () => {
     const template: string = new D6Template()
         .setGuidFrom("path")
-        .setMetadata("my-metadata")
-        .setName("my-name")
+        .setTemplateMetadata("my-metadata")
+        .setTemplateName("my-name")
         .setTexturePathRelativeToAssetsTextures("my-texture")
         .setFaceName(0, "face-name-0")
         .setFaceMetadata(0, "face-metadata-0")

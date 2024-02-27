@@ -41,7 +41,7 @@ it("add/set", () => {
             depth: 1,
         })
         .setGuidFrom("path/to/template.json")
-        .setName("my-name");
+        .setTemplateName("my-name");
 });
 
 it("toTemplate (no entries)", () => {
@@ -76,8 +76,9 @@ it("toTemplate", () => {
             top: 7,
         })
         .setGuidFrom("foo")
-        .setName("my-name")
-        .setMetadata("my-metadata")
+        .setScriptName("my-script")
+        .setTemplateMetadata("my-metadata")
+        .setTemplateName("my-name")
         .toTemplate();
     if (template.includes("$")) {
         throw new Error(template);
@@ -99,7 +100,7 @@ it("toTemplate", () => {
         Flippable: false,
         AutoStraighten: false,
         ShouldSnap: false,
-        ScriptName: "",
+        ScriptName: "my-script",
         Blueprint: "",
         Models: [
             {
