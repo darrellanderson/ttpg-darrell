@@ -8,6 +8,7 @@ import {
 import { ResizeCell } from "../../image/cell/resize-cell/resize-cell";
 import { AbstractCreateAssets } from "../abstract-create-assets/abstract-create-assets";
 import { CreateD6Params, CreateD6ParamsSchema } from "./create-d6-params";
+import { D6Template } from "../../template/d6-template/d6-template";
 
 export class CreateD6 extends AbstractCreateAssets {
     private readonly _params: CreateD6Params;
@@ -83,6 +84,44 @@ export class CreateD6 extends AbstractCreateAssets {
     }
 
     toFileData(): Promise<{ [key: string]: Buffer }> {
-        throw new Error("Method not implemented.");
+        const fileData: { [key: string]: Buffer } = {};
+
+        const imageCell: Promise<Buffer> = this._createD6Image();
+        const imageTextureFile: string = path.join(
+            this._params.rootDir ?? ".",
+            "assets",
+            "Textures",
+            `${this._params.assetFilename}.png`
+        );
+
+        const d6template: D6Template = new D6Template()
+            .setGuidFrom("")
+            .setMetadata("")
+            .setName("")
+            .setTexturePathRelativeToAssetsTextures("");
+        for (let i = 0; i < 6; i++) {
+            const face = this._params.faces[i];
+            if (face?.metadata) {
+                d6template.setFaceMetadata(i, face.metadata);
+            }
+            if (face?.name) {
+                d6template.setFaceName(i, face.name);
+            }
+        }
+        fileData[
+            path.join(
+                this._params.rootDir ?? ".",
+                "assets",
+                "Templates",
+                `${this._params.assetFilename}.json`
+            )
+        ];
+
+        return new Promise<{ [key: string]: Buffer }>((resolve, reject) => {
+            imageCell.then((buffer: Buffer) => {
+                fileData[imageTextureFile] = buffer;
+                resolve(fileData);
+            }, reject);
+        });
     }
 }

@@ -1,6 +1,58 @@
 {
-    "assetFilename": "my-asset-filename",
-    "faceSizePixel": { "width": 1, "height": 1 },
-    "templateame": "my-template-name",
-    "faces": []
+    "rootDir": "/Users/darrell/ttpg/_test",
+    "assetFilename": "my-d6",
+    "faceSizePixel": { "width": 100, "height": 100 },
+    "templateName": "my-template-name",
+    "faces": [
+        {
+            "name": "First",
+            "metadata": "first-metadata",
+            "image": {
+                "type": "SolidCell",
+                "width": 1,
+                "height": 1,
+                "color": "#ff0000"
+            }
+        },
+        {
+            "image": {
+                "type": "SolidCell",
+                "width": 1,
+                "height": 1,
+                "color": "#00ff00"
+            }
+        },
+        {
+            "image": {
+                "type": "SolidCell",
+                "width": 1,
+                "height": 1,
+                "color": "#0000ff"
+            }
+        },
+        {
+            "image": {
+                "type": "SolidCell",
+                "width": 1,
+                "height": 1,
+                "color": "#ffff00"
+            }
+        },
+        {
+            "image": {
+                "type": "SolidCell",
+                "width": 1,
+                "height": 1,
+                "color": "#ff00ff"
+            }
+        },
+        {
+            "image": {
+                "type": "SolidCell",
+                "width": 1,
+                "height": 1,
+                "color": "#00ffff"
+            }
+        }
+    ]
 }
