@@ -16,11 +16,6 @@ const args = yargs
             type: "string",
             demand: true,
         },
-        f: {
-            alias: "force",
-            descript: "overwrite any existing output file?",
-            type: "boolean",
-        },
     })
     .parseSync(); // creates typed result
 
