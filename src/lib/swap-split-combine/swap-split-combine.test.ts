@@ -4,8 +4,9 @@ import { GameObject, Player, world } from "@tabletop-playground/api";
 import { Spawn } from "../spawn/spawn";
 import { NSID } from "../nsid/nsid";
 
-it("constructor", () => {
-    new SwapSplitCombine([]);
+it("constructor, init", () => {
+    new MockGameObject(); // so init has an object to check
+    new SwapSplitCombine([]).init();
 });
 
 it("swap", () => {
@@ -38,6 +39,7 @@ it("swap", () => {
     expect(srcObj2.isValid()).toBeTruthy();
 
     swapSplitCombine._go(srcObj1, player);
+    swapSplitCombine._go(srcObj1, player); // suppress in progress
     const nsids: Array<string> = world
         .getAllObjects()
         .map((obj) => NSID.get(obj));

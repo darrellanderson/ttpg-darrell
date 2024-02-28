@@ -17,6 +17,11 @@ export type SwapSplitCombineRule = {
     repeat: boolean;
 };
 
+/**
+ * Replace one or more objects with others.  Applies the first matching rule.
+ *
+ * Useful to replace currency items with upper/lower versions.
+ */
 export class SwapSplitCombine implements IGlobal {
     private readonly _nsids: Set<string> = new Set<string>();
     private readonly _rules: Array<SwapSplitCombineRule>;
