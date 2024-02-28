@@ -1,4 +1,10 @@
-import { GameObject, Player, Vector, world } from "@tabletop-playground/api";
+import {
+    GameObject,
+    Player,
+    Vector,
+    globalEvents,
+    world,
+} from "@tabletop-playground/api";
 import { NSID } from "../nsid/nsid";
 import { IGlobal } from "../global/i-global";
 import { GarbageContainer } from "../game-object/garbage/garbage-container";
@@ -59,6 +65,7 @@ export class SwapSplitCombine implements IGlobal {
      * Add "r" handler to relevant objects.
      */
     init(): void {
+        globalEvents.onObjectCreated.add(this._objectCreatedHandler);
         for (const obj of world.getAllObjects()) {
             this._objectCreatedHandler(obj);
         }

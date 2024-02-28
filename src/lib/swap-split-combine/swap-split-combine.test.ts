@@ -12,11 +12,16 @@ it("constructor, init", () => {
 it("swap", () => {
     const swapSplitCombine = new SwapSplitCombine([
         {
-            src: { nsids: ["src-nsid"], count: 1 },
+            src: { nsids: ["bogus-nsid-1"], count: 1 },
+            dst: { nsid: "bogus-nsid-2", count: 1 },
+            repeat: false,
+        },
+        {
+            src: { nsids: ["bogus-nsid-3", "src-nsid"], count: 1 },
             dst: { nsid: "dst-nsid", count: 1 },
             repeat: false,
         },
-    ]);
+    ]).init();
 
     Spawn.inject({ "dst-nsid": "dst-template-id" });
     mockWorld._reset({
@@ -25,21 +30,23 @@ it("swap", () => {
         },
     });
 
-    const srcObj1: GameObject = new MockGameObject({
+    const srcObj1: MockGameObject = new MockGameObject({
         templateMetadata: "src-nsid",
     });
     const srcObj2: GameObject = new MockGameObject({
         templateMetadata: "src-nsid",
     });
     const player: Player = new MockPlayer({
-        selectedObjects: [srcObj1, srcObj2],
+        selectedObjects: [srcObj2], // omit srcObj1, will add via primary action object
     });
 
     expect(srcObj1.isValid()).toBeTruthy();
     expect(srcObj2.isValid()).toBeTruthy();
 
-    swapSplitCombine._go(srcObj1, player);
-    swapSplitCombine._go(srcObj1, player); // suppress in progress
+    srcObj1._primaryActionAsPlayer(player);
+    srcObj1._primaryActionAsPlayer(player); // suppress in progres
+    process.flushTicks();
+
     const nsids: Array<string> = world
         .getAllObjects()
         .map((obj) => NSID.get(obj));
@@ -55,7 +62,7 @@ it("swap, repeat", () => {
             dst: { nsid: "dst-nsid", count: 1 },
             repeat: true,
         },
-    ]);
+    ]).init();
 
     Spawn.inject({ "dst-nsid": "dst-template-id" });
     mockWorld._reset({
@@ -64,7 +71,7 @@ it("swap, repeat", () => {
         },
     });
 
-    const srcObj1: GameObject = new MockGameObject({
+    const srcObj1: MockGameObject = new MockGameObject({
         templateMetadata: "src-nsid",
     });
     const srcObj2: GameObject = new MockGameObject({
@@ -77,7 +84,9 @@ it("swap, repeat", () => {
     expect(srcObj1.isValid()).toBeTruthy();
     expect(srcObj2.isValid()).toBeTruthy();
 
-    swapSplitCombine._go(srcObj1, player);
+    srcObj1._primaryActionAsPlayer(player);
+    process.flushTicks();
+
     const nsids: Array<string> = world
         .getAllObjects()
         .map((obj) => NSID.get(obj));
@@ -93,7 +102,7 @@ it("combine (different nsids)", () => {
             dst: { nsid: "dst-nsid", count: 2 },
             repeat: false,
         },
-    ]);
+    ]).init();
 
     Spawn.inject({ "dst-nsid": "dst-template-id" });
     mockWorld._reset({
@@ -102,7 +111,7 @@ it("combine (different nsids)", () => {
         },
     });
 
-    const srcObj1: GameObject = new MockGameObject({
+    const srcObj1: MockGameObject = new MockGameObject({
         templateMetadata: "src-nsid-a",
     });
     const srcObj2: GameObject = new MockGameObject({
@@ -123,7 +132,9 @@ it("combine (different nsids)", () => {
     expect(srcObj3.isValid()).toBeTruthy();
     expect(srcObj4.isValid()).toBeTruthy();
 
-    swapSplitCombine._go(srcObj1, player);
+    srcObj1._primaryActionAsPlayer(player);
+    process.flushTicks();
+
     const nsids: Array<string> = world
         .getAllObjects()
         .map((obj) => NSID.get(obj));
