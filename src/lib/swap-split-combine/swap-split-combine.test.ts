@@ -24,19 +24,64 @@ it("swap", () => {
         },
     });
 
-    const srcObj: GameObject = new MockGameObject({
+    const srcObj1: GameObject = new MockGameObject({
         templateMetadata: "src-nsid",
     });
-    const player: Player = new MockPlayer();
+    const srcObj2: GameObject = new MockGameObject({
+        templateMetadata: "src-nsid",
+    });
+    const player: Player = new MockPlayer({
+        selectedObjects: [srcObj1, srcObj2],
+    });
 
-    expect(srcObj.isValid()).toBeTruthy();
+    expect(srcObj1.isValid()).toBeTruthy();
+    expect(srcObj2.isValid()).toBeTruthy();
 
-    swapSplitCombine._go(srcObj, player);
+    swapSplitCombine._go(srcObj1, player);
     const nsids: Array<string> = world
         .getAllObjects()
         .map((obj) => NSID.get(obj));
-    expect(srcObj.isValid()).toBeFalsy();
-    expect(nsids).toEqual(["dst-nsid"]);
+    expect(srcObj1.isValid()).toBeFalsy();
+    expect(srcObj2.isValid()).toBeTruthy();
+    expect(nsids).toEqual(["src-nsid", "dst-nsid"]);
+});
+
+it("swap, repeat", () => {
+    const swapSplitCombine = new SwapSplitCombine([
+        {
+            src: { nsids: ["src-nsid"], count: 1 },
+            dst: { nsid: "dst-nsid", count: 1 },
+            repeat: true,
+        },
+    ]);
+
+    Spawn.inject({ "dst-nsid": "dst-template-id" });
+    mockWorld._reset({
+        _templateIdToMockGameObjectParams: {
+            "dst-template-id": { templateMetadata: "dst-nsid" },
+        },
+    });
+
+    const srcObj1: GameObject = new MockGameObject({
+        templateMetadata: "src-nsid",
+    });
+    const srcObj2: GameObject = new MockGameObject({
+        templateMetadata: "src-nsid",
+    });
+    const player: Player = new MockPlayer({
+        selectedObjects: [srcObj1, srcObj2],
+    });
+
+    expect(srcObj1.isValid()).toBeTruthy();
+    expect(srcObj2.isValid()).toBeTruthy();
+
+    swapSplitCombine._go(srcObj1, player);
+    const nsids: Array<string> = world
+        .getAllObjects()
+        .map((obj) => NSID.get(obj));
+    expect(srcObj1.isValid()).toBeFalsy();
+    expect(srcObj2.isValid()).toBeFalsy();
+    expect(nsids).toEqual(["dst-nsid", "dst-nsid"]);
 });
 
 it("combine (different nsids)", () => {
