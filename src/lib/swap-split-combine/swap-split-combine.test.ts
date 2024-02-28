@@ -9,15 +9,18 @@ it("constructor, init", () => {
     new SwapSplitCombine([]).init();
 });
 
-it("swap", () => {
-    const swapSplitCombine = new SwapSplitCombine([
+it("swapX", () => {
+    new SwapSplitCombine([
         {
             src: { nsids: ["bogus-nsid-1"], count: 1 },
             dst: { nsid: "bogus-nsid-2", count: 1 },
             repeat: false,
         },
         {
-            src: { nsids: ["bogus-nsid-3", "src-nsid"], count: 1 },
+            src: {
+                nsids: ["bogus-nsid-3", "src-nsid-1", "src-nsid-2"],
+                count: 1,
+            },
             dst: { nsid: "dst-nsid", count: 1 },
             repeat: false,
         },
@@ -31,10 +34,12 @@ it("swap", () => {
     });
 
     const srcObj1: MockGameObject = new MockGameObject({
-        templateMetadata: "src-nsid",
+        templateMetadata: "src-nsid-1",
+        id: "srcObj1",
     });
     const srcObj2: GameObject = new MockGameObject({
-        templateMetadata: "src-nsid",
+        templateMetadata: "src-nsid-2",
+        id: "srcObj2",
     });
     const player: Player = new MockPlayer({
         selectedObjects: [srcObj2], // omit srcObj1, will add via primary action object
@@ -52,11 +57,11 @@ it("swap", () => {
         .map((obj) => NSID.get(obj));
     expect(srcObj1.isValid()).toBeFalsy();
     expect(srcObj2.isValid()).toBeTruthy();
-    expect(nsids).toEqual(["src-nsid", "dst-nsid"]);
+    expect(nsids).toEqual(["src-nsid-2", "dst-nsid"]);
 });
 
 it("swap, repeat", () => {
-    const swapSplitCombine = new SwapSplitCombine([
+    new SwapSplitCombine([
         {
             src: { nsids: ["src-nsid"], count: 1 },
             dst: { nsid: "dst-nsid", count: 1 },
@@ -96,7 +101,7 @@ it("swap, repeat", () => {
 });
 
 it("combine (different nsids)", () => {
-    const swapSplitCombine = new SwapSplitCombine([
+    new SwapSplitCombine([
         {
             src: { nsids: ["src-nsid-a", "src-nsid-b"], count: 3 },
             dst: { nsid: "dst-nsid", count: 2 },
