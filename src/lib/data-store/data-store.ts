@@ -4,7 +4,7 @@ import {
     ObjectType,
     world,
 } from "@tabletop-playground/api";
-import { NamespacedId } from "../namespace-id/namespace-id";
+import { NamespaceId } from "../namespace-id/namespace-id";
 
 const BLOCK_SIZE = 512; // setSavedData limit 1023 (json trimmings, metadata is extra!)
 const BLOCK_METADATA_SIZE = 32; // be conservative
@@ -49,7 +49,7 @@ export class DataStore {
      *
      * @param dataStoreId - each store MUST have a different id
      */
-    constructor(dataStoreId: NamespacedId) {
+    constructor(dataStoreId: NamespaceId) {
         let rootObj: GameObject | undefined;
 
         // Check if this store is already registered.
@@ -84,7 +84,7 @@ export class DataStore {
      * @param dataId
      * @returns
      */
-    delete(dataId: NamespacedId): void {
+    delete(dataId: NamespaceId): void {
         const firstBlockLocation: DataBlockLocation | undefined =
             this._getRootEntry(dataId);
         if (!firstBlockLocation) {
@@ -107,7 +107,7 @@ export class DataStore {
      * @param data
      * @returns
      */
-    set(dataId: NamespacedId, data: string): void {
+    set(dataId: NamespaceId, data: string): void {
         this.delete(dataId);
 
         if (data.length === 0) {
@@ -194,7 +194,7 @@ export class DataStore {
      * @param dataId
      * @returns
      */
-    get(dataId: NamespacedId): string | undefined {
+    get(dataId: NamespaceId): string | undefined {
         const firstBlockLocation: DataBlockLocation | undefined =
             this._getRootEntry(dataId);
         if (!firstBlockLocation) {
@@ -210,7 +210,7 @@ export class DataStore {
      * @param dataId
      * @returns
      */
-    private _getRootEntry(dataId: NamespacedId): DataBlockLocation | undefined {
+    private _getRootEntry(dataId: NamespaceId): DataBlockLocation | undefined {
         const blockLocationEncData = this._root.getSavedData(dataId);
         if (!blockLocationEncData || blockLocationEncData.length === 0) {
             return undefined;

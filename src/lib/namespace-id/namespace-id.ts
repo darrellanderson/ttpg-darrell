@@ -1,1 +1,1 @@
-export type NamespacedId = `@${string}/${string}`;
+export type NamespaceId = `@${string}/${string}`;

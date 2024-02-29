@@ -1,6 +1,6 @@
 import { world } from "@tabletop-playground/api";
 import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate/triggerable-multicast-delegate";
-import { NamespacedId } from "../../namespace-id/namespace-id";
+import { NamespaceId } from "../../namespace-id/namespace-id";
 import { PlayerWindow } from "./player-window";
 import { WindowParams } from "./window-params";
 
@@ -45,7 +45,7 @@ export class Window {
     constructor(
         params: WindowParams,
         playerSlots: Array<number>,
-        persistenceKey?: NamespacedId
+        persistenceKey?: NamespaceId
     ) {
         // Create (unattached) per-player windows.
         this._playerWindows = playerSlots.map(
