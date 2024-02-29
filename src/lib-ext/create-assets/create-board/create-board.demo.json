@@ -2,7 +2,7 @@
     "rootDir": "/Users/darrell/ttpg/_test",
     "assetFilename": "create-board-demo",
     "preshrink": {
-        "width": 7754,
+        "width": 0,
         "height": 4096
     },
     "srcImage": {

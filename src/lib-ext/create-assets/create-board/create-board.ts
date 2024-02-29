@@ -3,7 +3,7 @@ import {
     ImageSplit,
     ImageSplitChunk,
 } from "../../image/image-split/image-split";
-import { AbstractCell, CellSnapPoint } from "../../../index-ext";
+import { AbstractCell, CellSize, CellSnapPoint } from "../../../index-ext";
 import { AbstractCreateAssets } from "../abstract-create-assets/abstract-create-assets";
 import { BleedCell } from "../../image/cell/bleed-cell/bleed-cell";
 import { BufferCell } from "../../image/cell/buffer-cell/buffer-cell";
@@ -52,6 +52,20 @@ export class CreateBoard extends AbstractCreateAssets {
 
         // Resize image, shrink a little more to account for UV bleed edges.
         if (this._params.preshrink) {
+            // If either value is zero, size appropriately.
+            const srcImageSize: CellSize = this._srcImageCell.getSize();
+            if (this._params.preshrink.width === 0) {
+                this._params.preshrink.width = Math.round(
+                    (this._params.preshrink.height * srcImageSize.width) /
+                        srcImageSize.height
+                );
+            } else if (this._params.preshrink.height === 0) {
+                this._params.preshrink.height = Math.round(
+                    (this._params.preshrink.width * srcImageSize.height) /
+                        srcImageSize.width
+                );
+            }
+
             const size: { width: number; height: number } =
                 CubeModel.getInsetForUVs(
                     this._params.preshrink.width,

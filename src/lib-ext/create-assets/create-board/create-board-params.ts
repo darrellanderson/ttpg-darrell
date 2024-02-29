@@ -9,10 +9,11 @@ export const CreateBoardParamsSchema = z
         // Relative to "assets/X/", without extension.
         assetFilename: z.string().min(1),
 
+        // May use zero for one dimension to auto-size.
         preshrink: z
             .object({
-                width: z.number().positive(),
-                height: z.number().positive(),
+                width: z.number().nonnegative(),
+                height: z.number().nonnegative(),
             })
             .strict()
             .optional(),
