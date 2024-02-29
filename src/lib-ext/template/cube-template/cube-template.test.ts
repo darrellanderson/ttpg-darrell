@@ -130,6 +130,7 @@ it("toTemplate", () => {
 
 it("toTemplate (collider, snap point)", () => {
     const template: string = new CubeTemplate()
+        .setTemplateName("my-name")
         .addSubCubeEntry({
             texture: "my-texture",
             model: "my-model",
@@ -151,7 +152,7 @@ it("toTemplate (collider, snap point)", () => {
     expect(JSON.parse(template)).toEqual({
         Type: "Generic",
         GUID: "2C26B46B68FFC68FF99B453C1D304134",
-        Name: "",
+        Name: "my-name",
         Metadata: "",
         Collision: [
             {
