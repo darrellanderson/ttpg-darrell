@@ -48,6 +48,9 @@ export abstract class AbstractTemplate {
         if (this._guidFrom === "") {
             throw new Error("must setGuidFrom");
         }
+        if (this._templateName === "") {
+            throw new Error("must setTemplateName");
+        }
 
         template = JSON.parse(JSON.stringify(template));
 
