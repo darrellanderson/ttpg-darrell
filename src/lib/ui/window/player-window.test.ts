@@ -2,6 +2,7 @@ import { Rotator, Text, Vector, Widget } from "@tabletop-playground/api";
 import { clickAll } from "../../jest-util/click-all/click-all";
 import { WindowParams } from "./window-params";
 import { PlayerWindow } from "./player-window";
+import { MockPlayer } from "ttpg-mock";
 
 it("attach/detach (screen, defaults)", () => {
     const params: WindowParams = {
@@ -118,4 +119,35 @@ it("click", () => {
 
     clickAll(playerWindow._createWidget());
     clickAll(playerWindow._createWidget()); // collapse vs expand, etc
+});
+
+it("state", () => {
+    const params: WindowParams = {
+        size: {
+            width: 10,
+            height: 10,
+        },
+        createWidget: (scale: number): Widget => {
+            return new Text().setFontSize(scale * 8);
+        },
+    };
+    const playerSlot: number = 7;
+    const playerWindow = new PlayerWindow(params, playerSlot).attach();
+    const state = playerWindow.getState();
+    playerWindow.applyState(state);
+});
+
+it("vr", () => {
+    const params: WindowParams = {
+        size: {
+            width: 10,
+            height: 10,
+        },
+        createWidget: (scale: number): Widget => {
+            return new Text().setFontSize(scale * 8);
+        },
+    };
+    const playerSlot: number = 7;
+    new MockPlayer({ slot: playerSlot, isUsingVR: true });
+    new PlayerWindow(params, playerSlot).attach();
 });
