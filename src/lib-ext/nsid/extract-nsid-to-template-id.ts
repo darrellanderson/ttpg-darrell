@@ -30,7 +30,7 @@ const args = yargs
         },
         f: {
             alias: "force",
-            descript: "overwrite any existign output file?",
+            descript: "overwrite any existing output file?",
             type: "boolean",
         },
     })
