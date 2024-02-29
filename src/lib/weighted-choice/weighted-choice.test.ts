@@ -36,3 +36,19 @@ it("choice", () => {
 
     jest.restoreAllMocks();
 });
+
+it("choice (hack random to be past end", () => {
+    jest.spyOn(Math, "random").mockImplementation((): number => {
+        return 1.1;
+    });
+
+    const weightedChoice = new WeightedChoice<string>([
+        { value: "a", weight: 1 },
+    ]);
+
+    expect(() => {
+        weightedChoice.choice();
+    }).toThrow();
+
+    jest.restoreAllMocks();
+});
