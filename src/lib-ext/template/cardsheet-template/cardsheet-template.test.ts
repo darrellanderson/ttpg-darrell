@@ -86,3 +86,34 @@ it("toTemplate", () => {
         height: 4,
     });
 });
+
+it("toTemplate (no texture)", () => {
+    expect(() => {
+        new CardsheetTemplate().toTemplate();
+    }).toThrow();
+});
+
+it("toTemplate (no card size)", () => {
+    expect(() => {
+        new CardsheetTemplate().setTextures("a", "b", 0).toTemplate();
+    }).toThrow();
+});
+
+it("toTemplate (no cols)", () => {
+    expect(() => {
+        new CardsheetTemplate()
+            .setTextures("a", "b", 0)
+            .setCardSizeWorld(1, 1)
+            .toTemplate();
+    }).toThrow();
+});
+
+it("toTemplate (no cards)", () => {
+    expect(() => {
+        new CardsheetTemplate()
+            .setTextures("a", "b", 0)
+            .setCardSizeWorld(1, 1)
+            .setNumColsAndRows(1, 1)
+            .toTemplate();
+    }).toThrow();
+});
