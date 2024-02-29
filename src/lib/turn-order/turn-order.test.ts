@@ -62,6 +62,12 @@ it("nextTurn (invalid)", () => {
     expect(turnOrder.nextTurn()).toEqual(-1);
 });
 
+it("nextTurn (all passed)", () => {
+    const turnOrder = new TurnOrder("@test/test");
+    turnOrder.setTurnOrder([1], "forward", 1).setPassed(1, true);
+    expect(turnOrder.nextTurn()).toEqual(-1);
+});
+
 it("get/set current turn", () => {
     const turnOrder = new TurnOrder("@test/test");
     const value = 7;

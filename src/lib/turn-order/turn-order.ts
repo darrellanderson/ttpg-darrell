@@ -136,13 +136,15 @@ export class TurnOrder {
             }
 
             // Is the candidate available?
-            playerSlot = this._order[cursor] ?? -1;
-            if (
-                playerSlot >= 0 &&
-                !this._passed.has(playerSlot) &&
-                !this._eliminated.has(playerSlot)
-            ) {
-                break; // use this player slot
+            const candidate: PlayerSlot | undefined = this._order[cursor];
+            if (candidate !== undefined) {
+                playerSlot = candidate;
+                if (
+                    !this._passed.has(playerSlot) &&
+                    !this._eliminated.has(playerSlot)
+                ) {
+                    break; // use this player slot
+                }
             }
         }
         this._currentTurn = playerSlot;
