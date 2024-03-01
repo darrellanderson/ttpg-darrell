@@ -25,10 +25,8 @@ export class Shuffle<T> {
     choiceOrThrow(items: Array<T>): T {
         const item: T | undefined = this.choice(items);
         if (item === undefined) {
-            console.log("sadf2.5");
             throw new Error("item undefined");
         }
-        console.log("sadf3");
         return item;
     }
 }

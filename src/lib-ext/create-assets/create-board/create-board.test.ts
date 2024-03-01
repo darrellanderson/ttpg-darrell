@@ -41,9 +41,10 @@ it("clean", async () => {
 it("toFileData", async () => {
     const srcImage: ZSolidCell = {
         type: "SolidCell",
-        width: 2,
+        width: 5000,
         height: 1,
         color: "#ff0000",
+        snapPoints: [{}, { left: 0, top: 0 }],
     };
 
     const params: CreateBoardParams = {
@@ -62,6 +63,7 @@ it("toFileData", async () => {
         "assets/Models/" + CubeModel.ASSET_FILENAME,
         "assets/Templates/my-asset-filename.json",
         "assets/Textures/my-asset-filename-0x0.jpg",
+        "assets/Textures/my-asset-filename-1x0.jpg",
     ]);
 
     const model: string | undefined =
@@ -71,11 +73,17 @@ it("toFileData", async () => {
     expect(model).toBeDefined();
     expect(model?.includes("$")).toBeFalsy();
 
-    const image: Buffer | undefined =
+    let image: Buffer | undefined =
         filenameToBuffer["assets/Textures/my-asset-filename-0x0.jpg"];
     expect(image).toBeDefined();
-    const metadata = await sharp(image).metadata();
-    expect(metadata.width).toEqual(2);
+    let metadata = await sharp(image).metadata();
+    expect(metadata.width).toEqual(4096);
+    expect(metadata.height).toEqual(1);
+
+    image = filenameToBuffer["assets/Textures/my-asset-filename-1x0.jpg"];
+    expect(image).toBeDefined();
+    metadata = await sharp(image).metadata();
+    expect(metadata.width).toEqual(942);
     expect(metadata.height).toEqual(1);
 
     const template: string | undefined =
@@ -84,11 +92,11 @@ it("toFileData", async () => {
     expect(template?.includes("$")).toBeFalsy();
     const templateParsed = JSON.parse(template ?? "");
     expect(templateParsed.Name).toEqual("my-template-name");
-    expect(templateParsed.Models.length).toEqual(1);
+    expect(templateParsed.Models.length).toEqual(2);
 
     const templateModel = templateParsed.Models[0];
     expect(templateModel.Model).toEqual(CubeModel.ASSET_FILENAME);
     expect(templateModel.Texture).toEqual("my-asset-filename-0x0.jpg");
-    expect(templateModel.Offset).toEqual({ X: 0, Y: 0, Z: 0 });
-    expect(templateModel.Scale).toEqual({ X: 100, Y: 200, Z: 0.25 });
+    expect(templateModel.Offset).toEqual({ X: 0, Y: -18.72, Z: 0 });
+    expect(templateModel.Scale).toEqual({ X: 100, Y: 162.56, Z: 0.25 });
 });
