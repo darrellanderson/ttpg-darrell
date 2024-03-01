@@ -72,21 +72,25 @@ it("to/from grid (pointy)", () => {
             const s = -(q + r);
             const hex: string = Hex._hexToString(q, r, s);
             const pos: Vector = pointy.toPosition(hex);
-            const out: string = pointy.fromPosition(pos);
-            expect(out).toEqual(hex);
+            const hex2: string = pointy.fromPosition(pos);
+            const pos2: Vector = pointy.toPosition(hex2);
+            expect(hex2).toEqual(hex);
+            expect(pos2.toString()).toEqual(pos.toString());
         }
     }
 });
 
 it("to/from grid (flat)", () => {
-    const pointy = new Hex(HEX_LAYOUT_FLAT, 1);
+    const flat = new Hex(HEX_LAYOUT_FLAT, 1);
     for (let q = -10; q <= 10; q++) {
         for (let r = -10; r <= 10; r++) {
             const s = -(q + r);
             const hex: string = Hex._hexToString(q, r, s);
-            const pos: Vector = pointy.toPosition(hex);
-            const out: string = pointy.fromPosition(pos);
-            expect(out).toEqual(hex);
+            const pos: Vector = flat.toPosition(hex);
+            const hex2: string = flat.fromPosition(pos);
+            const pos2: Vector = flat.toPosition(hex2);
+            expect(hex2).toEqual(hex);
+            expect(pos2.toString()).toEqual(pos.toString());
         }
     }
 });
