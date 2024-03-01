@@ -11,7 +11,7 @@ import {
     world,
 } from "@tabletop-playground/api";
 import { Perf, PerfReport } from "../../perf/perf";
-import { SvgSparkline } from "../../svg/svg-sparkline";
+import { SvgSparkline } from "../../svg/svg-sparkline/svg-sparkline";
 import { UiVisibility } from "../../ui/ui-visibility/ui-visibility";
 
 import { PerfWidgetLocaleData } from "./perf-widget-locale.data";
@@ -77,7 +77,7 @@ export class PerfWidget {
 
     refresh(): this {
         // Browser.
-        const fpsHistory: number[] = this._perf.getFpsHistory();
+        const fpsHistory: Array<number> = this._perf.getFpsHistory();
         const url: string = SvgSparkline.url(fpsHistory);
         this._webBrowser.setURL(url);
 

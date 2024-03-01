@@ -67,7 +67,7 @@ it("parseSourceMappings (segments)", () => {
 
 it("parseSourceMappingSegment", () => {
     const errorHandler = new ErrorHandler();
-    let decoded: number[];
+    let decoded: Array<number>;
 
     decoded = errorHandler.parseSourceMappingSegment("uDt7D0TkuK");
     expect(decoded).toEqual([55, -1974, 314, 5346]);
@@ -112,9 +112,8 @@ it("getMap", () => {
 });
 
 it("getLineMapping (empty file)", () => {
-    const lineMapping: number[] | undefined = new ErrorHandler().getLineMapping(
-        ""
-    );
+    const lineMapping: Array<number> | undefined =
+        new ErrorHandler().getLineMapping("");
     expect(lineMapping).toBeUndefined();
 });
 
@@ -125,7 +124,8 @@ it("getLineMapping (js file, but no map file)", () => {
     });
 
     const errorHandler = new ErrorHandler(); // same instance for cache
-    let lineMapping: number[] | undefined = errorHandler.getLineMapping(jsFile);
+    let lineMapping: Array<number> | undefined =
+        errorHandler.getLineMapping(jsFile);
     expect(lineMapping).toBeUndefined();
 
     // Read it a second time (nack cache).
@@ -146,7 +146,8 @@ it("getLineMapping (map file)", () => {
     });
 
     const errorHandler = new ErrorHandler(); // same instance for cache
-    let lineMapping: number[] | undefined = errorHandler.getLineMapping(jsFile);
+    let lineMapping: Array<number> | undefined =
+        errorHandler.getLineMapping(jsFile);
     expect(lineMapping).toEqual([-1, -1, -1, 0, 1, 17, 23, -1, -1, -1, -1]);
 
     // Read it a second time (fetched from cache).
@@ -164,9 +165,8 @@ it("getLineMapping (corrupt map file)", () => {
     });
 
     jest.spyOn(console, "log").mockImplementation(() => {});
-    const lineMapping: number[] | undefined = new ErrorHandler().getLineMapping(
-        jsFile
-    );
+    const lineMapping: Array<number> | undefined =
+        new ErrorHandler().getLineMapping(jsFile);
     jest.restoreAllMocks();
     expect(lineMapping).toBeUndefined();
 });
@@ -183,9 +183,8 @@ it("getLineMapping (json field wrong type)", () => {
     });
 
     jest.spyOn(console, "log").mockImplementation(() => {});
-    const lineMapping: number[] | undefined = new ErrorHandler().getLineMapping(
-        jsFile
-    );
+    const lineMapping: Array<number> | undefined =
+        new ErrorHandler().getLineMapping(jsFile);
     jest.restoreAllMocks();
     expect(lineMapping).toBeUndefined();
 });

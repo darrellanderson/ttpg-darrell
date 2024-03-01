@@ -13,7 +13,7 @@ OnCardBecameSingletonOrDeck.onSingletonCardCreated.add((card: Card) => {
 
 OnCardBecameSingletonOrDeck.onSingletonCardMadeDeck.add(
     (card: Card, oldNsid: string) => {
-        const nsids: string[] = NSID.getDeck(card);
+        const nsids: Array<string> = NSID.getDeck(card);
         console.log(
             `onSingletonCardMadeDeck: [${nsids.join(", ")}], oldNsid: "${oldNsid}"`
         );

@@ -87,7 +87,7 @@ it("spawnMergeDecks", () => {
         throw new Error("x");
     }
 
-    const nsids: string[] = NSID.getDeck(deck);
+    const nsids: Array<string> = NSID.getDeck(deck);
     expect(nsids).toEqual([
         "deck1card1",
         "deck1card2",
@@ -125,7 +125,7 @@ it("spawnMergedDecksOrThrow", () => {
         ["deck1", "deck2"],
         [0, 0, 0]
     );
-    const nsids: string[] = NSID.getDeck(deck);
+    const nsids: Array<string> = NSID.getDeck(deck);
     expect(nsids).toEqual([
         "deck1card1",
         "deck1card2",

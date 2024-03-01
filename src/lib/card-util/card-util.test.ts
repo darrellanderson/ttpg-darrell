@@ -308,7 +308,7 @@ it("separateDeck", () => {
         ],
     });
     const cardUtil = new CardUtil();
-    const cards: Card[] = cardUtil.separateDeck(deck);
-    const nsids: string[] = cards.map((card) => NSID.get(card));
+    const cards: Array<Card> = cardUtil.separateDeck(deck);
+    const nsids: Array<string> = cards.map((card) => NSID.get(card));
     expect(nsids).toEqual(["card1", "card2", "card3"]);
 });

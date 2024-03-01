@@ -32,7 +32,7 @@ DiceGroup.roll({
     position: refObject.getPosition().add([0, 4, 0]),
     timeoutSeconds: -1, // no timeout
     deleteAfterSeconds: -1, // no delete
-    callback: (diceResults: DiceResult[]) => {
+    callback: (diceResults: Array<DiceResult>) => {
         console.log(
             diceResults
                 .map((diceResult) => DiceGroup.format(diceResult))

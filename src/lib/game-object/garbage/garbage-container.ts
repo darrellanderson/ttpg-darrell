@@ -28,7 +28,7 @@ export class GarbageContainer {
     public static onRecycled = new TriggerableMulticastDelegate<
         (obj: GameObject) => void
     >();
-    private static _garbageHandlers: GarbageHandler[] = [];
+    private static _garbageHandlers: Array<GarbageHandler> = [];
 
     private readonly _container: Container;
 
@@ -116,7 +116,7 @@ export class GarbageContainer {
 
     // Expose for testing.
     _recycle() {
-        const objs: GameObject[] = this._container.getItems();
+        const objs: Array<GameObject> = this._container.getItems();
         for (const obj of objs) {
             // Verify object.
             if (!obj.isValid()) {

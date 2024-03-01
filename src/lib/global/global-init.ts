@@ -8,9 +8,9 @@ export abstract class GlobalInit {
      *
      * @param abstractGlobals
      */
-    public static runGlobalInit(abstractGlobals: IGlobal[]) {
+    public static runGlobalInit(abstractGlobals: Array<IGlobal>) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const runnables: ((x: void) => any)[] = [];
+        const runnables: Array<(x: void) => any> = [];
         for (const abstractGlobal of abstractGlobals) {
             runnables.push(() => {
                 abstractGlobal.init();

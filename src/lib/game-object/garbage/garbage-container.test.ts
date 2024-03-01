@@ -151,7 +151,7 @@ it("_tryRecycleDeck (none)", () => {
 });
 
 it("onRecycled", () => {
-    const recycled: GameObject[] = [];
+    const recycled: Array<GameObject> = [];
     const onRecycledHandler = (obj: GameObject) => {
         recycled.push(obj);
     };
@@ -178,7 +178,7 @@ it("onRecycled", () => {
 });
 
 it("container onInserted", () => {
-    const recycledIds: string[] = [];
+    const recycledIds: Array<string> = [];
     const onRecycledHandler = (obj: GameObject) => {
         recycledIds.push(obj.getId());
     };

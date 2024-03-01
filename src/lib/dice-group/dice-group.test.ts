@@ -64,7 +64,7 @@ it("cleanup", () => {
 it("fakeRoll (empty)", () => {
     let eventCount = 0;
     let diceCount = 0;
-    const callback = (diceResults: DiceResult[]): void => {
+    const callback = (diceResults: Array<DiceResult>): void => {
         eventCount += 1;
         diceCount += diceResults.length;
     };
@@ -87,7 +87,7 @@ it("fakeRoll", () => {
     let hitCount = 0;
     let critCount = 0;
     let rollingPlayer: Player | undefined;
-    const callback = (diceResults: DiceResult[], player: Player): void => {
+    const callback = (diceResults: Array<DiceResult>, player: Player): void => {
         eventCount += 1;
         diceCount += diceResults.length;
         for (const diceResult of diceResults) {
@@ -151,7 +151,7 @@ it("roll", () => {
     let rerolledCount = 0;
     let hitCount = 0;
     let critCount = 0;
-    const callback = (diceResults: DiceResult[]): void => {
+    const callback = (diceResults: Array<DiceResult>): void => {
         eventCount += 1;
         diceCount += diceResults.length;
         for (const diceResult of diceResults) {

@@ -1,5 +1,5 @@
 import { Player, globalEvents, world } from "@tabletop-playground/api";
-import { IGlobal } from "../global/i-global";
+import { IGlobal } from "../../global/i-global";
 
 /**
  * Global content menu item to leave seat.  Move to an unused slot, NOT the

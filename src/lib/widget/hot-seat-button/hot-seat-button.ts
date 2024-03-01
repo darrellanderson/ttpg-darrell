@@ -13,7 +13,7 @@ import { locale } from "../../locale/locale";
 import { TurnOrder } from "../../turn-order/turn-order";
 
 import { HotSeatLocaleData } from "./hot-seat-locale.data";
-import { LeaveSeat } from "../../context-menu/leave-seat";
+import { LeaveSeat } from "../../context-menu/leave-seat/leave-seat";
 import { ThrottleClickHandler } from "../../event/throttle-click-handler/throttle-click-handler";
 locale.inject(HotSeatLocaleData);
 

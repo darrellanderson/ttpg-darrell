@@ -38,7 +38,7 @@ export class TurnOrder {
     private readonly _passed: Set<PlayerSlot> = new Set();
     private readonly _eliminated: Set<PlayerSlot> = new Set();
 
-    private _order: PlayerSlot[] = [];
+    private _order: Array<PlayerSlot> = [];
     private _direction: number = 1;
     private _currentTurn: PlayerSlot = -1;
     private _snake: boolean = false;
@@ -175,12 +175,12 @@ export class TurnOrder {
         return this;
     }
 
-    getTurnOrder(): PlayerSlot[] {
+    getTurnOrder(): Array<PlayerSlot> {
         return [...this._order]; // copy
     }
 
     setTurnOrder(
-        order: PlayerSlot[],
+        order: Array<PlayerSlot>,
         direction: Direction,
         currentTurn: PlayerSlot
     ): this {

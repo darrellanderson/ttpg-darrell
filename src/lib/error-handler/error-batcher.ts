@@ -6,7 +6,7 @@ export abstract class ErrorBatcher {
      * @returns {string}
      */
     static errorToString(error: Error): string {
-        const entry: string[] = [];
+        const entry: Array<string> = [];
         // STACK ALREADY INCLUDES NAME AND MESSAGE!
         // if (error.name.length > 0) {
         //     entry.push("NAME: " + error.name);
@@ -21,8 +21,8 @@ export abstract class ErrorBatcher {
         return entry.join("\n");
     }
 
-    static runMaybeThrowAtEnd(runnables: ((x: void) => unknown)[]): void {
-        const errors: Error[] = ErrorBatcher.runGatherErrors(runnables);
+    static runMaybeThrowAtEnd(runnables: Array<(x: void) => unknown>): void {
+        const errors: Array<Error> = ErrorBatcher.runGatherErrors(runnables);
         if (errors.length > 0) {
             const message = `ErrorBatcher (${errors.length}):`;
             const stack: string = errors
@@ -35,8 +35,10 @@ export abstract class ErrorBatcher {
         }
     }
 
-    static runGatherErrors(runnables: ((x: void) => unknown)[]): Error[] {
-        const errors: Error[] = [];
+    static runGatherErrors(
+        runnables: Array<(x: void) => unknown>
+    ): Array<Error> {
+        const errors: Array<Error> = [];
         for (const runnable of runnables) {
             try {
                 runnable.apply(null, []);

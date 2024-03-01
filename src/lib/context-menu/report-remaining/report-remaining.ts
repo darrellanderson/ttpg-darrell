@@ -51,7 +51,7 @@ export class ReportRemaining implements IGlobal {
 
     private _maybeAdd(obj: GameObject) {
         if (obj instanceof Card) {
-            const nsids: string[] = NSID.getDeck(obj);
+            const nsids: Array<string> = NSID.getDeck(obj);
             const firstNsid: string | undefined = nsids[0];
             if (firstNsid?.startsWith(this._cardNsidPrefix)) {
                 obj.removeCustomAction(ReportRemaining._actionName);

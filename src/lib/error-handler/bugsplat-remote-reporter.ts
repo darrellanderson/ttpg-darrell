@@ -60,7 +60,7 @@ export class BugSplatRemoteReporter implements IGlobal {
             "Content-Type": `multipart/form-data;boundary="${boundary}"`,
         };
 
-        const bodyLines: string[] = [""];
+        const bodyLines: Array<string> = [""];
         Object.entries(form).map(([k, v]) => {
             bodyLines.push(`--${boundary}`);
             bodyLines.push(`Content-Disposition: form-data; name="${k}"`);

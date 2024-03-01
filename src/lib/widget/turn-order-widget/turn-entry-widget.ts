@@ -34,7 +34,7 @@ export class TurnEntryWidget {
     private readonly _bgBorder: Border;
     private readonly _nameText: Text;
     private readonly _passedLine: Border;
-    private readonly _warts: TurnEntryWart[] = [];
+    private readonly _warts: Array<TurnEntryWart> = [];
 
     private readonly _nameCenter: {
         x: number;

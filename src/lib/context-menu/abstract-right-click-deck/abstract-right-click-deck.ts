@@ -47,7 +47,7 @@ export abstract class AbstractRightClickDeck implements IGlobal {
         });
         OnCardBecameSingletonOrDeck.onSingletonCardMadeDeck.add(
             (card: Card) => {
-                const nsids: string[] = NSID.getDeck(card);
+                const nsids: Array<string> = NSID.getDeck(card);
                 for (const nsid of nsids) {
                     if (!nsid.startsWith(this._deckNsidPrefix)) {
                         return; // at least one mismatch

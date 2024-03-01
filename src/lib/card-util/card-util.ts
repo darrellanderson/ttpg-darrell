@@ -158,12 +158,12 @@ export class CardUtil {
     isLooseCard(
         obj: GameObject,
         allowFaceDown?: boolean,
-        rejectSnapPointTags?: string[]
+        rejectSnapPointTags?: Array<string>
     ): boolean {
         if (rejectSnapPointTags) {
             const snapPoint: SnapPoint | undefined = obj.getSnappedToPoint();
             if (snapPoint) {
-                const tags: string[] = snapPoint.getTags();
+                const tags: Array<string> = snapPoint.getTags();
                 for (const tag of tags) {
                     if (rejectSnapPointTags.includes(tag)) {
                         return false;
@@ -188,8 +188,8 @@ export class CardUtil {
      * @param deck
      * @returns
      */
-    separateDeck(deck: Card): Card[] {
-        const cards: Card[] = [];
+    separateDeck(deck: Card): Array<Card> {
+        const cards: Array<Card> = [];
         while (deck.getStackSize() > 1) {
             const numCards = 1;
             const fromFront = true;

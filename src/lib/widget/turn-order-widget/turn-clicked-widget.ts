@@ -64,7 +64,7 @@ export class TurnClickedWidget {
                 targetPlayer: this._targetPlayerName,
             });
             Broadcast.chatAll(msg);
-            const order: number[] = this._turnOrder.getTurnOrder();
+            const order: Array<number> = this._turnOrder.getTurnOrder();
             const index: number = order.indexOf(this._targetPlayerSlot);
             if (index >= 0) {
                 this._turnOrder.setCurrentTurn(this._targetPlayerSlot);

@@ -90,7 +90,7 @@ export class DataStore {
         if (!firstBlockLocation) {
             return;
         }
-        const blocks: DataBlock[] = this._getChain(firstBlockLocation);
+        const blocks: Array<DataBlock> = this._getChain(firstBlockLocation);
         this._releaseBlock(firstBlockLocation);
         for (const block of blocks) {
             if (block.next) {
@@ -117,20 +117,20 @@ export class DataStore {
         const n = Math.ceil(data.length / BLOCK_SIZE);
 
         // Split data into chunks.
-        const dataChunks: string[] = [];
+        const dataChunks: Array<string> = [];
         for (let i = 0; i < data.length; i += BLOCK_SIZE) {
             const end = Math.min(i + BLOCK_SIZE, data.length);
             dataChunks.push(data.substring(i, end));
         }
 
         // Reserve block locations.
-        const blockLocations: DataBlockLocation[] = [];
+        const blockLocations: Array<DataBlockLocation> = [];
         for (let i = 0; i < dataChunks.length; i++) {
             blockLocations.push(this._allocBlock());
         }
 
         // Create chained blocks.
-        const blocks: DataBlock[] = [];
+        const blocks: Array<DataBlock> = [];
         for (let i = 0; i < n; i++) {
             const data: string | undefined = dataChunks[i];
             if (data) {
@@ -200,7 +200,7 @@ export class DataStore {
         if (!firstBlockLocation) {
             return undefined;
         }
-        const blocks: DataBlock[] = this._getChain(firstBlockLocation);
+        const blocks: Array<DataBlock> = this._getChain(firstBlockLocation);
         return blocks.map((block) => block.data).join("");
     }
 
@@ -235,8 +235,8 @@ export class DataStore {
      * @param blockLocation
      * @param processor
      */
-    private _getChain(blockLocation: DataBlockLocation): DataBlock[] {
-        const blocks: DataBlock[] = [];
+    private _getChain(blockLocation: DataBlockLocation): Array<DataBlock> {
+        const blocks: Array<DataBlock> = [];
 
         do {
             const blockEncData = blockLocation.obj.getSavedData(
@@ -291,7 +291,7 @@ export class DataStore {
         if (!freelistData || freelistData.length === 0) {
             throw new Error("bad freelistData");
         }
-        const freelist: number[] = JSON.parse(freelistData);
+        const freelist: Array<number> = JSON.parse(freelistData);
         if (!Array.isArray(freelist)) {
             throw new Error("freelist is not an array");
         }
@@ -326,7 +326,7 @@ export class DataStore {
         if (!freelistData || freelistData.length === 0) {
             throw new Error("bad freelistData");
         }
-        const freelist: number[] = JSON.parse(freelistData);
+        const freelist: Array<number> = JSON.parse(freelistData);
         if (!Array.isArray(freelist)) {
             throw new Error("freelist is not an array");
         }
@@ -354,7 +354,7 @@ export class DataStore {
         if (!rootStoreIdsData || rootStoreIdsData.length === 0) {
             throw new Error("bad rootStoreData");
         }
-        const rootStoreIds: string[] = JSON.parse(rootStoreIdsData);
+        const rootStoreIds: Array<string> = JSON.parse(rootStoreIdsData);
         if (!Array.isArray(rootStoreIds)) {
             throw new Error("rootStoreData not array");
         }
@@ -372,7 +372,7 @@ export class DataStore {
         if (!rootStoreIdsData || rootStoreIdsData.length === 0) {
             throw new Error("bad rootStoreData");
         }
-        const rootStoreIds: string[] = JSON.parse(rootStoreIdsData);
+        const rootStoreIds: Array<string> = JSON.parse(rootStoreIdsData);
         if (!Array.isArray(rootStoreIds)) {
             throw new Error("rootStoreData not array");
         }
@@ -395,7 +395,7 @@ export class DataStore {
         if (!rootStoreIdsData || rootStoreIdsData.length === 0) {
             throw new Error("bad rootStoreData");
         }
-        const rootStoreIds: string[] = JSON.parse(rootStoreIdsData);
+        const rootStoreIds: Array<string> = JSON.parse(rootStoreIdsData);
         if (!Array.isArray(rootStoreIds)) {
             throw new Error("rootStoreData not array");
         }
@@ -430,7 +430,7 @@ export class DataStore {
         this._root.addObjects([obj]);
 
         // Set free list.
-        const freelist: number[] = [];
+        const freelist: Array<number> = [];
         for (let i = 0; i < BLOCKS_PER_OBJ; i++) {
             freelist.push(i);
         }

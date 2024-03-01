@@ -74,7 +74,7 @@ async function main() {
         // Include decks as a "*" named NSID.
         if (json.Type === "Card" && typeof json.CardMetadata === "object") {
             // Require all cards share the same prefix.
-            const cardNsids: string[] = Object.values(json.CardMetadata);
+            const cardNsids: Array<string> = Object.values(json.CardMetadata);
             if (cardNsids.length === 1 && (cardNsids[0]?.length ?? 0) > 0) {
                 const newNsid = cardNsids[0];
                 if (nsid !== newNsid) {
@@ -84,14 +84,14 @@ async function main() {
                     nsid = newNsid;
                 }
             } else if (cardNsids.length > 1) {
-                const getPrefix = (items: string[]): string => {
+                const getPrefix = (items: Array<string>): string => {
                     const first: string = items[0] ?? "";
-                    const firstParts: string[] = first.split(".");
+                    const firstParts: Array<string> = first.split(".");
 
                     // Get longest dot-delimited matching type.
                     let matchingPartsCount = firstParts.length;
                     for (const item of items) {
-                        const parts: string[] = item.split(".");
+                        const parts: Array<string> = item.split(".");
                         for (let i = 0; i < parts.length; i++) {
                             if (parts[i] !== firstParts[i]) {
                                 matchingPartsCount = Math.min(
@@ -106,16 +106,18 @@ async function main() {
                 };
 
                 // Use a common prefix (matching to a dot-delimited string).
-                const types: string[] = cardNsids.map((cardNsid) => {
+                const types: Array<string> = cardNsids.map((cardNsid) => {
                     const m = cardNsid.match("([^:]+):([^/]+)/.+");
                     return m?.[1] ?? "";
                 });
                 const type = getPrefix(types);
 
-                const sources: string[] = cardNsids.map((cardNsid): string => {
-                    const m = cardNsid.match("([^:]+):([^/]+)/.+");
-                    return m?.[2] ?? "";
-                });
+                const sources: Array<string> = cardNsids.map(
+                    (cardNsid): string => {
+                        const m = cardNsid.match("([^:]+):([^/]+)/.+");
+                        return m?.[2] ?? "";
+                    }
+                );
                 const source = getPrefix(sources);
 
                 const newNsid = `${type}:${source}/*`;

@@ -54,7 +54,7 @@ export abstract class Spawn {
     }
 
     static spawnMergeDecks(
-        nsids: string[],
+        nsids: Array<string>,
         position?: Vector | [x: number, y: number, z: number],
         rotation?: Rotator | [pitch: number, yaw: number, roll: number]
     ): Card | undefined {
@@ -107,7 +107,7 @@ export abstract class Spawn {
     }
 
     static spawnMergeDecksOrThrow(
-        nsids: string[],
+        nsids: Array<string>,
         position?: Vector | [x: number, y: number, z: number],
         rotation?: Rotator | [pitch: number, yaw: number, roll: number]
     ): Card {
@@ -138,7 +138,7 @@ export abstract class Spawn {
         Spawn._nsidToTemplateId = {};
     }
 
-    static getAllNsids(): string[] {
+    static getAllNsids(): Array<string> {
         return Object.keys(Spawn._nsidToTemplateId);
     }
 
@@ -153,7 +153,7 @@ export abstract class Spawn {
             }
         }
 
-        const missing = [];
+        const missing: Array<string> = [];
         for (const [nsid, templateId] of Object.entries(
             Spawn._nsidToTemplateId
         )) {

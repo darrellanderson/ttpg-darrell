@@ -24,7 +24,7 @@ export class TurnOrderWidget {
     private readonly _panel: VerticalBox;
     private readonly _screenUI: ScreenUIElement;
     private readonly _uiVisibility: UiVisibility;
-    private _turnEntryWidgets: TurnEntryWidget[] = [];
+    private _turnEntryWidgets: Array<TurnEntryWidget> = [];
 
     private readonly _doUpdate = () => {
         this.update();

@@ -3,7 +3,7 @@ import { Heap } from "../heap/heap";
 export type AdjacencyResult = {
     node: string;
     distance: number;
-    path: string[];
+    path: Array<string>;
 };
 
 /**
@@ -29,7 +29,7 @@ export class Adjacency {
      * @param tags
      * @returns
      */
-    public addNodeTags(node: string, tags: string[]): this {
+    public addNodeTags(node: string, tags: Array<string>): this {
         let tagSet: Set<string> | undefined;
         let nodeSet: Set<string> | undefined;
         tagSet = this._nodeToTagSet[node];
@@ -49,7 +49,7 @@ export class Adjacency {
         return this;
     }
 
-    public removeNodeTags(node: string, tags: string[]): this {
+    public removeNodeTags(node: string, tags: Array<string>): this {
         const tagSet: Set<string> | undefined = this._nodeToTagSet[node];
         for (const tag of tags) {
             if (tagSet) {
@@ -184,7 +184,7 @@ export class Adjacency {
      * @param maxDistance
      * @returns
      */
-    public get(origin: string, maxDistance: number): AdjacencyResult[] {
+    public get(origin: string, maxDistance: number): Array<AdjacencyResult> {
         const originAdjacencyResult: AdjacencyResult = {
             node: origin,
             distance: 0,

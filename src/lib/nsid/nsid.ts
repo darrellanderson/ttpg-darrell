@@ -2,9 +2,9 @@ import { Card, CardDetails, StaticObject } from "@tabletop-playground/api";
 
 export type ParsedNSID = {
     nsid: string;
-    typeParts: string[];
-    sourceParts: string[];
-    nameParts: string[];
+    typeParts: Array<string>;
+    sourceParts: Array<string>;
+    nameParts: Array<string>;
     extra: string | undefined;
 };
 
@@ -63,7 +63,7 @@ export abstract class NSID {
      * @param input deck
      * @returns NSID array, per-card values
      */
-    static getDeck(input: Card): string[] {
+    static getDeck(input: Card): Array<string> {
         return input.getAllCardDetails().map((cardDetails: CardDetails) => {
             return cardDetails.metadata;
         });

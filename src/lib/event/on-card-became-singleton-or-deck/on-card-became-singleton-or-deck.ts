@@ -58,7 +58,7 @@ export class OnCardBecameSingletonOrDeck implements IGlobal {
                 );
 
                 // Tested in TTPG, with face up and down decks.
-                const nsids: string[] = NSID.getDeck(deck);
+                const nsids: Array<string> = NSID.getDeck(deck);
                 const oldNsid: string | undefined =
                     nsids[position === 1 ? 0 : nsids.length - 1];
                 if (oldNsid === undefined) {

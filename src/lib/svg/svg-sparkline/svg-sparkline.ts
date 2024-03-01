@@ -8,7 +8,7 @@ export class SvgSparkline {
      * @param values
      * @returns
      */
-    static svg(values: number[]): string {
+    static svg(values: Array<number>): string {
         // Get the average non-zero value.
         const nonZeroValues = values.filter((value) => value > 0);
         if (nonZeroValues.length === 0) {
@@ -42,7 +42,7 @@ export class SvgSparkline {
         return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${SvgSparkline.WIDTH} ${SvgSparkline.HEIGHT}'><path d='${path.join(" ")}' stroke-width='2' stroke='red' fill='transparent' /></svg>`;
     }
 
-    static url(values: number[]): string {
+    static url(values: Array<number>): string {
         return "data:image/svg+xml," + SvgSparkline.svg(values);
     }
 }

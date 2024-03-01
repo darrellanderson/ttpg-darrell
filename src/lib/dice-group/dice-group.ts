@@ -28,11 +28,11 @@ export type DiceParams = {
  * Setup for a group of dice.
  */
 export type DiceGroupParams = {
-    diceParams: DiceParams[];
+    diceParams: Array<DiceParams>;
     player: Player;
     timeoutSeconds?: number;
     deleteAfterSeconds?: number;
-    callback?: (diceResults: DiceResult[], player: Player) => void;
+    callback?: (diceResults: Array<DiceResult>, player: Player) => void;
     position?: Vector | [x: number, y: number, z: number];
     doFakeRoll?: boolean;
 };
@@ -96,7 +96,7 @@ export class DiceGroup {
      * @returns
      */
     public static format(diceResult: DiceResult) {
-        const parts: string[] = [];
+        const parts: Array<string> = [];
         if (diceResult.rerolledValue) {
             parts.push(`${diceResult.rerolledValue}->`);
         }
@@ -112,10 +112,10 @@ export class DiceGroup {
         return parts.join("");
     }
 
-    private readonly _diceParamsArray: DiceParams[];
+    private readonly _diceParamsArray: Array<DiceParams>;
     private readonly _player: Player;
     private readonly _callback:
-        | ((diceResults: DiceResult[], player: Player) => void)
+        | ((diceResults: Array<DiceResult>, player: Player) => void)
         | undefined;
     private readonly _deleteAfterSeconds: number;
     private readonly _timeoutSeconds: number;
@@ -128,7 +128,7 @@ export class DiceGroup {
 
     private readonly _onDiceRolledHandler = (
         player: Player,
-        diceArray: Dice[]
+        diceArray: Array<Dice>
     ): void => {
         for (const dice of diceArray) {
             const diceResult: DiceResult | undefined =
@@ -248,7 +248,7 @@ export class DiceGroup {
         globalEvents.onDiceRolled.remove(this._onDiceRolledHandler);
 
         // If any dice did not finish (e.g. timeout) use a fake value.
-        const diceResults: DiceResult[] = Object.values(
+        const diceResults: Array<DiceResult> = Object.values(
             this._diceObjIdToDiceResult
         );
         for (const diceResult of diceResults) {

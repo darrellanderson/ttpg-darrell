@@ -54,7 +54,7 @@ it("click to take seat", () => {
     mockWorld._reset({ players: [player] });
     const cardHolder: CardHolder = new MockCardHolder({ owningPlayerSlot: 7 });
     new CardHolderPlayerName(cardHolder);
-    const uis: UIElement[] = cardHolder.getUIs();
+    const uis: Array<UIElement> = cardHolder.getUIs();
     expect(uis.length).toEqual(1);
     const switcher = uis[0]?.widget;
     expect(switcher).toBeInstanceOf(WidgetSwitcher);
@@ -76,7 +76,7 @@ it("click to take seat", () => {
 it("click to take seat (invalid slot)", () => {
     const cardHolder: CardHolder = new MockCardHolder({ owningPlayerSlot: -1 });
     new CardHolderPlayerName(cardHolder);
-    const uis: UIElement[] = cardHolder.getUIs();
+    const uis: Array<UIElement> = cardHolder.getUIs();
     expect(uis.length).toEqual(1);
     const switcher = uis[0]?.widget;
     expect(switcher).toBeInstanceOf(WidgetSwitcher);
@@ -100,7 +100,7 @@ it("onPlayerJoined", () => {
     });
     expect(cardHolder.getOwningPlayerSlot()).toEqual(playerSlot);
     new CardHolderPlayerName(cardHolder);
-    const uis: UIElement[] = cardHolder.getUIs();
+    const uis: Array<UIElement> = cardHolder.getUIs();
     expect(uis.length).toEqual(1);
     const switcher = uis[0]?.widget;
     expect(switcher).toBeInstanceOf(WidgetSwitcher);

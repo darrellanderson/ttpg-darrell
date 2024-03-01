@@ -52,7 +52,7 @@ it("leaveSeat (none open)", () => {
     jest.spyOn(console, "log").mockImplementation(() => {});
 
     const player: Player = new MockPlayer({ slot: 0 });
-    const gameObjects: GameObject[] = [];
+    const gameObjects: Array<GameObject> = [];
     for (let slot = 0; slot < 20; slot++) {
         gameObjects.push(new MockGameObject({ owningPlayerSlot: slot }));
     }

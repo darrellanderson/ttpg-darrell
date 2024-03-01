@@ -12,7 +12,7 @@ import {
 export class UiVisibility {
     private readonly _ui: UIElement | ScreenUIElement;
     private readonly _obj: GameObject | undefined;
-    private _visibleToPlayerSlots: number[] = [];
+    private _visibleToPlayerSlots: Array<number> = [];
 
     constructor(ui: UIElement | ScreenUIElement, obj?: GameObject) {
         // Make sure widget is ready.

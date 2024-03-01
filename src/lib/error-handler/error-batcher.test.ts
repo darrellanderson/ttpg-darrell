@@ -15,7 +15,10 @@ it("runGatherErrors", () => {
         throw new Error("my err!");
     };
 
-    const errors: Error[] = ErrorBatcher.runGatherErrors([runnable, runnable]);
+    const errors: Array<Error> = ErrorBatcher.runGatherErrors([
+        runnable,
+        runnable,
+    ]);
 
     expect(errors.length).toEqual(2);
 });

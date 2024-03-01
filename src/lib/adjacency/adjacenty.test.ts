@@ -86,7 +86,7 @@ it("_getAdjacentNodeSet", () => {
         .addLink("tag-00", "tag-10")
         .addLink("tag-10", "tag-20");
     let adjNodeSet: Set<string>;
-    let adjNodeList: string[];
+    let adjNodeList: Array<string>;
 
     adjNodeSet = adj._getAdjacentNodeSet("00");
     adjNodeList = Array.from(adjNodeSet).sort();
@@ -133,7 +133,7 @@ it("get", () => {
         .addLink("tag-41", "tag-51")
         .addLink("tag-51", "tag-50");
 
-    let adjList: AdjacencyResult[] = [];
+    let adjList: Array<AdjacencyResult> = [];
     const getAndSortAdjList = (minDistance: number, maxDistance: number) => {
         adjList = adj
             .get("00", maxDistance)
@@ -206,7 +206,7 @@ it("get (hub link)", () => {
         .addNodeTags("node-a", ["tag-alpha"])
         .addNodeTags("node-b", ["tag-alpha"]);
 
-    let adjList: AdjacencyResult[];
+    let adjList: Array<AdjacencyResult>;
     adjList = adj.get("node-a", 1);
     expect(adjList).toEqual([
         { distance: 0, node: "node-a", path: ["node-a"] },

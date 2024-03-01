@@ -3,9 +3,11 @@ import { ErrorBatcher } from "../../error-handler/error-batcher";
 /**
  * Lookalike for TTPG's MulticastDelegate, but with a trigger method.
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export class TriggerableMulticastDelegate<T extends (...args: any[]) => any> {
-    private readonly _listeners: T[] = [];
+export class TriggerableMulticastDelegate<
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    T extends (...args: Array<any>) => any,
+> {
+    private readonly _listeners: Array<T> = [];
 
     /**
      * Add a function to the trigger set.
@@ -44,7 +46,7 @@ export class TriggerableMulticastDelegate<T extends (...args: any[]) => any> {
      * @param args
      */
     trigger(...args: Parameters<T>): void {
-        const runnables: ((x: void) => unknown)[] = [];
+        const runnables: Array<(x: void) => unknown> = [];
         for (const fn of this._listeners) {
             runnables.push(() => {
                 fn(...args);

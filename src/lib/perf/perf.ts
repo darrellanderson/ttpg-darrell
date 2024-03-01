@@ -12,10 +12,10 @@ export type PerfReport = {
 export class Perf implements IGlobal {
     private static _instance: Perf | undefined;
 
-    private readonly _windowFrameSecs: number[];
+    private readonly _windowFrameSecs: Array<number>;
     private _nextWindowFrameMsecsIndex: number = 0;
 
-    private readonly _windowFps: number[] = Array(60).fill(0);
+    private readonly _windowFps: Array<number> = Array(60).fill(0);
     private _nextWindowFpsIndex: number = 0;
     private _lastFpsUpdateSecond: number = -1;
 
@@ -58,7 +58,7 @@ export class Perf implements IGlobal {
     }
 
     getReport(): PerfReport {
-        const msecs: number[] = this._windowFrameSecs
+        const msecs: Array<number> = this._windowFrameSecs
             .filter((seconds) => seconds > 0)
             .map((seconds) => seconds * 1000);
         if (msecs.length === 0) {
@@ -69,7 +69,7 @@ export class Perf implements IGlobal {
         const stdDev: number = Math.sqrt(
             msecs.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n
         );
-        const sorted: number[] = msecs.sort((a, b) => b - a);
+        const sorted: Array<number> = msecs.sort((a, b) => b - a);
         const median: number | undefined =
             sorted[Math.floor(sorted.length / 2)];
         if (median === undefined) {
@@ -79,7 +79,7 @@ export class Perf implements IGlobal {
         // Mean of values within 3x stdDev (in the unlikely event of none,
         // use the regular mean).
         const tolerance: number = stdDev * 3;
-        const scrubbedArray: number[] = msecs.filter(
+        const scrubbedArray: Array<number> = msecs.filter(
             (x) => x > mean - tolerance && x < mean + tolerance
         );
         const scrubbed: number =
@@ -115,7 +115,7 @@ export class Perf implements IGlobal {
      *
      * @returns
      */
-    getFpsHistory(): number[] {
+    getFpsHistory(): Array<number> {
         return [
             ...this._windowFps.slice(this._nextWindowFpsIndex),
             ...this._windowFps.slice(0, this._nextWindowFpsIndex),

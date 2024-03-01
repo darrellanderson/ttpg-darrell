@@ -29,7 +29,7 @@ export type TurnOrderWidgetParams = {
     };
 
     // Attach additional items to the turn entry (e.g. score, faction, etc).
-    wartGenerators?: TurnEntryWartGenerator[];
+    wartGenerators?: Array<TurnEntryWartGenerator>;
 
     // Size for N turns.
     reserveSlots?: number;
@@ -39,11 +39,11 @@ export type TurnOrderWidgetParams = {
     toggleEliminated?: boolean;
 
     // Add extra options.
-    customActions?: {
+    customActions?: Array<{
         name: string;
         tooltip?: string;
         identifier?: string;
-    }[];
+    }>;
     onCustomAction?: (
         clickingPlayer: Player,
         identifier: string,

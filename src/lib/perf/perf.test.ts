@@ -60,7 +60,7 @@ it("reportStr", () => {
 it("getFpsHistory", () => {
     const perf = new Perf();
     mockGlobalEvents._tick(0.201);
-    const history: number[] = perf.getFpsHistory();
+    const history: Array<number> = perf.getFpsHistory();
     expect(history.length).toEqual(60);
     expect(history[0]).toEqual(0);
     expect(history[58]).toEqual(0);
