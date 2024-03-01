@@ -10,8 +10,8 @@ it("shuffle", () => {
 it("choice", () => {
     const items = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
-    const choice: number | undefined = new Shuffle<number>().choice(items);
-    expect(items.includes(choice ?? -1)).toBeTruthy();
+    const choice: number = new Shuffle<number>().choiceOrThrow(items);
+    expect(items.includes(choice)).toBeTruthy();
 });
 
 it("choiceOrThrow", () => {

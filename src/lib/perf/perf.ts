@@ -61,20 +61,15 @@ export class Perf implements IGlobal {
         const msecs: Array<number> = this._windowFrameSecs
             .filter((seconds) => seconds > 0)
             .map((seconds) => seconds * 1000);
-        if (msecs.length === 0) {
-            msecs.push(0);
-        }
+
         const n: number = msecs.length;
-        const mean: number = msecs.reduce((a, b) => a + b, 0) / n;
+        const mean: number = msecs.reduce((a, b) => a + b, 0) / Math.max(n, 1);
         const stdDev: number = Math.sqrt(
-            msecs.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n
+            msecs.map((x) => Math.pow(x - mean, 2)).reduce((a, b) => a + b, 0) /
+                Math.max(n, 1)
         );
         const sorted: Array<number> = msecs.sort((a, b) => b - a);
-        const median: number | undefined =
-            sorted[Math.floor(sorted.length / 2)];
-        if (median === undefined) {
-            throw new Error("missing median");
-        }
+        const median: number = sorted[Math.floor(sorted.length / 2)] ?? 0;
 
         // Mean of values within 3x stdDev (in the unlikely event of none,
         // use the regular mean).
