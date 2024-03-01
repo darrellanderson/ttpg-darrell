@@ -2,10 +2,7 @@
  * Shuffle an array of objects.
  */
 export class Shuffle<T> {
-    shuffle(items: T[]): T[] {
-        if (items.length <= 1) {
-            return items;
-        }
+    shuffle(items: Array<T>): Array<T> {
         // Fisher-Yates
         for (let i = items.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -19,12 +16,14 @@ export class Shuffle<T> {
         return items;
     }
 
-    choice(items: T[]): T {
-        console.log("sadf1");
+    choice(items: Array<T>): T | undefined {
         const index: number = Math.floor(Math.random() * items.length);
-        console.log("xxx " + index);
         const item: T | undefined = items[index];
-        console.log("sadf2 " + item);
+        return item;
+    }
+
+    choiceOrThrow(items: Array<T>): T {
+        const item: T | undefined = this.choice(items);
         if (item === undefined) {
             console.log("sadf2.5");
             throw new Error("item undefined");
