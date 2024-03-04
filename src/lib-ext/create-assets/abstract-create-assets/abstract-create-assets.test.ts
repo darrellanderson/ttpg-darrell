@@ -45,3 +45,41 @@ it("jpg", async () => {
     expect(jpg.at(1)).toEqual(216);
     expect(jpg.at(2)).toEqual(255);
 });
+
+it("writeOneFile", async () => {
+    jest.spyOn(console, "log").mockImplementation(() => {});
+    await AbstractCreateAssets.writeOneFile("/dev/null", Buffer.from(""));
+    jest.restoreAllMocks();
+});
+
+it("writeFiles", async () => {
+    class MyDevNullCreateAssets extends AbstractCreateAssets {
+        toFileData(): Promise<{ [key: string]: Buffer }> {
+            return new Promise<{ [key: string]: Buffer }>((resolve) => {
+                resolve({
+                    "/dev/null": Buffer.from(""),
+                });
+            });
+        }
+    }
+    jest.spyOn(console, "log").mockImplementation(() => {});
+    await new MyDevNullCreateAssets().writeFiles();
+    jest.restoreAllMocks();
+});
+
+it("writeFiles (reject)", async () => {
+    class MyRejectCreateAssets extends AbstractCreateAssets {
+        toFileData(): Promise<{ [key: string]: Buffer }> {
+            return new Promise<{ [key: string]: Buffer }>((resolve, reject) => {
+                reject("my-reject");
+            });
+        }
+    }
+    let err = "";
+    const resolve = () => {};
+    const reject = (e: string) => {
+        err = e;
+    };
+    await new MyRejectCreateAssets().writeFiles().then(resolve, reject);
+    expect(err).toEqual("my-reject");
+});

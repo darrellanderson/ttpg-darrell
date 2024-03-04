@@ -11,28 +11,31 @@ export abstract class AbstractCreateAssets {
         filenamePrefix: string
     ): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            fs.stat(dir).then((stats: Stats) => {
-                if (stats.isDirectory()) {
-                    fs.readdir(dir).then((filenames: Array<string>) => {
-                        const promises: Array<Promise<void>> = [];
-                        for (const filename of filenames) {
-                            if (filename.startsWith(filenamePrefix)) {
-                                const pathFile: string = path.join(
-                                    dir,
-                                    filename
-                                );
-                                console.log(
-                                    `CreateAssets.clean: removing "${pathFile}"`
-                                );
-                                promises.push(fs.rm(pathFile));
+            fs.stat(dir).then(
+                (stats: Stats) => {
+                    if (stats.isDirectory()) {
+                        fs.readdir(dir).then((filenames: Array<string>) => {
+                            const promises: Array<Promise<void>> = [];
+                            for (const filename of filenames) {
+                                if (filename.startsWith(filenamePrefix)) {
+                                    const pathFile: string = path.join(
+                                        dir,
+                                        filename
+                                    );
+                                    console.log(
+                                        `CreateAssets.clean: removing "${pathFile}"`
+                                    );
+                                    promises.push(fs.rm(pathFile));
+                                }
                             }
-                        }
-                        Promise.all(promises).then(() => {
-                            resolve();
+                            Promise.all(promises).then(() => {
+                                resolve();
+                            }, reject);
                         }, reject);
-                    }, reject);
-                }
-            }, resolve); // yuck.  "resolve" since stat throws if missing.
+                    }
+                },
+                resolve // yuck.  "resolve" since stat throws if missing.
+            );
         });
     }
 
@@ -93,7 +96,8 @@ export abstract class AbstractCreateAssets {
                     ).then(() => {
                         resolve();
                     }, reject);
-                }
+                },
+                reject
             );
         });
     }
