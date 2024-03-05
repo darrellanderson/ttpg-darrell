@@ -203,35 +203,33 @@ export class Adjacency {
         while (toVisit.size > 0) {
             // Find the closest of the to-visit nodes.
             const closestNode: string | undefined = heap.removeMin();
-            if (!closestNode) {
-                throw new Error("missing closest node");
-            }
-            const closest: AdjacencyResult | undefined =
-                nodeToAdjacencyResult[closestNode];
-            if (!closest) {
-                throw new Error("missing closest");
-            }
-            toVisit.delete(closest);
-            visited.add(closest.node);
+            if (closestNode) {
+                const closest: AdjacencyResult | undefined =
+                    nodeToAdjacencyResult[closestNode];
+                if (closest) {
+                    toVisit.delete(closest);
+                    visited.add(closest.node);
 
-            const adjNodeSet: Set<string> = this._getAdjacentNodeSet(
-                closest.node
-            );
-            for (const adjNode of adjNodeSet) {
-                if (!visited.has(adjNode)) {
-                    // Add to result.
-                    const isTransit = this._transitNodes.has(adjNode);
-                    const extraDistance = isTransit ? 0 : 1;
-                    const distance = closest.distance + extraDistance;
-                    if (distance <= maxDistance) {
-                        const adjResult: AdjacencyResult = {
-                            node: adjNode,
-                            distance,
-                            path: [...closest.path, adjNode],
-                        };
-                        nodeToAdjacencyResult[adjNode] = adjResult;
-                        toVisit.add(adjResult);
-                        heap.add(adjNode, distance);
+                    const adjNodeSet: Set<string> = this._getAdjacentNodeSet(
+                        closest.node
+                    );
+                    for (const adjNode of adjNodeSet) {
+                        if (!visited.has(adjNode)) {
+                            // Add to result.
+                            const isTransit = this._transitNodes.has(adjNode);
+                            const extraDistance = isTransit ? 0 : 1;
+                            const distance = closest.distance + extraDistance;
+                            if (distance <= maxDistance) {
+                                const adjResult: AdjacencyResult = {
+                                    node: adjNode,
+                                    distance,
+                                    path: [...closest.path, adjNode],
+                                };
+                                nodeToAdjacencyResult[adjNode] = adjResult;
+                                toVisit.add(adjResult);
+                                heap.add(adjNode, distance);
+                            }
+                        }
                     }
                 }
             }

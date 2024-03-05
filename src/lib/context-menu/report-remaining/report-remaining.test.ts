@@ -45,3 +45,23 @@ it("customActionHandler", () => {
     deck._customActionAsPlayer(player, "wrong");
     new MockGameObject()._customActionAsPlayer(player, identifier);
 });
+
+it("custom action handler (single card)", () => {
+    const cardDetails1: CardDetails = new MockCardDetails({
+        metadata: "card1",
+        name: "name1",
+    });
+
+    const player: Player = new MockPlayer();
+    const identifier: string = ReportRemaining._actionName;
+
+    const deck: MockCard = new MockCard({
+        cardDetails: [cardDetails1],
+    });
+
+    mockWorld._reset({ gameObjects: [deck] });
+    new ReportRemaining("card").init();
+
+    deck._customActionAsPlayer(player, identifier);
+    expect(Broadcast.lastMessage).toEqual("remaining: name1");
+});

@@ -21,28 +21,30 @@ export class ReportRemaining implements IGlobal {
         if (identifier !== ReportRemaining._actionName) {
             return; // not this
         }
-        if (!(obj instanceof Card)) {
-            throw new Error("not card");
+        if (obj instanceof Card) {
+            const names: Array<string> = obj
+                .getAllCardDetails()
+                .map((cardDetails): string => {
+                    return cardDetails.name;
+                });
+            const nameToCount: { [key: string]: number } = {};
+            for (const name of names) {
+                nameToCount[name] = (nameToCount[name] ?? 0) + 1;
+            }
+            const nameCountArray: Array<string> = Object.keys(nameToCount)
+                .sort()
+                .map((name: string): string => {
+                    const count: number | undefined = nameToCount[name];
+                    if (count !== undefined && count > 1) {
+                        return `${name} (${count})`;
+                    }
+                    return name;
+                });
+            Broadcast.chatOne(
+                player,
+                `remaining: ${nameCountArray.join(", ")}`
+            );
         }
-        const names: Array<string> = obj
-            .getAllCardDetails()
-            .map((cardDetails): string => {
-                return cardDetails.name;
-            });
-        const nameToCount: { [key: string]: number } = {};
-        for (const name of names) {
-            nameToCount[name] = (nameToCount[name] ?? 0) + 1;
-        }
-        const nameCountArray: Array<string> = Object.keys(nameToCount)
-            .sort()
-            .map((name: string): string => {
-                const count: number = nameToCount[name] ?? 0;
-                if (count > 1) {
-                    return `${name} (${count})`;
-                }
-                return name;
-            });
-        Broadcast.chatOne(player, `remaining: ${nameCountArray.join(", ")}`);
     };
 
     constructor(cardNsidPrefix: string) {
@@ -53,7 +55,7 @@ export class ReportRemaining implements IGlobal {
         if (obj instanceof Card) {
             const nsids: Array<string> = NSID.getDeck(obj);
             const firstNsid: string | undefined = nsids[0];
-            if (firstNsid?.startsWith(this._cardNsidPrefix)) {
+            if (firstNsid && firstNsid.startsWith(this._cardNsidPrefix)) {
                 obj.removeCustomAction(ReportRemaining._actionName);
                 obj.addCustomAction(ReportRemaining._actionName);
                 obj.onCustomAction.remove(this._customActionHandler);
