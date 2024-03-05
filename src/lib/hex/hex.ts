@@ -93,16 +93,19 @@ export class Hex {
 
     static _hexFromString(hex: HexType): [q: number, r: number, s: number] {
         const m = hex.match(/^<(-?\d+),(-?\d+),(-?\d+)>$/);
-        if (!m || m.length < 3) {
-            throw new Error("match error");
+        const qStr: string | undefined = m?.[1];
+        const rStr: string | undefined = m?.[2];
+        const sStr: string | undefined = m?.[3];
+        if (qStr !== undefined && rStr !== undefined && sStr !== undefined) {
+            const q: number = parseFloat(qStr);
+            const r: number = parseFloat(rStr);
+            const s: number = parseFloat(sStr);
+            if (Math.round(q + r + s) !== 0) {
+                throw new Error(`q + r + s must be 0 ("${hex}")`);
+            }
+            return [q, r, s];
         }
-        const q: number = parseFloat(m[1] ?? "0");
-        const r: number = parseFloat(m[2] ?? "0");
-        const s: number = parseFloat(m[3] ?? "0");
-        if (Math.round(q + r + s) !== 0) {
-            throw new Error(`q + r + s must be 0 ("${hex}")`);
-        }
-        return [q, r, s];
+        throw new Error("match error");
     }
 
     static _hexToString(q: number, r: number, s: number): HexType {
