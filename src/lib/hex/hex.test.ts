@@ -17,6 +17,12 @@ it("static neighbors", () => {
     ]);
 });
 
+it("static _hexFromString (invalid HexType)", () => {
+    expect(() => {
+        Hex._hexFromString("nope" as HexType);
+    }).toThrow();
+});
+
 it("static _hexFromString (number mismatch)", () => {
     expect(() => {
         Hex._hexFromString("<0,0,1>");
