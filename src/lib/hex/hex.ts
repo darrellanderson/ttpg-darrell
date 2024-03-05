@@ -1,5 +1,7 @@
 import { Vector, world } from "@tabletop-playground/api";
 
+export type HexType = `<${number},${number},${number}>`;
+
 export type HexLayoutType = {
     // F(orward) translates hex to position.
     f0: number;
@@ -68,7 +70,7 @@ export class Hex {
      * @param {string} hex - Hex as "<q,r,s>" string
      * @return {Array} list of hex strings
      */
-    static neighbors(hex: string): Array<string> {
+    static neighbors(hex: HexType): Array<HexType> {
         const [q, r, s] = Hex._hexFromString(hex);
         return [
             Hex._hexToString(q + 1, r + 0, s - 1),
@@ -89,7 +91,7 @@ export class Hex {
         this._tableHeight = world.getTableHeight();
     }
 
-    static _hexFromString(hex: string): [q: number, r: number, s: number] {
+    static _hexFromString(hex: HexType): [q: number, r: number, s: number] {
         const m = hex.match(/^<(-?\d+),(-?\d+),(-?\d+)>$/);
         if (!m || m.length < 3) {
             throw new Error("match error");
@@ -103,7 +105,7 @@ export class Hex {
         return [q, r, s];
     }
 
-    static _hexToString(q: number, r: number, s: number): string {
+    static _hexToString(q: number, r: number, s: number): HexType {
         return `<${q},${r},${s}>`;
     }
 
@@ -116,7 +118,7 @@ export class Hex {
      * @param {number} pos.z
      * @returns {string} hex as "<q,r,s>" string
      */
-    fromPosition(pos: Vector): string {
+    fromPosition(pos: Vector): HexType {
         const M = this._hexLayoutType;
 
         // Fractional hex position.
@@ -152,7 +154,7 @@ export class Hex {
      * @param {string} hex - Hex as "<q,r,s>" string
      * @returns {Vector} position
      */
-    toPosition(hex: string): Vector {
+    toPosition(hex: HexType): Vector {
         const M = this._hexLayoutType;
         const [q, r] = Hex._hexFromString(hex);
 
@@ -162,6 +164,39 @@ export class Hex {
         return new Vector(x, y, z);
     }
 
+    // Cartesian only works for pointy hex right now.
+    fromCartesian(cartesian: { left: number; top: number }): HexType {
+        let { left, top } = cartesian;
+
+        if (Math.abs(left) % 2 === 1) {
+            top += 0.5;
+        }
+
+        left *= this._halfSize * 2 * 0.75;
+        top *= this._halfSize * 2 * this._hexLayoutType.f1;
+
+        const pos: Vector = new Vector(top, left, 0);
+        return this.fromPosition(pos);
+    }
+
+    toCartesian(hex: HexType): { left: number; top: number } {
+        const pos: Vector = this.toPosition(hex);
+
+        let left: number = pos.y / (this._halfSize * 2 * 0.75);
+        let top: number = pos.x / (this._halfSize * 2 * this._hexLayoutType.f1);
+
+        // Want an integer, but keep a few decimal places in case more than
+        // just floating point error is wrong.
+        left = Math.round(left * 1000) / 1000;
+        top = Math.round(top * 1000) / 1000;
+
+        if (Math.abs(left) % 2 === 1) {
+            top -= 0.5;
+        }
+
+        return { left, top };
+    }
+
     /**
      * Get positions of hex corners.
      * First at "top right", winding counterclockwise.
@@ -169,7 +204,7 @@ export class Hex {
      * @param {string} hex - Hex as "<q,r,s>" string
      * @return {Array} list of position Vectors
      */
-    corners(hex: string): Array<Vector> {
+    corners(hex: HexType): Array<Vector> {
         const M = this._hexLayoutType;
         const center = this.toPosition(hex);
         const result = [];

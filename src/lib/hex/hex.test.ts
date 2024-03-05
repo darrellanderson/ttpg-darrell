@@ -1,5 +1,5 @@
 import { Vector } from "@tabletop-playground/api";
-import { HEX_LAYOUT_FLAT, HEX_LAYOUT_POINTY, Hex } from "./hex";
+import { HEX_LAYOUT_FLAT, HEX_LAYOUT_POINTY, Hex, HexType } from "./hex";
 
 const HALF_SIZE: number = 5.77735 * 1.5;
 const HEX: Hex = new Hex(HEX_LAYOUT_POINTY, HALF_SIZE);
@@ -17,12 +17,6 @@ it("static neighbors", () => {
     ]);
 });
 
-it("static _hexFromString (not a hex)", () => {
-    expect(() => {
-        Hex._hexFromString("not a hex");
-    }).toThrow();
-});
-
 it("static _hexFromString (number mismatch)", () => {
     expect(() => {
         Hex._hexFromString("<0,0,1>");
@@ -35,7 +29,7 @@ it("constructor", () => {
 
 it("fromPosition", () => {
     const pos: Vector = new Vector(0, 0, 0);
-    let hex: string = HEX.fromPosition(pos);
+    let hex: HexType = HEX.fromPosition(pos);
     expect(hex).toEqual("<0,0,0>");
 
     // Z does not matter.
@@ -51,7 +45,7 @@ it("fromPosition", () => {
 });
 
 it("toPosition", () => {
-    let hex: string = "<0,0,0>";
+    let hex: HexType = "<0,0,0>";
     let pos: Vector = HEX.toPosition(hex);
     expect(pos.x).toEqual(0);
     expect(pos.y).toEqual(0);
@@ -70,9 +64,9 @@ it("to/from grid (pointy)", () => {
     for (let q = -10; q <= 10; q++) {
         for (let r = -10; r <= 10; r++) {
             const s = -(q + r);
-            const hex: string = Hex._hexToString(q, r, s);
+            const hex: HexType = Hex._hexToString(q, r, s);
             const pos: Vector = pointy.toPosition(hex);
-            const hex2: string = pointy.fromPosition(pos);
+            const hex2: HexType = pointy.fromPosition(pos);
             const pos2: Vector = pointy.toPosition(hex2);
             expect(hex2).toEqual(hex);
             expect(pos2.toString()).toEqual(pos.toString());
@@ -85,9 +79,9 @@ it("to/from grid (flat)", () => {
     for (let q = -10; q <= 10; q++) {
         for (let r = -10; r <= 10; r++) {
             const s = -(q + r);
-            const hex: string = Hex._hexToString(q, r, s);
+            const hex: HexType = Hex._hexToString(q, r, s);
             const pos: Vector = flat.toPosition(hex);
-            const hex2: string = flat.fromPosition(pos);
+            const hex2: HexType = flat.fromPosition(pos);
             const pos2: Vector = flat.toPosition(hex2);
             expect(hex2).toEqual(hex);
             expect(pos2.toString()).toEqual(pos.toString());
@@ -96,7 +90,7 @@ it("to/from grid (flat)", () => {
 });
 
 it("corners", () => {
-    const hex: string = "<0,0,0>";
+    const hex: HexType = "<0,0,0>";
     const corners: Array<Vector> = HEX.corners(hex);
     expect(corners.length).toEqual(6);
 
@@ -130,4 +124,35 @@ it("corners", () => {
     // bottom-left
     expect(corners[5]?.x).toBeCloseTo(0);
     expect(corners[5]?.y).toBeCloseTo(right);
+});
+
+it("to/from cartesian", () => {
+    const hexToCartesian: { [key: HexType]: { left: number; top: number } } = {
+        // Origin.
+        "<0,0,0>": { left: 0, top: 0 },
+
+        // Distance 1.
+        "<1,0,-1>": { left: 0, top: 1 }, // north
+        "<1,-1,0>": { left: -1, top: 0 }, // northwest
+        "<0,-1,1>": { left: -1, top: -1 }, // southwest
+        "<-1,0,1>": { left: 0, top: -1 }, // south
+        "<-1,1,0>": { left: 1, top: -1 }, // southeast
+        "<0,1,-1>": { left: 1, top: 0 }, // northeast
+
+        // Distance 2.
+        "<2,0,-2>": { left: 0, top: 2 }, // north
+        "<2,-2,0>": { left: -2, top: 1 }, // northwest
+        "<0,-2,2>": { left: -2, top: -1 }, // southwest
+        "<-2,0,2>": { left: 0, top: -2 }, // south
+        "<-2,2,0>": { left: 2, top: -1 }, // southeast
+        "<0,2,-2>": { left: 2, top: 1 }, // northeast
+    };
+    for (const [hex, cartesian] of Object.entries(hexToCartesian)) {
+        const outCart: { left: number; top: number } = HEX.toCartesian(
+            hex as HexType
+        );
+        const outHex: HexType = HEX.fromCartesian(outCart);
+        expect(outCart).toEqual(cartesian);
+        expect(outHex).toEqual(hex);
+    }
 });
