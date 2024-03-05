@@ -95,37 +95,49 @@ export class ErrorHandler implements IGlobal {
         const re2 =
             /at (.*) \(file:\/\/.*Scripts\/(.*\.js):([0-9]*):([0-9]*)\)/;
         let m: RegExpMatchArray | null;
+        let method: string | undefined;
+        let file: string | undefined;
+        let jsLine: string | undefined;
+        let jsColumn: string | undefined;
 
         m = stackTraceLine.match(re1);
         if (m) {
-            const file: string | undefined = m[1];
-            const jsLine: string | undefined = m[2];
-            const jsColumn: string | undefined = m[3];
-            if (!file || !jsLine || !jsColumn) {
-                throw new Error("parse error");
+            file = m[1];
+            jsLine = m[2];
+            jsColumn = m[3];
+        } else {
+            m = stackTraceLine.match(re2);
+            if (m) {
+                method = m[1];
+                file = m[2];
+                jsLine = m[3];
+                jsColumn = m[4];
             }
+        }
+
+        if (
+            method === undefined &&
+            file !== undefined &&
+            jsLine !== undefined &&
+            jsColumn !== undefined
+        ) {
             errorLocation = {
                 file,
                 jsLine: Number.parseInt(jsLine),
                 jsColumn: Number.parseInt(jsColumn),
             };
-        } else {
-            m = stackTraceLine.match(re2);
-            if (m) {
-                const method: string | undefined = m[1];
-                const file: string | undefined = m[2];
-                const jsLine: string | undefined = m[3];
-                const jsColumn: string | undefined = m[4];
-                if (!method || !file || !jsLine || !jsColumn) {
-                    throw new Error("parse error");
-                }
-                errorLocation = {
-                    method,
-                    file,
-                    jsLine: Number.parseInt(jsLine),
-                    jsColumn: Number.parseInt(jsColumn),
-                };
-            }
+        } else if (
+            method !== undefined &&
+            file !== undefined &&
+            jsLine !== undefined &&
+            jsColumn !== undefined
+        ) {
+            errorLocation = {
+                method,
+                file,
+                jsLine: Number.parseInt(jsLine),
+                jsColumn: Number.parseInt(jsColumn),
+            };
         }
 
         if (errorLocation) {
