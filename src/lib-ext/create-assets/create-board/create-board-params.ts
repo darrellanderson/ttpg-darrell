@@ -22,6 +22,7 @@ export const CreateBoardParamsSchema = z
 
         // Original board image, may have snap points.
         srcImage: ZBaseCellSchema,
+        srcMask: ZBaseCellSchema.optional(),
 
         templateMetadata: z.string().optional(),
 

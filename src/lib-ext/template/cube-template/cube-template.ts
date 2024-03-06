@@ -10,6 +10,7 @@ import { AbstractTemplate } from "../abstract-template/abstract-template";
 // Entries are always centered, may apply an offset.
 export type CubeTemplateEntry = {
     texture: string;
+    mask?: string;
     model: string;
     width: number;
     height: number;
@@ -84,6 +85,7 @@ export class CubeTemplate extends AbstractTemplate {
                 );
                 modelEntry.Model = entry.model;
                 modelEntry.Texture = entry.texture;
+                modelEntry.ExtraMap = entry.mask ?? "";
                 modelEntry.Offset.Y = (entry.left ?? 0) + entry.width / 2;
                 modelEntry.Offset.X = -((entry.top ?? 0) + entry.height / 2);
                 modelEntry.Offset.Z = 0;

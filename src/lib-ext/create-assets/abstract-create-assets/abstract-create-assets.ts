@@ -10,6 +10,11 @@ export abstract class AbstractCreateAssets {
         dir: string,
         filenamePrefix: string
     ): Promise<void> {
+        // If file has a path, move it to the dir portion.
+        const dirPortionOfFilename: string = path.dirname(filenamePrefix);
+        dir = path.join(dir, dirPortionOfFilename);
+        filenamePrefix = path.basename(filenamePrefix);
+
         return new Promise<void>((resolve, reject) => {
             fs.stat(dir).then(
                 (stats: Stats) => {

@@ -62,8 +62,8 @@ it("toFileData", async () => {
     expect(Object.keys(filenameToBuffer).sort()).toEqual([
         "assets/Models/" + CubeModel.ASSET_FILENAME,
         "assets/Templates/my-asset-filename.json",
-        "assets/Textures/my-asset-filename-0x0.jpg",
-        "assets/Textures/my-asset-filename-1x0.jpg",
+        "assets/Textures/my-asset-filename/my-asset-filename-0x0.jpg",
+        "assets/Textures/my-asset-filename/my-asset-filename-1x0.jpg",
     ]);
 
     const model: string | undefined =
@@ -74,13 +74,18 @@ it("toFileData", async () => {
     expect(model?.includes("$")).toBeFalsy();
 
     let image: Buffer | undefined =
-        filenameToBuffer["assets/Textures/my-asset-filename-0x0.jpg"];
+        filenameToBuffer[
+            "assets/Textures/my-asset-filename/my-asset-filename-0x0.jpg"
+        ];
     expect(image).toBeDefined();
     let metadata = await sharp(image).metadata();
     expect(metadata.width).toEqual(4096);
     expect(metadata.height).toEqual(1);
 
-    image = filenameToBuffer["assets/Textures/my-asset-filename-1x0.jpg"];
+    image =
+        filenameToBuffer[
+            "assets/Textures/my-asset-filename/my-asset-filename-1x0.jpg"
+        ];
     expect(image).toBeDefined();
     metadata = await sharp(image).metadata();
     expect(metadata.width).toEqual(942);
@@ -96,7 +101,9 @@ it("toFileData", async () => {
 
     const templateModel = templateParsed.Models[0];
     expect(templateModel.Model).toEqual(CubeModel.ASSET_FILENAME);
-    expect(templateModel.Texture).toEqual("my-asset-filename-0x0.jpg");
+    expect(templateModel.Texture).toEqual(
+        "my-asset-filename/my-asset-filename-0x0.jpg"
+    );
     expect(templateModel.Offset).toEqual({ X: 0, Y: -18.72, Z: 0 });
     expect(templateModel.Scale).toEqual({ X: 100, Y: 162.56, Z: 0.25 });
 });

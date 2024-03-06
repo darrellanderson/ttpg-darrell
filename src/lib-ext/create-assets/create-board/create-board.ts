@@ -35,6 +35,7 @@ export class CreateBoard extends AbstractCreateAssets {
 
     private readonly _params: CreateBoardParams;
     private _srcImageCell: AbstractCell;
+    private _srcMaskCell: AbstractCell | undefined;
 
     static fromParamsJson(paramsJson: Buffer): CreateBoard {
         const params: CreateBoardParams = CreateBoardParamsSchema.parse(
@@ -49,6 +50,12 @@ export class CreateBoard extends AbstractCreateAssets {
         this._srcImageCell = new CellParser(this._params.rootDir).parse(
             this._params.srcImage
         );
+
+        if (this._params.srcMask) {
+            this._srcMaskCell = new CellParser(this._params.rootDir).parse(
+                this._params.srcMask
+            );
+        }
 
         // Resize image, shrink a little more to account for UV bleed edges.
         if (this._params.preshrink) {
@@ -82,10 +89,18 @@ export class CreateBoard extends AbstractCreateAssets {
     clean(): Promise<void> {
         const promises: Array<Promise<void>> = [];
 
+        // Textures are in a subdir.
+        const basename: string = path.basename(this._params.assetFilename);
+
         promises.push(
             AbstractCreateAssets.cleanByFilePrefix(
-                path.join(this._params.rootDir ?? ".", "assets", "Textures"),
-                this._params.assetFilename
+                path.join(
+                    this._params.rootDir ?? ".",
+                    "assets",
+                    "Textures",
+                    this._params.assetFilename
+                ),
+                basename
             ),
             AbstractCreateAssets.cleanByFilePrefix(
                 path.join(this._params.rootDir ?? ".", "assets", "Templates"),
@@ -100,12 +115,14 @@ export class CreateBoard extends AbstractCreateAssets {
         });
     }
 
-    _splitImage(): Promise<Array<ImageSplitChunk>> {
+    _splitImage(
+        bufferPromise: Promise<Buffer>
+    ): Promise<Array<ImageSplitChunk>> {
         if (CreateBoard.INSET_SIZE.width !== CreateBoard.INSET_SIZE.height) {
             throw new Error("inset size mismatch");
         }
         return new Promise<Array<ImageSplitChunk>>((resolve, reject): void => {
-            this._srcImageCell.toBuffer().then((buffer: Buffer) => {
+            bufferPromise.then((buffer: Buffer) => {
                 new ImageSplit(buffer, CreateBoard.INSET_SIZE.width)
                     .split()
                     .then((chunks: Array<ImageSplitChunk>): void => {
@@ -201,49 +218,88 @@ export class CreateBoard extends AbstractCreateAssets {
             );
         cubeTemplate.setSnapPoints(worldSpaceSnapPoints);
 
-        // Image chunks.
-        return new Promise<{ [key: string]: Buffer }>(
-            (resolve, reject): void => {
-                this._splitImage().then(
-                    (chunks: Array<ImageSplitChunk>): void => {
-                        // Image chunks.
-                        for (const chunk of chunks) {
-                            const innerFilename: string = `${this._params.assetFilename}-${chunk.col}x${chunk.row}.jpg`;
-                            const filename: string = path.join(
-                                this._params.rootDir ?? ".",
-                                "assets",
-                                "Textures",
-                                innerFilename
-                            );
-                            filenameToBuffer[filename] = chunk.buffer;
+        const promises: Array<Promise<void>> = [];
 
-                            const { width, height, depth } =
-                                this._params.topDownWorldSize;
-                            cubeTemplate.addSubCubeEntry({
-                                texture: innerFilename,
-                                model: CubeModel.ASSET_FILENAME,
-                                width: chunk.uv.width * width,
-                                height: chunk.uv.height * height,
-                                depth: depth,
-                                left: chunk.uv.left * width - width / 2,
-                                top: chunk.uv.top * height - height / 2,
-                            });
-                        }
-                        if (chunks.length > 1) {
-                            cubeTemplate.setCollider(CubeModel.ASSET_FILENAME);
-                        }
+        const addImagePromise = (
+            cell: AbstractCell,
+            hasMask: boolean,
+            isMask: boolean
+        ): void => {
+            const promise: Promise<void> = new Promise<void>(
+                (resolve, reject): void => {
+                    this._splitImage(cell.toBuffer()).then(
+                        (chunks: Array<ImageSplitChunk>): void => {
+                            // Image chunks.
+                            for (const chunk of chunks) {
+                                // Put chunks into a directory.
+                                const basename: string = path.basename(
+                                    this._params.assetFilename
+                                );
+                                const innerFilename: string = path.join(
+                                    this._params.assetFilename,
+                                    `${basename}-${chunk.col}x${chunk.row}.jpg`
+                                );
+                                const innerMaskFilename: string = path.join(
+                                    this._params.assetFilename,
+                                    `${basename}-${chunk.col}x${chunk.row}-mask.png`
+                                );
+                                const filename: string = path.join(
+                                    this._params.rootDir ?? ".",
+                                    "assets",
+                                    "Textures",
+                                    isMask ? innerMaskFilename : innerFilename
+                                );
+                                filenameToBuffer[filename] = chunk.buffer;
 
-                        // Template.
-                        filenameToBuffer[templateFilename] = Buffer.from(
-                            cubeTemplate.toTemplate(),
-                            "ascii"
-                        );
+                                const { width, height, depth } =
+                                    this._params.topDownWorldSize;
+                                cubeTemplate.addSubCubeEntry({
+                                    texture: innerFilename,
+                                    mask: hasMask
+                                        ? innerMaskFilename
+                                        : undefined,
+                                    model: CubeModel.ASSET_FILENAME,
+                                    width: chunk.uv.width * width,
+                                    height: chunk.uv.height * height,
+                                    depth: depth,
+                                    left: chunk.uv.left * width - width / 2,
+                                    top: chunk.uv.top * height - height / 2,
+                                });
+                            }
+                            if (chunks.length > 1) {
+                                cubeTemplate.setCollider(
+                                    CubeModel.ASSET_FILENAME
+                                );
+                            }
 
-                        resolve(filenameToBuffer);
-                    },
-                    reject
-                );
-            }
-        );
+                            // Template (only create once during non-mask call).
+                            if (!isMask) {
+                                filenameToBuffer[templateFilename] =
+                                    Buffer.from(
+                                        cubeTemplate.toTemplate(),
+                                        "ascii"
+                                    );
+                            }
+
+                            resolve();
+                        },
+                        reject
+                    );
+                }
+            );
+            promises.push(promise);
+        };
+
+        const hasMask: boolean = this._srcMaskCell ? true : false;
+        addImagePromise(this._srcImageCell, hasMask, false);
+        if (this._srcMaskCell) {
+            addImagePromise(this._srcMaskCell, hasMask, true);
+        }
+
+        return new Promise<{ [key: string]: Buffer }>((resolve, reject) => {
+            Promise.all(promises).then(() => {
+                resolve(filenameToBuffer);
+            }, reject);
+        });
     }
 }
