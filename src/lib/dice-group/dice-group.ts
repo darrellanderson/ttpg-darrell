@@ -69,6 +69,8 @@ export class DiceGroupCleanup implements IGlobal {
 /**
  * Roll a collection of dice, listen to onRolled for overall result.
  * Can only be used once, create a new one for new rolls.
+ *
+ * Intended use: roll + format
  */
 export class DiceGroup {
     public static readonly DEFAULT_TIMEOUT_SECONDS = 3;
@@ -80,7 +82,7 @@ export class DiceGroup {
      *
      * @param params
      */
-    public static roll(params: DiceGroupParams) {
+    public static roll(params: DiceGroupParams): void {
         const diceGroup = new DiceGroup(params);
         if (params.doFakeRoll) {
             diceGroup.fakeRoll();
@@ -95,7 +97,7 @@ export class DiceGroup {
      * @param diceResult
      * @returns
      */
-    public static format(diceResult: DiceResult) {
+    public static format(diceResult: DiceResult): string {
         const parts: Array<string> = [];
         if (diceResult.rerolledValue) {
             parts.push(`${diceResult.rerolledValue}->`);
@@ -218,19 +220,18 @@ export class DiceGroup {
         const z = world.getTableHeight() + 2;
         for (let i = 0; i < this._diceParamsArray.length; i++) {
             const diceParams: DiceParams | undefined = this._diceParamsArray[i];
-            if (!diceParams) {
-                throw new Error("missing diceParams");
+            if (diceParams) {
+                const phi = (i / this._diceParamsArray.length) * Math.PI * 2;
+                const r = this._diceParamsArray.length * 0.3;
+                const pos = new Vector(Math.cos(phi) * r, Math.sin(phi) * r, z);
+                const dice: Dice = DiceGroup._createDice(diceParams, pos);
+                this._diceObjIdToDiceResult[dice.getId()] = {
+                    diceParams,
+                    dice,
+                    value: -1,
+                };
+                this._activeDice.add(dice);
             }
-            const phi = (i / this._diceParamsArray.length) * Math.PI * 2;
-            const r = this._diceParamsArray.length * 0.3;
-            const pos = new Vector(Math.cos(phi) * r, Math.sin(phi) * r, z);
-            const dice: Dice = DiceGroup._createDice(diceParams, pos);
-            this._diceObjIdToDiceResult[dice.getId()] = {
-                diceParams,
-                dice,
-                value: -1,
-            };
-            this._activeDice.add(dice);
         }
 
         // Now that all dice are registered, roll.

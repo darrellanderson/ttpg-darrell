@@ -12,7 +12,7 @@ import {
     DiceParams,
     DiceResult,
 } from "./dice-group";
-import { Player } from "@tabletop-playground/api";
+import { Dice, Player } from "@tabletop-playground/api";
 
 it("format", () => {
     const diceParams: DiceParams = { sides: 10 };
@@ -38,6 +38,16 @@ it("constructor", () => {
         diceParams: [],
         player,
         doFakeRoll: true,
+    });
+});
+
+it("constructor (position)", () => {
+    const player = new MockPlayer();
+    DiceGroup.roll({
+        diceParams: [],
+        player,
+        doFakeRoll: true,
+        position: [0, 0, 0],
     });
 });
 
@@ -225,7 +235,7 @@ it("_createDice", () => {
             "1885447D4CF808B36797CFB1DD679BAC": { _objType: "Dice" },
         },
     });
-    const dice = DiceGroup._createDice(
+    const dice: Dice = DiceGroup._createDice(
         {
             id: "my-id",
             sides: 4,
@@ -239,4 +249,78 @@ it("_createDice", () => {
     expect(dice.getPrimaryColor().toHex()).toEqual("FF0000FF");
     expect(dice.getSecondaryColor().toHex()).toEqual("00FF00FF");
     expect(dice.getName()).toEqual("my-name");
+});
+
+it("createDice (different sides)", () => {
+    for (const sides of [4, 6, 8, 10, 12, 20, 21]) {
+        const params: DiceParams = {
+            id: "my-id",
+            sides: sides as 4 | 6 | 8 | 10 | 12 | 20,
+            primaryColor: [1, 0, 0, 1],
+            secondaryColor: [0, 1, 0, 1],
+            name: "my-name",
+        };
+        expect(() => {
+            // no template ids registered
+            DiceGroup._createDice(params, [0, 0, 0]);
+        }).toThrow();
+    }
+});
+
+it("createDice (template is not Dice)", () => {
+    mockWorld._reset({
+        _templateIdToMockGameObjectParams: {
+            "1885447D4CF808B36797CFB1DD679BAC": { _objType: "CardHolder" },
+        },
+    });
+    const params: DiceParams = {
+        id: "my-id",
+        sides: 4,
+        primaryColor: [1, 0, 0, 1],
+        secondaryColor: [0, 1, 0, 1],
+        name: "my-name",
+    };
+    expect(() => {
+        DiceGroup._createDice(params, [0, 0, 0]);
+    }).toThrow();
+});
+
+it("deleteAfterSeconds", () => {
+    mockWorld._reset({
+        _templateIdToMockGameObjectParams: {
+            "1885447D4CF808B36797CFB1DD679BAC": { _objType: "Dice" },
+        },
+    });
+    jest.useFakeTimers();
+
+    DiceGroup.roll({
+        diceParams: [{ sides: 4 }],
+        player: new MockPlayer(),
+        deleteAfterSeconds: 1,
+    });
+
+    jest.advanceTimersByTime(10000);
+    jest.clearAllTimers();
+    jest.useRealTimers();
+});
+
+it("timeoutSeconds", () => {
+    mockWorld._reset({
+        _templateIdToMockGameObjectParams: {
+            "1885447D4CF808B36797CFB1DD679BAC": { _objType: "Dice" },
+        },
+    });
+    jest.useFakeTimers();
+    jest.spyOn(MockDice.prototype, "roll").mockImplementation(() => {});
+
+    DiceGroup.roll({
+        diceParams: [{ sides: 4 }],
+        player: new MockPlayer(),
+        timeoutSeconds: 1,
+    });
+
+    jest.advanceTimersByTime(10000);
+    jest.clearAllTimers();
+    jest.restoreAllMocks();
+    jest.useRealTimers();
 });
