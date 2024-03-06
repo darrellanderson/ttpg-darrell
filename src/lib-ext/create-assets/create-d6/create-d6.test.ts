@@ -56,9 +56,7 @@ it("_createD6Image (no face)", async () => {
         faces: [],
     };
     const createD6 = new CreateD6(params);
-    let err: string = "";
-    await createD6._createD6Image().catch((e: string) => {
-        err = e;
-    });
-    expect(err).toEqual("");
+    expect(() => {
+        createD6._createD6Image();
+    }).toThrow();
 });
