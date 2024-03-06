@@ -1,5 +1,6 @@
-import { FetchOptions, FetchResponse } from "@tabletop-playground/api";
+import { FetchOptions, FetchResponse, fetch } from "@tabletop-playground/api";
 import { BugSplatRemoteReporter } from "./bugsplat-remote-reporter";
+import { ErrorHandler } from "./error-handler";
 
 it("init", () => {
     new BugSplatRemoteReporter({
@@ -54,6 +55,24 @@ it("createFetchOptions", () => {
 
 it("use FetchResponse", () => {
     expect(FetchResponse).toBeDefined();
+});
+
+it("mock fetch", () => {
+    jest.spyOn(globalThis, "fetch").mockImplementation(() => {
+        return new Promise<Response>(() => {});
+    });
+
+    const reporter = new BugSplatRemoteReporter({
+        database: "<your db name here>",
+        appName: "unittest",
+        appVersion: "1",
+    });
+    reporter.init();
+
+    ErrorHandler.onError.trigger("test");
+    ErrorHandler.onError.trigger("test"); // suppressed duplicate
+
+    jest.restoreAllMocks();
 });
 
 /*// This test sends an actual crash report, remove from general use!!
