@@ -1,5 +1,11 @@
 import { Container } from "@tabletop-playground/api";
-import { MockCard, MockContainer, MockGameObject, MockPlayer } from "ttpg-mock";
+import {
+    MockCard,
+    MockContainer,
+    MockGameObject,
+    MockPlayer,
+    mockWorld,
+} from "ttpg-mock";
 import { DeletedItemsContainer } from "./deleted-items-container";
 
 it("constructor", () => {
@@ -84,4 +90,25 @@ it("destroyWithoutCopying", () => {
 
     const obj = new MockGameObject();
     DeletedItemsContainer.destroyWithoutCopying(obj);
+});
+
+it("destroy clone", () => {
+    jest.spyOn(MockGameObject.prototype, "toJSONString").mockImplementation(
+        () => {
+            return "x";
+        }
+    );
+    jest.spyOn(mockWorld, "createObjectFromJSON").mockImplementation(() => {
+        return new MockGameObject();
+    });
+
+    const container: Container = new MockContainer();
+    new DeletedItemsContainer(container);
+
+    expect(container.getItems().length).toEqual(0);
+    new MockGameObject({ templateId: "my-template-id" }).destroy();
+    process.flushTicks();
+    expect(container.getItems().length).toEqual(1);
+
+    jest.restoreAllMocks();
 });

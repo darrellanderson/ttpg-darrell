@@ -102,16 +102,15 @@ export class DeletedItemsContainer {
             return; // do not keep other versions of this object
         }
 
-        const json: string = obj.toJSONString();
-        if (json.length === 0) {
-            return; // apparently can happen if deleted by script?
-        }
-        const clone: GameObject | undefined = world.createObjectFromJSON(
-            json,
-            [0, 0, 0]
-        );
-        if (clone) {
-            this._container.addObjects([clone]);
+        const json: string = obj.toJSONString(); // empty if deleted by script (?)
+        if (json.length > 0) {
+            const clone: GameObject | undefined = world.createObjectFromJSON(
+                json,
+                [0, 0, 0]
+            );
+            if (clone) {
+                this._container.addObjects([clone]);
+            }
         }
     }
 }
