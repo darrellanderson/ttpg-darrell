@@ -61,14 +61,13 @@ export class OnCardBecameSingletonOrDeck implements IGlobal {
                 const nsids: Array<string> = NSID.getDeck(deck);
                 const oldNsid: string | undefined =
                     nsids[position === 1 ? 0 : nsids.length - 1];
-                if (oldNsid === undefined) {
-                    throw new Error("missing oldNsid");
+                if (oldNsid !== undefined) {
+                    OnCardBecameSingletonOrDeck.onSingletonCardMadeDeck.trigger(
+                        deck,
+                        oldNsid,
+                        player
+                    );
                 }
-                OnCardBecameSingletonOrDeck.onSingletonCardMadeDeck.trigger(
-                    deck,
-                    oldNsid,
-                    player
-                );
             }
         });
     };
@@ -118,14 +117,12 @@ export class OnCardBecameSingletonOrDeck implements IGlobal {
                     OnCardBecameSingletonOrDeck._onRemovedHandler
                 );
                 const oldNsid: string | undefined = NSID.getDeck(obj)[0];
-                if (oldNsid === undefined) {
-                    throw new Error("missing oldNsid");
+                if (oldNsid !== undefined) {
+                    OnCardBecameSingletonOrDeck.onSingletonCardMadeDeck.trigger(
+                        obj,
+                        oldNsid
+                    );
                 }
-
-                OnCardBecameSingletonOrDeck.onSingletonCardMadeDeck.trigger(
-                    obj,
-                    oldNsid
-                );
             } else if (obj.getStackSize() === 1) {
                 // singleton card
                 obj.onInserted.remove(
