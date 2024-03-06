@@ -1,4 +1,4 @@
-import { world } from "@tabletop-playground/api";
+import { GameObject, world } from "@tabletop-playground/api";
 import { DataStore } from "./data-store";
 
 it("constructor", () => {
@@ -80,4 +80,31 @@ it("same key finds existing store", () => {
     dataStore = new DataStore("@test/not-test");
     output = dataStore.get(dataId);
     expect(output).toBeUndefined();
+});
+
+it("corrupt root (not-json freelist)", () => {
+    const dataStore = new DataStore("@test/test");
+    const root: GameObject | undefined = world.getAllObjects()[0];
+    root?.setSavedData("not json", "f");
+    expect(() => {
+        dataStore.set("@test/my-data-id", "x");
+    }).toThrow();
+});
+
+it("corrupt root (not-array freelist)", () => {
+    const dataStore = new DataStore("@test/test");
+    const root: GameObject | undefined = world.getAllObjects()[0];
+    root?.setSavedData("0", "f");
+    expect(() => {
+        dataStore.set("@test/my-data-id", "x");
+    }).toThrow("rootStoreData not array");
+});
+
+it("corrupt root (freelist has bad id)", () => {
+    const dataStore = new DataStore("@test/test");
+    const root: GameObject | undefined = world.getAllObjects()[0];
+    root?.setSavedData('["no such id"]', "f");
+    expect(() => {
+        dataStore.set("@test/my-data-id", "x");
+    }).toThrow("bad obj");
 });

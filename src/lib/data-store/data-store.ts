@@ -402,14 +402,13 @@ export class DataStore {
 
         if (rootStoreIds.length > 0) {
             const objId: string | undefined = rootStoreIds[0];
-            if (!objId) {
-                throw new Error("missing objId");
+            if (objId) {
+                const obj = world.getObjectById(objId);
+                if (!obj) {
+                    throw new Error("bad obj");
+                }
+                return obj;
             }
-            const obj = world.getObjectById(objId);
-            if (!obj) {
-                throw new Error("bad obj");
-            }
-            return obj;
         }
 
         return undefined;
