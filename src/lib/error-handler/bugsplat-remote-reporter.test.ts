@@ -1,4 +1,4 @@
-import { FetchOptions, FetchResponse, fetch } from "@tabletop-playground/api";
+import { FetchOptions, FetchResponse } from "@tabletop-playground/api";
 import { BugSplatRemoteReporter } from "./bugsplat-remote-reporter";
 import { ErrorHandler } from "./error-handler";
 
