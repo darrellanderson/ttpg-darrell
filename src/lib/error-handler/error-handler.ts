@@ -227,15 +227,17 @@ export class ErrorHandler implements IGlobal {
         const mappings: Array<string> = mappingsEncoded.split(";"); // one entry per line
         for (const mapping of mappings) {
             const segments: Array<string> = mapping.split(",");
-            const firstSegment: string = segments[0] ?? "";
-            const fields = this.parseSourceMappingSegment(firstSegment);
-            // [delta-js-col, src-index, delta-ts-line, delta-ts-col, names-index]
-            let tsLine: number = fields[2] ?? -1;
-            if (tsLine > 0) {
-                tsLine += lastTsLine;
-                lastTsLine = tsLine;
+            const firstSegment: string | undefined = segments[0];
+            if (firstSegment !== undefined) {
+                const fields = this.parseSourceMappingSegment(firstSegment);
+                // [delta-js-col, src-index, delta-ts-line, delta-ts-col, names-index]
+                let tsLine: number = fields[2] ?? -1;
+                if (tsLine > 0) {
+                    tsLine += lastTsLine;
+                    lastTsLine = tsLine;
+                }
+                lineMapping.push(tsLine);
             }
-            lineMapping.push(tsLine);
         }
         return lineMapping;
     }
