@@ -48,20 +48,36 @@ export class CreateCardsheet extends AbstractCreateAssets {
         super();
         this._params = params;
         this._sheetPlan = this._getSheetPlan();
-        this._sharedBackFilenameRelativeToAssets = `${params.assetFilename}.back.jpg`;
+
+        const basename: string = path.basename(params.assetFilename);
+        this._sharedBackFilenameRelativeToAssets = path.join(
+            params.assetFilename,
+            `${basename}.back.jpg`
+        );
     }
 
     clean(): Promise<void> {
         const promises: Array<Promise<void>> = [];
 
+        const basename: string = path.basename(this._params.assetFilename);
         promises.push(
             AbstractCreateAssets.cleanByFilePrefix(
-                path.join(this._params.rootDir ?? ".", "assets", "Textures"),
-                this._params.assetFilename
+                path.join(
+                    this._params.rootDir ?? ".",
+                    "assets",
+                    "Textures",
+                    this._params.assetFilename
+                ),
+                basename
             ),
             AbstractCreateAssets.cleanByFilePrefix(
-                path.join(this._params.rootDir ?? ".", "assets", "Templates"),
-                this._params.assetFilename
+                path.join(
+                    this._params.rootDir ?? ".",
+                    "assets",
+                    "Templates",
+                    this._params.assetFilename
+                ),
+                basename
             )
         );
 
@@ -82,6 +98,7 @@ export class CreateCardsheet extends AbstractCreateAssets {
         if (typeof imageData === "string") {
             const srcFilename = path.join(
                 this._params.rootDir ?? ".",
+                this._params.applyAllInputDir ?? ".",
                 imageData
             );
             return new ImageCell(
@@ -146,16 +163,39 @@ export class CreateCardsheet extends AbstractCreateAssets {
             const layout: { cols: number; rows: number } =
                 GridCell.getOptimalLayout(cellCount, cellSize);
 
+            // Place output sheets in an "assetFilename" directory.
+            const basename: string = path.basename(this._params.assetFilename);
             const sheetPlan: SheetPlan = {
-                faceFilenameRelativeToAssetsTextures: `${this._params.assetFilename}.face.${sheetIndex}.jpg`,
-                backFilenameRelativeToAssetsTextures: `${this._params.assetFilename}.back.${sheetIndex}.jpg`,
-                templateFilenameRelativeToAssetsTemplates: `${this._params.assetFilename}.${sheetIndex}.json`,
+                faceFilenameRelativeToAssetsTextures: path.join(
+                    this._params.assetFilename,
+                    `${basename}.face.${sheetIndex}.jpg`
+                ),
+                backFilenameRelativeToAssetsTextures: path.join(
+                    this._params.assetFilename,
+                    `${basename}.back.${sheetIndex}.jpg`
+                ),
+                templateFilenameRelativeToAssetsTemplates: path.join(
+                    this._params.assetFilename,
+                    `${basename}.${sheetIndex}.json`
+                ),
                 cols: layout.cols,
                 rows: layout.rows,
                 faceCells: faceCells.slice(start, end),
                 backCells: backCells.slice(start, end),
                 cardEntries: this._params.cards.slice(start, end),
             };
+            if (this._params.applyAllTags) {
+                for (const cardEntry of sheetPlan.cardEntries) {
+                    for (const tag of this._params.applyAllTags) {
+                        if (!cardEntry.tags) {
+                            cardEntry.tags = [];
+                        }
+                        if (!cardEntry.tags.includes(tag)) {
+                            cardEntry.tags.push(tag);
+                        }
+                    }
+                }
+            }
             result.push(sheetPlan);
         }
 

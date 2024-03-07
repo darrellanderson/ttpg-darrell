@@ -26,6 +26,12 @@ export const CreateCardsheetParamsSchema = z
             })
             .strict(),
 
+        // If using per-card filenames, prefix this directory to each.
+        applyAllInputDir: z.string().optional(),
+
+        // In addition to per-card tags, add common deck tags to each card.
+        applyAllTags: z.array(z.string()).optional(),
+
         cards: z.array(
             z
                 .object({
