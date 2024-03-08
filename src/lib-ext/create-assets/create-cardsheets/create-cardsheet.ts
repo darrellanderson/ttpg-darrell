@@ -96,11 +96,18 @@ export class CreateCardsheet extends AbstractCreateAssets {
      */
     private _getCardCell(imageData: string | ZBaseCell | undefined) {
         if (typeof imageData === "string") {
-            const srcFilename = path.join(
-                this._params.rootDir ?? ".",
-                this._params.applyAllInputDir ?? ".",
-                imageData
-            );
+            let srcFilename: string = "";
+            if (imageData.startsWith("./")) {
+                // Relative to rootDir.
+                srcFilename = path.join(this._params.rootDir ?? ".", imageData);
+            } else {
+                // Relative to applyAllInputDir.
+                srcFilename = path.join(
+                    this._params.rootDir ?? ".",
+                    this._params.applyAllInputDir ?? ".",
+                    imageData
+                );
+            }
             return new ImageCell(
                 this._params.cardSizePixel.width,
                 this._params.cardSizePixel.height,
