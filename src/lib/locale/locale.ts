@@ -7,12 +7,13 @@ const _lang: { [key: string]: string } = {};
 // Original author: ThatRobHuman
 export const locale = (
     key: string,
-    replacement: { [key: string]: string | number } | undefined = undefined
+    replacement?: { [key: string]: string | number }
 ): string => {
     const str = _lang[key];
     if (!str) {
         return key; // not registered, use key as stand-in
-    } else if (!replacement) {
+    }
+    if (replacement === undefined) {
         return str; // no need for regex
     }
     return str

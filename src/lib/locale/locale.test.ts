@@ -48,3 +48,36 @@ it("inject", () => {
     locale.inject({ [s]: v });
     expect(locale(s)).toEqual(v);
 });
+
+describe("copilot test locale", () => {
+    beforeEach(() => {
+        locale.inject({
+            test: "This is a test",
+            hello: "Hello, {name}!",
+            apples: "{#count|one apple|{count} apples|no apples}",
+        });
+    });
+
+    test("returns the localized string when the key is found", () => {
+        expect(locale("test")).toBe("This is a test");
+    });
+
+    test("returns the key when the key is not found", () => {
+        expect(locale("notfound")).toBe("notfound");
+    });
+
+    test("replaces placeholders with the corresponding values", () => {
+        expect(locale("hello", { name: "John" })).toBe("Hello, John!");
+    });
+
+    test("handles pluralization", () => {
+        expect(locale("apples", { count: 1 })).toBe("one apple");
+        expect(locale("apples", { count: 2 })).toBe("2 apples");
+        expect(locale("apples", { count: 0 })).toBe("no apples");
+    });
+
+    test("throws an error when the pluralization match fails", () => {
+        locale.inject({ bad: "{#count|one}" });
+        expect(() => locale("bad", { count: 1 })).toThrowError();
+    });
+});

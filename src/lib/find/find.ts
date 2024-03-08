@@ -36,7 +36,7 @@ export class Find {
         if (card && !(card instanceof Card)) {
             throw new Error(`findCard: "${nsid}" not a Card`);
         }
-        return card;
+        return card as Card | undefined;
     }
 
     findCardHolder(
@@ -52,7 +52,7 @@ export class Find {
         if (card && !(card instanceof CardHolder)) {
             throw new Error(`findCardHolder: "${nsid}" not a CardHolder`);
         }
-        return card;
+        return card as CardHolder | undefined;
     }
 
     findCardHolderBySlot(
@@ -92,7 +92,7 @@ export class Find {
         if (container && !(container instanceof Container)) {
             throw new Error(`findContainer: "${nsid}" not a Container`);
         }
-        return container;
+        return container as Container | undefined;
     }
 
     findDeckOrDiscard(
@@ -150,7 +150,7 @@ export class Find {
         if (dice && !(dice instanceof Dice)) {
             throw new Error(`findDice: "${nsid}" not a Dice`);
         }
-        return dice;
+        return dice as Dice | undefined;
     }
 
     findGameObject(
@@ -206,7 +206,7 @@ export class Find {
                 `findMultistateObject: "${nsid}" not a MultistateObject`
             );
         }
-        return multistateObject;
+        return multistateObject as MultistateObject | undefined;
     }
 
     findSnapPointByTag(tag: string): SnapPoint | undefined {

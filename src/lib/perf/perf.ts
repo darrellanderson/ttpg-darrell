@@ -9,6 +9,9 @@ export type PerfReport = {
     fps: number;
 };
 
+/**
+ * Singleton class for frames per second performance tracking.
+ */
 export class Perf implements IGlobal {
     private static _instance: Perf | undefined;
 
@@ -37,6 +40,10 @@ export class Perf implements IGlobal {
         }
     };
 
+    /**
+     * Returns the singleton instance of the Perf class.
+     * @returns {Perf} The singleton instance.
+     */
     public static getInstance(): Perf {
         if (!Perf._instance) {
             Perf._instance = new Perf();
@@ -57,6 +64,10 @@ export class Perf implements IGlobal {
         globalEvents.onTick.remove(this._onTickHandler);
     }
 
+    /**
+     * Returns a performance report based on the current data.
+     * @returns {PerfReport} The performance report.
+     */
     getReport(): PerfReport {
         const msecs: Array<number> = this._windowFrameSecs
             .filter((seconds) => seconds > 0)
@@ -95,6 +106,10 @@ export class Perf implements IGlobal {
         };
     }
 
+    /**
+     * Returns a string representation of the current performance report.
+     * @returns {string} The string representation of the performance report.
+     */
     getReportStr(): string {
         const report: PerfReport = this.getReport();
         const median = report.median.toFixed(1);

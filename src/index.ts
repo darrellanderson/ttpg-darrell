@@ -32,7 +32,7 @@ export * from "./lib/layout-objects/layout-objects";
 export * from "./lib/locale/locale";
 export * from "./lib/namespace-id/namespace-id";
 export * from "./lib/nsid/nsid";
-export * from "./lib/parse/parse-color";
+export * from "./lib/parse/parse-color/parse-color";
 export * from "./lib/perf/perf";
 export * from "./lib/setup/abstract-setup";
 export * from "./lib/shuffle/shuffle";
