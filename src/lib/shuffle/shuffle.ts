@@ -1,19 +1,21 @@
 /**
- * Shuffle an array of objects.
+ * Shuffle an array of objects.  Original is not modified,
+ * returns shuffled.
  */
 export class Shuffle<T> {
     shuffle(items: Array<T>): Array<T> {
+        const copy = [...items];
         // Fisher-Yates
-        for (let i = items.length - 1; i > 0; i--) {
+        for (let i = copy.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            const a: T | undefined = items[i];
-            const b: T | undefined = items[j];
+            const a: T | undefined = copy[i];
+            const b: T | undefined = copy[j];
             if (a !== undefined && b !== undefined) {
-                items[i] = b;
-                items[j] = a;
+                copy[i] = b;
+                copy[j] = a;
             }
         }
-        return items;
+        return copy;
     }
 
     choice(items: Array<T>): T | undefined {
