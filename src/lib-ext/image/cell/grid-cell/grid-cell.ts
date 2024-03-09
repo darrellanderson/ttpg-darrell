@@ -87,8 +87,8 @@ export class GridCell extends AbstractCell {
             }
         );
         super(
-            maxSize.width * numCols,
-            maxSize.height * numRows,
+            maxSize.width * numCols + spacing * (numCols - 1),
+            maxSize.height * numRows + spacing * (numRows - 1),
             childrenWithLayout
         );
     }

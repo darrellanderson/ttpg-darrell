@@ -38,14 +38,23 @@ import { TextCell } from "../text-cell/text-cell";
 export class CellParser {
     private readonly _rootDir: string;
     private readonly _exports: { [key: string]: number | string } = {};
+    private _lastJsonObject: object | undefined;
 
     constructor(rootDir?: string) {
         this._rootDir = rootDir ?? ".";
     }
 
     parse(jsonObject: object): AbstractCell {
-        const zBaseCellType: ZBaseCell = ZBaseCellSchema.parse(jsonObject);
-        const type: string = zBaseCellType.type;
+        let zBaseCellType: ZBaseCell = ZBaseCellSchema.parse(jsonObject);
+        let type: string = zBaseCellType.type;
+
+        if (type === "!copy" && this._lastJsonObject !== undefined) {
+            jsonObject = this._lastJsonObject;
+            zBaseCellType = ZBaseCellSchema.parse(jsonObject);
+            type = zBaseCellType.type;
+        } else {
+            this._lastJsonObject = jsonObject;
+        }
 
         // Exports are "last writer wins", not a push/pop stack.
         if (zBaseCellType.exports) {
