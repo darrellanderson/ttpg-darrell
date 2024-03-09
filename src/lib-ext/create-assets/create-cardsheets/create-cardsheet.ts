@@ -98,7 +98,9 @@ export class CreateCardsheet extends AbstractCreateAssets {
         if (typeof imageData === "string") {
             const srcFilename = path.join(
                 this._params.rootDir ?? ".",
-                this._params.applyAllInputDir ?? ".",
+                imageData.startsWith("./")
+                    ? "."
+                    : this._params.applyAllInputDir ?? ".",
                 imageData
             );
             return new ImageCell(
