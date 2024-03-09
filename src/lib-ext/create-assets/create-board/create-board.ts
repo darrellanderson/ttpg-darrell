@@ -3,17 +3,22 @@ import {
     ImageSplit,
     ImageSplitChunk,
 } from "../../image/image-split/image-split";
-import { AbstractCell, CellSize, CellSnapPoint } from "../../../index-ext";
+import {
+    AbstractCell,
+    CellSize,
+    CellSnapPoint,
+} from "../../image/cell/abstract-cell/abstract-cell";
 import { AbstractCreateAssets } from "../abstract-create-assets/abstract-create-assets";
 import { BleedCell } from "../../image/cell/bleed-cell/bleed-cell";
 import { BufferCell } from "../../image/cell/buffer-cell/buffer-cell";
-import { CubeModel, OffsetAndSize } from "../../model/cube-model/cube-model";
-import { CubeTemplate } from "../../template/cube-template/cube-template";
+import { CellParser } from "../../image/cell/cell-parser/cell-parser";
 import {
     CreateBoardParams,
     CreateBoardParamsSchema,
 } from "./create-board-params";
-import { CellParser } from "../../image/cell/cell-parser/cell-parser";
+import { CubeModel } from "../../model/cube-model/cube-model";
+import { CubeTemplate } from "../../template/cube-template/cube-template";
+import { OffsetAndSize } from "../../model/abstract-model/abstract-model";
 import { ResizeCell } from "../../image/cell/resize-cell/resize-cell";
 
 /**
@@ -83,6 +88,16 @@ export class CreateBoard extends AbstractCreateAssets {
                 size.height,
                 this._srcImageCell
             );
+        }
+
+        const { width, height }: CellSize = this._srcImageCell.getSize();
+        if (this._params.topDownWorldSize.widthScaledByPixels) {
+            this._params.topDownWorldSize.width *= width;
+            this._params.topDownWorldSize.widthScaledByPixels = false;
+        }
+        if (this._params.topDownWorldSize.heightScaledByPixels) {
+            this._params.topDownWorldSize.height *= height;
+            this._params.topDownWorldSize.heightScaledByPixels = false;
         }
     }
 

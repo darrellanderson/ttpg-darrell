@@ -156,6 +156,20 @@ it("ImageCell", () => {
     });
 });
 
+it("PaddedCell", () => {
+    new CellParser().parse({
+        type: "PaddedCell",
+        padding: 1,
+        background: "#ff0000",
+        child: {
+            type: "BufferCell",
+            width: 1,
+            height: 1,
+            bufferData: "my-data",
+        },
+    });
+});
+
 it("RowCell", () => {
     new CellParser().parse({
         type: "RowCell",

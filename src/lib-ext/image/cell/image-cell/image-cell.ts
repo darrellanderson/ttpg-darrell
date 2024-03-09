@@ -9,6 +9,7 @@ export class ImageCell extends AbstractCell {
     private _alpha: number = 1;
     private _grayscale: boolean = false;
     private _tint: string = "#ffffff";
+    private _invert: boolean = false;
 
     public static from(imageFile: string): Promise<ImageCell> {
         return new Promise<ImageCell>((resolve, reject) => {
@@ -44,6 +45,11 @@ export class ImageCell extends AbstractCell {
         return this;
     }
 
+    setInvert(value: boolean): this {
+        this._invert = value;
+        return this;
+    }
+
     setTint(value: string): this {
         if (!value.match(/^#[0-9a-f]{6}$/i)) {
             throw new Error(`invalid tint "${value}"`);
@@ -60,11 +66,14 @@ export class ImageCell extends AbstractCell {
             if (this._alpha < 1) {
                 image = image.ensureAlpha(this._alpha);
             }
+            if (this._tint !== "#ffffff") {
+                image = image.tint(this._tint);
+            }
             if (this._grayscale) {
                 image = image.grayscale(true);
             }
-            if (this._tint !== "#ffffff") {
-                image = image.tint(this._tint);
+            if (this._invert) {
+                image = image.negate(true);
             }
             resolve(image.png().toBuffer());
         });

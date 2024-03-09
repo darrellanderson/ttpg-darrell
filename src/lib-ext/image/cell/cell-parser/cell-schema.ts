@@ -82,8 +82,19 @@ export const ZImageCellSchema = ZBaseCellSchema.extend({
     alpha: z.number().optional(),
     grayscale: z.boolean().optional(),
     tint: z.string().optional(),
+    invert: z.boolean().optional(),
 }).strict();
 export type ZImageCell = z.infer<typeof ZImageCellSchema>;
+
+export const ZPaddedCellSchema = z
+    .object({
+        type: z.literal("PaddedCell"),
+        child: ZBaseCellSchema,
+        padding: z.number(),
+        background: z.string(),
+    })
+    .strict();
+export type ZPaddedCell = z.infer<typeof ZPaddedCellSchema>;
 
 export const ZRowCellSchema = z
     .object({

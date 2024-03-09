@@ -30,7 +30,10 @@ import {
     ZSolidCellSchema,
     ZTextCellSchema,
     ZTextCell,
+    ZPaddedCell,
+    ZPaddedCellSchema,
 } from "./cell-schema";
+import { PaddedCell } from "../padded-cell/padded-cell";
 
 export class CellParser {
     private readonly _rootDir: string;
@@ -108,13 +111,24 @@ export class CellParser {
             let imageFile: string = zImageCell.imageFile;
             const alpha: number = zImageCell.alpha ?? 1;
             const grayscale: boolean = zImageCell.grayscale ?? false;
+            const invert: boolean = zImageCell.invert ?? false;
             const tint: string = zImageCell.tint ?? "#ffffff";
 
             imageFile = path.join(this._rootDir, path.normalize(imageFile));
             abstractCell = new ImageCell(width, height, imageFile)
                 .setAlpha(alpha)
                 .setGrayscale(grayscale)
+                .setInvert(invert)
                 .setTint(tint);
+        }
+
+        if (type === "PaddedCell") {
+            const zPaddedCell: ZPaddedCell =
+                ZPaddedCellSchema.parse(jsonObject);
+            const child: AbstractCell = this.parse(zPaddedCell.child);
+            const padding: number = zPaddedCell.padding;
+            const background: string = zPaddedCell.background;
+            abstractCell = new PaddedCell(child, padding).setColor(background);
         }
 
         if (type === "RowCell") {

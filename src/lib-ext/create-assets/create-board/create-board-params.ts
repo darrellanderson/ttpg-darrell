@@ -37,6 +37,11 @@ export const CreateBoardParamsSchema = z
                 width: z.number().positive(), // TTPG Y
                 height: z.number().positive(), // TTPG X
                 depth: z.number().positive(), // TTPG Z
+
+                // Let the src image size control the world size.
+                // Useful when building a complex cell with a grid, padding, etc.
+                widthScaledByPixels: z.boolean().optional(),
+                heightScaledByPixels: z.boolean().optional(),
             })
             .strict(),
     })
