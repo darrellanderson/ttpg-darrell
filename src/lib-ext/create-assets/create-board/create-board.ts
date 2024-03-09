@@ -250,13 +250,17 @@ export class CreateBoard extends AbstractCreateAssets {
                                 const basename: string = path.basename(
                                     this._params.assetFilename
                                 );
+                                const colRow: string =
+                                    chunks.length > 1
+                                        ? `-${chunk.col}x${chunk.row}`
+                                        : "";
                                 const innerFilename: string = path.join(
                                     this._params.assetFilename,
-                                    `${basename}-${chunk.col}x${chunk.row}.jpg`
+                                    `${basename}${colRow}.jpg`
                                 );
                                 const innerMaskFilename: string = path.join(
                                     this._params.assetFilename,
-                                    `${basename}-${chunk.col}x${chunk.row}-mask.png`
+                                    `${basename}${colRow}-mask.png`
                                 );
                                 const filename: string = path.join(
                                     this._params.rootDir ?? ".",

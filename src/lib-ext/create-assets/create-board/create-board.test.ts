@@ -139,7 +139,7 @@ it("world size scaledByPixels", async () => {
     const templateModel = templateParsed.Models[0];
     expect(templateModel.Model).toEqual(CubeModel.ASSET_FILENAME);
     expect(templateModel.Texture).toEqual(
-        "my-asset-filename/my-asset-filename-0x0.jpg"
+        "my-asset-filename/my-asset-filename.jpg"
     );
     expect(templateModel.Offset).toEqual({ X: 0, Y: 0, Z: 0 });
     expect(templateModel.Scale).toEqual({ X: 3, Y: 14, Z: 0.25 });
