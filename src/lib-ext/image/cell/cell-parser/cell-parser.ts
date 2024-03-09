@@ -1,14 +1,4 @@
 import path from "path";
-import { AbstractCell, CellSnapPoint } from "../abstract-cell/abstract-cell";
-import { BleedCell } from "../bleed-cell/bleed-cell";
-import { BufferCell } from "../buffer-cell/buffer-cell";
-import { CanvasCell } from "../canvas-cell/canvas-cell";
-import { ColCell } from "../col-cell/col-cell";
-import { GridCell } from "../grid-cell/grid-cell";
-import { ImageCell } from "../image-cell/image-cell";
-import { RowCell } from "../row-cell/row-cell";
-import { SolidCell } from "../solid-cell/solid-cell";
-import { TextCell } from "../text-cell/text-cell";
 import {
     ZBaseCellSchema,
     ZBaseCell,
@@ -33,10 +23,21 @@ import {
     ZPaddedCell,
     ZPaddedCellSchema,
 } from "./cell-schema";
+import { AbstractCell, CellSnapPoint } from "../abstract-cell/abstract-cell";
+import { BleedCell } from "../bleed-cell/bleed-cell";
+import { BufferCell } from "../buffer-cell/buffer-cell";
+import { CanvasCell } from "../canvas-cell/canvas-cell";
+import { ColCell } from "../col-cell/col-cell";
+import { GridCell } from "../grid-cell/grid-cell";
+import { ImageCell } from "../image-cell/image-cell";
 import { PaddedCell } from "../padded-cell/padded-cell";
+import { RowCell } from "../row-cell/row-cell";
+import { SolidCell } from "../solid-cell/solid-cell";
+import { TextCell } from "../text-cell/text-cell";
 
 export class CellParser {
     private readonly _rootDir: string;
+    private readonly _exports: { [key: string]: number | string } = {};
 
     constructor(rootDir?: string) {
         this._rootDir = rootDir ?? ".";
@@ -45,6 +46,29 @@ export class CellParser {
     parse(jsonObject: object): AbstractCell {
         const zBaseCellType: ZBaseCell = ZBaseCellSchema.parse(jsonObject);
         const type: string = zBaseCellType.type;
+
+        // Exports are "last writer wins", not a push/pop stack.
+        if (zBaseCellType.exports) {
+            for (const [k, v] of Object.entries(zBaseCellType.exports)) {
+                this._exports[k] = v;
+            }
+        }
+
+        // Apply exports.
+        for (const [k, v] of Object.entries(jsonObject)) {
+            if (v === "$import") {
+                const exportedValue: number | string | undefined =
+                    this._exports[k];
+                if (exportedValue === undefined) {
+                    throw new Error(`export "${k}" not found`);
+                }
+
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                type StringToAny = { [key: string]: any };
+                const force: StringToAny = jsonObject as StringToAny;
+                force[k] = exportedValue;
+            }
+        }
 
         let abstractCell: AbstractCell | undefined;
 

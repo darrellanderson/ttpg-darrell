@@ -3,6 +3,10 @@ import { z } from "zod";
 export const ZBaseCellSchema = z
     .object({
         type: z.string().min(1),
+        // Later consumers can use "$import" value to use an export.
+        exports: z
+            .record(z.string().min(1), z.union([z.number(), z.string()]))
+            .optional(),
         snapPoints: z
             .array(
                 z
@@ -86,14 +90,12 @@ export const ZImageCellSchema = ZBaseCellSchema.extend({
 }).strict();
 export type ZImageCell = z.infer<typeof ZImageCellSchema>;
 
-export const ZPaddedCellSchema = z
-    .object({
-        type: z.literal("PaddedCell"),
-        child: ZBaseCellSchema,
-        padding: z.number(),
-        background: z.string(),
-    })
-    .strict();
+export const ZPaddedCellSchema = ZBaseCellSchema.extend({
+    type: z.literal("PaddedCell"),
+    child: ZBaseCellSchema,
+    padding: z.number(),
+    background: z.string(),
+}).strict();
 export type ZPaddedCell = z.infer<typeof ZPaddedCellSchema>;
 
 export const ZRowCellSchema = z

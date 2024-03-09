@@ -1,3 +1,4 @@
+import { CellSize } from "../abstract-cell/abstract-cell";
 import { CellParser } from "./cell-parser";
 
 it("constructor", () => {
@@ -8,6 +9,24 @@ it("invalid", () => {
     expect(() => {
         new CellParser().parse({ type: "nope!" });
     }).toThrow();
+});
+
+it("export", () => {
+    const size: CellSize = new CellParser()
+        .parse({
+            type: "PaddedCell",
+            padding: 0,
+            background: "#ff0000",
+            exports: { width: 10, bufferData: "my-data" },
+            child: {
+                type: "BufferCell",
+                width: "$import",
+                height: 1,
+                bufferData: "$import",
+            },
+        })
+        .getSize();
+    expect(size).toEqual({ width: 10, height: 1 });
 });
 
 it("snap points", () => {
