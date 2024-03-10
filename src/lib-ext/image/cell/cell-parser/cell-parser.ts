@@ -38,6 +38,7 @@ import { TextCell } from "../text-cell/text-cell";
 export class CellParser {
     private readonly _rootDir: string;
     private readonly _exports: { [key: string]: number | string } = {};
+    private _scale: number = 1;
     private _lastJsonObject: object | undefined;
 
     constructor(rootDir?: string) {
@@ -55,6 +56,39 @@ export class CellParser {
         } else {
             this._lastJsonObject = jsonObject;
         }
+
+        // Scale.
+        if (zBaseCellType.scale) {
+            this._scale = zBaseCellType.scale.pixel / zBaseCellType.scale.world;
+        }
+
+        // Apply scale.
+        const applyScale = (jsonObject: object) => {
+            for (let [k, v] of Object.entries(jsonObject)) {
+                if (k.startsWith("$scale")) {
+                    if (typeof v !== "number") {
+                        throw new Error(`scale only applies to numbers`);
+                    }
+                    const force: { [key: string]: number } = jsonObject as {
+                        [key: string]: number;
+                    };
+                    delete force[k];
+                    k = k.substring("$scale".length);
+                    v = Math.round(v * this._scale);
+                    force[k] = v;
+                }
+                if (typeof v === "object") {
+                    applyScale(v);
+                } else if (Array.isArray(v)) {
+                    for (const entry of v) {
+                        if (typeof entry === "object") {
+                            applyScale(entry);
+                        }
+                    }
+                }
+            }
+        };
+        applyScale(zBaseCellType);
 
         // Exports are "last writer wins", not a push/pop stack.
         if (zBaseCellType.exports) {

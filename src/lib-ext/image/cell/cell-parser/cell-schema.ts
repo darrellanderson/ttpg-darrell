@@ -7,6 +7,11 @@ export const ZBaseCellSchema = z
         exports: z
             .record(z.string().min(1), z.union([z.number(), z.string()]))
             .optional(),
+        // Later consumers can use "$scalefoo" value to scale and place in "foo".
+        scale: z
+            .object({ pixel: z.number(), world: z.number() })
+            .strict()
+            .optional(),
         snapPoints: z
             .array(
                 z
@@ -85,7 +90,7 @@ export const ZImageCellSchema = ZBaseCellSchema.extend({
     imageFile: z.string(),
     alpha: z.number().optional(),
     grayscale: z.boolean().optional(),
-    tint: z.string().optional(),
+    tint: z.string().length(7).regex(/^#/).optional(),
     invert: z.boolean().optional(),
 }).strict();
 export type ZImageCell = z.infer<typeof ZImageCellSchema>;
@@ -94,7 +99,7 @@ export const ZPaddedCellSchema = ZBaseCellSchema.extend({
     type: z.literal("PaddedCell"),
     child: ZBaseCellSchema,
     padding: z.number(),
-    background: z.string(),
+    background: z.string().length(7).regex(/^#/),
 }).strict();
 export type ZPaddedCell = z.infer<typeof ZPaddedCellSchema>;
 
@@ -111,7 +116,7 @@ export const ZSolidCellSchema = ZBaseCellSchema.extend({
     type: z.literal("SolidCell"),
     width: z.number().positive(),
     height: z.number().positive(),
-    color: z.string(),
+    color: z.string().length(7).regex(/^#/),
 }).strict();
 export type ZSolidCell = z.infer<typeof ZSolidCellSchema>;
 
@@ -120,7 +125,7 @@ export const ZTextCellSchema = ZBaseCellSchema.extend({
     width: z.number().positive(),
     height: z.number().positive(),
     text: z.string(),
-    textColor: z.string().optional(),
+    textColor: z.string().length(7).regex(/^#/).optional(),
     font: z.string().optional(),
     fontSize: z.number().positive().optional(),
     fontStyle: z.string().optional(),
