@@ -38,8 +38,8 @@ import { TextCell } from "../text-cell/text-cell";
 export class CellParser {
     private readonly _rootDir: string;
     private readonly _exports: { [key: string]: number | string } = {};
+    private readonly _idToJson: { [key: string]: string } = {};
     private _scale: number = 1;
-    private _lastJsonObject: object | undefined;
 
     constructor(rootDir?: string) {
         this._rootDir = rootDir ?? ".";
@@ -49,15 +49,7 @@ export class CellParser {
         let zBaseCellType: ZBaseCell = ZBaseCellSchema.parse(jsonObject);
         let type: string = zBaseCellType.type;
 
-        if (type === "!copy" && this._lastJsonObject !== undefined) {
-            jsonObject = this._lastJsonObject;
-            zBaseCellType = ZBaseCellSchema.parse(jsonObject);
-            type = zBaseCellType.type;
-        } else {
-            this._lastJsonObject = jsonObject;
-        }
-
-        // Scale.
+        // Update scale.
         if (zBaseCellType.scale) {
             this._scale = zBaseCellType.scale.pixel / zBaseCellType.scale.world;
         }
@@ -90,11 +82,30 @@ export class CellParser {
         };
         applyScale(zBaseCellType);
 
-        // Exports are "last writer wins", not a push/pop stack.
+        // Update exports ("last writer wins", not a push/pop stack).
         if (zBaseCellType.exports) {
             for (const [k, v] of Object.entries(zBaseCellType.exports)) {
+                console.log("export", k, v);
                 this._exports[k] = v;
             }
+        }
+
+        // Store if id.
+        if (zBaseCellType.id) {
+            this._idToJson[zBaseCellType.id] = JSON.stringify(jsonObject);
+        }
+
+        // Clone (does not use scale or exports defined in the clone,
+        // but does apply current exports to it for template-like behavior).
+        if (zBaseCellType.cloneId) {
+            const cloneJson: string | undefined =
+                this._idToJson[zBaseCellType.cloneId];
+            if (!cloneJson) {
+                throw new Error(`cloneId "${zBaseCellType.cloneId}" not found`);
+            }
+            jsonObject = JSON.parse(cloneJson);
+            zBaseCellType = ZBaseCellSchema.parse(jsonObject);
+            type = zBaseCellType.type;
         }
 
         // Apply exports.
