@@ -108,15 +108,12 @@ it("toFileData", async () => {
     expect(templateModel.Scale).toEqual({ X: 100, Y: 162.56, Z: 0.25 });
 });
 
-it("world size scaledByPixels", async () => {
+it("world size autoWidthHeight", async () => {
     const params: CreateBoardParams = {
         templateName: "my-template-name",
         assetFilename: "my-asset-filename",
         topDownWorldSize: {
-            width: 7,
-            widthScaledByPixels: true,
-            height: 3,
-            heightScaledByPixels: true,
+            autoWidthHeight: { pixel: 1, world: 3 },
             depth: 0.25,
         },
         srcImage: {
@@ -142,5 +139,5 @@ it("world size scaledByPixels", async () => {
         "my-asset-filename/my-asset-filename.jpg"
     );
     expect(templateModel.Offset).toEqual({ X: 0, Y: 0, Z: 0 });
-    expect(templateModel.Scale).toEqual({ X: 3, Y: 14, Z: 0.25 });
+    expect(templateModel.Scale).toEqual({ X: 3, Y: 6, Z: 0.25 });
 });

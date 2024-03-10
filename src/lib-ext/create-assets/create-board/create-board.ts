@@ -62,10 +62,18 @@ export class CreateBoard extends AbstractCreateAssets {
             );
         }
 
+        // If using auto-width/height, compute based on the before-shrink size.
+        let { width, height }: CellSize = this._srcImageCell.getSize();
+        if (this._params.topDownWorldSize.autoWidthHeight) {
+            const { pixel, world } =
+                this._params.topDownWorldSize.autoWidthHeight;
+            this._params.topDownWorldSize.width = (width * world) / pixel;
+            this._params.topDownWorldSize.height = (height * world) / pixel;
+        }
+
         // Resize image, shrink a little more to account for UV bleed edges.
         if (this._params.preshrink) {
             // If either value is zero, size appropriately.
-            let { width, height }: CellSize = this._srcImageCell.getSize();
             const maxDimension: number = Math.max(width, height);
             const scale: number = this._params.preshrink / maxDimension;
             width = Math.floor(width * scale);
@@ -78,16 +86,6 @@ export class CreateBoard extends AbstractCreateAssets {
                 size.height,
                 this._srcImageCell
             );
-        }
-
-        const { width, height }: CellSize = this._srcImageCell.getSize();
-        if (this._params.topDownWorldSize.widthScaledByPixels) {
-            this._params.topDownWorldSize.width *= width;
-            this._params.topDownWorldSize.widthScaledByPixels = false;
-        }
-        if (this._params.topDownWorldSize.heightScaledByPixels) {
-            this._params.topDownWorldSize.height *= height;
-            this._params.topDownWorldSize.heightScaledByPixels = false;
         }
     }
 
@@ -199,8 +197,11 @@ export class CreateBoard extends AbstractCreateAssets {
         // Snap points.
         const imgSize: { width: number; height: number } =
             this._srcImageCell.getSize();
-        const worldSize: { width: number; height: number; depth: number } =
-            this._params.topDownWorldSize;
+        const worldSize: {
+            width?: number;
+            height?: number;
+            depth: number;
+        } = this._params.topDownWorldSize;
         const imgSpaceSnapPoints: Array<CellSnapPoint> =
             this._srcImageCell.getSnapPoints();
         const worldSpaceSnapPoints: Array<CellSnapPoint> =
@@ -209,14 +210,15 @@ export class CreateBoard extends AbstractCreateAssets {
                     // Convert to world dimensions.
                     snapPoint.left =
                         ((snapPoint.left ?? 0) / imgSize.width) *
-                        worldSize.width;
+                        (worldSize.width ?? 0);
                     snapPoint.top =
                         ((snapPoint.top ?? 0) / imgSize.height) *
-                        worldSize.height;
+                        (worldSize.height ?? 0);
                     // Shift to origin being object center.
                     snapPoint.left =
-                        (snapPoint.left ?? 0) - worldSize.width / 2;
-                    snapPoint.top = worldSize.height / 2 - (snapPoint.top ?? 0);
+                        (snapPoint.left ?? 0) - (worldSize.width ?? 0) / 2;
+                    snapPoint.top =
+                        (worldSize.height ?? 0) / 2 - (snapPoint.top ?? 0);
 
                     return snapPoint;
                 }
@@ -260,8 +262,17 @@ export class CreateBoard extends AbstractCreateAssets {
                                 );
                                 filenameToBuffer[filename] = chunk.buffer;
 
-                                const { width, height, depth } =
+                                let { width, height, depth } =
                                     this._params.topDownWorldSize;
+                                if (width === undefined) {
+                                    width = 0;
+                                }
+                                if (height === undefined) {
+                                    height = 0;
+                                }
+                                if (depth === undefined) {
+                                    depth = 0;
+                                }
                                 cubeTemplate.addSubCubeEntry({
                                     texture: innerFilename,
                                     mask: hasMask

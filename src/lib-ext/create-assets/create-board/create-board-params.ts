@@ -28,14 +28,18 @@ export const CreateBoardParamsSchema = z
         // Prefer this over XYZ because TTPGs coordinate system flips X/Y.
         topDownWorldSize: z
             .object({
-                width: z.number().positive(), // TTPG Y
-                height: z.number().positive(), // TTPG X
+                width: z.number().positive().optional(), // TTPG Y
+                height: z.number().positive().optional(), // TTPG X
                 depth: z.number().positive(), // TTPG Z
 
-                // Let the src image size control the world size.
-                // Useful when building a complex cell with a grid, padding, etc.
-                widthScaledByPixels: z.boolean().optional(),
-                heightScaledByPixels: z.boolean().optional(),
+                // Compute width and height from the src image pixel size.
+                autoWidthHeight: z
+                    .object({
+                        pixel: z.number(),
+                        world: z.number(),
+                    })
+                    .strict()
+                    .optional(),
             })
             .strict(),
     })
