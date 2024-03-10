@@ -85,7 +85,6 @@ export class CellParser {
         // Update exports ("last writer wins", not a push/pop stack).
         if (zBaseCellType.exports) {
             for (const [k, v] of Object.entries(zBaseCellType.exports)) {
-                console.log("export", k, v);
                 this._exports[k] = v;
             }
         }

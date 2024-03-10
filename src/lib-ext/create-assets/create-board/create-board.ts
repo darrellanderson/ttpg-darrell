@@ -65,24 +65,14 @@ export class CreateBoard extends AbstractCreateAssets {
         // Resize image, shrink a little more to account for UV bleed edges.
         if (this._params.preshrink) {
             // If either value is zero, size appropriately.
-            const srcImageSize: CellSize = this._srcImageCell.getSize();
-            if (this._params.preshrink.width === 0) {
-                this._params.preshrink.width = Math.round(
-                    (this._params.preshrink.height * srcImageSize.width) /
-                        srcImageSize.height
-                );
-            } else if (this._params.preshrink.height === 0) {
-                this._params.preshrink.height = Math.round(
-                    (this._params.preshrink.width * srcImageSize.height) /
-                        srcImageSize.width
-                );
-            }
+            let { width, height }: CellSize = this._srcImageCell.getSize();
+            const maxDimension: number = Math.max(width, height);
+            const scale: number = this._params.preshrink / maxDimension;
+            width = Math.floor(width * scale);
+            height = Math.floor(height * scale);
 
             const size: { width: number; height: number } =
-                CubeModel.getInsetForUVs(
-                    this._params.preshrink.width,
-                    this._params.preshrink.height
-                );
+                CubeModel.getInsetForUVs(width, height);
             this._srcImageCell = new ResizeCell(
                 size.width,
                 size.height,

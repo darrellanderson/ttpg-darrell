@@ -16,7 +16,7 @@ it("fromParamsJson", () => {
                 height: 1,
                 color: "#ff0000",
             },
-            preshrink: { width: 100, height: 100 },
+            preshrink: 100,
         })
     );
     CreateBoard.fromParamsJson(paramsJson);
@@ -33,7 +33,7 @@ it("clean", async () => {
             height: 1,
             color: "#ff0000",
         },
-        preshrink: { width: 100, height: 100 },
+        preshrink: 100,
     });
     await createBoard.clean();
 });
