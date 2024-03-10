@@ -11,24 +11,6 @@ it("invalid", () => {
     }).toThrow();
 });
 
-it("scale", () => {
-    const size: CellSize = new CellParser()
-        .parse({
-            type: "PaddedCell",
-            padding: 0,
-            background: "#ff0000",
-            scale: { pixel: 3, world: 1 },
-            child: {
-                type: "BufferCell",
-                $scalewidth: 1,
-                $scaleheight: 2,
-                bufferData: "data",
-            },
-        })
-        .getSize();
-    expect(size).toEqual({ width: 3, height: 6 });
-});
-
 it("export", () => {
     const size: CellSize = new CellParser()
         .parse({

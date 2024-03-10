@@ -52,9 +52,17 @@ export class CreateBoard extends AbstractCreateAssets {
     constructor(params: CreateBoardParams) {
         super();
         this._params = params;
-        this._srcImageCell = new CellParser(this._params.rootDir).parse(
-            this._params.srcImage
-        );
+
+        let scale: number = 1;
+        if (this._params.topDownWorldSize.autoWidthHeight) {
+            const { pixel, world } =
+                this._params.topDownWorldSize.autoWidthHeight;
+            scale = pixel / world;
+        }
+
+        this._srcImageCell = new CellParser(this._params.rootDir)
+            .setScale(scale)
+            .parse(this._params.srcImage);
 
         if (this._params.srcMask) {
             this._srcMaskCell = new CellParser(this._params.rootDir).parse(

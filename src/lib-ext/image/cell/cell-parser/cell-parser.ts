@@ -45,14 +45,14 @@ export class CellParser {
         this._rootDir = rootDir ?? ".";
     }
 
+    setScale(scale: number): this {
+        this._scale = scale;
+        return this;
+    }
+
     parse(jsonObject: object): AbstractCell {
         let zBaseCellType: ZBaseCell = ZBaseCellSchema.parse(jsonObject);
         let type: string = zBaseCellType.type;
-
-        // Update scale.
-        if (zBaseCellType.scale) {
-            this._scale = zBaseCellType.scale.pixel / zBaseCellType.scale.world;
-        }
 
         // Apply scale.
         const applyScale = (jsonObject: object) => {
