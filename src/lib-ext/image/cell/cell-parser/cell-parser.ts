@@ -56,6 +56,8 @@ export class CellParser {
         let zBaseCellType: ZBaseCell = ZBaseCellSchema.parse(jsonObject);
         let type: string = zBaseCellType.type;
 
+        console.log("PARSE", type);
+
         // Apply scale.
         const applyScale = (jsonObject: object): void => {
             for (let [k, v] of Object.entries(jsonObject)) {
@@ -109,10 +111,15 @@ export class CellParser {
             type = zBaseCellType.type;
         }
 
+        console.log("KEYS", Object.keys(jsonObject).join(","));
+
         // Apply exports.
         const applyExports = (jsonObject: object): void => {
             for (const [k, v] of Object.entries(jsonObject)) {
+                console.log("XXXX LOOKING AT1", k);
+                console.log("KEY", k);
                 if (v === "$import") {
+                    console.log("IMPORT", k);
                     const exportedValue:
                         | number
                         | string
@@ -127,11 +134,17 @@ export class CellParser {
                     const force: StringToAny = jsonObject as StringToAny;
                     force[k] = exportedValue;
                 }
-                if (typeof v === "object" && v.type === undefined) {
+                if (k === "child" || k === "children" || k === "exports") {
+                    continue;
+                }
+                console.log("XXXX LOOKING AT", k);
+                if (typeof v === "object") {
+                    console.log("RECURSE OBJECT", k);
                     applyExports(v); // recurse but only for non-cell objects
                 } else if (Array.isArray(v)) {
                     for (const entry of v) {
                         if (typeof entry === "object") {
+                            console.log("RECURSE ARRAY", k);
                             applyExports(entry);
                         }
                     }
@@ -139,6 +152,7 @@ export class CellParser {
             }
         };
         applyExports(jsonObject);
+        console.log("XXX TYPE", type);
 
         let abstractCell: AbstractCell | undefined;
 

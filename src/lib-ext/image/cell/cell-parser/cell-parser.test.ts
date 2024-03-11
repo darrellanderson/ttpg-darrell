@@ -17,12 +17,13 @@ it("export", () => {
             type: "PaddedCell",
             padding: 0,
             background: "#ff0000",
-            exports: { width: 10, bufferData: "my-data" },
+            exports: { width: 10, bufferData: "my-data", tags: ["my-tag"] },
             child: {
                 type: "BufferCell",
                 width: "$import",
                 height: 1,
                 bufferData: "$import",
+                snapPoints: [{ tags: "$import" }],
             },
         })
         .getSize();
