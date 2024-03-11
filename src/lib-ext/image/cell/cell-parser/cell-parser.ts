@@ -127,8 +127,8 @@ export class CellParser {
                     const force: StringToAny = jsonObject as StringToAny;
                     force[k] = exportedValue;
                 }
-                if (typeof v === "object") {
-                    applyExports(v);
+                if (typeof v === "object" && v.type === undefined) {
+                    applyExports(v); // recurse but only for non-cell objects
                 } else if (Array.isArray(v)) {
                     for (const entry of v) {
                         if (typeof entry === "object") {
