@@ -12,7 +12,10 @@ export const ZBaseCellSchema = z
 
         // Later consumers can use "$import" value to use an export.
         exports: z
-            .record(z.string().min(1), z.union([z.number(), z.string()]))
+            .record(
+                z.string().min(1),
+                z.union([z.number(), z.string(), z.array(z.string().min(1))])
+            )
             .optional(),
 
         // Reuse previous cell, re-applying exports (can change exports)

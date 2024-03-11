@@ -37,7 +37,9 @@ import { TextCell } from "../text-cell/text-cell";
 
 export class CellParser {
     private readonly _rootDir: string;
-    private readonly _exports: { [key: string]: number | string } = {};
+    private readonly _exports: {
+        [key: string]: number | string | Array<string>;
+    } = {};
     private readonly _idToJson: { [key: string]: string } = {};
     private _scale: number = 1;
 
@@ -55,7 +57,7 @@ export class CellParser {
         let type: string = zBaseCellType.type;
 
         // Apply scale.
-        const applyScale = (jsonObject: object) => {
+        const applyScale = (jsonObject: object): void => {
             for (let [k, v] of Object.entries(jsonObject)) {
                 if (k.startsWith("$scale")) {
                     if (typeof v !== "number") {
@@ -108,20 +110,35 @@ export class CellParser {
         }
 
         // Apply exports.
-        for (const [k, v] of Object.entries(jsonObject)) {
-            if (v === "$import") {
-                const exportedValue: number | string | undefined =
-                    this._exports[k];
-                if (exportedValue === undefined) {
-                    throw new Error(`export "${k}" not found`);
-                }
+        const applyExports = (jsonObject: object): void => {
+            for (const [k, v] of Object.entries(jsonObject)) {
+                if (v === "$import") {
+                    const exportedValue:
+                        | number
+                        | string
+                        | Array<string>
+                        | undefined = this._exports[k];
+                    if (exportedValue === undefined) {
+                        throw new Error(`export "${k}" not found`);
+                    }
 
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                type StringToAny = { [key: string]: any };
-                const force: StringToAny = jsonObject as StringToAny;
-                force[k] = exportedValue;
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    type StringToAny = { [key: string]: any };
+                    const force: StringToAny = jsonObject as StringToAny;
+                    force[k] = exportedValue;
+                }
+                if (typeof v === "object") {
+                    applyExports(v);
+                } else if (Array.isArray(v)) {
+                    for (const entry of v) {
+                        if (typeof entry === "object") {
+                            applyExports(entry);
+                        }
+                    }
+                }
             }
-        }
+        };
+        applyExports(jsonObject);
 
         let abstractCell: AbstractCell | undefined;
 
