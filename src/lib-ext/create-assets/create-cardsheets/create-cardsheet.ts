@@ -172,18 +172,19 @@ export class CreateCardsheet extends AbstractCreateAssets {
 
             // Place output sheets in an "assetFilename" directory.
             const basename: string = path.basename(this._params.assetFilename);
+            const indexPart: string = numSheets > 1 ? `.${sheetIndex}` : "";
             const sheetPlan: SheetPlan = {
                 faceFilenameRelativeToAssetsTextures: path.join(
                     this._params.assetFilename,
-                    `${basename}.face.${sheetIndex}.jpg`
+                    `${basename}.face${indexPart}.jpg`
                 ),
                 backFilenameRelativeToAssetsTextures: path.join(
                     this._params.assetFilename,
-                    `${basename}.back.${sheetIndex}.jpg`
+                    `${basename}.back${indexPart}.jpg`
                 ),
                 templateFilenameRelativeToAssetsTemplates: path.join(
                     this._params.assetFilename,
-                    `${basename}.${sheetIndex}.json`
+                    `${basename}${indexPart}.json`
                 ),
                 cols: layout.cols,
                 rows: layout.rows,
