@@ -13,6 +13,16 @@ describe("ParseColor", () => {
         expect(color).toEqual(new Color(1, 0, 0, 1));
     });
 
+    test("parseColor parses a color (3)", () => {
+        const color = parseColor.parseColor("#f00");
+        expect(color).toEqual(new Color(1, 0, 0, 1));
+    });
+
+    test("parseColor parses a color (3)", () => {
+        const color = parseColor.parseColor("#ff000000");
+        expect(color).toEqual(new Color(1, 0, 0, 0));
+    });
+
     test("parseColor returns undefined when the input is invalid", () => {
         expect(parseColor.parseColor("invalid")).toBeUndefined();
     });
