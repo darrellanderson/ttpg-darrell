@@ -5,6 +5,7 @@ it("static", () => {
     const params: CreateD6Params = {
         assetFilename: "my-asset-filename",
         faceSizePixel: { width: 1, height: 1 },
+        tags: ["my-tag"],
         templateName: "my-template-name",
         faces: [],
     };

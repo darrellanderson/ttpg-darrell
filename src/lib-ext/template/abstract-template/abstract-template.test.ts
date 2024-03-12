@@ -10,6 +10,7 @@ it("set, copyAndFillBasicFields", () => {
     const template: TemplateType = new MyTemplate()
         .setGuidFrom("my-guid")
         .setScriptName("my-script-name")
+        .setTags(["my-tag"])
         .setTemplateMetadata("my-template-metadata")
         .setTemplateName("my-template-name")
         .copyAndFillBasicFields({});
@@ -18,6 +19,7 @@ it("set, copyAndFillBasicFields", () => {
         Metadata: "my-template-metadata",
         Name: "my-template-name",
         ScriptName: "my-script-name",
+        Tags: ["my-tag"],
     });
 });
 

@@ -97,15 +97,21 @@ export class CreateD6 extends AbstractCreateAssets {
 
         const d6template: D6Template = new D6Template()
             .setGuidFrom(this._params.assetFilename)
+            .setTags(this._params.tags ?? [])
             .setTemplateMetadata(this._params.templateMetadata ?? "")
             .setTemplateName(this._params.templateName)
             .setTexturePathRelativeToAssetsTextures(
                 texturePathRelativeToAssetsTextures
             );
+
         for (let i = 0; i < 6; i++) {
             const face = this._params.faces[i];
-            if (face?.metadata) {
-                d6template.setFaceMetadata(i, face.metadata);
+            if (typeof face?.metadata === "object") {
+                const metadata: string = JSON.stringify(face?.metadata);
+                d6template.setFaceMetadata(i, metadata);
+            } else if (typeof face?.metadata === "string") {
+                const metadata: string = face?.metadata;
+                d6template.setFaceMetadata(i, metadata);
             }
             if (face?.name) {
                 d6template.setFaceName(i, face.name);

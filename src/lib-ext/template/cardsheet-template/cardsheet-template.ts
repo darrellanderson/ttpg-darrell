@@ -67,7 +67,7 @@ export class CardsheetTemplate extends AbstractTemplate {
         template.NumHorizontal = this._numCols;
         template.NumVertical = this._numRows;
         template.Width = this._cardWidth;
-        template.height = this._cardHeight;
+        template.Height = this._cardHeight;
 
         this._cards.forEach((card: CardEntry, index: number) => {
             template.Indices.push(index);

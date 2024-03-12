@@ -62,7 +62,7 @@ it("toTemplate", () => {
         NumHorizontal: 1,
         NumVertical: 2,
         Width: 3,
-        Height: 0,
+        Height: 4,
         Thickness: 0.05,
         HiddenInHand: true,
         UsedWithCardHolders: true,
@@ -83,7 +83,7 @@ it("toTemplate", () => {
             "0": ["my-tag"],
         },
         GroundAccessibility: "ZoomAndContext",
-        height: 4,
+        Tags: [],
     });
 });
 

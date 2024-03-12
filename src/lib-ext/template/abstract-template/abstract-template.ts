@@ -8,6 +8,7 @@ export abstract class AbstractTemplate {
     private _templateMetadata: string = "";
     private _templateName: string = "";
     private _scriptName: string = "";
+    private _tags: Array<string> = [];
 
     constructor() {}
 
@@ -20,6 +21,11 @@ export abstract class AbstractTemplate {
      */
     setGuidFrom(guidFrom: string): this {
         this._guidFrom = guidFrom;
+        return this;
+    }
+
+    setTags(tags: Array<string>): this {
+        this._tags = tags;
         return this;
     }
 
@@ -65,6 +71,7 @@ export abstract class AbstractTemplate {
         template.Name = this._templateName;
         template.Metadata = this._templateMetadata;
         template.ScriptName = this._scriptName;
+        template.Tags = this._tags;
 
         return template;
     }

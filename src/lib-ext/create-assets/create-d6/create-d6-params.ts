@@ -16,6 +16,8 @@ export const CreateD6ParamsSchema = z
             })
             .strict(),
 
+        tags: z.array(z.string().min(1)).optional(),
+
         // Name in object library.
         templateName: z.string().min(1),
         templateMetadata: z.string().optional(),
@@ -25,7 +27,10 @@ export const CreateD6ParamsSchema = z
                 .object({
                     image: z.union([z.string(), ZBaseCellSchema]),
                     name: z.string().optional(),
-                    metadata: z.string().optional(),
+                    metadata: z.union([
+                        z.string().optional(),
+                        z.object({}).passthrough(),
+                    ]),
                 })
                 .strict()
         ),
