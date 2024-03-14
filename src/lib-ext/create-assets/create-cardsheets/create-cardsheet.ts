@@ -341,7 +341,8 @@ export class CreateCardsheet extends AbstractCreateAssets {
                 sheetPlan.faceFilenameRelativeToAssetsTextures,
                 backTexture,
                 backIndex
-            );
+            )
+            .setTags(this._params.applyAllTags ?? []);
         for (const cardEntry of sheetPlan.cardEntries) {
             sheetTemplate.addCard(cardEntry);
         }
