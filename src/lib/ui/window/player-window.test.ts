@@ -4,6 +4,13 @@ import { WindowParams, WindowWidgetParams } from "./window-params";
 import { PlayerWindow } from "./player-window";
 import { MockPlayer } from "ttpg-mock";
 
+it("static scale", () => {
+    const playerSlot: number = 7;
+    expect(PlayerWindow._loadScale(playerSlot)).toBe(1);
+    PlayerWindow._saveScale(playerSlot, 1.2);
+    expect(PlayerWindow._loadScale(playerSlot)).toBe(1.2);
+});
+
 it("attach/detach (screen, defaults)", () => {
     const params: WindowParams = {
         size: {

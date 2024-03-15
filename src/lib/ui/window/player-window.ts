@@ -31,6 +31,7 @@ export class PlayerWindow {
     private static readonly TITLE_HEIGHT = 30;
     private static readonly TITLE_FONT_SIZE = 24;
     private static readonly WORLD_SCALE = 2;
+    private static readonly PLAYER_SLOT_TO_SCALE_KEY = "pwScale";
 
     private readonly _params: WindowParams;
     private readonly _playerSlot: number;
@@ -45,6 +46,24 @@ export class PlayerWindow {
     public readonly onStateChanged = new TriggerableMulticastDelegate<
         () => void
     >();
+
+    static _saveScale(playerSlot: number, scale: number): void {
+        let json: string =
+            world.getSavedData(PlayerWindow.PLAYER_SLOT_TO_SCALE_KEY) ?? "{}";
+        const playerSlotToScale: { [playerSlot: number]: number } =
+            JSON.parse(json);
+        playerSlotToScale[playerSlot] = scale;
+        json = JSON.stringify(playerSlotToScale);
+        world.setSavedData(json, PlayerWindow.PLAYER_SLOT_TO_SCALE_KEY);
+    }
+
+    static _loadScale(playerSlot: number): number {
+        const json: string =
+            world.getSavedData(PlayerWindow.PLAYER_SLOT_TO_SCALE_KEY) ?? "{}";
+        const playerSlotToScale: { [playerSlot: number]: number } =
+            JSON.parse(json);
+        return playerSlotToScale[playerSlot] ?? 1;
+    }
 
     private readonly _onClickClose: (
         button: ImageButton,
@@ -92,6 +111,7 @@ export class PlayerWindow {
         this.detach();
         this._scale -= PlayerWindow.WORLD_SCALE_DELTA;
         this._scale = Math.max(this._scale, 0.3);
+        PlayerWindow._saveScale(this._playerSlot, this._scale);
         this.attach();
         this.onStateChanged.trigger();
     }).get();
@@ -120,6 +140,9 @@ export class PlayerWindow {
         this._params = params;
         this._playerSlot = playerSlot;
         this._target = params.defaultTarget ?? "screen";
+
+        // Use scale from last time player scaled a window.
+        this._scale = PlayerWindow._loadScale(playerSlot);
     }
 
     _getState(): string | undefined {
