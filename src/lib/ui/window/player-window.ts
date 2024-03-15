@@ -29,6 +29,7 @@ const packageId = refPackageId;
 export class PlayerWindow {
     private static readonly WORLD_SCALE_DELTA = 0.1;
     private static readonly TITLE_HEIGHT = 30;
+    private static readonly TITLE_FONT_SIZE = 24;
     private static readonly WORLD_SCALE = 2;
 
     private readonly _params: WindowParams;
@@ -146,6 +147,7 @@ export class PlayerWindow {
 
     private _getLayoutSizes(): {
         titleHeight: number;
+        titleFontSize: number;
         spacerHeight: number;
         padding: number;
         width: number;
@@ -155,6 +157,7 @@ export class PlayerWindow {
             this._scale *
             (this._target === "screen" ? 1 : PlayerWindow.WORLD_SCALE);
         const titleHeight = Math.ceil(PlayerWindow.TITLE_HEIGHT * scale);
+        const titleFontSize = PlayerWindow.TITLE_FONT_SIZE * scale; // not integer
         const spacerHeight = Math.ceil(titleHeight * 0.1);
         const padding = spacerHeight * 2;
         const width = Math.ceil(this._params.size.width * scale) + padding * 2;
@@ -165,14 +168,26 @@ export class PlayerWindow {
                 : spacerHeight +
                   Math.ceil(this._params.size.height * scale + padding * 2)) +
             padding * 2; // pad top, below title, below spacer, bottom
-        return { titleHeight, spacerHeight, padding, width, height };
+        return {
+            titleHeight,
+            titleFontSize,
+            spacerHeight,
+            padding,
+            width,
+            height,
+        };
     }
 
     public _createWidget(): Widget {
-        const { titleHeight, spacerHeight, padding, width, height } =
-            this._getLayoutSizes();
+        const {
+            titleHeight,
+            titleFontSize,
+            spacerHeight,
+            padding,
+            width,
+            height,
+        } = this._getLayoutSizes();
         const buttonSize = titleHeight - padding;
-        const fontSize = titleHeight * 0.8;
 
         const titleBarPanel: HorizontalBox = new HorizontalBox()
             .setChildDistance(padding)
@@ -180,7 +195,7 @@ export class PlayerWindow {
 
         const title: Text = new Text()
             .setBold(true)
-            .setFontSize(fontSize)
+            .setFontSize(titleFontSize)
             .setText(this._params.title ?? "");
         titleBarPanel.addChild(new Widget(), 1);
 
@@ -237,10 +252,13 @@ export class PlayerWindow {
         }
 
         const spacer = new Border().setColor([0, 0, 0, 0]);
-        const child: Widget = this._params.createWidget(
-            this._scale *
-                (this._target === "screen" ? 1 : PlayerWindow.WORLD_SCALE)
-        );
+        const child: Widget = this._params.createWidget({
+            scale:
+                this._scale *
+                (this._target === "screen" ? 1 : PlayerWindow.WORLD_SCALE),
+            fontSize: titleFontSize,
+            spacing: padding,
+        });
         const window: Canvas = new Canvas()
             .addChild(new Border(), 0, 0, width, height)
             .addChild(

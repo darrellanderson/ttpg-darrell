@@ -1,6 +1,6 @@
 import { Rotator, Text, Vector, Widget } from "@tabletop-playground/api";
 import { clickAll } from "../../jest-util/click-all/click-all";
-import { WindowParams } from "./window-params";
+import { WindowParams, WindowWidgetParams } from "./window-params";
 import { PlayerWindow } from "./player-window";
 import { MockPlayer } from "ttpg-mock";
 
@@ -10,8 +10,8 @@ it("attach/detach (screen, defaults)", () => {
             width: 10,
             height: 10,
         },
-        createWidget: (scale: number): Widget => {
-            return new Text().setFontSize(scale * 8);
+        createWidget: (widgetParams: WindowWidgetParams): Widget => {
+            return new Text().setFontSize(widgetParams.scale * 8);
         },
     };
     const playerSlot: number = 7;
@@ -34,8 +34,8 @@ it("attach/detach (screen, anchor, pos)", () => {
                 v: 1,
             },
         },
-        createWidget: (scale: number): Widget => {
-            return new Text().setFontSize(scale * 8);
+        createWidget: (widgetParams: WindowWidgetParams): Widget => {
+            return new Text().setFontSize(widgetParams.scale * 8);
         },
     };
     const playerSlot: number = 7;
@@ -49,8 +49,8 @@ it("attach/detach (world, defaults)", () => {
             width: 10,
             height: 10,
         },
-        createWidget: (scale: number): Widget => {
-            return new Text().setFontSize(scale * 8);
+        createWidget: (widgetParams: WindowWidgetParams): Widget => {
+            return new Text().setFontSize(widgetParams.scale * 8);
         },
     };
     const playerSlot: number = 7;
@@ -72,8 +72,8 @@ it("attach/detach (world, anchor, pos)", () => {
             pos: [2, 3, 4],
             rot: [5, 6, 7],
         },
-        createWidget: (scale: number): Widget => {
-            return new Text().setFontSize(scale * 8);
+        createWidget: (widgetParams: WindowWidgetParams): Widget => {
+            return new Text().setFontSize(widgetParams.scale * 8);
         },
     };
     const playerSlot: number = 7;
@@ -95,8 +95,8 @@ it("attach/detach (world, anchor, pos as vector/rotqtor)", () => {
             pos: new Vector(2, 3, 4),
             rot: new Rotator(5, 6, 7),
         },
-        createWidget: (scale: number): Widget => {
-            return new Text().setFontSize(scale * 8);
+        createWidget: (widgetParams: WindowWidgetParams): Widget => {
+            return new Text().setFontSize(widgetParams.scale * 8);
         },
     };
     const playerSlot: number = 7;
@@ -110,8 +110,8 @@ it("click", () => {
             width: 10,
             height: 10,
         },
-        createWidget: (scale: number): Widget => {
-            return new Text().setFontSize(scale * 8);
+        createWidget: (widgetParams: WindowWidgetParams): Widget => {
+            return new Text().setFontSize(widgetParams.scale * 8);
         },
     };
     const playerSlot: number = 7;
@@ -127,8 +127,8 @@ it("state", () => {
             width: 10,
             height: 10,
         },
-        createWidget: (scale: number): Widget => {
-            return new Text().setFontSize(scale * 8);
+        createWidget: (widgetParams: WindowWidgetParams): Widget => {
+            return new Text().setFontSize(widgetParams.scale * 8);
         },
     };
     const playerSlot: number = 7;
@@ -143,8 +143,8 @@ it("vr", () => {
             width: 10,
             height: 10,
         },
-        createWidget: (scale: number): Widget => {
-            return new Text().setFontSize(scale * 8);
+        createWidget: (widgetParams: WindowWidgetParams): Widget => {
+            return new Text().setFontSize(widgetParams.scale * 8);
         },
     };
     const playerSlot: number = 7;
