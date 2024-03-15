@@ -18,6 +18,10 @@ export class Window {
         () => void
     >();
 
+    public readonly onAllClosed = new TriggerableMulticastDelegate<
+        () => void
+    >();
+
     _getState(): string | undefined {
         const playerSlotToState: { [key: number]: string } = {};
         let hasState: boolean = false;
@@ -86,6 +90,14 @@ export class Window {
                 this._applyState(state);
             }
         }
+
+        // Event all windows are closed, either by players or by detach here.
+        this.onStateChanged.add(() => {
+            const state: string = this._getState() ?? "";
+            if (state.length === 0) {
+                this.onAllClosed.trigger();
+            }
+        });
     }
 
     attach(): this {

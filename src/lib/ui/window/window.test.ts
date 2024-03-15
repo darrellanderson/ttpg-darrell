@@ -29,11 +29,18 @@ it("attach/detach", () => {
         },
     };
     const window = new Window(params, [1, 2, 3]);
+    let onAllClosedCount = 0;
+    window.onAllClosed.add(() => {
+        onAllClosedCount++;
+    });
     expect(window._getState()).toBeUndefined();
+    expect(onAllClosedCount).toEqual(0);
     window.attach();
     expect(window._getState()).toBeDefined();
+    expect(onAllClosedCount).toEqual(0);
     window.detach();
     expect(window._getState()).toBeUndefined();
+    expect(onAllClosedCount).toEqual(1);
 });
 
 it("getState/applyState", () => {
