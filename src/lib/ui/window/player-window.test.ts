@@ -133,8 +133,8 @@ it("state", () => {
     };
     const playerSlot: number = 7;
     const playerWindow = new PlayerWindow(params, playerSlot).attach();
-    const state = playerWindow.getState();
-    playerWindow.applyState(state);
+    const state: string | undefined = playerWindow._getState();
+    playerWindow._applyState(state ?? "");
 });
 
 it("vr", () => {

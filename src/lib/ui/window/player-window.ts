@@ -122,7 +122,10 @@ export class PlayerWindow {
         this._target = params.defaultTarget ?? "screen";
     }
 
-    public getState(): string {
+    _getState(): string | undefined {
+        if (!this._screenUi && !this._worldUi) {
+            return undefined;
+        }
         return JSON.stringify({
             scale: this._scale,
             target: this._target,
@@ -131,7 +134,10 @@ export class PlayerWindow {
         });
     }
 
-    public applyState(state: string): void {
+    _applyState(state: string): void {
+        if (state.length === 0) {
+            return;
+        }
         const parsed = JSON.parse(state);
         this._scale = parsed.scale;
         this._target = parsed.target;

@@ -18,17 +18,22 @@ export class Window {
         () => void
     >();
 
-    public getState(): string {
+    _getState(): string | undefined {
         const playerSlotToState: { [key: number]: string } = {};
+        let hasState: boolean = false;
+
         for (const playerWindow of this._playerWindows) {
             const playerSlot: number = playerWindow.getPlayerSlot();
-            const state: string = playerWindow.getState();
-            playerSlotToState[playerSlot] = state;
+            const state: string | undefined = playerWindow._getState();
+            if (state) {
+                playerSlotToState[playerSlot] = state;
+                hasState = true;
+            }
         }
-        return JSON.stringify(playerSlotToState);
+        return hasState ? JSON.stringify(playerSlotToState) : undefined;
     }
 
-    public applyState(state: string): void {
+    _applyState(state: string): void {
         if (state.length === 0) {
             return;
         }
@@ -36,12 +41,21 @@ export class Window {
         for (const playerWindow of this._playerWindows) {
             const playerSlot: number = playerWindow.getPlayerSlot();
             const state: string | undefined = playerSlotToState[playerSlot];
-            if (state) {
-                playerWindow.applyState(state);
-            }
+            playerWindow._applyState(state ?? "");
         }
     }
 
+    /**
+     * Constructor.
+     *
+     * If persistenceKey is provided, the window top-level state will be saved
+     * and restored.  Window contents state is NOT persisted, caller should
+     * listen for state changes and persist as needed.
+     *
+     * @param params
+     * @param playerSlots : which players should see this window
+     * @param persistenceKey : optional, save window state
+     */
     constructor(
         params: WindowParams,
         playerSlots: Array<number>,
@@ -62,14 +76,14 @@ export class Window {
         if (persistenceKey) {
             // Save persistent data on state change.
             this.onStateChanged.add(() => {
-                const state: string = this.getState();
+                const state: string = this._getState() ?? "";
                 world.setSavedData(state, persistenceKey);
             });
 
             // Apply any persistent data.
             const state: string = world.getSavedData(persistenceKey);
             if (state && state.length > 0) {
-                this.applyState(state);
+                this._applyState(state);
             }
         }
     }

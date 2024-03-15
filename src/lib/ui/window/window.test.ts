@@ -28,7 +28,12 @@ it("attach/detach", () => {
                 .setOverrideWidth(1 * widgetParams.scale);
         },
     };
-    new Window(params, [1, 2, 3]).attach().detach();
+    const window = new Window(params, [1, 2, 3]);
+    expect(window._getState()).toBeUndefined();
+    window.attach();
+    expect(window._getState()).toBeDefined();
+    window.detach();
+    expect(window._getState()).toBeUndefined();
 });
 
 it("getState/applyState", () => {
@@ -41,9 +46,9 @@ it("getState/applyState", () => {
         },
     };
     const window: Window = new Window(params, [1, 2, 3]);
-    const state: string = window.getState();
-    window.applyState(state);
-    window.applyState(""); // ignored
+    const state: string | undefined = window._getState();
+    window._applyState(state ?? "");
+    window._applyState(""); // ignored
 });
 
 it("create, click", () => {
