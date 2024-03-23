@@ -7,11 +7,8 @@ export class ParseColor {
 
     parseColor(hexColor: string): Color | undefined {
         const m: RegExpMatchArray | null = hexColor.match(this._hexColorRegex);
+        const hexStr: string = m?.[1] ?? "";
         if (!m) {
-            return undefined;
-        }
-        const hexStr: string | undefined = m[1];
-        if (hexStr === undefined) {
             return undefined;
         }
         if (hexStr.length !== 3 && hexStr.length !== 6 && hexStr.length !== 8) {
