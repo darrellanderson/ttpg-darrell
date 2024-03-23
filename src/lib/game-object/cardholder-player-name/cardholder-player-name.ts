@@ -3,14 +3,12 @@ import {
     Button,
     CardHolder,
     Color,
-    LayoutBox,
     Player,
     Text,
     TextJustification,
     UIElement,
     UIPresentationStyle,
     Vector,
-    VerticalAlignment,
     Widget,
     WidgetSwitcher,
     globalEvents,
@@ -27,7 +25,6 @@ export class CardHolderPlayerName {
     private readonly _cardHolder: CardHolder;
     private readonly _nameText: Text;
     private readonly _nameBorder: Border;
-    private readonly _nameBox: LayoutBox;
     private readonly _takeSeatButton: Button;
     private readonly _widgetSwitcher: WidgetSwitcher;
     private readonly _ui: UIElement;
@@ -45,15 +42,12 @@ export class CardHolderPlayerName {
         this._nameBorder = new Border()
             .setColor([0, 0, 0, 0.75])
             .setChild(this._nameText);
-        this._nameBox = new LayoutBox()
-            .setVerticalAlignment(VerticalAlignment.Center)
-            .setChild(this._nameBorder);
         this._takeSeatButton = new Button()
             .setBold(true)
             .setText(" TAKE SEAT ");
         this._widgetSwitcher = new WidgetSwitcher()
             .addChild(this._takeSeatButton)
-            .addChild(this._nameBox);
+            .addChild(this._nameBorder);
 
         this._ui = new UIElement();
         this._ui.presentationStyle = UIPresentationStyle.ViewAligned;
@@ -136,7 +130,7 @@ export class CardHolderPlayerName {
         for (const player of world.getAllPlayers()) {
             if (player.getSlot() === playerSlot) {
                 this._nameText.setText(` ${player.getName()} `);
-                widget = this._nameBox;
+                widget = this._nameBorder;
                 break;
             }
         }
