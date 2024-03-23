@@ -15,6 +15,7 @@ it("constructor", () => {
         },
     };
     const window = new Window(params, [1, 2, 3], "@window/test");
+    window.attach();
     window.onStateChanged.trigger();
     new Window(params, [1, 2, 3], "@window/test"); // again, load persistent state
 });

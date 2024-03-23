@@ -139,9 +139,12 @@ it("state", () => {
         },
     };
     const playerSlot: number = 7;
-    const playerWindow = new PlayerWindow(params, playerSlot).attach();
-    const state: string | undefined = playerWindow._getState();
+    const playerWindow = new PlayerWindow(params, playerSlot);
+    let state: string | undefined = playerWindow._getState();
+    playerWindow.attach();
+    state = playerWindow._getState();
     playerWindow._applyState(state ?? "");
+    playerWindow._applyState("");
 });
 
 it("vr", () => {

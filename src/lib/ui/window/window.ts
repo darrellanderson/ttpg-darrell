@@ -45,7 +45,9 @@ export class Window {
         for (const playerWindow of this._playerWindows) {
             const playerSlot: number = playerWindow.getPlayerSlot();
             const state: string | undefined = playerSlotToState[playerSlot];
-            playerWindow._applyState(state ?? "");
+            if (state) {
+                playerWindow._applyState(state);
+            }
         }
     }
 

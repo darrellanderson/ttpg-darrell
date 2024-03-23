@@ -153,7 +153,7 @@ export class PlayerWindow {
             scale: this._scale,
             target: this._target,
             collapsed: this._collapsed,
-            attached: this._screenUi || this._worldUi ? true : false,
+            attached: true, // result is undefined if detached
         });
     }
 
