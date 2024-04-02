@@ -3,11 +3,11 @@
  *
  * 1. A singleton card gets added to a deck/second card.
  *
- * 2. A singleton card gets fromved from a deck.
+ * 2. A singleton card gets removed from a deck.
  *
  * 3. A deck has its second-last card removed, making that deck a singleton.
  *
- * Scripts may wish to offer content menu items for singleton cards, but
+ * Scripts may wish to offer context menu items for singleton cards, but
  * not when they become a deck (or vice versa).
  *
  * If one adds a listener during global init, it will be called next frame with
