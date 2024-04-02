@@ -76,13 +76,13 @@ export abstract class NSID {
      */
     static parse(nsid: string): ParsedNSID | undefined {
         const m = nsid.match(/^([^:]+):([^/]+)\/([^|]+)\|?(.*)$/);
+        const type: string = m?.[1] ?? "";
+        const source: string = m?.[2] ?? "";
+        const name: string = m?.[3] ?? "";
+        const extra: string = m?.[4] ?? "";
         if (!m) {
             return undefined;
         }
-        const type: string = m[1] ?? "";
-        const source: string = m[2] ?? "";
-        const name: string = m[3] ?? "";
-        const extra: string = m[4] ?? "";
         return {
             nsid: nsid,
             typeParts: type.split("."),

@@ -107,3 +107,20 @@ it("remove (singleton)", () => {
     expect(heap.removeMin()).toEqual("one");
     expect(heap.removeMin()).toBeUndefined();
 });
+
+it("multiple add/remove", () => {
+    const heap = new Heap<string>();
+    heap.add("1", 1);
+    heap.add("3", 3);
+    heap.add("5", 5);
+    heap.add("2", 2);
+    heap.add("4", 4);
+    heap.add("6", 6);
+
+    expect(heap.removeMin()).toEqual("1");
+    expect(heap.removeMin()).toEqual("2");
+    expect(heap.removeMin()).toEqual("3");
+    expect(heap.removeMin()).toEqual("4");
+    expect(heap.removeMin()).toEqual("5");
+    expect(heap.removeMin()).toEqual("6");
+});

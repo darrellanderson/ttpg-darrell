@@ -1,20 +1,21 @@
 import { LayoutBox, Widget, world } from "@tabletop-playground/api";
 import { MockPlayer } from "ttpg-mock";
 import { Window } from "./window";
-import { WindowParams } from "./window-params";
+import { WindowParams, WindowWidgetParams } from "./window-params";
 import { clickAll } from "../../jest-util/click-all/click-all";
 
 it("constructor", () => {
     new MockPlayer(); // create player to add PlayerWindow
     const params: WindowParams = {
         size: { width: 1, height: 1 },
-        createWidget: (scale: number): Widget => {
+        createWidget: (widgetParams: WindowWidgetParams): Widget => {
             return new LayoutBox()
-                .setOverrideHeight(1 * scale)
-                .setOverrideWidth(1 * scale);
+                .setOverrideHeight(1 * widgetParams.scale)
+                .setOverrideWidth(1 * widgetParams.scale);
         },
     };
     const window = new Window(params, [1, 2, 3], "@window/test");
+    window.attach();
     window.onStateChanged.trigger();
     new Window(params, [1, 2, 3], "@window/test"); // again, load persistent state
 });
@@ -22,38 +23,50 @@ it("constructor", () => {
 it("attach/detach", () => {
     const params: WindowParams = {
         size: { width: 1, height: 1 },
-        createWidget: (scale: number): Widget => {
+        createWidget: (widgetParams: WindowWidgetParams): Widget => {
             return new LayoutBox()
-                .setOverrideHeight(1 * scale)
-                .setOverrideWidth(1 * scale);
+                .setOverrideHeight(1 * widgetParams.scale)
+                .setOverrideWidth(1 * widgetParams.scale);
         },
     };
-    new Window(params, [1, 2, 3]).attach().detach();
+    const window = new Window(params, [1, 2, 3]);
+    let onAllClosedCount = 0;
+    window.onAllClosed.add(() => {
+        onAllClosedCount++;
+    });
+    expect(window._getState()).toBeUndefined();
+    expect(onAllClosedCount).toEqual(0);
+    window.attach();
+    expect(window._getState()).toBeDefined();
+    expect(onAllClosedCount).toEqual(0);
+    window.detach();
+    expect(window._getState()).toBeUndefined();
+    expect(onAllClosedCount).toEqual(1);
 });
 
 it("getState/applyState", () => {
     const params: WindowParams = {
         size: { width: 1, height: 1 },
-        createWidget: (scale: number): Widget => {
+        createWidget: (widgetParams: WindowWidgetParams): Widget => {
             return new LayoutBox()
-                .setOverrideHeight(1 * scale)
-                .setOverrideWidth(1 * scale);
+                .setOverrideHeight(1 * widgetParams.scale)
+                .setOverrideWidth(1 * widgetParams.scale);
         },
     };
     const window: Window = new Window(params, [1, 2, 3]);
-    const state: string = window.getState();
-    window.applyState(state);
-    window.applyState(""); // ignored
+    const state: string | undefined = window._getState();
+    window._applyState(state ?? "");
+    window._applyState(""); // ignored
 });
 
 it("create, click", () => {
     new MockPlayer(); // create player to add PlayerWindow
     const params: WindowParams = {
         size: { width: 1, height: 1 },
-        createWidget: (scale: number): Widget => {
+        createWidget: (widgetParams: WindowWidgetParams): Widget => {
             return new LayoutBox()
-                .setOverrideHeight(1 * scale)
-                .setOverrideWidth(1 * scale);
+                .setOverrideHeight(1 * widgetParams.scale)
+                .setOverrideWidth(1 * widgetParams.scale);
         },
     };
     new Window(params, [1, 2, 3], "@window/test").attach();

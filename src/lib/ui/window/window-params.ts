@@ -10,6 +10,12 @@ export const WINDOW_BUTTON_ASSET = {
     TO_WORLD: "ui/window/to-world.png",
 } as const;
 
+export type WindowWidgetParams = {
+    scale: number;
+    fontSize: number; // suggested
+    spacing: number; // suggested
+};
+
 export type WindowParams = {
     title?: string;
 
@@ -44,5 +50,5 @@ export type WindowParams = {
         rot?: [pitch: number, yaw: number, roll: number] | Rotator;
     };
 
-    createWidget: (scale: number) => Widget;
+    createWidget: (widgetParams: WindowWidgetParams) => Widget;
 };
