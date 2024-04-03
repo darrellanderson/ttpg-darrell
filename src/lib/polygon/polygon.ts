@@ -132,6 +132,20 @@ export class Polygon {
      * @returns {Polygon} Inset polygon
      */
     inset(amount: number): Polygon {
+        // Math requires prev/next be different from each point.
+        // If the polygon is closed, temporarily remove the last point,
+        // and add it back at the end (both in the inset and original polygons).
+        const head: Vector | undefined = this._polygon[0];
+        const tail: Vector | undefined =
+            this._polygon[this._polygon.length - 1];
+        const closed: boolean =
+            head && tail && head.subtract(tail).magnitudeSquared() < 0.01
+                ? true
+                : false;
+        if (closed) {
+            this._polygon.pop();
+        }
+
         const lineIntersection = function (
             a: { x: number; y: number },
             b: { x: number; y: number },
@@ -201,9 +215,9 @@ export class Polygon {
         };
 
         // Copy the first Z everywhere.
-        const z = this._polygon[0]?.z ?? 0;
-        const insetPoints = [];
-        const numVertices = this._polygon.length;
+        const z: number = this._polygon[0]?.z ?? 0;
+        const insetPoints: Array<Vector> = [];
+        const numVertices: number = this._polygon.length;
         for (let i = 0; i < numVertices; i++) {
             const prevPt: { x: number; y: number } | undefined =
                 this._polygon[(i + numVertices - 1) % numVertices];
@@ -215,6 +229,12 @@ export class Polygon {
                 const xy = insetCorner(prevPt, curPt, nextPt);
                 insetPoints.push(new Vector(xy.x, xy.y, z));
             }
+        }
+
+        const insetHead: Vector | undefined = insetPoints[0];
+        if (closed && head && insetHead) {
+            this._polygon.push(head.clone());
+            insetPoints.push(insetHead.clone());
         }
 
         return new Polygon(insetPoints);
