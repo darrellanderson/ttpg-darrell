@@ -61,7 +61,7 @@ export class Polygon {
      * @returns {Array.<Vector>} List of vertices.
      */
     getPoints(): Array<Vector> {
-        return this._polygon;
+        return this._polygon.map((p: Vector): Vector => p.clone());
     }
 
     /**
@@ -77,9 +77,6 @@ export class Polygon {
      * Is the point within the polygon's XY frame?
      *
      * @param {Vector} point
-     * @param {number} pos.x
-     * @param {number} pos.y
-     * @param {number} pos.z
      * @returns {boolean} True if point inside polygon
      */
     contains(point: Vector): boolean {
@@ -147,16 +144,16 @@ export class Polygon {
         }
 
         const lineIntersection = function (
-            a: { x: number; y: number },
-            b: { x: number; y: number },
-            c: { x: number; y: number },
-            d: { x: number; y: number }
-        ): { x: number; y: number } {
+            a: Vector,
+            b: Vector,
+            c: Vector,
+            d: Vector
+        ): Vector {
             // Translate so A is at the origin.
             //A = { x : 0, y : 0 }
-            const B = { x: b.x - a.x, y: b.y - a.y };
-            let C = { x: c.x - a.x, y: c.y - a.y };
-            let D = { x: d.x - a.x, y: d.y - a.y };
+            const B: Vector = b.subtract(a);
+            let C: Vector = c.subtract(a);
+            let D: Vector = d.subtract(a);
 
             const distAB = Math.hypot(B.x, B.y);
 
@@ -164,46 +161,62 @@ export class Polygon {
             const cos = B.x / distAB;
             const sin = B.y / distAB;
             //B = { x : distAB, y : 0 }
-            C = { x: C.x * cos + C.y * sin, y: C.y * cos - C.x * sin };
-            D = { x: D.x * cos + D.y * sin, y: D.y * cos - D.x * sin };
+            C = new Vector(C.x * cos + C.y * sin, C.y * cos - C.x * sin, c.z);
+            D = new Vector(D.x * cos + D.y * sin, D.y * cos - D.x * sin, d.z);
 
             // Get intersection on the AB x axis line.
             const ABx = D.x + ((C.x - D.x) * D.y) / (D.y - C.y);
 
             // Reverse rotation, translation.
-            return { x: a.x + ABx * cos, y: a.y + ABx * sin };
+            return new Vector(a.x + ABx * cos, a.y + ABx * sin, a.z);
         };
 
         const insetCorner = function (
-            prev: { x: number; y: number },
-            cur: { x: number; y: number },
-            next: { x: number; y: number }
-        ): { x: number; y: number } {
+            prev: Vector,
+            cur: Vector,
+            next: Vector
+        ): Vector {
             // Get line segments (preserve winding direction) and distances.
-            const d1 = { x: cur.x - prev.x, y: cur.y - prev.y };
-            const dist1 = Math.hypot(d1.x, d1.y);
-            const d2 = { x: next.x - cur.x, y: next.y - cur.y };
-            const dist2 = Math.hypot(d2.x, d2.y);
+            const d1: Vector = cur.subtract(prev);
+            const dist1: number = Math.hypot(d1.x, d1.y);
+            const d2: Vector = next.subtract(cur);
+            const dist2: number = Math.hypot(d2.x, d2.y);
             if (dist1 <= 0 || dist2 <= 0) {
                 return cur; // require non-zero edges
             }
 
             // Inset line segments prev->cur and cur->next.
-            const inset1 = {
-                x: (d1.y * amount) / dist1,
-                y: (-d1.x * amount) / dist1,
-            };
-            const prev1 = {
-                x: (prev?.x ?? 0) + inset1.x,
-                y: (prev?.y ?? 0) + inset1.y,
-            };
-            const prev2 = { x: cur.x + inset1.x, y: cur.y + inset1.y };
-            const inset2 = {
-                x: (d2.y * amount) / dist2,
-                y: (-d2.x * amount) / dist2,
-            };
-            const next1 = { x: cur.x + inset2.x, y: cur.y + inset2.y };
-            const next2 = { x: next.x + inset2.x, y: next.y + inset2.y };
+            const inset1: Vector = new Vector(
+                (d1.y * amount) / dist1,
+                (-d1.x * amount) / dist1,
+                cur.z
+            );
+            const prev1: Vector = new Vector(
+                (prev?.x ?? 0) + inset1.x,
+                (prev?.y ?? 0) + inset1.y,
+                cur.z
+            );
+            const prev2: Vector = new Vector(
+                cur.x + inset1.x,
+                cur.y + inset1.y,
+                cur.z
+            );
+            const inset2: Vector = new Vector(
+                (d2.y * amount) / dist2,
+                (-d2.x * amount) / dist2,
+                cur.z
+            );
+
+            const next1: Vector = new Vector(
+                cur.x + inset2.x,
+                cur.y + inset2.y,
+                cur.z
+            );
+            const next2: Vector = new Vector(
+                next.x + inset2.x,
+                next.y + inset2.y,
+                cur.z
+            );
 
             // If both inset line segments share an endpoint, lines are colinear.
             if (prev2.x == next1.x && prev2.y == next1.y) {
@@ -219,11 +232,10 @@ export class Polygon {
         const insetPoints: Array<Vector> = [];
         const numVertices: number = this._polygon.length;
         for (let i = 0; i < numVertices; i++) {
-            const prevPt: { x: number; y: number } | undefined =
+            const prevPt: Vector | undefined =
                 this._polygon[(i + numVertices - 1) % numVertices];
-            const curPt: { x: number; y: number } | undefined =
-                this._polygon[i];
-            const nextPt: { x: number; y: number } | undefined =
+            const curPt: Vector | undefined = this._polygon[i];
+            const nextPt: Vector | undefined =
                 this._polygon[(i + 1) % numVertices];
             if (prevPt && curPt && nextPt) {
                 const xy = insetCorner(prevPt, curPt, nextPt);
