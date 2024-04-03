@@ -12,28 +12,91 @@ export type PolygonBoundingBox = {
  */
 export class Polygon {
     private readonly _polygon: Array<Vector>;
-    private readonly _boundingBox: PolygonBoundingBox;
+    private _boundingBox: PolygonBoundingBox | undefined;
+
+    /**
+     * Join polygons sharing the tail of one with the head of another.
+     * @param polygons
+     * @returns
+     */
+    static conjoin(polygons: Array<Polygon>): Array<Polygon> {
+        const result: Array<Polygon> = [];
+        let watchdog: number = 0;
+        let grow: Polygon | undefined = undefined;
+        let found: boolean = false;
+        while (polygons.length > 0) {
+            watchdog += 1;
+            if (watchdog > 10000) {
+                throw new Error("stuck?");
+            }
+            // If the last loop failed, start a new segment.
+            if (!found) {
+                const head: Polygon | undefined = polygons.shift();
+                if (!head) {
+                    throw new Error("no head (cannot happen)");
+                }
+                grow = head;
+                result.push(grow);
+            }
+            if (!grow) {
+                throw new Error("no grow (cannot happen)");
+            }
+            found = false;
+
+            const points: Array<Vector> = grow.getPoints();
+            const growHead: Vector | undefined = points[0];
+            const growTail: Vector | undefined = points[points.length - 1];
+            if (!growHead || !growTail) {
+                throw new Error("no grow head or tail (cannot happen)");
+            }
+
+            // Keep growing.
+            for (const polygon of polygons) {
+                a; // head
+                b; // tail
+                let d = growHead.subtract(b).magnitudeSquared();
+                if (d < 0.1) {
+                    // Prepend
+                    grow.line.unshift(a);
+                    found = true;
+                    segments.splice(i, 1);
+                    break;
+                }
+
+                d = growHead.subtract(a).magnitudeSquared();
+                if (d < 0.1) {
+                    // Prepend
+                    grow.line.unshift(b);
+                    found = true;
+                    segments.splice(i, 1);
+                    break;
+                }
+
+                d = growTail.subtract(a).magnitudeSquared();
+                if (d < 0.1) {
+                    // Append
+                    grow.line.push(b);
+                    found = true;
+                    segments.splice(i, 1);
+                    break;
+                }
+
+                d = growTail.subtract(b).magnitudeSquared();
+                if (d < 0.1) {
+                    // Append
+                    grow.line.push(a);
+                    found = true;
+                    segments.splice(i, 1);
+                    break;
+                }
+            }
+        }
+
+        return result;
+    }
 
     constructor(points: Array<Vector>) {
         this._polygon = points;
-        this._boundingBox = {
-            left: Number.MAX_VALUE,
-            top: Number.MAX_VALUE,
-            right: Number.MIN_VALUE,
-            bottom: Number.MIN_VALUE,
-        };
-        for (const point of points) {
-            this._boundingBox.left = Math.min(point.x, this._boundingBox.left);
-            this._boundingBox.top = Math.min(point.y, this._boundingBox.top);
-            this._boundingBox.right = Math.max(
-                point.x,
-                this._boundingBox.right
-            );
-            this._boundingBox.bottom = Math.max(
-                point.y,
-                this._boundingBox.bottom
-            );
-        }
     }
 
     /**
@@ -70,6 +133,32 @@ export class Polygon {
      * @returns {Object} Dictionary from { left, top, right, bottom } to numbers.
      */
     getBoundingBox(): PolygonBoundingBox {
+        if (!this._boundingBox) {
+            this._boundingBox = {
+                left: Number.MAX_VALUE,
+                top: Number.MAX_VALUE,
+                right: Number.MIN_VALUE,
+                bottom: Number.MIN_VALUE,
+            };
+            for (const point of this._polygon) {
+                this._boundingBox.left = Math.min(
+                    point.x,
+                    this._boundingBox.left
+                );
+                this._boundingBox.top = Math.min(
+                    point.y,
+                    this._boundingBox.top
+                );
+                this._boundingBox.right = Math.max(
+                    point.x,
+                    this._boundingBox.right
+                );
+                this._boundingBox.bottom = Math.max(
+                    point.y,
+                    this._boundingBox.bottom
+                );
+            }
+        }
         return this._boundingBox;
     }
 
@@ -80,12 +169,14 @@ export class Polygon {
      * @returns {boolean} True if point inside polygon
      */
     contains(point: Vector): boolean {
+        const bb: PolygonBoundingBox = this.getBoundingBox();
+
         // Fast-reject based on bounding box.
         if (
-            point.x < this._boundingBox.left ||
-            point.y < this._boundingBox.top ||
-            point.x > this._boundingBox.right ||
-            point.y > this._boundingBox.bottom
+            point.x < bb.left ||
+            point.y < bb.top ||
+            point.x > bb.right ||
+            point.y > bb.bottom
         ) {
             return false;
         }
