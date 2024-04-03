@@ -11,6 +11,21 @@ it("add", () => {
     expect(points.length).toBe(2);
 });
 
+it("boundingBox", () => {
+    const p = new Polygon([
+        new Vector(0, 0, 0),
+        new Vector(1, 2, 0),
+        new Vector(1, 2, 0),
+        new Vector(1, 0, 0),
+    ]);
+    expect(p.getBoundingBox()).toEqual({
+        bottom: 2,
+        left: 0,
+        right: 1,
+        top: 0,
+    });
+});
+
 it("contains", () => {
     const p = new Polygon([
         new Vector(0, 0, 0),
@@ -20,6 +35,16 @@ it("contains", () => {
     ]);
     expect(p.contains(new Vector(1, 1, 0))).toBe(true);
     expect(p.contains(new Vector(3, 1, 0))).toBe(false);
+});
+
+it("drawDebug", () => {
+    const p = new Polygon([
+        new Vector(0, 0, 0),
+        new Vector(0, 2, 0),
+        new Vector(2, 2, 0),
+        new Vector(2, 0, 0),
+    ]);
+    p.drawDebug();
 });
 
 it("inset", () => {

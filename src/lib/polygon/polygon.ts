@@ -171,7 +171,7 @@ export class Polygon {
             const d2 = { x: next.x - cur.x, y: next.y - cur.y };
             const dist2 = Math.hypot(d2.x, d2.y);
             if (dist1 <= 0 || dist2 <= 0) {
-                throw new Error("Invalid polygon");
+                return cur; // require non-zero edges
             }
 
             // Inset line segments prev->cur and cur->next.
