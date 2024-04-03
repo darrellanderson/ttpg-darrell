@@ -6,6 +6,7 @@ export type PolygonBoundingBox = {
     right: number;
     bottom: number;
 };
+export type PolygonLineSegment = { a: Vector; b: Vector };
 
 /**
  * Manage a polygon in the XY plane.
@@ -15,27 +16,29 @@ export class Polygon {
     private _boundingBox: PolygonBoundingBox | undefined;
 
     /**
-     * Join polygons sharing the tail of one with the head of another.
-     * @param polygons
+     * Join two-point segments sharing the tail of one with the head of another.
+     * Useful for "faction borders" connecting a set of line segments.
+     *
+     * @param segments
      * @returns
      */
-    static conjoin(polygons: Array<Polygon>): Array<Polygon> {
-        const result: Array<Polygon> = [];
+    static conjoin(segments: Array<PolygonLineSegment>): Array<Polygon> {
+        const result: Array<Array<Vector>> = [];
         let watchdog: number = 0;
-        let grow: Polygon | undefined = undefined;
+        let grow: Array<Vector> = [];
         let found: boolean = false;
-        while (polygons.length > 0) {
+        while (segments.length > 0) {
             watchdog += 1;
             if (watchdog > 10000) {
                 throw new Error("stuck?");
             }
             // If the last loop failed, start a new segment.
             if (!found) {
-                const head: Polygon | undefined = polygons.shift();
-                if (!head) {
+                const next: PolygonLineSegment | undefined = segments.shift();
+                if (!next) {
                     throw new Error("no head (cannot happen)");
                 }
-                grow = head;
+                grow = [next.a, next.b];
                 result.push(grow);
             }
             if (!grow) {
@@ -43,21 +46,24 @@ export class Polygon {
             }
             found = false;
 
-            const points: Array<Vector> = grow.getPoints();
-            const growHead: Vector | undefined = points[0];
-            const growTail: Vector | undefined = points[points.length - 1];
+            const growHead: Vector | undefined = grow[0];
+            const growTail: Vector | undefined = grow[grow.length - 1];
             if (!growHead || !growTail) {
                 throw new Error("no grow head or tail (cannot happen)");
             }
 
             // Keep growing.
-            for (const polygon of polygons) {
-                a; // head
-                b; // tail
+            for (let i = 0; i < segments.length; i++) {
+                const segment: PolygonLineSegment | undefined = segments[i];
+                if (!segment) {
+                    throw new Error("no segment (cannot happen)");
+                }
+                const { a, b } = segment;
+
                 let d = growHead.subtract(b).magnitudeSquared();
                 if (d < 0.1) {
                     // Prepend
-                    grow.line.unshift(a);
+                    grow.unshift(a);
                     found = true;
                     segments.splice(i, 1);
                     break;
@@ -66,7 +72,7 @@ export class Polygon {
                 d = growHead.subtract(a).magnitudeSquared();
                 if (d < 0.1) {
                     // Prepend
-                    grow.line.unshift(b);
+                    grow.unshift(b);
                     found = true;
                     segments.splice(i, 1);
                     break;
@@ -75,7 +81,7 @@ export class Polygon {
                 d = growTail.subtract(a).magnitudeSquared();
                 if (d < 0.1) {
                     // Append
-                    grow.line.push(b);
+                    grow.push(b);
                     found = true;
                     segments.splice(i, 1);
                     break;
@@ -84,7 +90,7 @@ export class Polygon {
                 d = growTail.subtract(b).magnitudeSquared();
                 if (d < 0.1) {
                     // Append
-                    grow.line.push(a);
+                    grow.push(a);
                     found = true;
                     segments.splice(i, 1);
                     break;
@@ -92,7 +98,9 @@ export class Polygon {
             }
         }
 
-        return result;
+        return result.map(
+            (points: Array<Vector>): Polygon => new Polygon(points)
+        );
     }
 
     constructor(points: Array<Vector>) {

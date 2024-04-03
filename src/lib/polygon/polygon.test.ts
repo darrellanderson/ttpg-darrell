@@ -1,5 +1,24 @@
 import { Vector } from "@tabletop-playground/api";
-import { Polygon } from "./polygon";
+import { Polygon, PolygonLineSegment } from "./polygon";
+
+it("static conjoin", () => {
+    // The order of the first segment sets the direction.
+    const segments: Array<PolygonLineSegment> = [
+        { a: new Vector(0, 0, 0), b: new Vector(1, 0, 0) },
+        { a: new Vector(3, 0, 0), b: new Vector(2, 0, 0) },
+        { a: new Vector(3, 0, 0), b: new Vector(4, 0, 0) },
+        { a: new Vector(1, 0, 0), b: new Vector(2, 0, 0) },
+        { a: new Vector(10, 0, 0), b: new Vector(11, 0, 0) },
+    ];
+    const conjoined: Array<Polygon> = Polygon.conjoin(segments);
+    const xs: Array<Array<number>> = conjoined.map((polygon) =>
+        polygon.getPoints().map((p) => p.x)
+    );
+    expect(xs).toEqual([
+        [0, 1, 2, 3, 4],
+        [10, 11],
+    ]);
+});
 
 it("constructor", () => {
     new Polygon([]);
