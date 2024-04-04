@@ -21,6 +21,23 @@ import {
     SnapPoint,
 } from "@tabletop-playground/api";
 
+it("closestOwnedCardHolderOwner", () => {
+    const pos: [x: number, y: number, z: number] = [1, 0, 0];
+    const holder1 = new MockCardHolder({
+        position: [0, 0, 0],
+        owningPlayerSlot: 1,
+    });
+    const holder2 = new MockCardHolder({
+        position: [1, 0, 0],
+        owningPlayerSlot: 2,
+    });
+    mockWorld._reset({ gameObjects: [holder1, holder2] });
+
+    const find = new Find();
+    const owner = find.closestOwnedCardHolderOwner(pos);
+    expect(owner).toEqual(2);
+});
+
 it("findCard", () => {
     const nsid = "my-nsid";
     const card = new MockCard({

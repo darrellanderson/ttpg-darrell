@@ -10,18 +10,55 @@ import {
     world,
 } from "@tabletop-playground/api";
 import { NSID } from "../nsid/nsid";
+import { Vector } from "ttpg-mock";
 
 /**
  * Find things in the game world.  Generally speaking finds the first matching
  * candidate; expecting objects to be unique.
  */
 export class Find {
+    private _cardHolders: Array<CardHolder> = [];
     private readonly _nsidAndSlotToGameObject: { [key: string]: GameObject } =
         {};
     private readonly _snapPointTagToSnapPoint: { [key: string]: SnapPoint } =
         {};
     private readonly _playerSlotToCardHolder: { [key: number]: CardHolder } =
         {};
+
+    closestOwnedCardHolderOwner(
+        pos: Vector | [x: number, y: number, z: number]
+    ): number {
+        let closestOwner = -1;
+        let closestDistance = Number.MAX_VALUE;
+
+        if (this._cardHolders.length === 0) {
+            for (const obj of world.getAllObjects()) {
+                if (!(obj instanceof CardHolder)) {
+                    continue;
+                }
+                this._cardHolders.push(obj);
+            }
+        }
+
+        for (const cardHolder of this._cardHolders) {
+            if (!cardHolder.isValid()) {
+                continue;
+            }
+            const owner: number = cardHolder.getOwningPlayerSlot();
+            if (owner === -1) {
+                continue;
+            }
+            const distance = cardHolder
+                .getPosition()
+                .subtract(pos)
+                .magnitudeSquared();
+            if (distance < closestDistance) {
+                closestOwner = owner;
+                closestDistance = distance;
+            }
+        }
+        return closestOwner;
+    }
 
     findCard(
         nsid: string,
