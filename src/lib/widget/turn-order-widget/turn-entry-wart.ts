@@ -1,7 +1,11 @@
 import { Color } from "@tabletop-playground/api";
+import { TurnOrderWidgetParams } from "./turn-order-widget-params";
+import { TurnEntryWidget } from "./turn-entry-widget";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type TurnEntryWartGenerator = (...args: Array<any>) => TurnEntryWart;
+export type TurnEntryWartGenerator = (
+    widget: TurnEntryWidget,
+    params: TurnOrderWidgetParams
+) => TurnEntryWart;
 
 /**
  * Augment a TurnEntryWidget.  May update its own widgets independently of
