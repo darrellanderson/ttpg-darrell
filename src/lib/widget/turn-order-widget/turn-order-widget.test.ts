@@ -12,7 +12,8 @@ it("getInstance", () => {
 
 it("constructor", () => {
     const turnOrder: TurnOrder = new TurnOrder("@test/test");
-    new TurnOrderWidget(turnOrder, {});
+    const widget = new TurnOrderWidget(turnOrder, {});
+    widget.destroy();
 });
 
 it("destroy", () => {
@@ -22,15 +23,17 @@ it("destroy", () => {
 
 it("update (via event)", () => {
     const turnOrder: TurnOrder = new TurnOrder("@test/test");
-    new TurnOrderWidget(turnOrder, {});
+    const widget = new TurnOrderWidget(turnOrder, {});
     TurnOrder.onTurnStateChanged.trigger(turnOrder);
+    widget.destroy();
 });
 
 it("update (change player count)", () => {
     const turnOrder: TurnOrder = new TurnOrder("@test/test");
-    new TurnOrderWidget(turnOrder, {});
+    const widget = new TurnOrderWidget(turnOrder, {});
     turnOrder.setTurnOrder([1, 2], "forward", 1);
     turnOrder.setTurnOrder([1, 2, 3], "forward", 1);
+    widget.destroy();
 });
 
 it("attach/detach (defaults)", () => {
@@ -40,6 +43,7 @@ it("attach/detach (defaults)", () => {
     widget.attachToScreen();
     widget.detach();
     widget.detach();
+    widget.destroy();
 });
 
 it("attach/detach (override values)", () => {
@@ -53,6 +57,7 @@ it("attach/detach (override values)", () => {
     widget.attachToScreen();
     widget.detach();
     widget.detach();
+    widget.destroy();
 });
 
 it("toggle visibility", () => {
@@ -65,6 +70,7 @@ it("toggle visibility", () => {
     expect(widget.isVisibleTo(1)).toBeFalsy();
     widget.toggleVisibility(1);
     expect(widget.isVisibleTo(1)).toBeTruthy();
+    widget.destroy();
 });
 
 it("toggle visibility (context menu)", () => {
@@ -80,4 +86,5 @@ it("toggle visibility (context menu)", () => {
     expect(widget.isVisibleTo(1)).toBeTruthy();
     mockGlobalEvents._customActionAsPlayer(player, actionName);
     expect(widget.isVisibleTo(1)).toBeFalsy();
+    widget.destroy();
 });

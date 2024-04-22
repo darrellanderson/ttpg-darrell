@@ -25,6 +25,7 @@ export class TurnOrderWidget {
     private readonly _screenUI: ScreenUIElement;
     private readonly _uiVisibility: UiVisibility;
     private _turnEntryWidgets: Array<TurnEntryWidget> = [];
+    private _intervalId;
 
     private readonly _doUpdate = () => {
         this.update();
@@ -76,6 +77,10 @@ export class TurnOrderWidget {
         world.addCustomAction(this._toggleVisibilityActionName);
 
         this.update();
+
+        this._intervalId = setInterval(() => {
+            this.update();
+        }, 1000);
     }
 
     public destroy(): void {
@@ -84,6 +89,8 @@ export class TurnOrderWidget {
         globalEvents.onPlayerLeft.remove(this._doUpdate);
         globalEvents.onPlayerSwitchedSlots.remove(this._doUpdate);
         globalEvents.onCustomAction.remove(this._onCustomActionHandler);
+
+        clearInterval(this._intervalId);
     }
 
     public getWidget(): Widget {

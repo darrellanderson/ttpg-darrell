@@ -95,7 +95,7 @@ export class TurnEntryWidget {
             x: name.l + Math.floor(name.w / 2),
             y: name.t + Math.floor(name.h / 2),
         };
-        const d = Math.floor(name.h * 0.06); // tweak to center text vertically
+        const d: number = Math.floor(name.h * 0.06); // tweak to center text vertically
         name.t += d;
 
         this._nameWidth = name.w;
