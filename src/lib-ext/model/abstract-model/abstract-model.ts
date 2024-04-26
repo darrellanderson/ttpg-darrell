@@ -79,7 +79,7 @@ export abstract class AbstractModel {
         botVerticies: Array<ObjVertexForFace>
     ): Array<string> {
         const lines: Array<string> = [];
-        for (let i = 0; i < topVerticies.length; i++) {
+        for (let i = 0; i < topVerticies.length; i += 1) {
             const a = i; // top
             const b = a; // bottom
             const d = (i + 1) % topVerticies.length; // top

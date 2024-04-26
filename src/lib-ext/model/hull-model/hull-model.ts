@@ -4,63 +4,54 @@ import {
     ObjVertexForFace,
 } from "../abstract-model/abstract-model";
 
-type Vector3d = { x: number; y: number; z: number };
+export type HullVector3d = { x: number; y: number; z: number };
 
 export class HullModel extends AbstractModel {
-    private readonly _points: Array<Vector3d>;
-    private readonly _height: number;
+    private _hull: Array<HullVector3d>;
+    private _height: number = 0;
     private _padding: number = 0;
     private _pixelSize: number = 0;
 
-    constructor(points: Array<Vector3d>, height: number) {
-        super();
-
-        this._points = points;
-        this._height = height;
-    }
-
-    setPadding(padding: number): this {
-        this._padding = padding;
-        return this;
-    }
-
-    setPixelSize(pixelSize: number): this {
-        this._pixelSize = pixelSize;
-        return this;
-    }
-
     /**
-     * Given an arbitrary collection of points, create an XY hull (clear Z).
+     * Given an arbitrary collection of points, create a clockwise-winging
+     * XY hull (clear Z).
      *
      * @param points
-     * @returns {Array<Vector3d>} padded hull
+     * @returns {Array<HullVector3d>} padded hull
      */
-    static _getHull(points: Array<Vector3d>): Array<Vector3d> {
+    static __convexHull(points: Array<HullVector3d>): Array<HullVector3d> {
         type XY = [x: number, y: number];
         const xyInput: Array<XY> = points.map((point): XY => {
             return [point.x, point.y];
         });
         const xyOutput: Array<XY> = monotoneChainConvexHull(xyInput);
-        return xyOutput.map((xy): Vector3d => {
+        return xyOutput.map((xy): HullVector3d => {
             return { x: xy[0], y: xy[1], z: 0 };
         });
     }
 
-    /**
-     * Pad a hull, adding curves to the corners (clear Z).
-     *
-     * @param points
-     * @param padding
-     */
-    static _padHull(
-        hull: Array<Vector3d>,
-        padding: number,
-        cornerSegments: number
-    ): Array<Vector3d> {
-        const hullPlus: Array<Vector3d> = [...hull];
+    constructor(points: Array<HullVector3d>, height: number) {
+        super();
+        this._hull = HullModel.__convexHull(points);
+        this._height = height;
+    }
 
-        const deltaPhi = Math.PI / 2 / cornerSegments;
-        for (const point of hull) {
+    getHull(): Array<HullVector3d> {
+        return this._hull;
+    }
+
+    /**
+     * Pad the hull by a given amount, creating a new hull.
+     * Apply corner segments to smooth the hull.
+     *
+     * @param padding
+     * @param cornerSegments
+     * @returns
+     */
+    padHull(padding: number, cornerSegments: number): this {
+        const hullPlus: Array<HullVector3d> = [...this._hull];
+        const deltaPhi = (Math.PI * 2) / cornerSegments;
+        for (const point of this._hull) {
             for (let i = 0; i < cornerSegments; i++) {
                 const phi = deltaPhi * i;
                 const x = padding * Math.cos(phi);
@@ -68,35 +59,40 @@ export class HullModel extends AbstractModel {
                 hullPlus.push({ x: point.x + x, y: point.y + y, z: 0 });
             }
         }
-
-        return HullModel._getHull(hullPlus);
+        this._hull = HullModel.__convexHull(hullPlus);
+        return this;
     }
 
     /**
      * Quantize hull, "pixelating" then creating a hull from pixel corners.
      * This can significantly reduce the number of edges in the hull,
      * especially for curves.  Hull will grow by a portion of pixel size.
-     *
-     * @param hull
-     * @returns
      */
-    static _quantizeHull(
-        hull: Array<Vector3d>,
-        pixelSize: number
-    ): Array<Vector3d> {
-        const invPixelSize: number = 1 / pixelSize;
-        const hullPlus: Array<Vector3d> = [];
-        for (const point of hull) {
-            const x0: number = Math.floor(point.x * invPixelSize);
-            const x1: number = Math.ceil(point.x * invPixelSize);
-            const y0: number = Math.floor(point.y * invPixelSize);
-            const y1: number = Math.ceil(point.y * invPixelSize);
+    quantizeHull(pixelSize: number): this {
+        const hullPlus: Array<HullVector3d> = [];
+        for (const point of this._hull) {
+            const x0: number = Math.floor(point.x / pixelSize) * pixelSize;
+            const x1: number = Math.ceil(point.x / pixelSize) * pixelSize;
+            const y0: number = Math.floor(point.y / pixelSize) * pixelSize;
+            const y1: number = Math.ceil(point.y / pixelSize) * pixelSize;
             hullPlus.push({ x: x0, y: y0, z: 0 });
             hullPlus.push({ x: x1, y: y0, z: 0 });
             hullPlus.push({ x: x1, y: y1, z: 0 });
             hullPlus.push({ x: x0, y: y1, z: 0 });
         }
-        return HullModel._getHull(hullPlus);
+        this._hull = HullModel.__convexHull(hullPlus);
+        return this;
+    }
+
+    cleanHull(): this {
+        this._hull = this._hull.map((point) => {
+            return {
+                x: Math.round(point.x * 10000) / 10000,
+                y: Math.round(point.y * 10000) / 10000,
+                z: Math.round(point.z * 10000) / 10000,
+            };
+        });
+        return this;
     }
 
     /**
@@ -106,16 +102,16 @@ export class HullModel extends AbstractModel {
      * @param hull
      * @returns
      */
-    static _getSideNormals(hull: Array<Vector3d>): Array<Vector3d> {
+    static _getSideNormals(hull: Array<HullVector3d>): Array<HullVector3d> {
         // Perpendicular to clockwise segment:
         // (x, y) -> (y, -x)
         // Counter-clockwise:
         // (x, y) -> (-y, x)
-        const normals: Array<Vector3d> = [];
+        const normals: Array<HullVector3d> = [];
         const zero = { x: 0, y: 0, z: 0 };
         for (let i = 0; i < hull.length; i++) {
-            const p0: Vector3d = hull[i] ?? zero;
-            const p1: Vector3d = hull[(i + 1) % hull.length] ?? zero;
+            const p0: HullVector3d = hull[i] ?? zero;
+            const p1: HullVector3d = hull[(i + 1) % hull.length] ?? zero;
             const dx = p1.x - p0.x;
             const dy = p1.y - p0.y;
             const m = Math.max(Math.sqrt(dx * dx + dy * dy), Number.EPSILON);
@@ -124,7 +120,7 @@ export class HullModel extends AbstractModel {
         return normals;
     }
 
-    static _toObjLineine(type: "v" | "vn", vertex: Vector3d): string {
+    static _toObjLineine(type: "v" | "vn", vertex: HullVector3d): string {
         // TTPG uses flipped X/Y, Z is up, OBJ Y is up.
         vertex.x = Math.round(vertex.x * 10000) / 10000;
         vertex.y = Math.round(vertex.y * 10000) / 10000;
@@ -134,69 +130,106 @@ export class HullModel extends AbstractModel {
     }
 
     toModel(): string {
-        let hull: Array<Vector3d> = HullModel._getHull(this._points);
-        hull = HullModel._padHull(hull, this._padding, 16);
-        hull = HullModel._quantizeHull(hull, this._pixelSize);
+        let numNormals = 0;
+        let numVertices = 0;
 
-        const lines: Array<string> = [`# Hull, ${this._numSides} sides`];
+        // Reverse the hull to make the top face counterclockwise.
+        const hull: Array<HullVector3d> = this._hull.reverse();
 
-        const top: Array<Vector3d> = hull.map((point): Vector3d => {
-            return {
+        const lines: Array<string> = [`# Hull, ${hull.length} sides`];
+
+        lines.push("", "# Top vertices");
+        const topVertices1BasedStart = numVertices + 1;
+        numVertices += hull.length;
+        hull.forEach((point): void => {
+            const vertex: HullVector3d = {
                 x: point.x,
                 y: point.y,
                 z: this._height / 2,
             };
+            lines.push(HullModel._toObjLineine("v", vertex));
         });
-        const bot: Array<Vector3d> = hull.map((point): Vector3d => {
-            return {
+
+        lines.push("", "# Bottom vertices");
+        const botVertices1BasedStart = numVertices + 1;
+        numVertices += hull.length;
+        hull.forEach((point): void => {
+            const vertex: HullVector3d = {
                 x: point.x,
                 y: point.y,
                 z: -this._height / 2,
             };
-        });
-        const topNormal: Vector3d = { x: 0, y: 0, z: 1 };
-        const botNormal: Vector3d = {
-            x: 0,
-            y: 0,
-            z: -1,
-        };
-        const sideNormals: Array<Vector3d> = HullModel._getSideNormals(hull);
-
-        // Vertices.
-        lines.push("");
-        lines.push("# Top vertices");
-        topCircle.forEach((vertex) => {
-            lines.push(this._toVertexLine(vertex));
-        });
-        lines.push("");
-        lines.push("# Bottom vertices");
-        botCircle.forEach((vertex) => {
-            lines.push(this._toVertexLine(vertex));
+            lines.push(HullModel._toObjLineine("v", vertex));
         });
 
-        // Faces.
-        const topFaceEntries: Array<ObjVertexForFace> = topCircle.map(
-            (vertex, index): ObjVertexForFace => {
-                return `${index + 1}//`;
-            }
-        );
-        const botFaceEntries: Array<ObjVertexForFace> = botCircle.map(
-            (vertex, index): ObjVertexForFace => {
-                return `${this._numSides + index + 1}//`;
+        lines.push("", "# Top normal");
+        const topNormal1BasedStart = numNormals + 1;
+        numNormals += 1;
+        const topNormal: HullVector3d = { x: 0, y: 0, z: 1 };
+        lines.push(HullModel._toObjLineine("vn", topNormal));
+
+        lines.push("", "# Bottom normal");
+        const botNormal1BasedStart = numNormals + 1;
+        numNormals += 1;
+        const botNormal: HullVector3d = { x: 0, y: 0, z: -1 };
+        lines.push(HullModel._toObjLineine("vn", botNormal));
+
+        lines.push("", "# Side normals");
+        const sideNormal1BasedStart = numNormals + 1;
+        numNormals += hull.length;
+        HullModel._getSideNormals(hull).forEach(
+            (normal: HullVector3d): void => {
+                lines.push(HullModel._toObjLineine("vn", normal));
             }
         );
 
-        lines.push(
-            "",
-            "# Top triangles",
-            ...AbstractModel.triangleStrip(topFaceEntries, true),
-            "",
-            "# Bottom triangles",
-            ...AbstractModel.triangleStrip(botFaceEntries, false),
-            "",
-            "# Side triangles",
-            ...AbstractModel.triangleSides(topFaceEntries, botFaceEntries)
+        // Top faces.
+        lines.push("", "# Top faces");
+        const topFaceEntries: Array<ObjVertexForFace> = hull.map(
+            (_, index): ObjVertexForFace => {
+                const v: number = topVertices1BasedStart + index;
+                //const vt: string = "";
+                const vn: number = topNormal1BasedStart;
+                return `${v}//${vn}`;
+            }
         );
+        lines.push(...AbstractModel.triangleStrip(topFaceEntries, true));
+
+        // Bottom faces.
+        lines.push("", "# Bottom faces");
+        const botFaceEntries: Array<ObjVertexForFace> = hull.map(
+            (_, index): ObjVertexForFace => {
+                const v: number = botVertices1BasedStart + index;
+                //const vt: string = "";
+                const vn: number = botNormal1BasedStart;
+                return `${v}//${vn}`;
+            }
+        );
+        lines.push(...AbstractModel.triangleStrip(botFaceEntries, false));
+
+        // Side faces.
+        lines.push("", "# Side faces");
+        for (let index = 0; index <= hull.length; index++) {
+            const a: number = topVertices1BasedStart + index;
+            const b: number =
+                topVertices1BasedStart + ((index + 1) % hull.length);
+            const c: number = botVertices1BasedStart + index;
+            const d: number =
+                botVertices1BasedStart + ((index + 1) % hull.length);
+            const vn: number = sideNormal1BasedStart + index;
+            const f0: Array<ObjVertexForFace> = [
+                `${a}//${vn}`,
+                `${c}//${vn}`,
+                `${b}//${vn}`,
+            ];
+            const f1: Array<ObjVertexForFace> = [
+                `${b}//${vn}`,
+                `${c}//${vn}`,
+                `${d}//${vn}`,
+            ];
+            lines.push("f " + f0.join(" "));
+            lines.push("f " + f1.join(" "));
+        }
 
         return lines.join("\n");
     }
