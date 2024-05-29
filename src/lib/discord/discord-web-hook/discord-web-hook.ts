@@ -1,3 +1,5 @@
+import { fetch } from "@tabletop-playground/api";
+
 /**
  * Create, read, and delete discord messages using a webhook.
  * Only needs the "fetch" API, suitable for use in Tabletop Playground.
@@ -37,10 +39,10 @@ export class DiscordWebHook {
                     reject(new Error(`HTTP error: ${response.status}`));
                     return;
                 }
-                response.json().then((json) => {
-                    const messageId = json.id ?? "";
-                    resolve(messageId);
-                }, reject);
+                const text = response.text();
+                const json = JSON.parse(text);
+                const messageId = json.id ?? "";
+                resolve(messageId);
             }, reject);
         });
     }
@@ -57,13 +59,13 @@ export class DiscordWebHook {
                 `${this.URL}/${this._id}/${this._token}/messages/${messageId}`
             ).then((response) => {
                 if (!response.ok) {
-                    reject(new Error(`HTTP error: ${response.status}`));
+                    reject(`HTTP error: ${response.status}`);
                     return;
                 }
-                response.json().then((json) => {
-                    const content: string = json.content ?? "";
-                    resolve(content);
-                }, reject);
+                const text: string = response.text();
+                const json = JSON.parse(text);
+                const content: string = json.content ?? "";
+                resolve(content);
             }, reject);
         });
     }
