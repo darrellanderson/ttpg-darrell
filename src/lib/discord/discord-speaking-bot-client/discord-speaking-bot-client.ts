@@ -3,13 +3,9 @@ import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-
 import { DiscordWebHook } from "../discord-web-hook/discord-web-hook";
 import { SpeakingAssign } from "./speaking-assign";
 import { SpeakingParser, SpeakingRecord } from "./speaking-parser";
-import { world } from "@tabletop-playground/api";
-import { closest } from "fastest-levenshtein";
+import { SpeakerToPlayer } from "./speaker-to-player";
 
 export class DiscordSpeakingBotClient {
-    private static readonly _speakerNameToPlayerName: Map<string, string> =
-        new Map();
-
     public readonly onSpeakingDeltas: TriggerableMulticastDelegate<
         (deltas: Map<string, number>, summary: Array<string>) => void
     > = new TriggerableMulticastDelegate<
@@ -19,6 +15,7 @@ export class DiscordSpeakingBotClient {
     private readonly _speakingAssign: SpeakingAssign = new SpeakingAssign();
     private readonly _speakingParser: SpeakingParser = new SpeakingParser();
     private readonly _webHook: DiscordWebHook;
+    private readonly _speakerToPlayer: SpeakerToPlayer = new SpeakerToPlayer();
 
     private _verbose: boolean = false;
     private _messageId: string | undefined;
@@ -26,30 +23,6 @@ export class DiscordSpeakingBotClient {
 
     private _lastTimestamp: number = 0;
     private _lastSpeaker: string = "";
-
-    static _getPlayerName(speakerName: string): string {
-        // Get the closest player name.
-        const playerNames: Array<string> = world
-            .getAllPlayers()
-            .map((player) => player.getName());
-        const bestName: string = closest(speakerName, playerNames);
-
-        // If the current mapping better?
-        const currentName: string | undefined =
-            DiscordSpeakingBotClient._speakerNameToPlayerName.get(speakerName);
-        if (currentName && currentName !== bestName) {
-            const vs: string = closest(speakerName, [currentName, bestName]);
-            if (vs === currentName) {
-                return currentName; // existing mapping is better
-            }
-        }
-
-        DiscordSpeakingBotClient._speakerNameToPlayerName.set(
-            speakerName,
-            bestName
-        );
-        return bestName;
-    }
 
     static _parseBase64Data(base64data: string): {
         webhookId: string;
@@ -166,8 +139,9 @@ export class DiscordSpeakingBotClient {
                 this._lastTimestamp = speaker.endTimestamp;
                 this._lastSpeaker = speaker.userId;
 
-                const playerName: string =
-                    DiscordSpeakingBotClient._getPlayerName(speaker.userId);
+                const playerName: string | undefined =
+                    this._speakerToPlayer.getPlayerName(speaker.userId) ??
+                    speaker.userId;
 
                 const data: {
                     summary: Array<string>;
