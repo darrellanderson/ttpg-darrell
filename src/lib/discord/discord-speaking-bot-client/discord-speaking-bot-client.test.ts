@@ -1,3 +1,4 @@
+import { MockPlayer, mockWorld } from "ttpg-mock";
 import { DiscordSpeakingBotClient } from "./discord-speaking-bot-client";
 
 it("decode", () => {
@@ -10,4 +11,23 @@ it("decode", () => {
         webhookToken:
             "h15FhlpIvft4Cg5fb2KsKKY4dssxWS9fayFLIKXN4fa0KVoY7zYSBVJzE00ZuJr7vM2r",
     });
+});
+
+it("speakerNameToPlayerName", () => {
+    mockWorld._reset({
+        players: [
+            new MockPlayer({ name: "alice" }),
+            new MockPlayer({ name: "bob" }),
+        ],
+    });
+    let playerName: string = "";
+
+    playerName = DiscordSpeakingBotClient._getPlayerName("alzze");
+    expect(playerName).toEqual("alice");
+
+    playerName = DiscordSpeakingBotClient._getPlayerName("alize");
+    expect(playerName).toEqual("alice");
+
+    playerName = DiscordSpeakingBotClient._getPlayerName("bzb");
+    expect(playerName).toEqual("bob");
 });

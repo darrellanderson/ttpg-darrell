@@ -3,8 +3,13 @@ import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-
 import { DiscordWebHook } from "../discord-web-hook/discord-web-hook";
 import { SpeakingAssign } from "./speaking-assign";
 import { SpeakingParser, SpeakingRecord } from "./speaking-parser";
+import { world } from "@tabletop-playground/api";
+import { closest } from "fastest-levenshtein";
 
 export class DiscordSpeakingBotClient {
+    private static readonly _speakerNameToPlayerName: Map<string, string> =
+        new Map();
+
     public readonly onSpeakingDeltas: TriggerableMulticastDelegate<
         (deltas: Map<string, number>, summary: Array<string>) => void
     > = new TriggerableMulticastDelegate<
@@ -21,6 +26,53 @@ export class DiscordSpeakingBotClient {
 
     private _lastTimestamp: number = 0;
     private _lastSpeaker: string = "";
+
+    static _getPlayerName(speakerName: string): string {
+        // Get the closest player name.
+        const playerNames: Array<string> = world
+            .getAllPlayers()
+            .map((player) => player.getName());
+        const bestName: string = closest(speakerName, playerNames);
+
+        // If the current mapping better?
+        const currentName: string | undefined =
+            DiscordSpeakingBotClient._speakerNameToPlayerName.get(speakerName);
+        if (currentName && currentName !== bestName) {
+            const vs: string = closest(speakerName, [currentName, bestName]);
+            if (vs === currentName) {
+                return currentName; // existing mapping is better
+            }
+        }
+
+        DiscordSpeakingBotClient._speakerNameToPlayerName.set(
+            speakerName,
+            bestName
+        );
+        return bestName;
+    }
+
+    static _parseBase64Data(base64data: string): {
+        webhookId: string;
+        webhookToken: string;
+        messgeId: string;
+    } {
+        const json: string = Base64.decode(base64data); // base64url style
+        const data = JSON.parse(json);
+
+        const webhookId: string | undefined = data.i;
+        const webhookToken: string | undefined = data.t;
+        const messgeId: string | undefined = data.m;
+
+        if (!webhookId || !webhookToken || !messgeId) {
+            throw new Error("Invalid base64 data");
+        }
+
+        return {
+            webhookId,
+            webhookToken,
+            messgeId,
+        };
+    }
 
     constructor() {
         this._webHook = new DiscordWebHook();
@@ -62,30 +114,6 @@ export class DiscordSpeakingBotClient {
             this._intervalHandle = undefined;
         }
         return this;
-    }
-
-    static _parseBase64Data(base64data: string): {
-        webhookId: string;
-        webhookToken: string;
-        messgeId: string;
-    } {
-        const json: string = Base64.decode(base64data); // base64url style
-        console.log(json);
-        const data = JSON.parse(json);
-
-        const webhookId: string | undefined = data.i;
-        const webhookToken: string | undefined = data.t;
-        const messgeId: string | undefined = data.m;
-
-        if (!webhookId || !webhookToken || !messgeId) {
-            throw new Error("Invalid base64 data");
-        }
-
-        return {
-            webhookId,
-            webhookToken,
-            messgeId,
-        };
     }
 
     _readAndProcessWebHook(): void {
@@ -138,11 +166,14 @@ export class DiscordSpeakingBotClient {
                 this._lastTimestamp = speaker.endTimestamp;
                 this._lastSpeaker = speaker.userId;
 
+                const playerName: string =
+                    DiscordSpeakingBotClient._getPlayerName(speaker.userId);
+
                 const data: {
                     summary: Array<string>;
                     deltas: Map<string, number>;
                 } = this._speakingAssign.summarizeSpeakingOverlaps(
-                    speaker.userId,
+                    playerName,
                     speaker.startTimestamp,
                     speaker.endTimestamp
                 );
