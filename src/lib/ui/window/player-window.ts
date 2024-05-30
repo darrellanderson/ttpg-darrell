@@ -287,6 +287,7 @@ export class PlayerWindow {
                 (this._target === "screen" ? 1 : PlayerWindow.WORLD_SCALE),
             fontSize: titleFontSize,
             spacing: padding,
+            playerSlot: this._playerSlot,
         });
         const window: Canvas = new Canvas()
             .addChild(new Border(), 0, 0, width, height)

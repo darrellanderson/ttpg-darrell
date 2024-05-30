@@ -14,6 +14,7 @@ export type WindowWidgetParams = {
     scale: number;
     fontSize: number; // suggested
     spacing: number; // suggested
+    playerSlot: number;
 };
 
 export type WindowParams = {
