@@ -1,6 +1,18 @@
 import { Border, Text, Widget, world } from "@tabletop-playground/api";
-import { WindowParams, WindowWidgetParams } from "./window-params";
+import {
+    IWindowWidget,
+    WindowParams,
+    WindowWidgetParams,
+} from "./window-params";
 import { Window } from "./window";
+
+class WindowWidget implements IWindowWidget {
+    create(params: WindowWidgetParams): Widget {
+        const text = new Text().setFontSize(params.scale * 50).setText("World");
+        return new Border().setColor([1, 0, 0, 0.2]).setChild(text);
+    }
+    destroy(): void {}
+}
 
 const params: WindowParams = {
     title: "Hello",
@@ -12,12 +24,7 @@ const params: WindowParams = {
         anchor: { x: 0.5, y: 0 },
         pos: { u: 0.5, v: 0.1 },
     },
-    createWidget: (widgetParams: WindowWidgetParams): Widget => {
-        const text = new Text()
-            .setFontSize(widgetParams.scale * 50)
-            .setText("World");
-        return new Border().setColor([1, 0, 0, 0.2]).setChild(text);
-    },
+    windowWidgetGenerator: (): IWindowWidget => new WindowWidget(),
 };
 
 const playerSlots: Array<number> = world
