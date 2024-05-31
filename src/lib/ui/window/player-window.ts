@@ -16,7 +16,11 @@ import {
     refPackageId,
     world,
 } from "@tabletop-playground/api";
-import { WINDOW_BUTTON_ASSET, WindowParams } from "./window-params";
+import {
+    IWindowWidget,
+    WINDOW_BUTTON_ASSET,
+    WindowParams,
+} from "./window-params";
 import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate/triggerable-multicast-delegate";
 import { ThrottleClickHandler } from "../../event/throttle-click-handler/throttle-click-handler";
 
@@ -35,6 +39,7 @@ export class PlayerWindow {
 
     private readonly _params: WindowParams;
     private readonly _playerSlot: number;
+    private _windowWidget: IWindowWidget | undefined;
 
     private _scale: number = 1;
     private _target: "screen" | "world" = "screen";
@@ -139,6 +144,8 @@ export class PlayerWindow {
     constructor(params: WindowParams, playerSlot: number) {
         this._params = params;
         this._playerSlot = playerSlot;
+        this._windowWidget = params.windowWidgetGenerator();
+
         this._target = params.defaultTarget ?? "screen";
 
         // Use scale from last time player scaled a window.
@@ -280,8 +287,11 @@ export class PlayerWindow {
             titleBarPanel.addChild(button, 0);
         }
 
+        if (!this._windowWidget) {
+            throw new Error("Window widget not created");
+        }
         const spacer = new Border().setColor([0, 0, 0, 0]);
-        const child: Widget = this._params.createWidget({
+        const child: Widget = this._windowWidget.create({
             scale:
                 this._scale *
                 (this._target === "screen" ? 1 : PlayerWindow.WORLD_SCALE),
@@ -332,6 +342,14 @@ export class PlayerWindow {
 
     public attach(): this {
         this.detach();
+
+        // IWindowWidget only exists between attach and detach.
+        // Track it carefully because it is a potential memory leak
+        // if it adds event listeners.
+        if (this._windowWidget) {
+            throw new Error("Window widget already exists");
+        }
+        this._windowWidget = this._params.windowWidgetGenerator();
 
         // Screen UI does not exist for VR players.
         const player: Player | undefined = world.getPlayerBySlot(
@@ -420,6 +438,11 @@ export class PlayerWindow {
             world.removeUIElement(this._worldUi);
             this._worldUi = undefined;
         }
+        if (this._windowWidget) {
+            this._windowWidget.destroy();
+            this._windowWidget = undefined;
+        }
+
         return this;
     }
 }

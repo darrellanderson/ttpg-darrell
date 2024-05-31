@@ -1,8 +1,19 @@
 import { Rotator, Text, Vector, Widget } from "@tabletop-playground/api";
 import { clickAll } from "../../jest-util/click-all/click-all";
-import { WindowParams, WindowWidgetParams } from "./window-params";
+import {
+    IWindowWidget,
+    WindowParams,
+    WindowWidgetParams,
+} from "./window-params";
 import { PlayerWindow } from "./player-window";
 import { MockPlayer } from "ttpg-mock";
+
+class MockIWindowWidget implements IWindowWidget {
+    create(params: WindowWidgetParams): Widget {
+        return new Text().setFontSize(params.scale * 8);
+    }
+    destroy(): void {}
+}
 
 it("static scale", () => {
     const playerSlot: number = 7;
@@ -17,8 +28,8 @@ it("attach/detach (screen, defaults)", () => {
             width: 10,
             height: 10,
         },
-        createWidget: (widgetParams: WindowWidgetParams): Widget => {
-            return new Text().setFontSize(widgetParams.scale * 8);
+        windowWidgetGenerator: (): IWindowWidget => {
+            return new MockIWindowWidget();
         },
     };
     const playerSlot: number = 7;
@@ -41,8 +52,8 @@ it("attach/detach (screen, anchor, pos)", () => {
                 v: 1,
             },
         },
-        createWidget: (widgetParams: WindowWidgetParams): Widget => {
-            return new Text().setFontSize(widgetParams.scale * 8);
+        windowWidgetGenerator: (): IWindowWidget => {
+            return new MockIWindowWidget();
         },
     };
     const playerSlot: number = 7;
@@ -56,8 +67,8 @@ it("attach/detach (world, defaults)", () => {
             width: 10,
             height: 10,
         },
-        createWidget: (widgetParams: WindowWidgetParams): Widget => {
-            return new Text().setFontSize(widgetParams.scale * 8);
+        windowWidgetGenerator: (): IWindowWidget => {
+            return new MockIWindowWidget();
         },
     };
     const playerSlot: number = 7;
@@ -79,8 +90,8 @@ it("attach/detach (world, anchor, pos)", () => {
             pos: [2, 3, 4],
             rot: [5, 6, 7],
         },
-        createWidget: (widgetParams: WindowWidgetParams): Widget => {
-            return new Text().setFontSize(widgetParams.scale * 8);
+        windowWidgetGenerator: (): IWindowWidget => {
+            return new MockIWindowWidget();
         },
     };
     const playerSlot: number = 7;
@@ -102,8 +113,8 @@ it("attach/detach (world, anchor, pos as vector/rotqtor)", () => {
             pos: new Vector(2, 3, 4),
             rot: new Rotator(5, 6, 7),
         },
-        createWidget: (widgetParams: WindowWidgetParams): Widget => {
-            return new Text().setFontSize(widgetParams.scale * 8);
+        windowWidgetGenerator: (): IWindowWidget => {
+            return new MockIWindowWidget();
         },
     };
     const playerSlot: number = 7;
@@ -117,15 +128,17 @@ it("click", () => {
             width: 10,
             height: 10,
         },
-        createWidget: (widgetParams: WindowWidgetParams): Widget => {
-            return new Text().setFontSize(widgetParams.scale * 8);
+        windowWidgetGenerator: (): IWindowWidget => {
+            return new MockIWindowWidget();
         },
     };
     const playerSlot: number = 7;
     const playerWindow: PlayerWindow = new PlayerWindow(params, playerSlot);
 
-    clickAll(playerWindow._createWidget());
-    clickAll(playerWindow._createWidget()); // collapse vs expand, etc
+    playerWindow.attach();
+    const widget: Widget = playerWindow._createWidget();
+    clickAll(widget);
+    clickAll(widget); // collapse vs expand, etc
 });
 
 it("state", () => {
@@ -134,8 +147,8 @@ it("state", () => {
             width: 10,
             height: 10,
         },
-        createWidget: (widgetParams: WindowWidgetParams): Widget => {
-            return new Text().setFontSize(widgetParams.scale * 8);
+        windowWidgetGenerator: (): IWindowWidget => {
+            return new MockIWindowWidget();
         },
     };
     const playerSlot: number = 7;
@@ -153,8 +166,8 @@ it("vr", () => {
             width: 10,
             height: 10,
         },
-        createWidget: (widgetParams: WindowWidgetParams): Widget => {
-            return new Text().setFontSize(widgetParams.scale * 8);
+        windowWidgetGenerator: (): IWindowWidget => {
+            return new MockIWindowWidget();
         },
     };
     const playerSlot: number = 7;

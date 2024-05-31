@@ -1,17 +1,26 @@
-import { LayoutBox, Widget, world } from "@tabletop-playground/api";
+import { Text, Widget, world } from "@tabletop-playground/api";
 import { MockPlayer } from "ttpg-mock";
 import { Window } from "./window";
-import { WindowParams, WindowWidgetParams } from "./window-params";
+import {
+    IWindowWidget,
+    WindowParams,
+    WindowWidgetParams,
+} from "./window-params";
 import { clickAll } from "../../jest-util/click-all/click-all";
+
+class MockIWindowWidget implements IWindowWidget {
+    create(params: WindowWidgetParams): Widget {
+        return new Text().setFontSize(params.scale * 8);
+    }
+    destroy(): void {}
+}
 
 it("constructor", () => {
     new MockPlayer(); // create player to add PlayerWindow
     const params: WindowParams = {
         size: { width: 1, height: 1 },
-        createWidget: (widgetParams: WindowWidgetParams): Widget => {
-            return new LayoutBox()
-                .setOverrideHeight(1 * widgetParams.scale)
-                .setOverrideWidth(1 * widgetParams.scale);
+        windowWidgetGenerator: (): IWindowWidget => {
+            return new MockIWindowWidget();
         },
     };
     const window = new Window(params, [1, 2, 3], "@window/test");
@@ -23,10 +32,8 @@ it("constructor", () => {
 it("attach/detach", () => {
     const params: WindowParams = {
         size: { width: 1, height: 1 },
-        createWidget: (widgetParams: WindowWidgetParams): Widget => {
-            return new LayoutBox()
-                .setOverrideHeight(1 * widgetParams.scale)
-                .setOverrideWidth(1 * widgetParams.scale);
+        windowWidgetGenerator: (): IWindowWidget => {
+            return new MockIWindowWidget();
         },
     };
     const window = new Window(params, [1, 2, 3]);
@@ -47,10 +54,8 @@ it("attach/detach", () => {
 it("getState/applyState", () => {
     const params: WindowParams = {
         size: { width: 1, height: 1 },
-        createWidget: (widgetParams: WindowWidgetParams): Widget => {
-            return new LayoutBox()
-                .setOverrideHeight(1 * widgetParams.scale)
-                .setOverrideWidth(1 * widgetParams.scale);
+        windowWidgetGenerator: (): IWindowWidget => {
+            return new MockIWindowWidget();
         },
     };
     const window: Window = new Window(params, [1, 2, 3]);
@@ -63,10 +68,8 @@ it("create, click", () => {
     new MockPlayer(); // create player to add PlayerWindow
     const params: WindowParams = {
         size: { width: 1, height: 1 },
-        createWidget: (widgetParams: WindowWidgetParams): Widget => {
-            return new LayoutBox()
-                .setOverrideHeight(1 * widgetParams.scale)
-                .setOverrideWidth(1 * widgetParams.scale);
+        windowWidgetGenerator: (): IWindowWidget => {
+            return new MockIWindowWidget();
         },
     };
     new Window(params, [1, 2, 3], "@window/test").attach();

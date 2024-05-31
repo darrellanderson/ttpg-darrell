@@ -10,6 +10,16 @@ export const WINDOW_BUTTON_ASSET = {
     TO_WORLD: "ui/window/to-world.png",
 } as const;
 
+/**
+ * Wrapper around a widget, created before attaching to a window and
+ * destroyed after detaching.  The IWindowWidget is not reused, will
+ * create a new one if needed.
+ */
+export interface IWindowWidget {
+    create(params: WindowWidgetParams): Widget;
+    destroy(): void;
+}
+
 export type WindowWidgetParams = {
     scale: number;
     fontSize: number; // suggested
@@ -51,5 +61,5 @@ export type WindowParams = {
         rot?: [pitch: number, yaw: number, roll: number] | Rotator;
     };
 
-    createWidget: (widgetParams: WindowWidgetParams) => Widget;
+    windowWidgetGenerator: () => IWindowWidget;
 };
