@@ -24,6 +24,7 @@ type ChessClockWidgetButtonData = {
 
 export class ChessClockWidget implements IWindowWidget {
     private readonly _chessClockData: ChessClockData;
+
     private _buttonData: Array<ChessClockWidgetButtonData> = [];
 
     private _intervalUpdateWidget: NodeJS.Timeout | undefined = undefined;
@@ -58,8 +59,12 @@ export class ChessClockWidget implements IWindowWidget {
         for (let i: number = 0; i < playerCount; i++) {
             const buttonData: ChessClockWidgetButtonData = {
                 bg: new Border(),
-                playerName: new Text().setJustification(TextJustification.Left),
-                time: new Text().setJustification(TextJustification.Right),
+                playerName: new Text()
+                    .setJustification(TextJustification.Left)
+                    .setFontSize(params.fontSize),
+                time: new Text()
+                    .setJustification(TextJustification.Right)
+                    .setFontSize(params.fontSize),
             };
 
             buttonData.bg.setChild(
