@@ -33,6 +33,8 @@ export class ChessClockData {
             this._intervalAssignTimeToActivePlayer,
             ChessClockData.INTERVAL_SECONDS * 1000
         ) as NodeJS.Timeout;
+
+        // TODO persistence.
     }
 
     destroy(): void {

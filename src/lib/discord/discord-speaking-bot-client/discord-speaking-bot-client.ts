@@ -11,6 +11,9 @@ export class DiscordSpeakingBotClient {
     > = new TriggerableMulticastDelegate<
         (deltas: Map<string, number>, summary: Array<string>) => void
     >();
+    public readonly onSpeakingError: TriggerableMulticastDelegate<
+        (reason: string) => void
+    > = new TriggerableMulticastDelegate<(reason: string) => void>();
 
     private readonly _speakingAssign: SpeakingAssign = new SpeakingAssign();
     private readonly _speakingParser: SpeakingParser = new SpeakingParser();
@@ -110,10 +113,11 @@ export class DiscordSpeakingBotClient {
         }
 
         const reject = (reason: string): void => {
-            console.error(
-                "DiscordSpeakingBotClient._readAndProcessWebHook: reject",
-                reason
-            );
+            const msg =
+                "DiscordSpeakingBotClient._readAndProcessWebHook: reject " +
+                reason;
+            console.log(msg);
+            this.onSpeakingError.trigger(msg);
         };
 
         this._webHook.get(this._messageId).then((message: string): void => {
