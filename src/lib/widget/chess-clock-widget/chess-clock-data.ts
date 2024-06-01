@@ -1,36 +1,37 @@
-import { Color } from "@tabletop-playground/api";
+import { Color, Player, world } from "@tabletop-playground/api";
+import { Broadcast } from "../../broadcast/broadcast";
 
 export class ChessClockData {
     private readonly _playerSlotToWidgetColor: Map<number, Color> = new Map();
-    private readonly _playerSlotToRemainingTime: Map<number, number> =
+    private readonly _playerSlotToRemainingSeconds: Map<number, number> =
         new Map();
 
     private _playerCount: number = -1;
     private _playerOrder: Array<number> = [];
-    private _timeBudget: number = 0;
+    private _timeBudgetSeconds: number = 0;
     private _activePlayerSlot: number = -1;
     private _intervalHandle: NodeJS.Timeout | undefined = undefined;
 
     // Expose for testing.
-    public static readonly INTERVAL_DURATION_ASSIGN_TIME = 1000;
+    public static readonly INTERVAL_SECONDS = 1;
     public readonly _intervalAssignTimeToActivePlayer = (): void => {
         const activePlayerSlot: number = this._activePlayerSlot;
         if (activePlayerSlot === -1) {
             return;
         }
         const remainingTime: number =
-            this._playerSlotToRemainingTime.get(activePlayerSlot) ??
-            this._timeBudget;
-        this._playerSlotToRemainingTime.set(
+            this._playerSlotToRemainingSeconds.get(activePlayerSlot) ??
+            this._timeBudgetSeconds;
+        this._playerSlotToRemainingSeconds.set(
             activePlayerSlot,
-            remainingTime - ChessClockData.INTERVAL_DURATION_ASSIGN_TIME
+            remainingTime - ChessClockData.INTERVAL_SECONDS
         );
     };
 
     constructor() {
         this._intervalHandle = setInterval(
             this._intervalAssignTimeToActivePlayer,
-            ChessClockData.INTERVAL_DURATION_ASSIGN_TIME
+            ChessClockData.INTERVAL_SECONDS * 1000
         ) as NodeJS.Timeout;
     }
 
@@ -82,25 +83,66 @@ export class ChessClockData {
         return this;
     }
 
-    getTimeBudget(): number {
-        return this._timeBudget;
+    getTimeBudgetSeconds(): number {
+        return this._timeBudgetSeconds;
     }
 
-    setTimeBudget(timeBudget: number): this {
-        this._timeBudget = timeBudget;
+    setTimeBudgetSeconds(timeBudgetSeconds: number): this {
+        this._timeBudgetSeconds = timeBudgetSeconds;
         return this;
     }
 
-    getTimeRemaining(playerSlot: number): number {
+    getTimeRemainingSeconds(playerSlot: number): number {
         return (
-            this._playerSlotToRemainingTime.get(playerSlot) ?? this._timeBudget
+            this._playerSlotToRemainingSeconds.get(playerSlot) ??
+            this._timeBudgetSeconds
         );
     }
 
     resetTimers(): this {
-        for (const playerSlot of this._playerSlotToRemainingTime.keys()) {
-            this._playerSlotToRemainingTime.set(playerSlot, this._timeBudget);
+        for (const playerSlot of this._playerSlotToRemainingSeconds.keys()) {
+            this._playerSlotToRemainingSeconds.set(
+                playerSlot,
+                this._timeBudgetSeconds
+            );
         }
+        return this;
+    }
+
+    applyTimeDetlas(deltas: Map<string, number>, summary: Array<string>): this {
+        const msg: string = "Chess clock: " + summary.join("\n");
+        this.broadcast(msg);
+
+        for (const [playerName, delta] of deltas.entries()) {
+            const player: Player | undefined =
+                world.getPlayerByName(playerName);
+            if (!player) {
+                console.log(
+                    `ChessClockData.applyTimeDetlas: player not found: ${playerName}`
+                );
+                continue;
+            }
+            const playerSlot: number = player.getSlot();
+
+            const remainingTime: number =
+                this._playerSlotToRemainingSeconds.get(playerSlot) ??
+                this._timeBudgetSeconds;
+
+            console.log(
+                `ChessClockData.applyTimeDetlas: ${playerName} ${delta} ${remainingTime}`
+            );
+
+            this._playerSlotToRemainingSeconds.set(
+                playerSlot,
+                remainingTime - delta // counting down, subtract to remove time
+            );
+        }
+        return this;
+    }
+
+    broadcast(msg: string): this {
+        const msgColor: Color = new Color(1, 0.55, 0, 1);
+        Broadcast.chatAll(msg, msgColor);
         return this;
     }
 }

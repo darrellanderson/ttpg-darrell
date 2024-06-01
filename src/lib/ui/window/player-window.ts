@@ -53,8 +53,12 @@ export class PlayerWindow {
     >();
 
     static _saveScale(playerSlot: number, scale: number): void {
-        let json: string =
-            world.getSavedData(PlayerWindow.PLAYER_SLOT_TO_SCALE_KEY) ?? "{}";
+        let json: string = world.getSavedData(
+            PlayerWindow.PLAYER_SLOT_TO_SCALE_KEY
+        );
+        if (!json || json.length === 0) {
+            json = "{}";
+        }
         const playerSlotToScale: { [playerSlot: number]: number } =
             JSON.parse(json);
         playerSlotToScale[playerSlot] = scale;
@@ -63,8 +67,12 @@ export class PlayerWindow {
     }
 
     static _loadScale(playerSlot: number): number {
-        const json: string =
-            world.getSavedData(PlayerWindow.PLAYER_SLOT_TO_SCALE_KEY) ?? "{}";
+        let json: string = world.getSavedData(
+            PlayerWindow.PLAYER_SLOT_TO_SCALE_KEY
+        );
+        if (!json || json.length === 0) {
+            json = "{}";
+        }
         const playerSlotToScale: { [playerSlot: number]: number } =
             JSON.parse(json);
         return playerSlotToScale[playerSlot] ?? 1;
@@ -105,6 +113,7 @@ export class PlayerWindow {
         this.detach();
         this._scale += PlayerWindow.WORLD_SCALE_DELTA;
         this._scale = Math.min(this._scale, 3);
+        PlayerWindow._saveScale(this._playerSlot, this._scale);
         this.attach();
         this.onStateChanged.trigger();
     }).get();
@@ -291,13 +300,20 @@ export class PlayerWindow {
             throw new Error("Window widget not created");
         }
         const spacer = new Border().setColor([0, 0, 0, 0]);
+
+        const scale =
+            this._scale *
+            (this._target === "screen" ? 1 : PlayerWindow.WORLD_SCALE);
+
         const child: Widget = this._windowWidget.create({
-            scale:
-                this._scale *
-                (this._target === "screen" ? 1 : PlayerWindow.WORLD_SCALE),
+            scale,
             fontSize: titleFontSize,
             spacing: padding,
             playerSlot: this._playerSlot,
+            windowSize: {
+                width: this._params.size.width * scale,
+                height: this._params.size.height * scale,
+            },
         });
         const window: Canvas = new Canvas()
             .addChild(new Border(), 0, 0, width, height)

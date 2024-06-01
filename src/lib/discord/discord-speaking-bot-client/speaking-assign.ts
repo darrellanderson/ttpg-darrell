@@ -4,8 +4,12 @@ export class SpeakingAssignRecord extends TimeSpanRecord {
     public readonly defaultUser: string | undefined;
     public readonly speakers: Array<string> = [];
 
-    constructor(start: number, end: number, defaultUser: string | undefined) {
-        super(start, end);
+    constructor(
+        startSeconds: number,
+        endSeconds: number,
+        defaultUser: string | undefined
+    ) {
+        super(startSeconds, endSeconds);
         this.defaultUser = defaultUser;
     }
 
@@ -37,27 +41,27 @@ export class SpeakingAssign {
         return this._spans.getSpans();
     }
 
-    addChangeTurn(name: string | undefined, timestamp: number): this {
-        this._spans.clampLast(timestamp);
-        this._spans.add(new SpeakingAssignRecord(timestamp, Infinity, name));
+    addChangeTurn(name: string | undefined, seconds: number): this {
+        this._spans.clampLast(seconds);
+        this._spans.add(new SpeakingAssignRecord(seconds, Infinity, name));
         return this;
     }
 
     _addSpeaking(
         name: string,
-        start: number,
-        end: number
+        startSeconds: number,
+        endSeconds: number
     ): Array<SpeakingAssignRecord> {
         const result: Array<SpeakingAssignRecord> = [];
 
         // Split any existing spans at the speaking start/end times.
-        this._spans.split(start);
-        this._spans.split(end);
+        this._spans.split(startSeconds);
+        this._spans.split(endSeconds);
 
         // Add this new speaker to the matching spans.
         const overlaps: Array<SpeakingAssignRecord> = this._spans.overlaps(
-            start,
-            end
+            startSeconds,
+            endSeconds
         );
         for (const overlap of overlaps) {
             if (overlap.defaultUser === name) {
@@ -74,8 +78,8 @@ export class SpeakingAssign {
 
     summarizeSpeakingOverlaps(
         name: string,
-        start: number,
-        end: number
+        startSeconds: number,
+        endSeconds: number
     ): {
         summary: Array<string>;
         deltas: Map<string, number>;
@@ -83,13 +87,13 @@ export class SpeakingAssign {
         const summary: Array<string> = [];
         const deltas: Map<string, number> = new Map();
 
-        const duration = end - start;
-        summary.push(`${name} spoke ${duration.toFixed(1)} seconds`);
+        const seconds: number = endSeconds - startSeconds;
+        summary.push(`${name} spoke ${seconds.toFixed(1)} seconds`);
 
         const records: Array<SpeakingAssignRecord> = this._addSpeaking(
             name,
-            start,
-            end
+            startSeconds,
+            endSeconds
         );
 
         for (const record of records) {
@@ -97,8 +101,8 @@ export class SpeakingAssign {
                 continue;
             }
 
-            const offsetStart = record.start - start;
-            const offsetEnd = record.end - start;
+            const offsetStart = record.start - startSeconds;
+            const offsetEnd = record.end - startSeconds;
             const prefix = `[${offsetStart.toFixed(1)}:${offsetEnd.toFixed(1)}]`;
             const duration = record.end - record.start;
             const speakerCount = record.speakers.length;

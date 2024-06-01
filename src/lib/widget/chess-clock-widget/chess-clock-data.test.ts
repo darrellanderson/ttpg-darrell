@@ -49,29 +49,29 @@ it("timeBudget", () => {
     const data: ChessClockData = new ChessClockData();
 
     let timeBudget: number = 0;
-    expect(data.getTimeBudget()).toBe(timeBudget);
+    expect(data.getTimeBudgetSeconds()).toBe(timeBudget);
 
     timeBudget = 100;
-    data.setTimeBudget(timeBudget);
-    expect(data.getTimeBudget()).toBe(timeBudget);
+    data.setTimeBudgetSeconds(timeBudget);
+    expect(data.getTimeBudgetSeconds()).toBe(timeBudget);
 
     data.destroy();
 });
 
 it("interval", () => {
-    const data: ChessClockData = new ChessClockData().setTimeBudget(10000);
+    const data: ChessClockData = new ChessClockData().setTimeBudgetSeconds(10);
     const playerSlot: number = 7;
-    expect(data.getTimeRemaining(playerSlot)).toBe(10000);
+    expect(data.getTimeRemainingSeconds(playerSlot)).toBe(10);
 
     data._intervalAssignTimeToActivePlayer();
-    expect(data.getTimeRemaining(playerSlot)).toBe(10000);
+    expect(data.getTimeRemainingSeconds(playerSlot)).toBe(10);
 
     data.setActivePlayerSlot(playerSlot);
     data._intervalAssignTimeToActivePlayer();
-    expect(data.getTimeRemaining(playerSlot)).toBe(9000);
+    expect(data.getTimeRemainingSeconds(playerSlot)).toBe(9);
 
     data.resetTimers();
-    expect(data.getTimeRemaining(playerSlot)).toBe(10000);
+    expect(data.getTimeRemainingSeconds(playerSlot)).toBe(10);
 
     data.destroy();
 });

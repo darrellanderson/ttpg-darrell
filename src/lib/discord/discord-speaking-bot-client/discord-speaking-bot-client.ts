@@ -21,7 +21,7 @@ export class DiscordSpeakingBotClient {
     private _messageId: string | undefined;
     private _intervalHandle: NodeJS.Timeout | undefined;
 
-    private _lastTimestamp: number = 0;
+    private _lastSeconds: number = 0;
     private _lastSpeaker: string = "";
 
     static _parseBase64Data(base64data: string): {
@@ -53,6 +53,12 @@ export class DiscordSpeakingBotClient {
 
     setVerbose(verbose: boolean): this {
         this._verbose = verbose;
+        return this;
+    }
+
+    setActivePlayer(playerName: string | undefined): this {
+        const seconds: number = Date.now() / 1000;
+        this._speakingAssign.addChangeTurn(playerName, seconds);
         return this;
     }
 
@@ -115,6 +121,10 @@ export class DiscordSpeakingBotClient {
                 console.log(
                     "DiscordSpeakingBotClient._readAndProcessWebHook: read message"
                 );
+                console.log(`MESSAGE: """\n${message}\n"""`);
+            }
+            if (message.startsWith("Waiting for data")) {
+                return; // nothing to process
             }
 
             const speakers: Array<SpeakingRecord> =
@@ -124,19 +134,19 @@ export class DiscordSpeakingBotClient {
             for (const speaker of speakers) {
                 // Skip old records, already processed.  Allow
                 // multiple records with same timestamp.
-                if (speaker.endTimestamp < this._lastTimestamp) {
+                if (speaker.endSeconds < this._lastSeconds) {
                     continue;
                 }
                 // Skip if same speaker as the last processed record.
                 if (
-                    speaker.endTimestamp === this._lastTimestamp &&
+                    speaker.endSeconds === this._lastSeconds &&
                     speaker.userId === this._lastSpeaker
                 ) {
                     continue;
                 }
 
                 // Remember the last processed record.
-                this._lastTimestamp = speaker.endTimestamp;
+                this._lastSeconds = speaker.endSeconds;
                 this._lastSpeaker = speaker.userId;
 
                 const playerName: string | undefined =
@@ -148,9 +158,13 @@ export class DiscordSpeakingBotClient {
                     deltas: Map<string, number>;
                 } = this._speakingAssign.summarizeSpeakingOverlaps(
                     playerName,
-                    speaker.startTimestamp,
-                    speaker.endTimestamp
+                    speaker.startSeconds,
+                    speaker.endSeconds
                 );
+
+                if (data.deltas.size === 0) {
+                    continue;
+                }
 
                 if (this._verbose) {
                     console.log(

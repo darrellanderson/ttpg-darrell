@@ -2,10 +2,13 @@ import {
     Border,
     Color,
     ContentButton,
+    HorizontalAlignment,
     HorizontalBox,
+    LayoutBox,
     Player,
     Text,
     TextJustification,
+    VerticalAlignment,
     VerticalBox,
     Widget,
     world,
@@ -43,9 +46,7 @@ export class ChessClockWidget implements IWindowWidget {
             this.update();
         }, 1000);
 
-        const widget: VerticalBox = new VerticalBox().setChildDistance(
-            params.spacing
-        );
+        const verticalBox: VerticalBox = new VerticalBox().setChildDistance(0);
 
         const playerCount: number = this._chessClockData.getPlayerCount();
         const playerSlots: Array<number> =
@@ -54,6 +55,11 @@ export class ChessClockWidget implements IWindowWidget {
             throw new Error("player count mismatch");
         }
 
+        // ContentButton does not support Fill alignment (yet),
+        // set a layout box with exact size.  Content button adds
+        // 4 padding to the contained widget (unless stripped).
+        const h: number = (params.windowSize.height - 2) / playerCount;
+
         this._buttonData = [];
 
         for (let i: number = 0; i < playerCount; i++) {
@@ -61,17 +67,26 @@ export class ChessClockWidget implements IWindowWidget {
                 bg: new Border(),
                 playerName: new Text()
                     .setJustification(TextJustification.Left)
-                    .setFontSize(params.fontSize),
+                    .setFontSize(params.fontSize)
+                    .setAutoWrap(false),
                 time: new Text()
                     .setJustification(TextJustification.Right)
-                    .setFontSize(params.fontSize),
+                    .setFontSize(params.fontSize)
+                    .setAutoWrap(false),
             };
 
-            buttonData.bg.setChild(
-                new HorizontalBox()
-                    .addChild(buttonData.playerName)
-                    .addChild(buttonData.time)
-            );
+            const horizontalBox: Widget = new HorizontalBox()
+                .addChild(buttonData.playerName, 0)
+                .addChild(buttonData.time, 1);
+
+            const layoutBox: Widget = new LayoutBox()
+                .setHorizontalAlignment(HorizontalAlignment.Fill)
+                .setVerticalAlignment(VerticalAlignment.Center)
+                .setOverrideHeight(h)
+                .setOverrideWidth(params.windowSize.width)
+                .setChild(horizontalBox);
+
+            buttonData.bg.setChild(layoutBox);
             const button: ContentButton = new ContentButton().setChild(
                 buttonData.bg
             );
@@ -92,21 +107,29 @@ export class ChessClockWidget implements IWindowWidget {
                     this._chessClockData.getActivePlayerSlot() ===
                     targetPlayerSlot
                 ) {
-                    const msg: string = `Player ${clickingPlayerName} stopped the clock`;
-                    console.log(msg);
+                    const msg: string = `${clickingPlayerName} stopped the clock`;
+                    this._chessClockData.broadcast(msg);
                     this._chessClockData.setActivePlayerSlot(-1);
                 } else {
-                    const msg: string = `Player ${clickingPlayerName} set the clock to ${targetPlayerName}`;
-                    console.log(msg);
+                    const msg: string = `${clickingPlayerName} set the clock to ${targetPlayerName}`;
+                    this._chessClockData.broadcast(msg);
                     this._chessClockData.setActivePlayerSlot(targetPlayerSlot);
                 }
+
+                this.update();
             });
             this._buttonData.push(buttonData);
+
+            // Remove the content button border.
+            const buttonBox: Widget = new LayoutBox()
+                .setPadding(-4, -4, -4, -4)
+                .setOverrideHeight(h)
+                .setChild(button);
+            verticalBox.addChild(buttonBox);
         }
 
         this.update();
-
-        return widget;
+        return verticalBox;
     }
 
     destroy(): void {
@@ -142,7 +165,7 @@ export class ChessClockWidget implements IWindowWidget {
                 throw new Error("invalid color");
             }
 
-            let playerName: string = `<player ${i}>`;
+            let playerName: string = `<player ${i + 1}>`;
             const player: Player | undefined =
                 world.getPlayerBySlot(playerSlot);
             if (player !== undefined) {
@@ -150,15 +173,16 @@ export class ChessClockWidget implements IWindowWidget {
             }
 
             const time: number =
-                this._chessClockData.getTimeRemaining(playerSlot) / 1000;
-            const minutes: string = Math.floor(time / 60).toString();
-            const seconds: string = Math.floor(time % 60)
-                .toString()
-                .padStart(2, "0");
-            const timeStr: string = `${minutes}:${seconds}`;
+                this._chessClockData.getTimeRemainingSeconds(playerSlot);
+            const sign: string = time < 0 ? "-" : "";
+            const minutes: string = Math.floor(Math.abs(time) / 60).toString();
+            const seconds: string = (Math.abs(time) % 60)
+                .toFixed(1)
+                .padStart(4, "0");
+            const timeStr: string = `${sign}${minutes}:${seconds}`;
 
-            buttonData.playerName.setText(playerName);
-            buttonData.time.setText(timeStr);
+            buttonData.playerName.setText(" " + playerName + "   ");
+            buttonData.time.setText(timeStr + " ");
 
             const isActive: boolean =
                 this._chessClockData.getActivePlayerSlot() === playerSlot;

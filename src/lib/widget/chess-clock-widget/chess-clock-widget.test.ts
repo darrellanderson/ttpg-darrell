@@ -23,6 +23,10 @@ it("create/update/destroy", () => {
         fontSize: 10,
         spacing: 1,
         playerSlot: 7,
+        windowSize: {
+            width: 100,
+            height: 100,
+        },
     });
     chessClockWidget.update();
     chessClockWidget.destroy();
