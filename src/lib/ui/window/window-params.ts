@@ -53,12 +53,12 @@ export type WindowParams = {
     };
 
     world?: {
-        anchor: {
-            x: number;
-            y: number;
+        playerSlotToTransform: {
+            [key: number]: {
+                pos: [x: number, y: number, z: number] | Vector;
+                rot: [pitch: number, yaw: number, roll: number] | Rotator;
+            };
         };
-        pos: [x: number, y: number, z: number] | Vector;
-        rot?: [pitch: number, yaw: number, roll: number] | Rotator;
     };
 
     windowWidgetGenerator: () => IWindowWidget;

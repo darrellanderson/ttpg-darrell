@@ -1,4 +1,4 @@
-import { Rotator, Text, Vector, Widget } from "@tabletop-playground/api";
+import { Text, Widget } from "@tabletop-playground/api";
 import { clickAll } from "../../jest-util/click-all/click-all";
 import {
     IWindowWidget,
@@ -83,12 +83,7 @@ it("attach/detach (world, anchor, pos)", () => {
             height: 10,
         },
         world: {
-            anchor: {
-                x: 1,
-                y: 1,
-            },
-            pos: [2, 3, 4],
-            rot: [5, 6, 7],
+            playerSlotToTransform: { 0: { pos: [2, 3, 4], rot: [5, 6, 7] } },
         },
         windowWidgetGenerator: (): IWindowWidget => {
             return new MockIWindowWidget();
@@ -106,12 +101,7 @@ it("attach/detach (world, anchor, pos as vector/rotqtor)", () => {
             height: 10,
         },
         world: {
-            anchor: {
-                x: 1,
-                y: 1,
-            },
-            pos: new Vector(2, 3, 4),
-            rot: new Rotator(5, 6, 7),
+            playerSlotToTransform: { 0: { pos: [2, 3, 4], rot: [5, 6, 7] } },
         },
         windowWidgetGenerator: (): IWindowWidget => {
             return new MockIWindowWidget();

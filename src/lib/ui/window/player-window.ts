@@ -388,28 +388,38 @@ export class PlayerWindow {
             const ui = new UIElement();
             this._worldUi = ui;
 
-            ui.anchorX = this._params.world?.anchor.x ?? 0.5;
-            ui.anchorY = this._params.world?.anchor.y ?? 0.5;
+            const rawPos:
+                | [x: number, y: number, z: number]
+                | Vector
+                | undefined =
+                this._params.world?.playerSlotToTransform[this._playerSlot]
+                    ?.pos;
 
-            if (Array.isArray(this._params.world?.pos)) {
-                const [x, y, z]: [x: number, y: number, z: number] =
-                    this._params.world.pos;
+            const rawRot:
+                | [pitch: number, yaw: number, roll: number]
+                | Rotator
+                | undefined =
+                this._params.world?.playerSlotToTransform[this._playerSlot]
+                    ?.rot;
+
+            if (Array.isArray(rawPos)) {
+                const [x, y, z]: [x: number, y: number, z: number] = rawPos;
                 ui.position = new Vector(x, y, z);
-            } else if (this._params.world?.pos) {
-                ui.position = this._params.world.pos;
+            } else if (rawPos) {
+                ui.position = rawPos;
             } else {
                 ui.position = new Vector(0, 0, world.getTableHeight() + 3);
             }
 
-            if (Array.isArray(this._params.world?.rot)) {
+            if (Array.isArray(rawRot)) {
                 const [pitch, yaw, roll]: [
                     pitch: number,
                     yaw: number,
                     roll: number,
-                ] = this._params.world.rot;
+                ] = rawRot;
                 ui.rotation = new Rotator(pitch, yaw, roll);
-            } else if (this._params.world?.rot) {
-                ui.rotation = this._params.world.rot;
+            } else if (rawRot) {
+                ui.rotation = rawRot;
             } else {
                 ui.rotation = new Rotator(0, 0, 0);
             }
