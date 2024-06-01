@@ -46,8 +46,15 @@ export class ChessClockWidget implements IWindowWidget {
             params.spacing
         );
 
-        this._buttonData = [];
         const playerCount: number = this._chessClockData.getPlayerCount();
+        const playerSlots: Array<number> =
+            this._chessClockData.getPlayerOrder();
+        if (playerSlots.length !== playerCount) {
+            throw new Error("player count mismatch");
+        }
+
+        this._buttonData = [];
+
         for (let i: number = 0; i < playerCount; i++) {
             const buttonData: ChessClockWidgetButtonData = {
                 bg: new Border(),
@@ -65,8 +72,7 @@ export class ChessClockWidget implements IWindowWidget {
             );
 
             button.onClicked.add((button: ContentButton, player: Player) => {
-                const targetPlayerSlot: number | undefined =
-                    this._chessClockData.getPlayerOrder()[i];
+                const targetPlayerSlot: number | undefined = playerSlots[i];
                 if (targetPlayerSlot === undefined) {
                     throw new Error("invalid player slot");
                 }
@@ -127,7 +133,7 @@ export class ChessClockWidget implements IWindowWidget {
 
             const color: Color | undefined =
                 this._chessClockData.getWidgetColor(playerSlot);
-            if (color !== undefined) {
+            if (color === undefined) {
                 throw new Error("invalid color");
             }
 
