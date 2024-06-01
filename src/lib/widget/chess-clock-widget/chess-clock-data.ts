@@ -5,6 +5,7 @@ export class ChessClockData {
     private readonly _playerSlotToRemainingTime: Map<number, number> =
         new Map();
 
+    private _playerCount: number = -1;
     private _playerOrder: Array<number> = [];
     private _timeBudget: number = 0;
     private _activePlayerSlot: number = -1;
@@ -49,11 +50,23 @@ export class ChessClockData {
         return this;
     }
 
+    getPlayerCount(): number {
+        return this._playerCount;
+    }
+
+    setPlayerCount(playerCount: number): this {
+        this._playerCount = playerCount;
+        return this;
+    }
+
     getPlayerOrder(): Array<number> {
         return this._playerOrder;
     }
 
     setPlayerOrder(playerOrder: Array<number>): this {
+        if (playerOrder.length !== this._playerCount) {
+            throw new Error("player count mismatch");
+        }
         this._playerOrder = [...playerOrder];
         return this;
     }

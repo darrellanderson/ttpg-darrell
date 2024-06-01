@@ -19,7 +19,7 @@ it("activePlayerSlot", () => {
 });
 
 it("playerOrder", () => {
-    const data: ChessClockData = new ChessClockData();
+    const data: ChessClockData = new ChessClockData().setPlayerCount(4);
 
     let playerOrder: Array<number> = [];
     expect(data.getPlayerOrder()).toEqual(playerOrder);
