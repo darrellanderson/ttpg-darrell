@@ -34,7 +34,15 @@ export class ChessClockData {
             ChessClockData.INTERVAL_SECONDS * 1000
         ) as NodeJS.Timeout;
 
-        // TODO persistence.
+        this._load();
+    }
+
+    private _load(): void {
+        // TODO
+    }
+
+    private _save(): void {
+        // TODO
     }
 
     destroy(): void {
@@ -50,6 +58,7 @@ export class ChessClockData {
 
     setActivePlayerSlot(playerSlot: number): this {
         this._activePlayerSlot = playerSlot;
+        this._save();
         return this;
     }
 
@@ -59,6 +68,7 @@ export class ChessClockData {
 
     setPlayerCount(playerCount: number): this {
         this._playerCount = playerCount;
+        this._save();
         return this;
     }
 
@@ -71,6 +81,7 @@ export class ChessClockData {
             throw new Error("player count mismatch");
         }
         this._playerOrder = [...playerOrder];
+        this._save();
         return this;
     }
 
@@ -82,6 +93,7 @@ export class ChessClockData {
 
     setWidgetColor(playerSlot: number, color: Color): this {
         this._playerSlotToWidgetColor.set(playerSlot, color);
+        this._save();
         return this;
     }
 
@@ -91,6 +103,7 @@ export class ChessClockData {
 
     setTimeBudgetSeconds(timeBudgetSeconds: number): this {
         this._timeBudgetSeconds = timeBudgetSeconds;
+        this._save();
         return this;
     }
 
@@ -99,6 +112,12 @@ export class ChessClockData {
             this._playerSlotToRemainingSeconds.get(playerSlot) ??
             this._timeBudgetSeconds
         );
+    }
+
+    setTimeRemainingSeconds(playerSlot: number, seconds: number): this {
+        this._playerSlotToRemainingSeconds.set(playerSlot, seconds);
+        this._save();
+        return this;
     }
 
     resetTimers(): this {
@@ -139,6 +158,7 @@ export class ChessClockData {
                 remainingTime - delta // counting down, subtract to remove time
             );
         }
+        this._save();
         return this;
     }
 

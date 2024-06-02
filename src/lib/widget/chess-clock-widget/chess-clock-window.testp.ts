@@ -12,7 +12,7 @@ const chessClockData = new ChessClockData()
     .setPlayerOrder([0, 1, 2, 3])
     .setWidgetColor(1, new Color(1, 1, 0))
     .setActivePlayerSlot(1)
-    .setTimeBudgetSeconds(300);
+    .setTimeBudgetSeconds(1200);
 new ChessClockWindow(chessClockData);
 
 const speaking = new DiscordSpeakingBotClient()
