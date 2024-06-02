@@ -3,6 +3,7 @@ import { ChessClockData } from "./chess-clock-data";
 import { IWindowWidget, WindowParams } from "../../ui/window/window-params";
 import { NamespaceId } from "../../namespace-id/namespace-id";
 import { Window } from "../../ui/window/window";
+import { ChessClockConfigWidget } from "./chess-clock-config-widget";
 
 export class ChessClockConfigWindow {
     constructor(chessClockData: ChessClockData) {
@@ -13,16 +14,17 @@ export class ChessClockConfigWindow {
         const params: WindowParams = {
             title: "Chess Clock Config",
             size: {
-                width: 500,
-                height: 500,
+                width: 750,
+                height: 400,
             },
             screen: {
                 anchor: { x: 0.5, y: 0.5 },
                 pos: { u: 0.5, v: 0.5 },
             },
             windowWidgetGenerator: (): IWindowWidget => {
-                throw new Error("Not implemented yet");
+                return new ChessClockConfigWidget(chessClockData);
             },
+            diableWarpScreenWorld: true,
         };
 
         const playerSlots: Array<number> = world

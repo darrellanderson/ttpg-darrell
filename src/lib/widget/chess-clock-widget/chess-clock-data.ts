@@ -1,7 +1,10 @@
 import { Color, Player, world } from "@tabletop-playground/api";
 import { Broadcast } from "../../broadcast/broadcast";
+import { NamespaceId } from "../../namespace-id/namespace-id";
 
 export class ChessClockData {
+    private readonly _persistentKey: NamespaceId | undefined;
+
     private readonly _playerSlotToWidgetColor: Map<number, Color> = new Map();
     private readonly _playerSlotToRemainingSeconds: Map<number, number> =
         new Map();
@@ -28,7 +31,9 @@ export class ChessClockData {
         );
     };
 
-    constructor() {
+    constructor(persistenceKey?: NamespaceId) {
+        this._persistentKey = persistenceKey;
+
         this._intervalHandle = setInterval(
             this._intervalAssignTimeToActivePlayer,
             ChessClockData.INTERVAL_SECONDS * 1000
@@ -38,11 +43,45 @@ export class ChessClockData {
     }
 
     private _load(): void {
-        // TODO
+        if (!this._persistentKey) {
+            return;
+        }
+        const json: string = world.getSavedData(this._persistentKey);
+        if (!json || json.length === 0) {
+            return;
+        }
+
+        // Should use Zod for validation...
+        const data = JSON.parse(json);
+        if (data.rs) {
+            for (const [playerSlot, remainingSeconds] of data.rs) {
+                this._playerSlotToRemainingSeconds.set(
+                    playerSlot,
+                    remainingSeconds
+                );
+            }
+        }
+        if (data.tb) {
+            this._timeBudgetSeconds = data.tb;
+        }
+        if (data.ap !== undefined) {
+            this._activePlayerSlot = data.ap;
+        }
     }
 
     private _save(): void {
-        // TODO
+        if (!this._persistentKey) {
+            return;
+        }
+
+        // Only persist some fields, assume recreation handles most.
+        const data = {
+            rs: Array.from(this._playerSlotToRemainingSeconds.entries()),
+            tb: this._timeBudgetSeconds,
+            ap: this._activePlayerSlot,
+        };
+        const json: string = JSON.stringify(data);
+        world.setSavedData(json, this._persistentKey);
     }
 
     destroy(): void {

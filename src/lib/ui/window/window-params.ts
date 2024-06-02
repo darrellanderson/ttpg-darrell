@@ -29,6 +29,7 @@ export type WindowWidgetParams = {
         width: number;
         height: number;
     };
+    close: () => void;
 };
 
 export type WindowParams = {
@@ -66,4 +67,7 @@ export type WindowParams = {
     };
 
     windowWidgetGenerator: () => IWindowWidget;
+
+    // Show a global context menu item to show/hide per-player windows.
+    addToggleMenuItem?: boolean;
 };

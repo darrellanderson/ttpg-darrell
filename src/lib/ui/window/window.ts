@@ -1,4 +1,4 @@
-import { world } from "@tabletop-playground/api";
+import { Player, globalEvents, world } from "@tabletop-playground/api";
 import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate/triggerable-multicast-delegate";
 import { NamespaceId } from "../../namespace-id/namespace-id";
 import { PlayerWindow } from "./player-window";
@@ -9,6 +9,7 @@ import { WindowParams } from "./window-params";
  * (starts in world for VR players).  Optionally allow collapse, close.
  */
 export class Window {
+    private readonly _windowName: string | undefined;
     private readonly _playerWindows: Array<PlayerWindow>;
 
     /**
@@ -67,6 +68,8 @@ export class Window {
         playerSlots: Array<number>,
         persistenceKey?: NamespaceId
     ) {
+        this._windowName = params.title;
+
         // Create (unattached) per-player windows.
         this._playerWindows = playerSlots.map(
             (playerSlot) => new PlayerWindow(params, playerSlot)
@@ -100,6 +103,10 @@ export class Window {
                 this.onAllClosed.trigger();
             }
         });
+
+        if (params.addToggleMenuItem) {
+            this.addGlobalContextMenuToggle();
+        }
     }
 
     attach(): this {
@@ -115,6 +122,33 @@ export class Window {
             playerWindow.detach();
         }
         this.onStateChanged.trigger();
+        return this;
+    }
+
+    addGlobalContextMenuToggle(): this {
+        console.log("Window.addGlobalContextMenuToggle");
+        if (!this._windowName) {
+            throw new Error("must have a window name");
+        }
+        const actionName: string = `*Toggle ${this._windowName}`;
+        world.addCustomAction(actionName, "show/hide the window");
+
+        globalEvents.onCustomAction.add(
+            (clickingPlayer: Player, identifier: string): void => {
+                if (identifier === actionName) {
+                    for (const playerWindow of this._playerWindows) {
+                        if (
+                            playerWindow.getPlayerSlot() ===
+                            clickingPlayer.getSlot()
+                        ) {
+                            console.log("Window context menu toggle");
+                            playerWindow.toggle();
+                        }
+                    }
+                }
+            }
+        );
+
         return this;
     }
 }

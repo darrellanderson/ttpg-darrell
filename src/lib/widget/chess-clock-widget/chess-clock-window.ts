@@ -12,7 +12,7 @@ export class ChessClockWindow {
     private readonly _chessClockData: ChessClockData;
     private readonly _window: Window;
 
-    constructor(chessClockData: ChessClockData) {
+    constructor(chessClockData: ChessClockData, persistenceKey?: NamespaceId) {
         if (chessClockData.getPlayerOrder().length === 0) {
             throw new Error("No players in chess clock data.");
         }
@@ -32,6 +32,8 @@ export class ChessClockWindow {
             windowWidgetGenerator: function (): IWindowWidget {
                 return new ChessClockWidget(chessClockData);
             },
+            diableWarpScreenWorld: true,
+            addToggleMenuItem: true,
         };
 
         // Create for all involved players.
@@ -45,7 +47,6 @@ export class ChessClockWindow {
             }
         }
 
-        const persistenceKey: NamespaceId | undefined = undefined;
         this._window = new Window(params, playerSlots, persistenceKey).attach();
     }
 

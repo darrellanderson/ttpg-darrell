@@ -314,6 +314,10 @@ export class PlayerWindow {
                 width: this._params.size.width * scale,
                 height: this._params.size.height * scale,
             },
+            close: () => {
+                this.detach();
+                this.onStateChanged.trigger();
+            },
         });
         const window: Canvas = new Canvas()
             .addChild(new Border(), 0, 0, width, height)
@@ -469,6 +473,15 @@ export class PlayerWindow {
             this._windowWidget = undefined;
         }
 
+        return this;
+    }
+
+    public toggle(): this {
+        if (this._screenUi || this._worldUi) {
+            this.detach();
+        } else {
+            this.attach();
+        }
         return this;
     }
 }

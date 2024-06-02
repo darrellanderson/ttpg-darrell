@@ -1,5 +1,6 @@
 import { Color } from "ttpg-mock";
 import { ChessClockData } from "./chess-clock-data";
+import { NamespaceId } from "../../namespace-id/namespace-id";
 
 it("constructor", () => {
     new ChessClockData().destroy();
@@ -74,4 +75,41 @@ it("interval", () => {
     expect(data.getTimeRemainingSeconds(playerSlot)).toBe(10);
 
     data.destroy();
+});
+
+it("persist remaining time", () => {
+    let chessClockData: ChessClockData | undefined;
+    const key: NamespaceId = "@test/chess-clock-data";
+    const playerSlot: number = 7;
+    const remainingSeconds: number = 3;
+    const timeBudgetSeconds: number = 10;
+    const activePlayerSlot: number = 8;
+
+    // Create initial, expect empty.
+    chessClockData = new ChessClockData(key);
+    expect(chessClockData.getTimeBudgetSeconds()).toBe(0);
+    expect(chessClockData.getTimeRemainingSeconds(playerSlot)).toBe(0);
+    expect(chessClockData.getActivePlayerSlot()).toBe(-1);
+
+    // Set, validate values.
+    chessClockData.setTimeBudgetSeconds(timeBudgetSeconds);
+    chessClockData.setTimeRemainingSeconds(playerSlot, remainingSeconds);
+    chessClockData.setActivePlayerSlot(activePlayerSlot);
+    expect(chessClockData.getTimeBudgetSeconds()).toBe(timeBudgetSeconds);
+    expect(chessClockData.getTimeRemainingSeconds(playerSlot)).toBe(
+        remainingSeconds
+    );
+    expect(chessClockData.getActivePlayerSlot()).toBe(activePlayerSlot);
+
+    chessClockData.destroy();
+
+    // Create new instance, expect values to persist.
+    chessClockData = new ChessClockData(key);
+    expect(chessClockData.getTimeBudgetSeconds()).toBe(timeBudgetSeconds);
+    expect(chessClockData.getTimeRemainingSeconds(playerSlot)).toBe(
+        remainingSeconds
+    );
+    expect(chessClockData.getActivePlayerSlot()).toBe(activePlayerSlot);
+
+    chessClockData.destroy();
 });

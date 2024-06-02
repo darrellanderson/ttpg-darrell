@@ -3,6 +3,7 @@ import { DiscordSpeakingBotClient } from "../../discord/discord-speaking-bot-cli
 import { ErrorHandler } from "../../error-handler/error-handler";
 import { ChessClockData } from "./chess-clock-data";
 import { ChessClockWindow } from "./chess-clock-window";
+import { ChessClockConfigWindow } from "./chess-clock-config-window";
 
 console.log("ChessClockWindow testp");
 new ErrorHandler().init();
@@ -35,3 +36,5 @@ speaking.onSpeakingError.add((reason: string): void => {
 speaking.connect(
     "eyJpIjoiMTI0NjU0MjE1NDM0ODg4ODE1NyIsInQiOiJvb2NGelJHVXBJc1dpMWc3dFNPQVZQRElNUHBtQjhrSTJtOHcycDZZMnQ5UnZpOHo4Zkt0VkNkbXJIbmhoMFZxVWN1ayIsIm0iOiIxMjQ2NTQyMTU1MjAwMDY5NzYzIn0"
 );
+
+new ChessClockConfigWindow(chessClockData);
