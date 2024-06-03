@@ -1,7 +1,7 @@
 import { Color } from "@tabletop-playground/api";
 import { ErrorHandler } from "../../error-handler/error-handler";
 import { ChessClockData } from "./chess-clock-data";
-import { ChessClockWindow } from "./chess-clock-window";
+//import { ChessClockWindow } from "./chess-clock-window";
 import { ChessClockConfigWindow } from "./chess-clock-config-window";
 
 console.log("ChessClockWindow testp");
@@ -15,9 +15,9 @@ const chessClockData = new ChessClockData()
     .setActivePlayerSlot(1)
     .setTimeBudgetSeconds(1200);
 
-chessClockData.connectDiscordSpeaking(
-    "eyJpIjoiMTI0NjU0MjE1NDM0ODg4ODE1NyIsInQiOiJvb2NGelJHVXBJc1dpMWc3dFNPQVZQRElNUHBtQjhrSTJtOHcycDZZMnQ5UnZpOHo4Zkt0VkNkbXJIbmhoMFZxVWN1ayIsIm0iOiIxMjQ2NTQyMTU1MjAwMDY5NzYzIn0"
-);
+//chessClockData.connectDiscordSpeaking(
+//    "eyJpIjoiMTI0NjU0MjE1NDM0ODg4ODE1NyIsInQiOiJvb2NGelJHVXBJc1dpMWc3dFNPQVZQRElNUHBtQjhrSTJtOHcycDZZMnQ5UnZpOHo4Zkt0VkNkbXJIbmhoMFZxVWN1ayIsIm0iOiIxMjQ2NTQyMTU1MjAwMDY5NzYzIn0"
+//);
 
-new ChessClockWindow(chessClockData);
+//new ChessClockWindow(chessClockData);
 new ChessClockConfigWindow(chessClockData);

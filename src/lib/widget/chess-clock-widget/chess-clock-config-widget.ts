@@ -14,9 +14,14 @@ import {
     WindowWidgetParams,
 } from "../../ui/window/window-params";
 import { ChessClockData } from "./chess-clock-data";
+import { ChessClockWindow } from "./chess-clock-window";
 
 export class ChessClockConfigWidget implements IWindowWidget {
+    private readonly _chessClockData: ChessClockData;
+
     constructor(chessClockData: ChessClockData) {
+        this._chessClockData = chessClockData;
+
         if (chessClockData.getPlayerOrder().length === 0) {
             throw new Error("No players in chess clock data.");
         }
@@ -94,7 +99,14 @@ export class ChessClockConfigWidget implements IWindowWidget {
         okButton.onClicked.add(() => {
             params.close();
 
-            // TODO CREATE SPEAKING WINDOW
+            const timeBudgetMinutes: number = timeBudget.getValue();
+            const discordToken: string = discordKey.getText();
+
+            this._chessClockData.setTimeBudgetSeconds(timeBudgetMinutes * 60);
+            if (discordToken && discordToken.length > 0) {
+                this._chessClockData.connectDiscordSpeaking(discordToken);
+            }
+            new ChessClockWindow(this._chessClockData);
         });
 
         return panel;

@@ -124,9 +124,7 @@ export class ChessClockData {
         this.disconnectDiscordSpeaking();
 
         this._discordToken = discordToken;
-        this._discordSpeaking = new DiscordSpeakingBotClient().setVerbose(
-            false
-        );
+        this._discordSpeaking = new DiscordSpeakingBotClient().setVerbose(true);
         this._discordSpeaking.onSpeakingDeltas.add(this._onSpeakingDeltas);
         this._discordSpeaking.onSpeakingError.add(this._onSpeakingError);
         this._discordSpeaking.connect(discordToken);
