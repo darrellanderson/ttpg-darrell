@@ -13,7 +13,7 @@ it("activePlayerSlot", () => {
     expect(data.getActivePlayerSlot()).toBe(playerSlot);
 
     playerSlot = 7;
-    data.setActivePlayerSlot(playerSlot);
+    data.overrideActivePlayerSlot(playerSlot);
     expect(data.getActivePlayerSlot()).toBe(playerSlot);
 
     data.destroy();
@@ -67,7 +67,7 @@ it("interval", () => {
     data._intervalAssignTimeToActivePlayer();
     expect(data.getTimeRemainingSeconds(playerSlot)).toBe(10);
 
-    data.setActivePlayerSlot(playerSlot);
+    data.overrideActivePlayerSlot(playerSlot);
     data._intervalAssignTimeToActivePlayer();
     expect(data.getTimeRemainingSeconds(playerSlot)).toBe(9);
 
@@ -94,7 +94,7 @@ it("persist remaining time", () => {
     // Set, validate values.
     chessClockData.setTimeBudgetSeconds(timeBudgetSeconds);
     chessClockData.setTimeRemainingSeconds(playerSlot, remainingSeconds);
-    chessClockData.setActivePlayerSlot(activePlayerSlot);
+    chessClockData.overrideActivePlayerSlot(activePlayerSlot);
     expect(chessClockData.getTimeBudgetSeconds()).toBe(timeBudgetSeconds);
     expect(chessClockData.getTimeRemainingSeconds(playerSlot)).toBe(
         remainingSeconds

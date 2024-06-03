@@ -150,14 +150,14 @@ export class ChessClockData {
      * @param playerSlot
      * @returns
      */
-    setActivePlayerSlot(playerSlot: number): this {
+    overrideActivePlayerSlot(playerSlot: number): this {
         this._activePlayerSlot = playerSlot;
         this._save();
         return this;
     }
 
     setCurrentTurn(playerSlot: number): this {
-        this.setActivePlayerSlot(playerSlot);
+        this.overrideActivePlayerSlot(playerSlot);
         if (this._discordSpeaking) {
             const playerName: string | undefined = world
                 .getPlayerBySlot(playerSlot)

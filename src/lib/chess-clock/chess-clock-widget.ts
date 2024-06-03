@@ -128,11 +128,11 @@ export class ChessClockWidget implements IWindowWidget {
                     ) {
                         const msg: string = `${clickingPlayerName} stopped the clock`;
                         this._chessClockData.broadcast(msg);
-                        this._chessClockData.setActivePlayerSlot(-1);
+                        this._chessClockData.overrideActivePlayerSlot(-1);
                     } else {
                         const msg: string = `${clickingPlayerName} set the clock to ${targetPlayerName}`;
                         this._chessClockData.broadcast(msg);
-                        this._chessClockData.setActivePlayerSlot(
+                        this._chessClockData.overrideActivePlayerSlot(
                             targetPlayerSlot
                         );
                     }
@@ -192,7 +192,7 @@ export class ChessClockWidget implements IWindowWidget {
         this._chessClockData.broadcast(msg);
 
         // Pause updates.
-        this._chessClockData.setActivePlayerSlot(-1);
+        this._chessClockData.overrideActivePlayerSlot(-1);
 
         for (const buttonData of this._buttonData) {
             const value: string = buttonData.time.getText();

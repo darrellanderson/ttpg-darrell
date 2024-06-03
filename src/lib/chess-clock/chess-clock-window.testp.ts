@@ -12,7 +12,7 @@ const chessClockData = new ChessClockData()
     .setPlayerOrder([0, 1, 2, 3])
     .setWidgetColor(1, new Color(1, 1, 0))
     .setCurrentTurn(1)
-    .setActivePlayerSlot(1)
+    .overrideActivePlayerSlot(1)
     .setTimeBudgetSeconds(1200);
 
 //chessClockData.connectDiscordSpeaking(
@@ -20,4 +20,6 @@ const chessClockData = new ChessClockData()
 //);
 
 //new ChessClockWindow(chessClockData);
+
+// config will create the chess clock window
 new ChessClockConfigWindow(chessClockData);
