@@ -1,6 +1,6 @@
 import { Color } from "ttpg-mock";
 import { ChessClockData } from "./chess-clock-data";
-import { NamespaceId } from "../../namespace-id/namespace-id";
+import { NamespaceId } from "../namespace-id/namespace-id";
 
 it("constructor", () => {
     new ChessClockData().destroy();

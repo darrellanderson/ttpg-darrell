@@ -1,7 +1,7 @@
 import { Color, Player, world } from "@tabletop-playground/api";
-import { Broadcast } from "../../broadcast/broadcast";
-import { NamespaceId } from "../../namespace-id/namespace-id";
-import { DiscordSpeakingBotClient } from "../../discord/discord-speaking-bot-client/discord-speaking-bot-client";
+import { Broadcast } from "../broadcast/broadcast";
+import { NamespaceId } from "../namespace-id/namespace-id";
+import { DiscordSpeakingBotClient } from "../discord/discord-speaking-bot-client/discord-speaking-bot-client";
 
 export class ChessClockData {
     private readonly _persistentKey: NamespaceId | undefined;

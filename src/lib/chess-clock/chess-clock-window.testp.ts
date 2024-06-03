@@ -1,5 +1,5 @@
 import { Color } from "@tabletop-playground/api";
-import { ErrorHandler } from "../../error-handler/error-handler";
+import { ErrorHandler } from "../error-handler/error-handler";
 import { ChessClockData } from "./chess-clock-data";
 //import { ChessClockWindow } from "./chess-clock-window";
 import { ChessClockConfigWindow } from "./chess-clock-config-window";

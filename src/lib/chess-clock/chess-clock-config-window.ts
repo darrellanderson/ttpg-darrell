@@ -1,8 +1,8 @@
 import { world } from "@tabletop-playground/api";
 import { ChessClockData } from "./chess-clock-data";
-import { IWindowWidget, WindowParams } from "../../ui/window/window-params";
-import { NamespaceId } from "../../namespace-id/namespace-id";
-import { Window } from "../../ui/window/window";
+import { IWindowWidget, WindowParams } from "../ui/window/window-params";
+import { NamespaceId } from "../namespace-id/namespace-id";
+import { Window } from "../ui/window/window";
 import { ChessClockConfigWidget } from "./chess-clock-config-widget";
 
 export class ChessClockConfigWindow {

@@ -16,10 +16,7 @@ import {
     WidgetSwitcher,
     world,
 } from "@tabletop-playground/api";
-import {
-    IWindowWidget,
-    WindowWidgetParams,
-} from "../../ui/window/window-params";
+import { IWindowWidget, WindowWidgetParams } from "../ui/window/window-params";
 import { ChessClockData } from "./chess-clock-data";
 
 type ChessClockWidgetButtonData = {
