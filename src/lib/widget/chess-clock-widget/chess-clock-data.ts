@@ -1,6 +1,7 @@
 import { Color, Player, world } from "@tabletop-playground/api";
 import { Broadcast } from "../../broadcast/broadcast";
 import { NamespaceId } from "../../namespace-id/namespace-id";
+import { DiscordSpeakingBotClient } from "../../discord/discord-speaking-bot-client/discord-speaking-bot-client";
 
 export class ChessClockData {
     private readonly _persistentKey: NamespaceId | undefined;
@@ -14,6 +15,9 @@ export class ChessClockData {
     private _timeBudgetSeconds: number = 0;
     private _activePlayerSlot: number = -1;
     private _intervalHandle: NodeJS.Timeout | undefined = undefined;
+
+    private _discordToken: string | undefined = undefined;
+    private _discordSpeaking: DiscordSpeakingBotClient | undefined = undefined;
 
     // Expose for testing.
     public static readonly INTERVAL_SECONDS = 1;
@@ -40,6 +44,10 @@ export class ChessClockData {
         ) as NodeJS.Timeout;
 
         this._load();
+
+        if (this._discordToken) {
+            this.connectDiscordSpeaking(this._discordToken);
+        }
     }
 
     private _load(): void {
@@ -67,6 +75,9 @@ export class ChessClockData {
         if (data.ap !== undefined) {
             this._activePlayerSlot = data.ap;
         }
+        if (data.dt && data.dt.length > 0) {
+            this._discordToken = data.dt;
+        }
     }
 
     private _save(): void {
@@ -79,6 +90,7 @@ export class ChessClockData {
             rs: Array.from(this._playerSlotToRemainingSeconds.entries()),
             tb: this._timeBudgetSeconds,
             ap: this._activePlayerSlot,
+            dt: this._discordToken ?? "",
         };
         const json: string = JSON.stringify(data);
         world.setSavedData(json, this._persistentKey);
@@ -89,15 +101,71 @@ export class ChessClockData {
             clearInterval(this._intervalHandle);
             this._intervalHandle = undefined;
         }
+        if (this._discordSpeaking) {
+            this._discordSpeaking.disconnect();
+            this._discordSpeaking = undefined;
+        }
+    }
+
+    private readonly _onSpeakingDeltas = (
+        deltas: Map<string, number>,
+        summary: Array<string>
+    ): void => {
+        this.applyTimeDetlas(deltas, summary);
+    };
+    private readonly _onSpeakingError = (reason: string): void => {
+        this.broadcast(
+            "onSpeakingError, disconnecting from Discord: " + reason
+        );
+        this.disconnectDiscordSpeaking();
+    };
+
+    connectDiscordSpeaking(discordToken: string) {
+        this.disconnectDiscordSpeaking();
+
+        this._discordToken = discordToken;
+        this._discordSpeaking = new DiscordSpeakingBotClient().setVerbose(
+            false
+        );
+        this._discordSpeaking.onSpeakingDeltas.add(this._onSpeakingDeltas);
+        this._discordSpeaking.onSpeakingError.add(this._onSpeakingError);
+        this._discordSpeaking.connect(discordToken);
+    }
+
+    disconnectDiscordSpeaking() {
+        if (!this._discordSpeaking) {
+            return; // already disconnected
+        }
+        this._discordSpeaking.onSpeakingDeltas.remove(this._onSpeakingDeltas);
+        this._discordSpeaking.onSpeakingError.remove(this._onSpeakingError);
+        this._discordSpeaking.disconnect();
+        this._discordSpeaking = undefined;
     }
 
     getActivePlayerSlot(): number {
         return this._activePlayerSlot;
     }
 
+    /**
+     * Override the current turn player.
+     *
+     * @param playerSlot
+     * @returns
+     */
     setActivePlayerSlot(playerSlot: number): this {
         this._activePlayerSlot = playerSlot;
         this._save();
+        return this;
+    }
+
+    setCurrentTurn(playerSlot: number): this {
+        this.setActivePlayerSlot(playerSlot);
+        if (this._discordSpeaking) {
+            const playerName: string | undefined = world
+                .getPlayerBySlot(playerSlot)
+                ?.getName();
+            this._discordSpeaking.setCurrentTurn(playerName);
+        }
         return this;
     }
 

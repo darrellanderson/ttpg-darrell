@@ -117,7 +117,7 @@ export class DiscordSpeakingBotClient {
                 "DiscordSpeakingBotClient._readAndProcessWebHook: reject " +
                 reason;
             console.log(msg);
-            this.onSpeakingError.trigger(msg);
+            this.onSpeakingError.trigger(reason);
         };
 
         this._webHook.get(this._messageId).then((message: string): void => {
