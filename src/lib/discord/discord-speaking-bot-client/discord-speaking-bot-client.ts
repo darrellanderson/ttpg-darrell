@@ -59,7 +59,7 @@ export class DiscordSpeakingBotClient {
         return this;
     }
 
-    setActivePlayer(playerName: string | undefined): this {
+    setCurrentTurn(playerName: string | undefined): this {
         const seconds: number = Date.now() / 1000;
         this._speakingAssign.addChangeTurn(playerName, seconds);
         return this;

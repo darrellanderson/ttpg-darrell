@@ -18,7 +18,7 @@ new ChessClockWindow(chessClockData);
 
 const speaking = new DiscordSpeakingBotClient()
     .setVerbose(false)
-    .setActivePlayer("player 2");
+    .setCurrentTurn("player 2");
 
 speaking.onSpeakingDeltas.add(
     (deltas: Map<string, number>, summary: Array<string>): void => {
