@@ -126,7 +126,6 @@ export class Window {
     }
 
     addGlobalContextMenuToggle(): this {
-        console.log("Window.addGlobalContextMenuToggle");
         if (!this._windowName) {
             throw new Error("must have a window name");
         }
@@ -141,7 +140,6 @@ export class Window {
                             playerWindow.getPlayerSlot() ===
                             clickingPlayer.getSlot()
                         ) {
-                            console.log("Window context menu toggle");
                             playerWindow.toggle();
                         }
                     }

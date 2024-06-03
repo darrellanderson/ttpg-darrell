@@ -27,6 +27,7 @@ it("create/update/destroy", () => {
             width: 100,
             height: 100,
         },
+        close: () => {},
     });
     chessClockWidget.update();
     chessClockWidget.destroy();
