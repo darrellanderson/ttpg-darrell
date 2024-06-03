@@ -44,8 +44,8 @@ it("attach/detach (screen, anchor, pos)", () => {
         },
         screen: {
             anchor: {
-                x: 1,
-                y: 1,
+                u: 1,
+                v: 1,
             },
             pos: {
                 u: 1,

@@ -26,7 +26,7 @@ export class ChessClockWindow {
                 height: chessClockData.getPlayerCount() * 60,
             },
             screen: {
-                anchor: { x: 0.5, y: 0 },
+                anchor: { u: 0.5, v: 0 },
                 pos: { u: 0.5, v: 0.1 },
             },
             windowWidgetGenerator: function (): IWindowWidget {

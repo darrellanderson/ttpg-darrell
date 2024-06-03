@@ -18,7 +18,7 @@ export class ChessClockConfigWindow {
                 height: 400,
             },
             screen: {
-                anchor: { x: 0.5, y: 0.5 },
+                anchor: { u: 0.5, v: 0.5 },
                 pos: { u: 0.5, v: 0.5 },
             },
             windowWidgetGenerator: (): IWindowWidget => {
