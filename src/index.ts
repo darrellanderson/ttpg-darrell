@@ -8,7 +8,7 @@ export * from "./lib/chess-clock/chess-clock-config-widget";
 export * from "./lib/chess-clock/chess-clock-config-window";
 export * from "./lib/chess-clock/chess-clock-data";
 export * from "./lib/chess-clock/chess-clock-widget";
-export * from "./lib/chess-clock/chess-clock-window";
+export * from "./lib/chess-clock/chess-clock";
 export * from "./lib/context-menu/abstract-right-click-card/abstract-right-click-card";
 export * from "./lib/context-menu/abstract-right-click-deck/abstract-right-click-deck";
 export * from "./lib/context-menu/leave-seat/leave-seat";

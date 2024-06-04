@@ -1,12 +1,15 @@
-import { world } from "@tabletop-playground/api";
 import { ChessClockData } from "./chess-clock-data";
+import { ChessClockConfigWidget } from "./chess-clock-config-widget";
 import { IWindowWidget, WindowParams } from "../ui/window/window-params";
 import { NamespaceId } from "../namespace-id/namespace-id";
 import { Window } from "../ui/window/window";
-import { ChessClockConfigWidget } from "./chess-clock-config-widget";
 
 export class ChessClockConfigWindow {
-    constructor(chessClockData: ChessClockData) {
+    constructor(
+        visibleToPlayerSlot: number,
+        chessClockData: ChessClockData,
+        onOkClicked: () => void
+    ) {
         if (chessClockData.getPlayerOrder().length === 0) {
             throw new Error("No players in chess clock data.");
         }
@@ -22,25 +25,12 @@ export class ChessClockConfigWindow {
                 pos: { u: 0.5, v: 0.5 },
             },
             windowWidgetGenerator: (): IWindowWidget => {
-                return new ChessClockConfigWidget(chessClockData);
+                return new ChessClockConfigWidget(chessClockData, onOkClicked);
             },
             diableWarpScreenWorld: true,
         };
 
-        const playerSlots: Array<number> = world
-            .getAllPlayers()
-            .filter((player) => player.isHost())
-            .map((player) => player.getSlot());
-        if (playerSlots.length !== 1) {
-            throw new Error(
-                `Expected 1 host player, got ${playerSlots.length}`
-            );
-        }
-
-        chessClockData.broadcast(
-            "Opening chess clock config on host's screen."
-        );
-
+        const playerSlots: Array<number> = [visibleToPlayerSlot];
         const persistenceKey: NamespaceId | undefined = undefined;
         new Window(params, playerSlots, persistenceKey).attach();
     }

@@ -11,13 +11,14 @@ import {
 } from "@tabletop-playground/api";
 import { IWindowWidget, WindowWidgetParams } from "../ui/window/window-params";
 import { ChessClockData } from "./chess-clock-data";
-import { ChessClockWindow } from "./chess-clock-window";
 
 export class ChessClockConfigWidget implements IWindowWidget {
     private readonly _chessClockData: ChessClockData;
+    private readonly _onOkClicked: () => void | undefined;
 
-    constructor(chessClockData: ChessClockData) {
+    constructor(chessClockData: ChessClockData, onOkClicked: () => void) {
         this._chessClockData = chessClockData;
+        this._onOkClicked = onOkClicked;
 
         if (chessClockData.getPlayerOrder().length === 0) {
             throw new Error("No players in chess clock data.");
@@ -103,7 +104,11 @@ export class ChessClockConfigWidget implements IWindowWidget {
             if (discordToken && discordToken.length > 0) {
                 this._chessClockData.connectDiscordSpeaking(discordToken);
             }
-            new ChessClockWindow(this._chessClockData);
+
+            // Tell listener.
+            if (this._onOkClicked) {
+                this._onOkClicked();
+            }
         });
 
         return panel;
