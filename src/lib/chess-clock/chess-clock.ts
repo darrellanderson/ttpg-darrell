@@ -14,7 +14,8 @@ export type ChessClockParams = {
 };
 
 export class ChessClock {
-    private static readonly KEY_CHESS_DATA: NamespaceId | undefined = undefined; // "@data/chess-clock";
+    private static readonly KEY_CHESS_DATA: NamespaceId | undefined =
+        "@data/chess-clock";
     private static readonly KEY_WINDOW: NamespaceId = "@window/chess-clock";
 
     private readonly _chessClockData: ChessClockData;
