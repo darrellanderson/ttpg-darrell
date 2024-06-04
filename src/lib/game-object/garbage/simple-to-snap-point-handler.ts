@@ -1,7 +1,6 @@
-import { GameObject, SnapPoint } from "@tabletop-playground/api";
+import { GameObject, Rotator, SnapPoint } from "@tabletop-playground/api";
 import { GarbageHandler } from "./garbage-container";
 import { NSID } from "../../nsid/nsid";
-import { Rotator } from "ttpg-mock";
 import { Find } from "../../find/find";
 
 /**

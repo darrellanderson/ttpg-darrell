@@ -38,7 +38,6 @@ export * from "./lib/global/global-init";
 export * from "./lib/global/i-global";
 export * from "./lib/heap/heap";
 export * from "./lib/hex/hex";
-export * from "./lib/jest-util/click-all/click-all";
 export * from "./lib/layout-objects/layout-objects";
 export * from "./lib/locale/locale";
 export * from "./lib/namespace-id/namespace-id";
