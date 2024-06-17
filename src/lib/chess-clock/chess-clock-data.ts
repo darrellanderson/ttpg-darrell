@@ -156,6 +156,13 @@ export class ChessClockData {
         return this;
     }
 
+    /**
+     * Turn change, set current player and tell speaking
+     * where to refund talk-over time.
+     *
+     * @param playerSlot
+     * @returns
+     */
     setCurrentTurn(playerSlot: number): this {
         this.overrideActivePlayerSlot(playerSlot);
         if (this._discordSpeaking) {

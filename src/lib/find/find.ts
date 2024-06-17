@@ -7,10 +7,10 @@ import {
     MultistateObject,
     SnapPoint,
     StaticObject,
+    Vector,
     world,
 } from "@tabletop-playground/api";
 import { NSID } from "../nsid/nsid";
-import { Vector } from "ttpg-mock";
 
 /**
  * Find things in the game world.  Generally speaking finds the first matching

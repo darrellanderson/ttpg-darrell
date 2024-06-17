@@ -21,7 +21,7 @@ const params: WindowParams = {
         height: 400,
     },
     screen: {
-        anchor: { x: 0.5, y: 0 },
+        anchor: { u: 0.5, v: 0 },
         pos: { u: 0.5, v: 0.1 },
     },
     windowWidgetGenerator: (): IWindowWidget => new WindowWidget(),

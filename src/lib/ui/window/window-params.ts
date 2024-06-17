@@ -48,8 +48,8 @@ export type WindowParams = {
 
     screen?: {
         anchor: {
-            x: number;
-            y: number;
+            u: number;
+            v: number;
         };
         pos: {
             u: number;

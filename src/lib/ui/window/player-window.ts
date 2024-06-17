@@ -385,8 +385,8 @@ export class PlayerWindow {
             const ui = new ScreenUIElement();
             this._screenUi = ui;
 
-            ui.anchorX = this._params.screen?.anchor.x ?? 0.5;
-            ui.anchorY = this._params.screen?.anchor.y ?? 0.5;
+            ui.anchorX = this._params.screen?.anchor.u ?? 0.5;
+            ui.anchorY = this._params.screen?.anchor.v ?? 0.5;
 
             ui.relativePositionX = true;
             ui.relativePositionY = true;
