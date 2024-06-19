@@ -105,7 +105,7 @@ export class Hex {
             }
             return [q, r, s];
         }
-        throw new Error("match error");
+        throw new Error(`match error: "${hex}"`);
     }
 
     static _hexToString(q: number, r: number, s: number): HexType {
