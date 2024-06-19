@@ -134,48 +134,26 @@ it("get", () => {
         .addLink("tag-51", "tag-50");
 
     let adjList: Array<AdjacencyResult> = [];
-    const getAndSortAdjList = (minDistance: number, maxDistance: number) => {
+    const getAdjList = (minDistance: number, maxDistance: number) => {
         adjList = adj
             .get("00", maxDistance)
             .filter((x) => x.distance >= minDistance);
-        adjList.sort((a, b) => {
-            if (a.distance < b.distance) {
-                return -1;
-            } else if (a.distance > b.distance) {
-                return 1;
-            }
-            if (a.node < b.node) {
-                return -1;
-            } else if (a.node > b.node) {
-                return 1;
-            }
-            return 0;
-        });
     };
 
-    getAndSortAdjList(0, 0);
+    getAdjList(0, 0);
     expect(adjList).toEqual([{ distance: 0, node: "00", path: ["00"] }]);
 
-    getAndSortAdjList(0, 1);
+    getAdjList(0, 1);
     expect(adjList).toEqual([
         { distance: 0, node: "00", path: ["00"] },
         { distance: 1, node: "01", path: ["00", "01"] },
         { distance: 1, node: "10", path: ["00", "10"] },
-        { distance: 1, node: "11", path: ["00", "01", "11"] },
-        { distance: 1, node: "21", path: ["00", "01", "11", "21"] },
-        { distance: 1, node: "31", path: ["00", "01", "11", "21", "31"] },
-        { distance: 1, node: "41", path: ["00", "01", "11", "21", "31", "41"] },
     ]);
 
-    getAndSortAdjList(0, 2);
+    getAdjList(1, 2);
     expect(adjList).toEqual([
-        { distance: 0, node: "00", path: ["00"] },
         { distance: 1, node: "01", path: ["00", "01"] },
         { distance: 1, node: "10", path: ["00", "10"] },
-        { distance: 1, node: "11", path: ["00", "01", "11"] },
-        { distance: 1, node: "21", path: ["00", "01", "11", "21"] },
-        { distance: 1, node: "31", path: ["00", "01", "11", "21", "31"] },
-        { distance: 1, node: "41", path: ["00", "01", "11", "21", "31", "41"] },
         { distance: 2, node: "20", path: ["00", "10", "20"] },
         {
             distance: 2,
@@ -184,7 +162,7 @@ it("get", () => {
         },
     ]);
 
-    getAndSortAdjList(2, 3);
+    getAdjList(2, 3);
     expect(adjList).toEqual([
         { distance: 2, node: "20", path: ["00", "10", "20"] },
         {

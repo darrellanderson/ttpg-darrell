@@ -9,6 +9,8 @@ export type AdjacencyResult = {
 /**
  * Nodes have tags, links connect tags.
  * Tansit nodes are on a path, but do not add to distance ("hyperlane").
+ * Transit nodes are not "reachable" and will not appear as destinations,
+ * but they can appear in paths to reach other nodes.
  *
  * If two nodes share a tag they are NOT connected UNLESS there is a link
  * from tag back to itself.
@@ -232,6 +234,26 @@ export class Adjacency {
                 }
             }
         }
-        return Object.values(nodeToAdjacencyResult);
+        let result = Object.values(nodeToAdjacencyResult);
+
+        // Remove transit nodes.
+        result = result.filter((entry) => !this._transitNodes.has(entry.node));
+
+        // Sort by distance.
+        result = result.sort((a, b) => {
+            if (a.distance < b.distance) {
+                return -1;
+            } else if (a.distance > b.distance) {
+                return 1;
+            }
+            if (a.node < b.node) {
+                return -1;
+            } else if (a.node > b.node) {
+                return 1;
+            }
+            return 0;
+        });
+
+        return result;
     }
 }
