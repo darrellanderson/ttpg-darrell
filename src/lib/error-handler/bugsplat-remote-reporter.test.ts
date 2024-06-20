@@ -69,8 +69,8 @@ it("mock fetch", () => {
     });
     reporter.init();
 
-    ErrorHandler.onError.trigger("test");
-    ErrorHandler.onError.trigger("test"); // suppressed duplicate
+    ErrorHandler.onError.trigger("test", "raw-test");
+    ErrorHandler.onError.trigger("test", "raw-test"); // suppressed duplicate
 
     jest.restoreAllMocks();
 });

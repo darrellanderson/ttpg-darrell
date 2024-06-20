@@ -28,7 +28,7 @@ export type ErrorLocation = {
 export class ErrorHandler implements IGlobal {
     // Event that sends the rewritten error (line mapping).
     public static readonly onError: TriggerableMulticastDelegate<
-        (error: string) => void
+        (error: string, rawError?: string) => void
     > = new TriggerableMulticastDelegate<(error: string) => void>();
 
     private readonly _reverseBase64Alphabet: Map<string, number>;
@@ -49,7 +49,7 @@ export class ErrorHandler implements IGlobal {
         globalThis.$uncaughtException = (error: string) => {
             const rewrittenError = this.rewriteError(error);
             this.reportError(rewrittenError);
-            ErrorHandler.onError.trigger(rewrittenError);
+            ErrorHandler.onError.trigger(rewrittenError, error);
         };
     }
 

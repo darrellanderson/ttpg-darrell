@@ -27,8 +27,8 @@ export class BugSplatRemoteReporter implements IGlobal {
     }
 
     init() {
-        ErrorHandler.onError.add((error: string) => {
-            this.onError(error);
+        ErrorHandler.onError.add((error: string, rawError?: string) => {
+            this.onError(rawError ?? error);
         });
     }
 
