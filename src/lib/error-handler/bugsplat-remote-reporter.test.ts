@@ -48,7 +48,7 @@ it("createFetchOptions", () => {
         "--~~boundary~~",
         'Content-Disposition: form-data; name="callstack"',
         "",
-        "my-error",
+        "Error: my-error",
         "--~~boundary~~--",
     ]);
 });
@@ -85,13 +85,14 @@ it("error", async () => {
     reporter.init();
 
     const report = (res: FetchResponse) => {
+        console.log("report");
         console.log(
             JSON.stringify({ url: res.url, ok: res.ok, status: res.status })
         );
-        console.log(res.text());
+        //console.log(res.text());
     };
 
-    const error: string = new Error().stack || "n/a";
+    const error: string = new Error("unittest").stack || "n/a";
 
     await reporter.sendError(error).then(report, report);
 });

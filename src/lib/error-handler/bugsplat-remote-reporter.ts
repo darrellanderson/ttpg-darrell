@@ -48,6 +48,10 @@ export class BugSplatRemoteReporter implements IGlobal {
     }
 
     createFetchOptions(error: string): FetchOptions {
+        if (!error.startsWith("Error: ")) {
+            error = "Error: " + error;
+        }
+
         const form: { [key: string]: string } = {
             database: this._database,
             appName: this._appName,
