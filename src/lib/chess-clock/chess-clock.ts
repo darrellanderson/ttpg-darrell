@@ -55,7 +55,7 @@ export class ChessClock {
             windowWidgetGenerator: function (): IWindowWidget {
                 return new ChessClockWidget(chessClockData);
             },
-            diableWarpScreenWorld: true,
+            disableWarpScreenWorld: true,
             addToggleMenuItem: true,
         };
         const visibleTo: Array<number> = [...params.playerSlotOrder];

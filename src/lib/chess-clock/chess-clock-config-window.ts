@@ -27,7 +27,7 @@ export class ChessClockConfigWindow {
             windowWidgetGenerator: (): IWindowWidget => {
                 return new ChessClockConfigWidget(chessClockData, onOkClicked);
             },
-            diableWarpScreenWorld: true,
+            disableWarpScreenWorld: true,
         };
 
         const playerSlots: Array<number> = [visibleToPlayerSlot];

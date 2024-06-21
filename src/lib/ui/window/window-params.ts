@@ -36,8 +36,8 @@ export type WindowParams = {
     title?: string;
 
     disableClose?: boolean;
-    diableCollapse?: boolean;
-    diableWarpScreenWorld?: boolean;
+    disableCollapse?: boolean;
+    disableWarpScreenWorld?: boolean;
 
     size: {
         width: number;

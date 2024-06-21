@@ -256,7 +256,7 @@ export class PlayerWindow {
         button.onClicked.add(this._onClickGrow);
         titleBarPanel.addChild(button, 0);
 
-        if (!this._params.diableWarpScreenWorld) {
+        if (!this._params.disableWarpScreenWorld) {
             const image: string =
                 this._target === "screen"
                     ? WINDOW_BUTTON_ASSET.TO_WORLD
@@ -272,7 +272,7 @@ export class PlayerWindow {
             titleBarPanel.addChild(button, 0);
         }
 
-        if (!this._params.diableCollapse) {
+        if (!this._params.disableCollapse) {
             const image: string = this._collapsed
                 ? WINDOW_BUTTON_ASSET.EXPAND
                 : WINDOW_BUTTON_ASSET.COLLAPSE;
