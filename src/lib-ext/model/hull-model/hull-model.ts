@@ -126,7 +126,7 @@ export class HullModel extends AbstractModel {
         vertex.y = Math.round(vertex.y * 10000) / 10000;
         vertex.z = Math.round(vertex.z * 10000) / 10000;
 
-        return `${type} ${vertex.y} ${vertex.z} ${vertex.x}`;
+        return `${type} ${vertex.x} ${vertex.z} ${vertex.y}`;
     }
 
     toModel(): string {
@@ -187,7 +187,8 @@ export class HullModel extends AbstractModel {
         lines.push("", "# Top faces");
         const topFaceEntries: Array<ObjVertexForFace> = hull.map(
             (_, index): ObjVertexForFace => {
-                const v: number = topVertices1BasedStart + index;
+                const v: number =
+                    topVertices1BasedStart + (index % hull.length);
                 //const vt: string = "";
                 const vn: number = topNormal1BasedStart;
                 return `${v}//${vn}`;
@@ -199,7 +200,8 @@ export class HullModel extends AbstractModel {
         lines.push("", "# Bottom faces");
         const botFaceEntries: Array<ObjVertexForFace> = hull.map(
             (_, index): ObjVertexForFace => {
-                const v: number = botVertices1BasedStart + index;
+                const v: number =
+                    botVertices1BasedStart + (index % hull.length);
                 //const vt: string = "";
                 const vn: number = botNormal1BasedStart;
                 return `${v}//${vn}`;
@@ -210,13 +212,13 @@ export class HullModel extends AbstractModel {
         // Side faces.
         lines.push("", "# Side faces");
         for (let index = 0; index <= hull.length; index++) {
-            const a: number = topVertices1BasedStart + index;
+            const a: number = topVertices1BasedStart + (index % hull.length);
             const b: number =
                 topVertices1BasedStart + ((index + 1) % hull.length);
-            const c: number = botVertices1BasedStart + index;
+            const c: number = botVertices1BasedStart + (index % hull.length);
             const d: number =
                 botVertices1BasedStart + ((index + 1) % hull.length);
-            const vn: number = sideNormal1BasedStart + index;
+            const vn: number = sideNormal1BasedStart + (index % hull.length);
             const f0: Array<ObjVertexForFace> = [
                 `${a}//${vn}`,
                 `${c}//${vn}`,
