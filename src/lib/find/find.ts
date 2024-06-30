@@ -32,7 +32,8 @@ export class Find {
         let closestDistance = Number.MAX_VALUE;
 
         if (this._cardHolders.length === 0) {
-            for (const obj of world.getAllObjects()) {
+            const skippedContained: boolean = true;
+            for (const obj of world.getAllObjects(skippedContained)) {
                 if (!(obj instanceof CardHolder)) {
                     continue;
                 }
