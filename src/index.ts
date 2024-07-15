@@ -1,4 +1,5 @@
 export * from "./lib/adjacency/adjacency";
+export * from "./lib/atop/atop";
 export * from "./lib/broadcast/broadcast";
 export * from "./lib/bug-workarounds/bug-card-holder-assignment/bug-card-holder-assignment";
 export * from "./lib/bug-workarounds/bug-force-transform-updates/bug-force-transform-updates";
