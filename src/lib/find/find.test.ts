@@ -152,6 +152,43 @@ it("findDeckOrDiscard (deck)", () => {
     expect(found).toEqual(deck);
 });
 
+it("findDeckOrDiscard (deck, player slot)", () => {
+    const deckSnapPointTag = "deck-snappoint";
+    const deck = new MockCard();
+    const mat = new MockGameObject({
+        snapPoints: [
+            new MockSnapPoint({
+                snappedObject: deck,
+                tags: [deckSnapPointTag],
+            }),
+        ],
+    });
+    mockWorld._reset({ gameObjects: [deck, mat] });
+
+    const find = new Find();
+    const discardSnapPointTag = undefined;
+    const shuffleDisard = false;
+    const playerSlot = 7;
+    let found: Card | undefined;
+
+    found = find.findDeckOrDiscard(
+        deckSnapPointTag,
+        discardSnapPointTag,
+        shuffleDisard,
+        playerSlot
+    );
+    expect(found).toBeUndefined();
+
+    mat.setOwningPlayerSlot(playerSlot);
+    found = find.findDeckOrDiscard(
+        deckSnapPointTag,
+        discardSnapPointTag,
+        shuffleDisard,
+        playerSlot
+    );
+    expect(found).toEqual(deck);
+});
+
 it("findDeckOrDiscard (discard)", () => {
     const deckSnapPointTag = "deck-snappoint";
     const discardSnapPointTag = "discard-snappoint";
