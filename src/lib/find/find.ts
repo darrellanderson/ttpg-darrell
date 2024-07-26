@@ -20,8 +20,9 @@ export class Find {
     private _cardHolders: Array<CardHolder> = [];
     private readonly _nsidAndSlotToGameObject: { [key: string]: GameObject } =
         {};
-    private readonly _snapPointTagToSnapPoint: { [key: string]: SnapPoint } =
-        {};
+    private readonly _snapPointTagAndSlotToSnapPoint: {
+        [key: string]: SnapPoint;
+    } = {};
     private readonly _playerSlotToCardHolder: { [key: number]: CardHolder } =
         {};
 
@@ -136,10 +137,14 @@ export class Find {
     findDeckOrDiscard(
         deckSnapPointTag: string,
         discardSnapPointTag?: string,
-        shuffleDiscard?: boolean
+        shuffleDiscard?: boolean,
+        playerSlot?: number
     ): Card | undefined {
         // Look for deck.
-        const deckSnapPoint = this.findSnapPointByTag(deckSnapPointTag);
+        const deckSnapPoint = this.findSnapPointByTag(
+            deckSnapPointTag,
+            playerSlot
+        );
         if (!deckSnapPoint) {
             return undefined;
         }
@@ -152,7 +157,10 @@ export class Find {
         if (!discardSnapPointTag) {
             return undefined;
         }
-        const discardSnapPoint = this.findSnapPointByTag(discardSnapPointTag);
+        const discardSnapPoint = this.findSnapPointByTag(
+            discardSnapPointTag,
+            playerSlot
+        );
         if (!discardSnapPoint) {
             return undefined;
         }
@@ -247,10 +255,15 @@ export class Find {
         return multistateObject as MultistateObject | undefined;
     }
 
-    findSnapPointByTag(tag: string): SnapPoint | undefined {
+    findSnapPointByTag(
+        tag: string,
+        playerSlot?: number
+    ): SnapPoint | undefined {
+        const key = `${tag}@${playerSlot ?? ""}`;
+
         // Check cache.
         const snapPoint: SnapPoint | undefined =
-            this._snapPointTagToSnapPoint[tag];
+            this._snapPointTagAndSlotToSnapPoint[key];
         const parent: StaticObject | undefined = snapPoint?.getParentObject();
         if (snapPoint && (!parent || parent.isValid())) {
             return snapPoint;
@@ -260,7 +273,7 @@ export class Find {
         for (const obj of world.getAllTables()) {
             for (const snapPoint of obj.getAllSnapPoints()) {
                 if (snapPoint.getTags().includes(tag)) {
-                    this._snapPointTagToSnapPoint[tag] = snapPoint;
+                    this._snapPointTagAndSlotToSnapPoint[key] = snapPoint;
                     return snapPoint;
                 }
             }
@@ -269,9 +282,15 @@ export class Find {
         // Search objects (update cache if found).
         const skipContained = true;
         for (const obj of world.getAllObjects(skipContained)) {
+            if (
+                playerSlot !== undefined &&
+                obj.getOwningPlayerSlot() !== playerSlot
+            ) {
+                continue;
+            }
             for (const snapPoint of obj.getAllSnapPoints()) {
                 if (snapPoint.getTags().includes(tag)) {
-                    this._snapPointTagToSnapPoint[tag] = snapPoint;
+                    this._snapPointTagAndSlotToSnapPoint[key] = snapPoint;
                     return snapPoint;
                 }
             }

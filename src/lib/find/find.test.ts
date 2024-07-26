@@ -348,3 +348,41 @@ it("findSnapPointByTag (table)", () => {
     found = find.findSnapPointByTag(tag);
     expect(found).toEqual(snapPoint);
 });
+
+it("findSnapPointByTag (game object)", () => {
+    const tag = "my-tag";
+    const snapPoint = new MockSnapPoint({ tags: [tag] });
+    const obj = new MockGameObject({ snapPoints: [snapPoint] });
+    mockWorld._reset({ gameObjects: [obj] });
+
+    const find = new Find();
+    let found: SnapPoint | undefined;
+
+    found = find.findSnapPointByTag(tag);
+    expect(found).toEqual(snapPoint);
+
+    // Check cache.
+    found = find.findSnapPointByTag(tag);
+    expect(found).toEqual(snapPoint);
+});
+
+it("findSnapPointByTag (game object, owning player slot)", () => {
+    const tag = "my-tag";
+    const snapPoint = new MockSnapPoint({ tags: [tag] });
+    const obj = new MockGameObject({ snapPoints: [snapPoint] });
+    mockWorld._reset({ gameObjects: [obj] });
+
+    const find = new Find();
+    let found: SnapPoint | undefined;
+
+    found = find.findSnapPointByTag(tag, 7);
+    expect(found).toBeUndefined();
+
+    obj.setOwningPlayerSlot(7);
+    found = find.findSnapPointByTag(tag, 7);
+    expect(found).toBeDefined();
+
+    // Check cache.
+    found = find.findSnapPointByTag(tag, 7);
+    expect(found).toBeDefined();
+});
