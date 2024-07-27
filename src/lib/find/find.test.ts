@@ -152,6 +152,43 @@ it("findDeckOrDiscard (deck)", () => {
     expect(found).toEqual(deck);
 });
 
+it("findDeckOrDiscard (deck, player slot)", () => {
+    const deckSnapPointTag = "deck-snappoint";
+    const deck = new MockCard();
+    const mat = new MockGameObject({
+        snapPoints: [
+            new MockSnapPoint({
+                snappedObject: deck,
+                tags: [deckSnapPointTag],
+            }),
+        ],
+    });
+    mockWorld._reset({ gameObjects: [deck, mat] });
+
+    const find = new Find();
+    const discardSnapPointTag = undefined;
+    const shuffleDisard = false;
+    const playerSlot = 7;
+    let found: Card | undefined;
+
+    found = find.findDeckOrDiscard(
+        deckSnapPointTag,
+        discardSnapPointTag,
+        shuffleDisard,
+        playerSlot
+    );
+    expect(found).toBeUndefined();
+
+    mat.setOwningPlayerSlot(playerSlot);
+    found = find.findDeckOrDiscard(
+        deckSnapPointTag,
+        discardSnapPointTag,
+        shuffleDisard,
+        playerSlot
+    );
+    expect(found).toEqual(deck);
+});
+
 it("findDeckOrDiscard (discard)", () => {
     const deckSnapPointTag = "deck-snappoint";
     const discardSnapPointTag = "discard-snappoint";
@@ -347,4 +384,42 @@ it("findSnapPointByTag (table)", () => {
     // Check cache.
     found = find.findSnapPointByTag(tag);
     expect(found).toEqual(snapPoint);
+});
+
+it("findSnapPointByTag (game object)", () => {
+    const tag = "my-tag";
+    const snapPoint = new MockSnapPoint({ tags: [tag] });
+    const obj = new MockGameObject({ snapPoints: [snapPoint] });
+    mockWorld._reset({ gameObjects: [obj] });
+
+    const find = new Find();
+    let found: SnapPoint | undefined;
+
+    found = find.findSnapPointByTag(tag);
+    expect(found).toEqual(snapPoint);
+
+    // Check cache.
+    found = find.findSnapPointByTag(tag);
+    expect(found).toEqual(snapPoint);
+});
+
+it("findSnapPointByTag (game object, owning player slot)", () => {
+    const tag = "my-tag";
+    const snapPoint = new MockSnapPoint({ tags: [tag] });
+    const obj = new MockGameObject({ snapPoints: [snapPoint] });
+    mockWorld._reset({ gameObjects: [obj] });
+
+    const find = new Find();
+    let found: SnapPoint | undefined;
+
+    found = find.findSnapPointByTag(tag, 7);
+    expect(found).toBeUndefined();
+
+    obj.setOwningPlayerSlot(7);
+    found = find.findSnapPointByTag(tag, 7);
+    expect(found).toBeDefined();
+
+    // Check cache.
+    found = find.findSnapPointByTag(tag, 7);
+    expect(found).toBeDefined();
 });

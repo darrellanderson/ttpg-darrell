@@ -91,7 +91,9 @@ export class Hex {
         this._tableHeight = world.getTableHeight();
     }
 
-    static _hexFromString(hex: HexType): [q: number, r: number, s: number] {
+    static _maybeHexFromString(
+        hex: HexType
+    ): [q: number, r: number, s: number] | undefined {
         const m = hex.match(/^<(-?\d+),(-?\d+),(-?\d+)>$/);
         const qStr: string | undefined = m?.[1];
         const rStr: string | undefined = m?.[2];
@@ -105,7 +107,16 @@ export class Hex {
             }
             return [q, r, s];
         }
-        throw new Error(`match error: "${hex}"`);
+        return undefined;
+    }
+
+    static _hexFromString(hex: HexType): [q: number, r: number, s: number] {
+        const result: [q: number, r: number, s: number] | undefined =
+            Hex._maybeHexFromString(hex);
+        if (result === undefined) {
+            throw new Error(`match error: "${hex}"`);
+        }
+        return result;
     }
 
     static _hexToString(q: number, r: number, s: number): HexType {
