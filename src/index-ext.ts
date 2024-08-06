@@ -9,7 +9,6 @@ export * from "./lib-ext/image/cell/abstract-cell/abstract-cell";
 export * from "./lib-ext/image/cell/bleed-cell/bleed-cell";
 export * from "./lib-ext/image/cell/buffer-cell/buffer-cell";
 export * from "./lib-ext/image/cell/canvas-cell/canvas-cell";
-export * from "./lib-ext/image/cell/cell-parser/cell-parser.test";
 export * from "./lib-ext/image/cell/cell-parser/cell-parser";
 export * from "./lib-ext/image/cell/cell-parser/cell-schema";
 export * from "./lib-ext/image/cell/col-cell/col-cell";
