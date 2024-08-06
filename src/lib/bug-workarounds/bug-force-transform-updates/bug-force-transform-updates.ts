@@ -5,7 +5,7 @@ export const DELTA: number = 0.021;
 
 /**
  * Object transforms aren't getting replicated reliably.
- * When an object stops moving, force a few trnaform updates.
+ * When an object stops moving, force a few transform updates.
  */
 export class BugForceTransformUpdates implements IGlobal {
     private readonly _idToRemainingPokeCount: Map<string, number> = new Map();

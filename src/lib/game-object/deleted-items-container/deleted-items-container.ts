@@ -22,7 +22,7 @@ export class DeletedItemsContainer {
      *
      * @param obj
      */
-    static destroyWithoutCopying(obj: GameObject) {
+    static destroyWithoutCopying(obj: GameObject): void {
         const tags: Array<string> = obj.getTags();
         tags.push(this.IGNORE_TAG);
         obj.setTags(tags);
@@ -34,7 +34,7 @@ export class DeletedItemsContainer {
      *
      * @param nsids
      */
-    static ignoreNSIDs(nsids: Array<string>) {
+    static ignoreNSIDs(nsids: Array<string>): void {
         for (const nsid of nsids) {
             DeletedItemsContainer._ignoreNSIDs.add(nsid);
         }
