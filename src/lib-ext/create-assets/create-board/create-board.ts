@@ -89,6 +89,7 @@ export class CreateBoard extends AbstractCreateAssets {
 
             const size: { width: number; height: number } =
                 CubeModel.getInsetForUVs(width, height);
+
             this._srcImageCell = new ResizeCell(
                 size.width,
                 size.height,

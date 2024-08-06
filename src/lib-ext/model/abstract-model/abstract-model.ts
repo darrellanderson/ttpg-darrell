@@ -16,8 +16,8 @@ export abstract class AbstractModel {
      * @returns
      */
     static getInsetForUVs(width: number, height: number): OffsetAndSize {
-        const left: number = Math.floor(width / 256);
-        const top: number = Math.floor(height / 256);
+        const left: number = Math.ceil(width / 256);
+        const top: number = Math.ceil(height / 256);
         return {
             left,
             top,
