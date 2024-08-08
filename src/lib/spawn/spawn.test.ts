@@ -255,6 +255,18 @@ it("getAllNSIDs", () => {
     Spawn.clear();
 });
 
+it("getTemplateIdOrThrow", () => {
+    const nsid = "my-nsid";
+    const templateId = "my-template-id";
+    Spawn.clear();
+    expect(() => {
+        Spawn.getTemplateIdOrThrow(nsid);
+    }).toThrow();
+    Spawn.inject({ [nsid]: templateId });
+    expect(Spawn.getTemplateIdOrThrow(nsid)).toEqual(templateId);
+    Spawn.clear();
+});
+
 it("validate", () => {
     const nsid = "my-nsid";
     const templateId = "my-template-id";

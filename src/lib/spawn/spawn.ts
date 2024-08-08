@@ -142,6 +142,14 @@ export abstract class Spawn {
         return Object.keys(Spawn._nsidToTemplateId);
     }
 
+    static getTemplateIdOrThrow(nsid: string): string {
+        const templateId = Spawn._nsidToTemplateId[nsid];
+        if (!templateId) {
+            throw new Error(`getTemplateIdOrThrow failed for "${nsid}"`);
+        }
+        return templateId;
+    }
+
     /**
      * Make sure all registered templates exist.
      */
