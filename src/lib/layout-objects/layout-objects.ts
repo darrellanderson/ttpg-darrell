@@ -1,6 +1,7 @@
 import {
     GameObject,
     HorizontalAlignment,
+    UIElement,
     Vector,
     VerticalAlignment,
     world,
@@ -161,6 +162,12 @@ export class LayoutObjects {
     ): LayoutObjectsSize {
         let childSize: LayoutObjectsSize;
         if (child instanceof GameObject) {
+            // Remove UIs before size measurement.
+            const uis: Array<UIElement> = child.getUIs();
+            for (const ui of uis) {
+                child.removeUIElement(ui);
+            }
+
             const currentRotation = true;
             const includeGeometry = false;
             const extent: Vector = child.getExtent(
@@ -168,6 +175,11 @@ export class LayoutObjects {
                 includeGeometry
             );
             childSize = { w: extent.y * 2, h: extent.x * 2 };
+
+            // Restore UIs.
+            for (const ui of uis) {
+                child.addUI(ui);
+            }
         } else {
             childSize = child.calculateSize();
         }
