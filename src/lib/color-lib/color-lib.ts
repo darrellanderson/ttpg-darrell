@@ -56,11 +56,11 @@ export class ColorLib {
         const g: number = color.g;
         const b: number = color.b;
 
-        let r2: number =
-            r * 0.962913 + g * 0.175808 + b * -0.040397 + -0.064871;
-        let g2: number =
-            r * 0.056713 + g * 1.084592 + b * -0.077897 + -0.062697;
-        let b2: number = r * 0.053359 + g * 0.252938 + b * 0.873196 + -0.071277;
+        let r2, g2, b2: number;
+
+        r2 = r * -0.885652 + g * -0.193955 + b * 0.037328 + 1.006563;
+        g2 = r * -0.073606 + g * -0.99281 + b * 0.04058 + 1.016531;
+        b2 = r * -0.040628 + g * -0.132085 + b * -0.887354 + 1.004528;
 
         r2 = Math.min(1, Math.max(0, r2));
         g2 = Math.min(1, Math.max(0, g2));
@@ -80,10 +80,11 @@ export class ColorLib {
         const g: number = color.g;
         const b: number = color.b;
 
-        let r2: number =
-            r * 0.915852 + g * 0.219762 + b * -0.057954 + -0.110148;
-        let g2: number = r * 0.032956 + g * 1.00863 + b * -0.025745 + -0.115907;
-        let b2: number = r * -8.8e-5 + g * 0.097476 + b * 0.941221 + -0.069098;
+        let r2, g2, b2: number;
+
+        r2 = r * -0.936864 + g * -0.147072 + b * 0.076043 + 1.101073;
+        g2 = r * 0.005879 + g * -1.02424 + b * 0.016932 + 1.098499;
+        b2 = r * 0.000126 + g * -0.077908 + b * -1.00191 + 1.131442;
 
         r2 = Math.min(1, Math.max(0, r2));
         g2 = Math.min(1, Math.max(0, g2));
