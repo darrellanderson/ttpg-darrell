@@ -55,16 +55,17 @@ export class ColorLib {
         const r: number = color.r;
         const g: number = color.g;
         const b: number = color.b;
-        const result = new Color(
-            r * 0.962913 + g * 0.175808 + b * -0.040397 + -0.064871,
-            r * 0.056713 + g * 1.084592 + b * -0.077897 + -0.062697,
-            r * 0.053359 + g * 0.252938 + b * 0.873196 + -0.071277,
-            1
-        );
-        result.r = Math.min(1, Math.max(0, result.r));
-        result.g = Math.min(1, Math.max(0, result.g));
-        result.b = Math.min(1, Math.max(0, result.b));
-        return result;
+
+        let r2: number =
+            r * 0.962913 + g * 0.175808 + b * -0.040397 + -0.064871;
+        let g2: number =
+            r * 0.056713 + g * 1.084592 + b * -0.077897 + -0.062697;
+        let b2: number = r * 0.053359 + g * 0.252938 + b * 0.873196 + -0.071277;
+
+        r2 = Math.min(1, Math.max(0, r2));
+        g2 = Math.min(1, Math.max(0, g2));
+        b2 = Math.min(1, Math.max(0, b2));
+        return new Color(r2, g2, b2, 1);
     }
 
     /**
@@ -78,15 +79,15 @@ export class ColorLib {
         const r: number = color.r;
         const g: number = color.g;
         const b: number = color.b;
-        const result = new Color(
-            r * 0.915852 + g * 0.219762 + b * -0.057954 + -0.110148,
-            r * 0.032956 + g * 1.00863 + b * -0.025745 + -0.115907,
-            r * -8.8e-5 + g * 0.097476 + b * 0.941221 + -0.069098,
-            1
-        );
-        result.r = Math.min(1, Math.max(0, result.r));
-        result.g = Math.min(1, Math.max(0, result.g));
-        result.b = Math.min(1, Math.max(0, result.b));
-        return result;
+
+        let r2: number =
+            r * 0.915852 + g * 0.219762 + b * -0.057954 + -0.110148;
+        let g2: number = r * 0.032956 + g * 1.00863 + b * -0.025745 + -0.115907;
+        let b2: number = r * -8.8e-5 + g * 0.097476 + b * 0.941221 + -0.069098;
+
+        r2 = Math.min(1, Math.max(0, r2));
+        g2 = Math.min(1, Math.max(0, g2));
+        b2 = Math.min(1, Math.max(0, b2));
+        return new Color(r2, g2, b2, 1);
     }
 }
