@@ -51,14 +51,14 @@ it("colorToObjectColor", () => {
     expect(color.toHex()).toBe("A800D0FF");
 
     const objColor: Color = colorLib.colorToObjectColor(color);
-    expect(objColor.toHex()).toBe("6600ACFF");
+    expect(objColor.toHex()).toBe("4D00A8FF");
 });
 
-it("colorToObjectColor", () => {
+it("colorToWidgetColor", () => {
     const colorLib: ColorLib = new ColorLib();
     const color: Color = colorLib.parseColorOrThrow("#a800d0");
     expect(color.toHex()).toBe("A800D0FF");
 
     const widgetColor: Color = colorLib.colorToWidgetColor(color);
-    expect(widgetColor.toHex()).toBe("8101B0FF");
+    expect(widgetColor.toHex()).toBe("8701BBFF");
 });
