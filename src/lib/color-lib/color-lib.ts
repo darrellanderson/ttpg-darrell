@@ -2,6 +2,21 @@ import { Color } from "@tabletop-playground/api";
 
 export const HEX_COLOR_REGEX = /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 
+// multivariateLinearRegression from src/lib-ext/color-mapping/color-mapping.data.ts
+type RGB = [number, number, number];
+const PLASTIC_TO_RAW_COLOR: Array<RGB> = [
+    [0.841358460237672, -0.013108375536332595, -0.011247688669399292],
+    [0.18940476375788595, 0.9188285086136809, 0.11692068575029335],
+    [-0.07201052309532319, -0.05137631855162739, 0.8940890841056348],
+    [0.02971955627557943, 0.07210017274215108, 0.024357355949243598],
+];
+const WIDGET_TO_RAW_COLOR: Array<RGB> = [
+    [1.0112993474793672, -0.06290310130591337, -0.06941585954311336],
+    [0.3003253755435189, 1.0567967707507098, 0.05179696702148906],
+    [-0.062188132243505834, -0.017770573277682722, 0.9435839674631517],
+    [-0.24024577034604455, -0.10386971615865725, -0.025508920630368692],
+];
+
 export class ColorLib {
     private readonly _hexColorRegex: RegExp = new RegExp(HEX_COLOR_REGEX);
 
@@ -42,6 +57,46 @@ export class ColorLib {
         return color;
     }
 
+    _toRawColor(color: Color, regression: Array<RGB>): Color {
+        const input: RGB = [color.r, color.g, color.b];
+        const output: RGB = [0, 0, 0];
+
+        // Seed with intercept.
+        const rgb: RGB | undefined = regression[3];
+        if (rgb) {
+            for (let i = 0; i < 3; i++) {
+                const weight: number | undefined = rgb[i];
+                if (weight !== undefined) {
+                    output[i] = weight;
+                }
+            }
+        }
+
+        // Apply weight matrix.
+        for (let i = 0; i < 3; i++) {
+            const inValue: number | undefined = input[i];
+            const weightRow: RGB | undefined = regression[i];
+            if (inValue !== undefined && weightRow !== undefined) {
+                for (let j = 0; j < 3; j++) {
+                    const outValue = output[j];
+                    const weight: number | undefined = weightRow[j];
+                    if (outValue !== undefined && weight !== undefined) {
+                        output[j] = outValue + weight * inValue;
+                    }
+                }
+            }
+        }
+
+        let r2: number = output[0];
+        let g2: number = output[1];
+        let b2: number = output[2];
+
+        r2 = Math.min(1, Math.max(0, r2));
+        g2 = Math.min(1, Math.max(0, g2));
+        b2 = Math.min(1, Math.max(0, b2));
+        return new Color(r2, g2, b2, 1);
+    }
+
     /**
      * Given a desired color, convert it to an object color that will
      * match the desired color when rendered in the game.
@@ -52,41 +107,7 @@ export class ColorLib {
      * @returns
      */
     colorToObjectColor(color: Color): Color {
-        const r: number = color.r;
-        const g: number = color.g;
-        const b: number = color.b;
-
-        let r2, g2, b2: number;
-
-        r2 =
-            r * -0.0902095325985418 +
-            g * 0.13529200886427478 +
-            b * 0.12358104118425324 +
-            r * r * 1.1247037549494685 +
-            g * g * 0.12382579853439336 +
-            b * b * -0.1937725065563627 +
-            -0.09950361133477958;
-        g2 =
-            r * -0.25458168224775274 +
-            g * -0.23662262440300025 +
-            b * 0.09936146757400728 +
-            r * r * 0.3157282712938037 +
-            g * g * 1.4471966406254066 +
-            b * b * -0.10276370037530605 +
-            -0.021178519598628043;
-        b2 =
-            r * -0.2555956705318538 +
-            g * 0.07894334765236367 +
-            b * -0.13792469943191013 +
-            r * r * 0.2610095645718642 +
-            g * g * 0.03985318195098798 +
-            b * b * 1.2653880093969054 +
-            -0.016018974164296318;
-
-        r2 = Math.min(1, Math.max(0, r2));
-        g2 = Math.min(1, Math.max(0, g2));
-        b2 = Math.min(1, Math.max(0, b2));
-        return new Color(r2, g2, b2, 1);
+        return this._toRawColor(color, PLASTIC_TO_RAW_COLOR);
     }
 
     /**
@@ -97,40 +118,6 @@ export class ColorLib {
      * @returns
      */
     colorToWidgetColor(color: Color): Color {
-        const r: number = color.r;
-        const g: number = color.g;
-        const b: number = color.b;
-
-        let r2, g2, b2: number;
-
-        r2 =
-            r * 0.5488134621500121 +
-            g * 0.0009417953587216267 +
-            b * 0.033135988668633605 +
-            r * r * 0.3654662993866032 +
-            g * g * 0.21316829595160297 +
-            b * b * -0.062316302183577005 +
-            0.02370758768841924;
-        g2 =
-            r * -0.16198076023524963 +
-            g * 0.7285896654135345 +
-            b * 0.17715918142331255 +
-            r * r * 0.26045932533178323 +
-            g * g * 0.29557961818501094 +
-            b * b * -0.22156622826895 +
-            -0.0014416892418535054;
-        b2 =
-            r * -0.14974048157579797 +
-            g * 0.058049709971899136 +
-            b * 0.6218316431412642 +
-            r * r * 0.19888467914689917 +
-            g * g * 0.0636706824508024 +
-            b * b * 0.2950080637594291 +
-            0.04326095329843915;
-
-        r2 = Math.min(1, Math.max(0, r2));
-        g2 = Math.min(1, Math.max(0, g2));
-        b2 = Math.min(1, Math.max(0, b2));
-        return new Color(r2, g2, b2, 1);
+        return this._toRawColor(color, WIDGET_TO_RAW_COLOR);
     }
 }
