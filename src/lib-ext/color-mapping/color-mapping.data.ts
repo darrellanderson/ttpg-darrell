@@ -41,9 +41,9 @@ export const RAW_COLORS: Array<RGB> = [
     [0.2901, 0.2901, 0.2901],
     [0.1725, 0.1725, 0.1803],
     [0.1803, 0.149, 0.149],
+];
 
-    /*
-    // "Full" range.
+export const RAW_COLORS_SPECTRUM: Array<RGB> = [
     [1, 1, 1],
     [1, 1, 0.8],
     [1, 1, 0.6],
@@ -260,7 +260,6 @@ export const RAW_COLORS: Array<RGB> = [
     [0, 0, 0.4],
     [0, 0, 0.2],
     [0, 0, 0],
-    */
 ];
 
 export const PLASTIC_COLORS: Array<RGB> = [
@@ -304,9 +303,9 @@ export const PLASTIC_COLORS: Array<RGB> = [
     [0.2627, 0.2627, 0.2705],
     [0.1607, 0.1607, 0.1686],
     [0.1647, 0.1372, 0.1411],
+];
 
-    /*
-    // "Full" range.
+export const PLASTIC_COLORS_SPECTRUM: Array<RGB> = [
     [0.8117, 0.8117, 0.8117],
     [0.8156, 0.8156, 0.7568],
     [0.8156, 0.8196, 0.6588],
@@ -523,7 +522,6 @@ export const PLASTIC_COLORS: Array<RGB> = [
     [0.0117, 0, 0.6156],
     [0.0039, 0, 0.4274],
     [0, 0, 0],
-    */
 ];
 
 export const WIDGET_COLORS: Array<RGB> = [
@@ -567,9 +565,9 @@ export const WIDGET_COLORS: Array<RGB> = [
     [0.5019, 0.5019, 0.5019],
     [0.3607, 0.3647, 0.3764],
     [0.3764, 0.3294, 0.3294],
+];
 
-    /*
-    // "Full" range.
+export const WIDGET_COLORS_SPECTRUM: Array<RGB> = [
     [0.8588, 0.8588, 0.8666],
     [0.8627, 0.8666, 0.7333],
     [0.8627, 0.8745, 0.4862],
@@ -786,5 +784,4 @@ export const WIDGET_COLORS: Array<RGB> = [
     [0.0431, 0, 0.396],
     [0.0745, 0.0705, 0.196],
     [0.0745, 0.0745, 0.0745],
-    */
 ];
