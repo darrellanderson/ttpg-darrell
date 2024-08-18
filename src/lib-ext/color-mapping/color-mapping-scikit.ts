@@ -1,6 +1,5 @@
 import {
     PLASTIC_COLORS,
-    PLASTIC_COLORS_SPECTRUM,
     RAW_COLORS,
     RAW_COLORS_SPECTRUM,
     WIDGET_COLORS,
@@ -22,35 +21,33 @@ const raw = {
     BS: RAW_COLORS_SPECTRUM.map(([_r, _g, b]) => b),
 };
 
-async function processOne(
-    name: string,
-    channel: Array<number>,
-    raw: Array<Array<number>>
-) {
-    let best: Array<number> = [];
+async function processOne(channel: Array<number>, raw: Array<Array<number>>) {
+    let best;
     let bestScore = 0;
     for (let i = 0; i < 20; i++) {
         const model: SGDRegressor = await new LinearRegression({
             fitIntercept: true,
+            modelFitOptions: {},
         }).fit(raw, channel);
         const score: number = model.score(raw, channel);
         if (score > bestScore) {
-            best = model.coef.arraySync().flat();
-            best.push(model.intercept as number);
+            const coefs: number[] = model.coef.arraySync().flat();
+            best = {
+                intercept: model.intercept as number,
+                coefs,
+                score,
+            };
+            const scrub = (x: number): number => Math.round(x * 10000) / 10000;
+            best.intercept = scrub(best.intercept);
+            best.coefs = best.coefs.map(scrub);
+            best.score = scrub(best.score);
             bestScore = score;
         }
     }
-    const s: number = 100;
-    best = best.map((value: number): number => Math.round(value * s) / s);
-    console.log(name, "coef+intercept", best.join(","));
-    console.log(name, "score", bestScore);
+    return best;
 }
 
-async function processOneSq(
-    name: string,
-    channel: Array<number>,
-    raw: Array<Array<number>>
-) {
+async function processOneSq(channel: Array<number>, raw: Array<Array<number>>) {
     raw = raw.map((entry: Array<number>): Array<number> => {
         const result: Array<number> = [...entry];
         for (const value of entry) {
@@ -58,25 +55,46 @@ async function processOneSq(
         }
         return result;
     });
-    await processOne(name, channel, raw);
+    return await processOne(channel, raw);
 }
 
 async function processAll() {
-    await processOne("R", raw.R, PLASTIC_COLORS);
-    await processOne("R+", raw.RS, PLASTIC_COLORS_SPECTRUM);
-    await processOne("G", raw.G, PLASTIC_COLORS);
-    await processOne("B", raw.B, PLASTIC_COLORS);
-    await processOne("RW", raw.R, WIDGET_COLORS);
-    await processOne("GW", raw.G, WIDGET_COLORS);
-    await processOne("BW", raw.B, WIDGET_COLORS);
+    let result;
+    result = {
+        r: await processOne(raw.R, PLASTIC_COLORS),
+        g: await processOne(raw.G, PLASTIC_COLORS),
+        b: await processOne(raw.B, PLASTIC_COLORS),
+        score: 0,
+    };
+    result.score = Math.min(result.r!.score, result.g!.score, result.b!.score);
+    console.log("plastic", JSON.stringify(result));
 
-    await processOneSq("R2", raw.R, PLASTIC_COLORS);
-    await processOneSq("R2+", raw.RS, PLASTIC_COLORS_SPECTRUM);
-    await processOneSq("G2", raw.G, PLASTIC_COLORS);
-    await processOneSq("B2", raw.B, PLASTIC_COLORS);
-    await processOneSq("R2W", raw.R, WIDGET_COLORS);
-    await processOneSq("G2W", raw.G, WIDGET_COLORS);
-    await processOneSq("B2W", raw.B, WIDGET_COLORS);
+    result = {
+        r: await processOne(raw.R, WIDGET_COLORS),
+        g: await processOne(raw.G, WIDGET_COLORS),
+        b: await processOne(raw.B, WIDGET_COLORS),
+        score: 0,
+    };
+    result.score = Math.min(result.r!.score, result.g!.score, result.b!.score);
+    console.log("widget", JSON.stringify(result));
+
+    result = {
+        r: await processOneSq(raw.R, PLASTIC_COLORS),
+        g: await processOneSq(raw.G, PLASTIC_COLORS),
+        b: await processOneSq(raw.B, PLASTIC_COLORS),
+        score: 0,
+    };
+    result.score = Math.min(result.r!.score, result.g!.score, result.b!.score);
+    console.log("plasticSq", JSON.stringify(result));
+
+    result = {
+        r: await processOneSq(raw.R, WIDGET_COLORS),
+        g: await processOneSq(raw.G, WIDGET_COLORS),
+        b: await processOneSq(raw.B, WIDGET_COLORS),
+        score: 0,
+    };
+    result.score = Math.min(result.r!.score, result.g!.score, result.b!.score);
+    console.log("widgetSq", JSON.stringify(result));
 }
 
 processAll();

@@ -2,20 +2,61 @@ import { Color } from "@tabletop-playground/api";
 
 export const HEX_COLOR_REGEX = /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 
-// multivariateLinearRegression from src/lib-ext/color-mapping/color-mapping.data.ts
-type RGB = [number, number, number];
-const PLASTIC_TO_RAW_COLOR: Array<RGB> = [
-    [0.9160779164688018, -0.00647402387904128, -0.0027511064857912437],
-    [0.1413838520371149, 0.9941086941407544, 0.06706570306908022],
-    [-0.09194011909311994, -0.04294957552227885, 0.9567240049656589],
-    [-0.06137826498112098, -0.050652394997429795, -0.07904498200504406],
-];
-const WIDGET_TO_RAW_COLOR: Array<RGB> = [
-    [0.8791911770085878, 0.028548810169618744, 0.0019427189882161855],
-    [0.18303526808759774, 0.9707834376796969, 0.09945167047598824],
-    [-0.047372766342947514, -0.04492329662797023, 0.8885868917791109],
-    [-0.0074794875255239646, 0.00022352805111136576, 0.013608753140974983],
-];
+type RegressionChannel = {
+    intercept: number;
+    coefs: [
+        r1: number,
+        g1: number,
+        b1: number,
+        r2: number,
+        g2: number,
+        b2: number,
+    ];
+    score: number;
+};
+type RegressionRGB = {
+    r: RegressionChannel;
+    g: RegressionChannel;
+    b: RegressionChannel;
+    score: number;
+};
+
+const PLASTIC: RegressionRGB = {
+    r: {
+        intercept: 0.0766,
+        coefs: [0.5645, -0.0367, 0.052, 0.2791, 0.2155, -0.1261],
+        score: 0.9272,
+    },
+    g: {
+        intercept: 0.097,
+        coefs: [-0.0703, 0.4939, 0.2167, 0.0627, 0.4718, -0.2707],
+        score: 0.9766,
+    },
+    b: {
+        intercept: 0.0401,
+        coefs: [-0.0279, 0.0403, 0.8571, 0.0279, 0.08, 0.035],
+        score: 0.9631,
+    },
+    score: 0.9272,
+};
+const WIDGET: RegressionRGB = {
+    r: {
+        intercept: -0.127,
+        coefs: [0.2367, -0.2194, 0.3499, 0.8011, 0.5352, -0.4461],
+        score: 0.9671,
+    },
+    g: {
+        intercept: 0.1,
+        coefs: [0.1499, -0.4533, 0.144, -0.2057, 1.531, -0.1811],
+        score: 0.9758,
+    },
+    b: {
+        intercept: 0.0785,
+        coefs: [0.16, -0.255, -0.1359, -0.2357, 0.3107, 1.241],
+        score: 0.981,
+    },
+    score: 0.9671,
+};
 
 export class ColorLib {
     private readonly _hexColorRegex: RegExp = new RegExp(HEX_COLOR_REGEX);
@@ -57,39 +98,26 @@ export class ColorLib {
         return color;
     }
 
-    _toRawColor(color: Color, regression: Array<RGB>): Color {
-        const input: RGB = [color.r, color.g, color.b];
-        const output: RGB = [0, 0, 0];
+    _toRawColor(color: Color, regression: RegressionRGB): Color {
+        const r: number = color.r;
+        const g: number = color.g;
+        const b: number = color.b;
 
-        // Seed with intercept.
-        const rgb: RGB | undefined = regression[3];
-        if (rgb) {
-            for (let i = 0; i < 3; i++) {
-                const weight: number | undefined = rgb[i];
-                if (weight !== undefined) {
-                    output[i] = weight;
-                }
-            }
-        }
+        const getChannelColor = (channel: RegressionChannel): number => {
+            return (
+                channel.intercept +
+                channel.coefs[0] * r +
+                channel.coefs[1] * g +
+                channel.coefs[2] * b +
+                channel.coefs[3] * r * r +
+                channel.coefs[4] * g * g +
+                channel.coefs[5] * b * b
+            );
+        };
 
-        // Apply weight matrix.
-        for (let i = 0; i < 3; i++) {
-            const inValue: number | undefined = input[i];
-            const weightRow: RGB | undefined = regression[i];
-            if (inValue !== undefined && weightRow !== undefined) {
-                for (let j = 0; j < 3; j++) {
-                    const outValue = output[j];
-                    const weight: number | undefined = weightRow[j];
-                    if (outValue !== undefined && weight !== undefined) {
-                        output[j] = outValue + weight * inValue;
-                    }
-                }
-            }
-        }
-
-        let r2: number = output[0];
-        let g2: number = output[1];
-        let b2: number = output[2];
+        let r2: number = getChannelColor(regression.r);
+        let g2: number = getChannelColor(regression.g);
+        let b2: number = getChannelColor(regression.b);
 
         r2 = Math.min(1, Math.max(0, r2));
         g2 = Math.min(1, Math.max(0, g2));
@@ -107,7 +135,7 @@ export class ColorLib {
      * @returns
      */
     colorToObjectColor(color: Color): Color {
-        return this._toRawColor(color, PLASTIC_TO_RAW_COLOR);
+        return this._toRawColor(color, PLASTIC);
     }
 
     /**
@@ -118,6 +146,6 @@ export class ColorLib {
      * @returns
      */
     colorToWidgetColor(color: Color): Color {
-        return this._toRawColor(color, WIDGET_TO_RAW_COLOR);
+        return this._toRawColor(color, WIDGET);
     }
 }
