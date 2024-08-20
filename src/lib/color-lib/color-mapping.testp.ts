@@ -130,7 +130,7 @@ for (const color of TRAINING_COLORS) {
     create(pos, color, true);
 
     // Create the game object and widget using the corrected color.
-    create(pos.add([8 * SCALE, 0, 0]), color, false);
+    create(pos.add([12 * SCALE, 0, 0]), color, false);
 
     // Move to the next position.
     pos = pos.add([0, 8 * SCALE, 0]);

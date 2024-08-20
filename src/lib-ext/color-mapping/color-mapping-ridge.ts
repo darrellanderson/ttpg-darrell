@@ -1,11 +1,13 @@
 import {
     PLASTIC_COLORS,
+    PLASTIC_COLORS_SPECTRUM,
     RAW_COLORS,
     RAW_COLORS_SPECTRUM,
     WIDGET_COLORS,
+    WIDGET_COLORS_SPECTRUM,
 } from "./color-mapping.data";
 
-import { LinearRegression, setBackend } from "scikitjs";
+import { RidgeRegression, setBackend } from "scikitjs";
 import { SGDRegressor } from "scikitjs/dist/es5/linear_model/SgdRegressor";
 import * as tensorflow from "@tensorflow/tfjs";
 
@@ -25,9 +27,8 @@ async function processOne(channel: Array<number>, raw: Array<Array<number>>) {
     let best;
     let bestScore = 0;
     for (let i = 0; i < 20; i++) {
-        const model: SGDRegressor = await new LinearRegression({
+        const model: SGDRegressor = await new RidgeRegression({
             fitIntercept: true,
-            modelFitOptions: {},
         }).fit(raw, channel);
         const score: number = model.score(raw, channel);
         if (score > bestScore) {
@@ -60,6 +61,9 @@ async function processOneSq(channel: Array<number>, raw: Array<Array<number>>) {
 
 async function processAll() {
     let result;
+
+    console.log("----------------------------------------");
+
     result = {
         r: await processOne(raw.R, PLASTIC_COLORS),
         g: await processOne(raw.G, PLASTIC_COLORS),
@@ -78,6 +82,8 @@ async function processAll() {
     result.score = Math.min(result.r!.score, result.g!.score, result.b!.score);
     console.log("widget", JSON.stringify(result));
 
+    console.log("----------------------------------------");
+
     result = {
         r: await processOneSq(raw.R, PLASTIC_COLORS),
         g: await processOneSq(raw.G, PLASTIC_COLORS),
@@ -95,6 +101,28 @@ async function processAll() {
     };
     result.score = Math.min(result.r!.score, result.g!.score, result.b!.score);
     console.log("widgetSq", JSON.stringify(result));
+
+    console.log("----------------------------------------");
+
+    result = {
+        r: await processOneSq(raw.RS, PLASTIC_COLORS_SPECTRUM),
+        g: await processOneSq(raw.GS, PLASTIC_COLORS_SPECTRUM),
+        b: await processOneSq(raw.BS, PLASTIC_COLORS_SPECTRUM),
+        score: 0,
+    };
+    result.score = Math.min(result.r!.score, result.g!.score, result.b!.score);
+    console.log("plasticSqSpectrum", JSON.stringify(result));
+
+    result = {
+        r: await processOneSq(raw.RS, WIDGET_COLORS_SPECTRUM),
+        g: await processOneSq(raw.GS, WIDGET_COLORS_SPECTRUM),
+        b: await processOneSq(raw.BS, WIDGET_COLORS_SPECTRUM),
+        score: 0,
+    };
+    result.score = Math.min(result.r!.score, result.g!.score, result.b!.score);
+    console.log("widgetSqSpectrun", JSON.stringify(result));
+
+    console.log("----------------------------------------");
 }
 
 processAll();
