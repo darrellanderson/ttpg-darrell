@@ -36,4 +36,5 @@ async function process() {
         ].join(" ")
     );
 }
-process();
+
+setInterval(process, 3000);
