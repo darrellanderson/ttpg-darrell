@@ -9,7 +9,7 @@ import url from "url";
 import Jimp from "jimp";
 import { ParsedUrlQuery } from "querystring";
 
-const POS = {
+const POS_OFFICE = {
     CAPTURE: {
         // rectangle to screenshot, other positions relative to this
         x: 2500,
@@ -31,12 +31,52 @@ const POS = {
     },
 };
 
+const POS_LAPTOP = {
+    CAPTURE: {
+        // rectangle to screenshot, other positions relative to this
+        x: 1200,
+        y: 100,
+        w: 100,
+        h: 300,
+    },
+    SLOT: {
+        x: 174,
+        y: 101,
+    },
+    OBJ: {
+        x: 132,
+        y: 352,
+    },
+    WIDGET: {
+        x: 152,
+        y: 536,
+    },
+};
+
+const ENV: string = "laptop";
+const POS = ENV === "laptop" ? POS_LAPTOP : POS_OFFICE;
+
+const allColors: Array<string> = [];
+const d = 4;
+for (let b = 128; b < 256; b += d) {
+    for (let g = 0; g < 256; g += d) {
+        for (let r = 0; r < 256; r += d) {
+            allColors.push(JSON.stringify({ r, g, b }));
+        }
+    }
+}
+
+function nextColorAsJson(): string | undefined {
+    const rgb: string | undefined = allColors.shift();
+    return rgb;
+}
+
 async function extractColors(r: number, g: number, b: number): Promise<string> {
-    const before: number = Date.now();
+    //const before: number = Date.now();
     const { x, y, w, h } = POS.CAPTURE;
     execSync(`screencapture -R${x},${y},${w},${h} -t png /tmp/px.png`);
-    const delta: number = Date.now() - before;
-    console.log("screencapture ms", delta);
+    //const delta: number = Date.now() - before;
+    //console.log("screencapture ms", delta);
 
     const image = await Jimp.read("/tmp/px.png");
     const slot = Jimp.intToRGBA(image.getPixelColor(POS.SLOT.x, POS.SLOT.y));
@@ -44,23 +84,20 @@ async function extractColors(r: number, g: number, b: number): Promise<string> {
     const widget = Jimp.intToRGBA(
         image.getPixelColor(POS.WIDGET.x, POS.WIDGET.y)
     );
+
+    const intToHex = (int: number): string => {
+        return int.toString(16).toUpperCase().padStart(2, "0");
+    };
+    const rgbToHex = (r: number, g: number, b: number): string => {
+        return `${intToHex(r)}${intToHex(g)}${intToHex(b)}`;
+    };
     return [
-        "raw:",
-        r.toString().padStart(3, "0"),
-        g.toString().padStart(3, "0"),
-        b.toString().padStart(3, "0"),
-        "slot:",
-        slot.r.toString().padStart(3, "0"),
-        slot.g.toString().padStart(3, "0"),
-        slot.b.toString().padStart(3, "0"),
-        "obj:",
-        obj.r.toString().padStart(3, "0"),
-        obj.g.toString().padStart(3, "0"),
-        obj.b.toString().padStart(3, "0"),
-        "widget:",
-        widget.r.toString().padStart(3, "0"),
-        widget.g.toString().padStart(3, "0"),
-        widget.b.toString().padStart(3, "0"),
+        allColors.length,
+        "@",
+        rgbToHex(r, g, b),
+        rgbToHex(slot.r, slot.g, slot.b),
+        rgbToHex(obj.r, obj.g, obj.b),
+        rgbToHex(widget.r, widget.g, widget.b),
     ].join(" ");
 }
 
@@ -78,7 +115,7 @@ const listener: http.RequestListener = async (
         res.end("Not Found");
         return;
     }
-    console.log("URL", req.url);
+    //console.log("URL", req.url);
     const queryArgs: ParsedUrlQuery = url.parse(req.url, true).query;
 
     let r, g, b: number | undefined;
@@ -97,8 +134,14 @@ const listener: http.RequestListener = async (
         console.log(summary);
     }
     res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({})); // TODO return next color
+
+    const content: string | undefined = nextColorAsJson();
+    res.end(content ?? "");
 };
+
 const server: http.Server = http.createServer(listener);
 server.listen(8013, "localhost");
-console.log("Server running at http://localhost:8013/");
+console.log("# Server running at http://localhost:8013/");
+console.log("# |allColors|:", allColors.length);
+console.log("# hours:", (allColors.length * 100) / 1000 / 3600);
+console.log("# raw slot plastic widget");
