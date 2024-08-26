@@ -84,8 +84,7 @@ function colorDistance(a: RGB, b: RGB): number {
     return dr * dr + dg * dg + db * db;
 }
 
-const rawColors: Set<string> = new Set();
-for (const targetHexColor of targetHexColors) {
+function closest(targetHexColor: string): Record<string, string> {
     const targetRGB: RGB = rgbFromHex(targetHexColor);
 
     // Best "raw" value for each color type.
@@ -107,10 +106,10 @@ for (const targetHexColor of targetHexColors) {
             throw new Error(`bad raw entry: "${rawLine}"`);
         }
 
-        const rawHex: string = parts[0]!;
-        const slotHex: string = parts[1]!;
-        const plasticHex: string = parts[2]!;
-        const widgetHex: string = parts[3]!;
+        const rawHex: string = "#" + parts[0]!;
+        const slotHex: string = "#" + parts[1]!;
+        const plasticHex: string = "#" + parts[2]!;
+        const widgetHex: string = "#" + parts[3]!;
 
         const slotRGB: RGB = rgbFromHex(slotHex);
         const plasticRGB: RGB = rgbFromHex(plasticHex);
@@ -139,18 +138,23 @@ for (const targetHexColor of targetHexColors) {
         }
     }
 
-    console.log(
-        JSON.stringify({
-            target: targetHexColor,
-            slot: bestSlotRaw,
-            slotC: bestSlotCooked,
-            plastic: bestPlasticRaw,
-            plasticC: bestPlasticCooked,
-            widget: bestWidgetRaw,
-            widgetC: bestWidgetCooked,
-        })
-    );
-    rawColors.add(bestSlotRaw);
-    rawColors.add(bestPlasticRaw);
-    rawColors.add(bestWidgetRaw);
+    return {
+        target: targetHexColor,
+        slot: bestSlotRaw,
+        slotRendered: bestSlotCooked,
+        plastic: bestPlasticRaw,
+        plasticRendered: bestPlasticCooked,
+        widget: bestWidgetRaw,
+        widgetRendered: bestWidgetCooked,
+    };
 }
+
+const colorToClosests: Record<string, Array<object>> = {};
+for (const entry of data) {
+    const closests: Array<object> = [closest(entry.hexColor)];
+    for (const variant of entry.variants) {
+        closests.push(closest(variant));
+    }
+    colorToClosests[entry.colorName] = closests;
+}
+console.log(JSON.stringify(colorToClosests, null, 2));
