@@ -48,7 +48,7 @@ export class ColorLib {
         return colorsArray?.[index];
     }
 
-    getColorByNameOrThrow(colorName: string, index: number): ColorsType {
+    getColorsByNameOrThrow(colorName: string, index: number): ColorsType {
         const color: ColorsType | undefined = this.getColorsByName(
             colorName,
             index

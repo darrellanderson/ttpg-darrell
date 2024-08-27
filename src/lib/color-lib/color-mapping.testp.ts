@@ -15,6 +15,7 @@
     world,
 } from "@tabletop-playground/api";
 import { ColorLib } from "./color-lib";
+import { ColorsType } from "./colors.data";
 
 // Clear the world before (re)creating objects.
 for (const obj of world.getAllObjects()) {
@@ -23,58 +24,35 @@ for (const obj of world.getAllObjects()) {
     }
 }
 
-// Andcat's "good" player color choices.
-const TRAINING_COLORS: Array<Color> = [
-    "#00c20a",
-    "#5dc262",
-    "#0c9113",
-    "#82eb09",
-    "#09eb67",
-    "#ff0909",
-    "#ad5e5e",
-    "#c02516",
-    "#cf213e",
-    "#ff6969",
-    "#ffdc13",
-    "#fce979",
-    "#a69317",
-    "#d6bd4b",
-    "#f6ff00",
-    "#f68cd7",
-    "#edadd9",
-    "#c21f90",
-    "#bd2db0",
-    "#de64b1",
-    "#ff8d54",
-    "#e09f5c",
-    "#854300",
-    "#ff6200",
-    "#ffa600",
-    "#9d00f8",
-    "#af76cf",
-    "#681d91",
-    "#945ced",
-    "#a600ff",
-    "#39c1ff",
-    "#6fd9f2",
-    "#0e96b5",
-    "#00ffea",
-    "#0091ff",
-    "#e6e6e6",
-    "#969696",
-    "#4a4a4a",
-    "#2c2c2e",
-    "#2e2626",
-].map((hexColor: string): Color => new ColorLib().parseColorOrThrow(hexColor));
+const COLOR_NAMES: Array<string> = [
+    "white",
+    "blue",
+    "purple",
+    "green",
+    "red",
+    "yellow",
+    "orange",
+    "pink",
+];
 
-const SCALE: number = 15 / TRAINING_COLORS.length;
+const SCALE: number = 5 / COLOR_NAMES.length;
 
 const templateId: string = "83FDE12C4E6D912B16B85E9A00422F43"; // cube
 const z: number = world.getTableHeight() + 4;
 
 // Create the game object and widget using the given color, OR version with
 // corrected colors for comparison.
-function create(pos: Vector, color: Color, correct: boolean): void {
+function create(pos: Vector, colorName: string, correct: boolean): void {
+    const colorLib: ColorLib = new ColorLib();
+
+    const colorsType: ColorsType = colorLib.getColorsByNameOrThrow(
+        colorName,
+        0
+    );
+    const color: Color = colorLib.parseColorOrThrow(colorsType.target);
+    const objColor: Color = colorLib.parseColorOrThrow(colorsType.plastic);
+    const widgetColor: Color = colorLib.parseColorOrThrow(colorsType.widget);
+
     const obj: GameObject | undefined = world.createObjectFromTemplate(
         templateId,
         pos
@@ -104,40 +82,25 @@ function create(pos: Vector, color: Color, correct: boolean): void {
         obj.addUI(ui);
 
         if (correct) {
-            const colorLib: ColorLib = new ColorLib();
-
-            const objColor: Color = colorLib.colorToObjectColor(color);
             obj.setPrimaryColor(objColor);
 
-            const widgetColor: Color = colorLib.colorToWidgetColor(color);
             (ui.widget as Border).setColor(widgetColor);
             console.log(color.toHex(), widgetColor.toHex());
         }
     }
 }
 
-const srcColors: Array<Array<number>> = [];
-let pos = new Vector(0, ((TRAINING_COLORS.length - 1) / 2) * -8 * SCALE, z);
-for (const color of TRAINING_COLORS) {
-    const s: number = 10000;
-    srcColors.push([
-        Math.floor(color.r * s) / s,
-        Math.floor(color.g * s) / s,
-        Math.floor(color.b * s) / s,
-    ]);
-
+let pos = new Vector(0, ((COLOR_NAMES.length - 1) / 2) * -8 * SCALE, z);
+for (const colorName of COLOR_NAMES) {
     // Create the game object and widget using the given color.
-    create(pos, color, true);
+    create(pos, colorName, false);
 
     // Create the game object and widget using the corrected color.
-    create(pos.add([12 * SCALE, 0, 0]), color, false);
+    create(pos.add([12 * SCALE, 0, 0]), colorName, true);
 
     // Move to the next position.
     pos = pos.add([0, 8 * SCALE, 0]);
 }
-
-console.log(JSON.stringify(srcColors));
-console.log("|colors| = " + srcColors.length);
 
 // Look straight down at result.
 const player: Player | undefined = world.getAllPlayers()[0];

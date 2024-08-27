@@ -50,8 +50,8 @@ describe("parseColor", () => {
     });
 
     test("getColorsByNameOrThrow", () => {
-        colorLib.getColorByNameOrThrow("red", 0);
-        expect(() => colorLib.getColorByNameOrThrow("invalid", 0)).toThrow();
+        colorLib.getColorsByNameOrThrow("red", 0);
+        expect(() => colorLib.getColorsByNameOrThrow("invalid", 0)).toThrow();
     });
 
     test("getColorsLength returns the length of the colors array", () => {
