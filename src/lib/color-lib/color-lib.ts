@@ -1,4 +1,5 @@
 import { Color } from "@tabletop-playground/api";
+import { COLORS, ColorsType } from "./colors.data";
 
 export const HEX_COLOR_REGEX = /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 
@@ -40,5 +41,34 @@ export class ColorLib {
             throw new Error(`bad hexColor "${hexColor}"`);
         }
         return color;
+    }
+
+    getColorsByName(colorName: string, index: number): ColorsType | undefined {
+        const colorsArray: Array<ColorsType> | undefined = COLORS[colorName];
+        return colorsArray?.[index];
+    }
+
+    getColorByNameOrThrow(colorName: string, index: number): ColorsType {
+        const color: ColorsType | undefined = this.getColorsByName(
+            colorName,
+            index
+        );
+        if (color === undefined) {
+            throw new Error(`bad colorName "${colorName}" or index "${index}"`);
+        }
+        return color;
+    }
+
+    getColorsLength(colorName: string): number | undefined {
+        const colorsArray: Array<ColorsType> | undefined = COLORS[colorName];
+        return colorsArray?.length;
+    }
+
+    getColorsLengthOrThrow(colorName: string): number {
+        const length: number | undefined = this.getColorsLength(colorName);
+        if (length === undefined) {
+            throw new Error(`bad colorName "${colorName}"`);
+        }
+        return length;
     }
 }

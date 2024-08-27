@@ -1,4 +1,4 @@
-export type ColorType = {
+export type ColorsType = {
     target: string; // desired color
     slot: string; // use as slot color
     slotRendered: string;
@@ -8,7 +8,7 @@ export type ColorType = {
     widgetRendered: string;
 };
 
-export const COLORS: Record<string, Array<ColorType>> = {
+export const COLORS: Record<string, Array<ColorsType>> = {
     green: [
         {
             target: "#00C60A",
