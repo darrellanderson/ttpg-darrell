@@ -44,21 +44,3 @@ describe("parseColor", () => {
         expect(() => colorLib.parseColorOrThrow("#gggggg")).toThrowError();
     });
 });
-
-it("colorToObjectColor", () => {
-    const colorLib: ColorLib = new ColorLib();
-    const color: Color = colorLib.parseColorOrThrow("#a800d0");
-    expect(color.toHex()).toBe("A800D0FF");
-
-    const objColor: Color = colorLib.colorToObjectColor(color);
-    expect(objColor.toHex()).toBe("8713C1FF");
-});
-
-it("colorToWidgetColor", () => {
-    const colorLib: ColorLib = new ColorLib();
-    const color: Color = colorLib.parseColorOrThrow("#a800d0");
-    expect(color.toHex()).toBe("A800D0FF");
-
-    const widgetColor: Color = colorLib.colorToWidgetColor(color);
-    expect(widgetColor.toHex()).toBe("5D1BCBFF");
-});

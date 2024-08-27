@@ -139,7 +139,7 @@ function closest(targetHexColor: string): Record<string, string> {
     }
 
     return {
-        target: targetHexColor,
+        target: targetHexColor.toUpperCase(),
         slot: bestSlotRaw,
         slotRendered: bestSlotCooked,
         plastic: bestPlasticRaw,
