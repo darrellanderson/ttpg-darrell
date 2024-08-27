@@ -59,6 +59,43 @@ export class ColorLib {
         return color;
     }
 
+    getColorsByTarget(target: string): ColorsType | undefined {
+        const targetColor: Color | undefined = this.parseColor(target);
+        if (!targetColor) {
+            return undefined;
+        }
+
+        let best: ColorsType | undefined;
+        let bestD: number = Number.MAX_SAFE_INTEGER;
+
+        for (const colorsArray of Object.values(COLORS)) {
+            for (const colorsType of colorsArray) {
+                const color: Color | undefined = this.parseColor(
+                    colorsType.target
+                );
+                if (color) {
+                    const dr = targetColor.r - color.r;
+                    const dg = targetColor.g - color.g;
+                    const db = targetColor.b - color.b;
+                    const d = dr * dr + dg * dg + db * db;
+                    if (d < bestD) {
+                        best = colorsType;
+                        bestD = d;
+                    }
+                }
+            }
+        }
+        return best;
+    }
+
+    getColorsByTargetOrThrow(target: string): ColorsType {
+        const color: ColorsType | undefined = this.getColorsByTarget(target);
+        if (color === undefined) {
+            throw new Error(`bad target "${target}"`);
+        }
+        return color;
+    }
+
     getColorsLength(colorName: string): number | undefined {
         const colorsArray: Array<ColorsType> | undefined = COLORS[colorName];
         return colorsArray?.length;

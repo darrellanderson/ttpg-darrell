@@ -54,6 +54,16 @@ describe("parseColor", () => {
         expect(() => colorLib.getColorsByNameOrThrow("invalid", 0)).toThrow();
     });
 
+    test("getColorsByTarget returns a color", () => {
+        const color = colorLib.getColorsByTarget("#FF0000");
+        expect(color?.target).toEqual("#FF0505");
+    });
+
+    test("getColorsByTargetOrThrow", () => {
+        colorLib.getColorsByTargetOrThrow("#FF0000");
+        expect(() => colorLib.getColorsByTargetOrThrow("invalid")).toThrow();
+    });
+
     test("getColorsLength returns the length of the colors array", () => {
         const length = colorLib.getColorsLength("red");
         expect(length).toEqual(5);
