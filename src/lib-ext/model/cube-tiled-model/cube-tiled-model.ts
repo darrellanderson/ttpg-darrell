@@ -29,8 +29,10 @@ export class CubeTiledModel extends AbstractModel {
                 const b: number = v0 + 1;
                 const c: number = v0 + this._tileCount + 1;
                 const d: number = v0 + this._tileCount + 2;
-                parts.push(`f ${a}/1/1 ${b}/2/1 ${c}/3/1 # ${x},${y}`);
-                parts.push(`f ${b}/2/1 ${d}/4/1 ${c}/3/1`);
+                parts.push(`f ${a}/1/1 ${b}/2/1 ${c}/4/1`);
+                parts.push(`f ${b}/2/1 ${d}/3/1 ${c}/4/1`);
+                //parts.push(`f ${a}/1/1 ${b}/2/1 ${c}/3/1`);
+                //parts.push(`f ${b}/2/1 ${d}/4/1 ${c}/3/1`);
             }
         }
 
