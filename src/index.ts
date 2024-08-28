@@ -11,6 +11,7 @@ export * from "./lib/chess-clock/chess-clock-data";
 export * from "./lib/chess-clock/chess-clock-widget";
 export * from "./lib/chess-clock/chess-clock";
 export * from "./lib/color-lib/color-lib";
+export * from "./lib/color-lib/colors.data";
 export * from "./lib/context-menu/abstract-right-click-card/abstract-right-click-card";
 export * from "./lib/context-menu/abstract-right-click-deck/abstract-right-click-deck";
 export * from "./lib/context-menu/leave-seat/leave-seat";

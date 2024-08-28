@@ -23,6 +23,8 @@ export * from "./lib-ext/image/image-split/image-split";
 export * from "./lib-ext/model/abstract-model/abstract-model";
 export * from "./lib-ext/model/cube-model/cube-model.data";
 export * from "./lib-ext/model/cube-model/cube-model";
+export * from "./lib-ext/model/cube-tiled-model/cube-tiled-model.data";
+export * from "./lib-ext/model/cube-tiled-model/cube-tiled-model";
 export * from "./lib-ext/model/cylinder-model/cylinder-model";
 export * from "./lib-ext/model/hull-model/hull-model";
 export * from "./lib-ext/template/abstract-template/abstract-template";
