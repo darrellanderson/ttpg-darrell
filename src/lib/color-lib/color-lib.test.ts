@@ -54,6 +54,15 @@ describe("parseColor", () => {
         expect(() => colorLib.getColorsByNameOrThrow("invalid", 0)).toThrow();
     });
 
+    test("getColorsByPlayerSlot", () => {
+        const color = colorLib.getColorsByPlayerSlot(0);
+        expect(color?.target).toEqual("#F0F0F0");
+    });
+
+    test("getColorsByPlayerSlotOrThrow", () => {
+        colorLib.getColorsByPlayerSlotOrThrow(0);
+    });
+
     test("getColorsByTarget returns a color", () => {
         const color = colorLib.getColorsByTarget("#FF0000");
         expect(color?.target).toEqual("#FF0505");

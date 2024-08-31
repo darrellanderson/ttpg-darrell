@@ -1,4 +1,4 @@
-import { Color } from "@tabletop-playground/api";
+import { Color, world } from "@tabletop-playground/api";
 import { COLORS, ColorsType } from "./colors.data";
 
 export const HEX_COLOR_REGEX = /^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
@@ -55,6 +55,21 @@ export class ColorLib {
         );
         if (color === undefined) {
             throw new Error(`bad colorName "${colorName}" or index "${index}"`);
+        }
+        return color;
+    }
+
+    getColorsByPlayerSlot(playerSlot: number): ColorsType | undefined {
+        const slotColor: Color = world.getSlotColor(playerSlot);
+        const slotHex: string = "#" + slotColor.toHex().substring(0, 6);
+        return this.getColorsByTarget(slotHex);
+    }
+
+    getColorsByPlayerSlotOrThrow(playerSlot: number): ColorsType {
+        const color: ColorsType | undefined =
+            this.getColorsByPlayerSlot(playerSlot);
+        if (color === undefined) {
+            throw new Error(`bad playerSlot "${playerSlot}"`);
         }
         return color;
     }
