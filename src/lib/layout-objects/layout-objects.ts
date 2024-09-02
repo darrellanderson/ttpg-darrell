@@ -22,6 +22,7 @@ export class LayoutObjects {
     private _horizontalAlignment: number = HorizontalAlignment.Center;
     private _verticalAlignment: number = VerticalAlignment.Center;
     private _childDistance: number = 0;
+    private _padding: number = 0;
     private _isVertical: boolean = false;
 
     private _overrideHeight: number = 0;
@@ -40,6 +41,11 @@ export class LayoutObjects {
 
     setHorizontalAlignment(value: number): this {
         this._horizontalAlignment = value;
+        return this;
+    }
+
+    setPadding(value: number): this {
+        this._padding = value;
         return this;
     }
 
@@ -154,6 +160,9 @@ export class LayoutObjects {
             }
         }
 
+        size.w += this._padding * 2;
+        size.h += this._padding * 2;
+
         return size;
     }
 
@@ -210,8 +219,8 @@ export class LayoutObjects {
             padTop = (overrideSize.h - childrenSize.h) / 2; // center (even if "Fill")
         }
 
-        let left = -overrideSize.w / 2 + padLeft;
-        let top = overrideSize.h / 2 - padTop;
+        let left = -overrideSize.w / 2 + padLeft + this._padding;
+        let top = overrideSize.h / 2 - padTop + this._padding;
 
         for (const child of this._children) {
             const childSize: LayoutObjectsSize =
