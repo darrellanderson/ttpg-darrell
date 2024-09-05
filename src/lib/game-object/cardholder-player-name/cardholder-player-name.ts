@@ -55,21 +55,23 @@ export class CardHolderPlayerName {
         this._ui.useWidgetSize = true;
         this._ui.widget = this._widgetSwitcher;
 
-        this._takeSeatButton.onClicked.add((button: Button, player: Player) => {
-            const thisSlot = this._cardHolder.getOwningPlayerSlot();
-            if (thisSlot < 0) {
-                throw new Error("invalid player slot");
-            }
-            player.switchSlot(thisSlot);
-
-            // Make sure attached card holder follows.
-            const delayedResetCardHolder = () => {
-                if (this._cardHolder instanceof CardHolder) {
-                    player.setHandHolder(this._cardHolder);
+        this._takeSeatButton.onClicked.add(
+            (_button: Button, player: Player) => {
+                const thisSlot = this._cardHolder.getOwningPlayerSlot();
+                if (thisSlot < 0) {
+                    throw new Error("invalid player slot");
                 }
-            };
-            process.nextTick(delayedResetCardHolder);
-        });
+                player.switchSlot(thisSlot);
+
+                // Make sure attached card holder follows.
+                const delayedResetCardHolder = () => {
+                    if (this._cardHolder instanceof CardHolder) {
+                        player.setHandHolder(this._cardHolder);
+                    }
+                };
+                process.nextTick(delayedResetCardHolder);
+            }
+        );
 
         // Listen for events (delay processing by a frame for "final" state).
         const eventHandler = () => {
