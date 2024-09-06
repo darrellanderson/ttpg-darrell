@@ -225,7 +225,7 @@ export class LayoutObjects {
         let sign: number;
         sign = this._horizontalAlignment === HorizontalAlignment.Right ? -1 : 1;
         left += sign * this._padding;
-        sign = this._verticalAlignment === VerticalAlignment.Bottom ? -1 : 1;
+        sign = this._verticalAlignment === VerticalAlignment.Bottom ? 1 : -1;
         top += sign * this._padding;
 
         for (const child of this._children) {
