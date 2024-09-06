@@ -205,22 +205,28 @@ export class LayoutObjects {
         let padLeft: number;
         let padTop: number;
         if (this._horizontalAlignment === HorizontalAlignment.Left) {
-            padLeft = this._padding;
+            padLeft = 0;
         } else if (this._horizontalAlignment === HorizontalAlignment.Right) {
-            padLeft = overrideSize.w - childrenSize.w - this._padding;
+            padLeft = overrideSize.w - childrenSize.w;
         } else {
             padLeft = (overrideSize.w - childrenSize.w) / 2; // center (even if "Fill")
         }
         if (this._verticalAlignment === VerticalAlignment.Top) {
-            padTop = this._padding;
+            padTop = 0;
         } else if (this._verticalAlignment === VerticalAlignment.Bottom) {
-            padTop = overrideSize.h - childrenSize.h - this._padding;
+            padTop = overrideSize.h - childrenSize.h;
         } else {
             padTop = (overrideSize.h - childrenSize.h) / 2; // center (even if "Fill")
         }
 
         let left = -overrideSize.w / 2 + padLeft;
         let top = overrideSize.h / 2 - padTop;
+
+        let sign: number;
+        sign = this._horizontalAlignment === HorizontalAlignment.Right ? -1 : 1;
+        left += sign * this._padding;
+        sign = this._verticalAlignment === VerticalAlignment.Bottom ? -1 : 1;
+        top += sign * this._padding;
 
         for (const child of this._children) {
             const childSize: LayoutObjectsSize =
