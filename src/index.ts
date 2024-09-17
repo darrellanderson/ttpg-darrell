@@ -41,6 +41,7 @@ export * from "./lib/global/global-init";
 export * from "./lib/global/i-global";
 export * from "./lib/heap/heap";
 export * from "./lib/hex/hex";
+export * from "./lib/layout-objects/layout-border";
 export * from "./lib/layout-objects/layout-objects";
 export * from "./lib/locale/locale";
 export * from "./lib/namespace-id/namespace-id";
