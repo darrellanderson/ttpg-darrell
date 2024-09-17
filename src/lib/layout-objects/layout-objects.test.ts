@@ -16,18 +16,6 @@ it("calculateSize (1x1)", () => {
     expect(size).toEqual({ w: 10, h: 10 });
 });
 
-it("calculateSize (1x1, padding 3)", () => {
-    const size = new LayoutObjects()
-        .setIsVertical(false)
-        .setHorizontalAlignment(HorizontalAlignment.Fill)
-        .setVerticalAlignment(VerticalAlignment.Fill)
-        .setChildDistance(1)
-        .setPadding(3)
-        .add(new MockGameObject({ _modelSize: [10, 10, 10] }))
-        .calculateSize();
-    expect(size).toEqual({ w: 16, h: 16 });
-});
-
 it("calculateSize (2x1)", () => {
     const size = new LayoutObjects()
         .setIsVertical(false)
