@@ -3,7 +3,7 @@ import { LayoutObjects, LayoutObjectsSize } from "./layout-objects";
 
 export class LayoutBorder extends LayoutObjects {
     private _playerSlot: number = 0;
-    private _linewidth: number = 1;
+    private _outlineWidth: number = 1;
 
     constructor(layoutObjects: LayoutObjects, padding: number) {
         super();
@@ -23,8 +23,8 @@ export class LayoutBorder extends LayoutObjects {
         return this;
     }
 
-    setWidth(width: number): LayoutBorder {
-        this._linewidth = width;
+    setOutlineWidth(width: number): LayoutBorder {
+        this._outlineWidth = width;
         return this;
     }
 
@@ -41,20 +41,15 @@ export class LayoutBorder extends LayoutObjects {
         center.z = world.getTableHeight() + 0.02;
         const wh: { w: number; h: number } = this.calculateSize();
         const extent: Vector = new Vector(wh.h, wh.w, 0).multiply(0.5);
-        let topLeft: Vector = center.add(new Vector(extent.x, -extent.y, 0));
-        let topRight: Vector = center.add(new Vector(extent.x, extent.y, 0));
-        let botRight: Vector = center.add(new Vector(-extent.x, extent.y, 0));
-        let botLeft: Vector = center.add(new Vector(-extent.x, -extent.y, 0));
 
-        const d = 6;
-        topLeft = topLeft.add(new Vector(d, -d, 0));
-        topRight = topRight.add(new Vector(d, d, 0));
-        botLeft = botLeft.add(new Vector(-d, -d, 0));
-        botRight = botRight.add(new Vector(-d, d, 0));
+        const topLeft: Vector = center.add(new Vector(extent.x, -extent.y, 0));
+        const topRight: Vector = center.add(new Vector(extent.x, extent.y, 0));
+        const botRight: Vector = center.add(new Vector(-extent.x, extent.y, 0));
+        const botLeft: Vector = center.add(new Vector(-extent.x, -extent.y, 0));
 
         const line: DrawingLine = new DrawingLine();
         line.points = [topLeft, topRight, botRight, botLeft, topLeft];
-        line.thickness = this._linewidth;
+        line.thickness = this._outlineWidth;
         line.color = world.getSlotColor(this._playerSlot);
         line.tag = lineTag;
         world.addDrawingLine(line);
