@@ -13,7 +13,7 @@ export class LayoutBorder extends LayoutObjects {
             .setOverrideWidth(size.w + padding * 2)
             .setOverrideHeight(size.h + padding * 2);
 
-        layoutObjects.addAfterLayout(() => {});
+        this._addBorder();
     }
 
     setPlayerSlot(playerSlot: number): LayoutBorder {
