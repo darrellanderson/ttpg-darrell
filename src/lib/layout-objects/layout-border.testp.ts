@@ -7,11 +7,11 @@ console.log("layout-border.testp.ts");
 const layout = new LayoutObjects().setChildDistance(1);
 
 const a = new LayoutObjects().setOverrideWidth(1).setOverrideHeight(2);
-const ab = new LayoutBorder(a, 1).setPlayerSlot(1).setOutlineWidth(1);
+const ab = new LayoutBorder(a, 1).setOutlineWidth(1);
 layout.add(ab);
 
 const b = new LayoutObjects().setOverrideWidth(1).setOverrideHeight(2);
-const bb = new LayoutBorder(b, 1).setPlayerSlot(2).setOutlineWidth(1);
+const bb = new LayoutBorder(b, 1).setOutlineWidth(1);
 layout.add(bb);
 
 layout.doLayoutAtPoint(new Vector(0, 0, 0), 0);
