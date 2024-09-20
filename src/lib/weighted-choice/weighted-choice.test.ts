@@ -29,7 +29,7 @@ it("choice", () => {
     const choiceCount: { [key: string]: number } = { a: 0, b: 0 };
     for (let i = 0; i < 100; i++) {
         const choice: string = weightedChoice.choice();
-        choiceCount[choice]++;
+        choiceCount[choice] = (choiceCount[choice] ?? 0) + 1;
     }
     expect(Math.abs(choiceCount["a"] ?? 0) - 25).toBeLessThan(10);
     expect(Math.abs(choiceCount["b"] ?? 0) - 75).toBeLessThan(10);

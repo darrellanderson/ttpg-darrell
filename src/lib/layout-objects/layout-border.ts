@@ -1,9 +1,10 @@
-import { DrawingLine, Vector, world } from "@tabletop-playground/api";
+import { Color, DrawingLine, Vector, world } from "@tabletop-playground/api";
 import { LayoutObjects, LayoutObjectsSize } from "./layout-objects";
 
 export class LayoutBorder extends LayoutObjects {
-    private _playerSlot: number = 0;
+    private _color: Color = new Color(1, 1, 1, 1);
     private _outlineWidth: number = 1;
+    private _tag: string = "";
 
     constructor(layoutObjects: LayoutObjects, padding: number) {
         super();
@@ -18,8 +19,8 @@ export class LayoutBorder extends LayoutObjects {
         });
     }
 
-    setPlayerSlot(playerSlot: number): LayoutBorder {
-        this._playerSlot = playerSlot;
+    setColor(color: Color): LayoutBorder {
+        this._color = color.clone();
         return this;
     }
 
@@ -28,12 +29,17 @@ export class LayoutBorder extends LayoutObjects {
         return this;
     }
 
-    _addBorder(): void {
-        const lineTag: string = "player-area-" + this._playerSlot;
+    setTag(tag: string): LayoutBorder {
+        this._tag = tag;
+        return this;
+    }
 
-        for (const line of world.getDrawingLines()) {
-            if (line.tag === lineTag) {
-                world.removeDrawingLineObject(line);
+    _addBorder(): void {
+        if (this._tag.length > 0) {
+            for (const line of world.getDrawingLines()) {
+                if (line.tag === this._tag) {
+                    world.removeDrawingLineObject(line);
+                }
             }
         }
 
@@ -50,8 +56,8 @@ export class LayoutBorder extends LayoutObjects {
         const line: DrawingLine = new DrawingLine();
         line.points = [topLeft, topRight, botRight, botLeft, topLeft];
         line.thickness = this._outlineWidth;
-        line.color = world.getSlotColor(this._playerSlot);
-        line.tag = lineTag;
+        line.color = this._color;
+        line.tag = this._tag;
         world.addDrawingLine(line);
     }
 }

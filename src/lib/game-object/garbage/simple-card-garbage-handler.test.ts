@@ -77,7 +77,7 @@ it("recycle (no deck)", () => {
 
     const snapPoint = new MockSnapPoint({
         tags: [snapPointTag],
-        globalPosition: deckPos,
+        localPosition: deckPos,
     });
     const mat = new MockGameObject({
         snapPoints: [snapPoint],
@@ -85,23 +85,35 @@ it("recycle (no deck)", () => {
     });
     mockWorld._reset({ gameObjects: [mat] });
 
-    const card: Card = new MockCard({
-        cardDetails: [new MockCardDetails({ metadata: cardNsidPrefix })],
-    });
+    const createCard = (): Card => {
+        return new MockCard({
+            cardDetails: [new MockCardDetails({ metadata: cardNsidPrefix })],
+        });
+    };
+    let card: Card;
 
+    card = createCard();
+    expect(card.getStackSize()).toEqual(1);
     expect(card.getPosition().x).toEqual(0);
     let success: boolean = scgh.recycle(card);
     expect(success).toBeTruthy();
     expect(card.getPosition().x).toEqual(100);
+    expect(card.getStackSize()).toEqual(1);
 
     // Try again (picks up cached result).
+    card = createCard();
+    expect(card.getStackSize()).toEqual(1);
     success = scgh.recycle(card);
     expect(success).toBeTruthy();
+    expect(card.getStackSize()).toEqual(1);
 
     // And again after deleting mat.
+    card = createCard();
     mat.destroy();
+    expect(card.getStackSize()).toEqual(1);
     success = scgh.recycle(card);
     expect(success).toBeFalsy();
+    expect(card.getStackSize()).toEqual(1);
 });
 
 it("recycle (missing mat)", () => {
