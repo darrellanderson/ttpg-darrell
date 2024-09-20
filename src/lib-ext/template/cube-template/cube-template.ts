@@ -108,7 +108,7 @@ export class CubeTemplate extends AbstractTemplate {
                 );
                 templateSnapPoint.Y = snapPoint.left ?? 0;
                 templateSnapPoint.X = snapPoint.top ?? 0;
-                templateSnapPoint.Z = bb.maxDepth / 2 ?? 0;
+                templateSnapPoint.Z = bb.maxDepth / 2;
                 templateSnapPoint.RotationOffset = snapPoint.rotation ?? 0;
                 templateSnapPoint.Tags = snapPoint.tags ?? [];
                 return templateSnapPoint;

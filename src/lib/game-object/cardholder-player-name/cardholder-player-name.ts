@@ -116,7 +116,7 @@ export class CardHolderPlayerName {
         this._takeSeatButton.setFontSize(fontSize);
 
         // UI position.
-        const x = (this._cardHolder.getPosition().x >= 0 ? 1 : -1) * 15;
+        const x = (this._cardHolder.getPosition().x >= 0 ? 1 : -1) * 30;
         const z = Math.ceil(fontSize * 0.15);
         this._ui.position = new Vector(x, 0, z);
         this._cardHolder.updateUI(this._ui);
