@@ -11,6 +11,7 @@ export type PlayerSlot = number;
 // that space so the state size is mostly stable.
 const TURN_ORDER_STATE_SCHEMA = z
     .object({
+        a: z.number().array(), // away
         p: z.number().array(), // passed
         e: z.number().array(), // eliminated
         o: z.number().array(), // order
@@ -35,6 +36,7 @@ export class TurnOrder {
     } = {};
 
     private readonly _savedDataKey: NamespaceId;
+    private readonly _away: Set<PlayerSlot> = new Set();
     private readonly _passed: Set<PlayerSlot> = new Set();
     private readonly _eliminated: Set<PlayerSlot> = new Set();
 
@@ -71,6 +73,7 @@ export class TurnOrder {
 
     _saveState() {
         const state: TurnOrderState = {
+            a: Array.from(this._away),
             p: Array.from(this._passed),
             e: Array.from(this._eliminated),
             o: this._order,
@@ -92,6 +95,10 @@ export class TurnOrder {
         const jsonObj = JSON.parse(jsonStr);
         const state: TurnOrderState = TURN_ORDER_STATE_SCHEMA.parse(jsonObj);
 
+        this._away.clear();
+        for (const playerSlot of state.a) {
+            this._away.add(playerSlot);
+        }
         this._passed.clear();
         for (const playerSlot of state.p) {
             this._passed.add(playerSlot);
@@ -206,6 +213,22 @@ export class TurnOrder {
         this._direction = direction === "reverse" ? -1 : 1;
         this._snake = direction === "snake";
         this._snakeNeedsAnotherTurn = false;
+
+        this._saveState();
+        TurnOrder.onTurnStateChanged.trigger(this);
+        return this;
+    }
+
+    getAway(playerSlot: PlayerSlot): boolean {
+        return this._away.has(playerSlot);
+    }
+
+    setAway(playerSlot: PlayerSlot, value: boolean): this {
+        if (value) {
+            this._away.add(playerSlot);
+        } else {
+            this._away.delete(playerSlot);
+        }
 
         this._saveState();
         TurnOrder.onTurnStateChanged.trigger(this);

@@ -121,3 +121,13 @@ it("get/set passed", () => {
     expect(turnOrder.setPassed(playerSlot, false)).toEqual(turnOrder);
     expect(turnOrder.getPassed(playerSlot)).toBeFalsy();
 });
+
+it("get/set away", () => {
+    const turnOrder = new TurnOrder("@test/test");
+    const playerSlot = 7;
+    expect(turnOrder.getAway(playerSlot)).toBeFalsy();
+    expect(turnOrder.setAway(playerSlot, true)).toEqual(turnOrder);
+    expect(turnOrder.getAway(playerSlot)).toBeTruthy();
+    expect(turnOrder.setAway(playerSlot, false)).toEqual(turnOrder);
+    expect(turnOrder.getAway(playerSlot)).toBeFalsy();
+});
