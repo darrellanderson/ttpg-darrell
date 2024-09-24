@@ -15,6 +15,7 @@ it("constructor", () => {
 it("start/stop", () => {
     const timer = new Timer("@timer/test");
     timer.setCountdownFromSeconds(100);
+    expect(timer.getCountdownFromSeconds()).toBe(100);
     timer.start();
     expect(timer.getSeconds()).toBe(100);
     timer.stop();

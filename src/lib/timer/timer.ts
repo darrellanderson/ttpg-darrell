@@ -8,7 +8,6 @@ export type TimerExportType = {
     countdownFromSeconds: number;
     anchorTimestamp: number;
     anchorValue: number;
-    active: boolean;
 };
 
 /**
@@ -70,12 +69,15 @@ export class Timer {
         this._nameSpaceId = nameSpaceId;
     }
 
+    getCountdownFromSeconds(): number {
+        return this._countdownFromSeconds;
+    }
+
     getExport(): TimerExportType {
         return {
             countdownFromSeconds: this._countdownFromSeconds,
             anchorTimestamp: this._anchorTimestamp,
             anchorValue: this._anchorValue,
-            active: this._active,
         };
     }
 
