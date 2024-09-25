@@ -1,11 +1,11 @@
-import { Timer } from "./timer";
+import { Timer, TimerBreakdown } from "./timer";
 
-it("static getTimeString", () => {
-    expect(Timer.getTimeString(0.1)).toBe("00:00:00");
-    expect(Timer.getTimeString(1)).toBe("00:00:01");
-    expect(Timer.getTimeString(60)).toBe("00:01:00");
-    expect(Timer.getTimeString(3600)).toBe("01:00:00");
-    expect(Timer.getTimeString(3661.1)).toBe("01:01:01");
+it("toTimeString", () => {
+    expect(new TimerBreakdown(0.1).toTimeString()).toBe("00 : 00 : 00");
+    expect(new TimerBreakdown(1).toTimeString()).toBe("00 : 00 : 01");
+    expect(new TimerBreakdown(60).toTimeString()).toBe("00 : 01 : 00");
+    expect(new TimerBreakdown(3600).toTimeString()).toBe("01 : 00 : 00");
+    expect(new TimerBreakdown(3661.1).toTimeString()).toBe("01 : 01 : 01");
 });
 
 it("constructor", () => {
@@ -14,9 +14,8 @@ it("constructor", () => {
 
 it("start/stop", () => {
     const timer = new Timer("@timer/test");
-    timer.setCountdownFromSeconds(100);
-    expect(timer.getCountdownFromSeconds()).toBe(100);
-    timer.start();
+    expect(timer.getSeconds()).toBe(0);
+    timer.start(100, -1);
     expect(timer.getSeconds()).toBe(100);
     timer.stop();
 });

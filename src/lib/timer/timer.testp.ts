@@ -3,7 +3,7 @@ import { Timer } from "./timer";
 
 console.log("Timer test");
 
-const timer: Timer = new Timer("@timer/test").setCountdownFromSeconds(100);
+const timer: Timer = new Timer("@timer/test");
 
 const button: Button = new Button().setFontSize(40).setText("x");
 button.onClicked.add(() => {
@@ -17,6 +17,6 @@ ui.widget = button;
 world.addUI(ui);
 
 setInterval(() => {
-    console.log(timer.getSecondsFromAnchorTimestamp());
+    console.log(timer.getSeconds());
     button.setText(timer.getTimeString());
 }, 1000);

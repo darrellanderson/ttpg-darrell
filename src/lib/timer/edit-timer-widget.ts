@@ -6,7 +6,7 @@ import {
     VerticalBox,
     Widget,
 } from "@tabletop-playground/api";
-import { Timer } from "./timer";
+import { Timer, TimerBreakdown } from "./timer";
 
 export class EditTimerWidget {
     private readonly _timer: Timer;
@@ -17,31 +17,20 @@ export class EditTimerWidget {
     }
 
     createWidget(): Widget {
+        const timerBreakdown: TimerBreakdown = new TimerBreakdown(
+            this._timer.getSeconds()
+        );
+
         const fontSize: number = 12 * this._scale;
         const spacing: number = 10 * this._scale;
-
-        let overallSeconds: number = Math.abs(this._timer.getSeconds());
-        let seconds: number = Math.floor(overallSeconds % 60);
-        let minutes: number = Math.floor(overallSeconds / 60) % 60;
-        let hours: number = Math.floor(overallSeconds / 3600);
 
         const value: Text = new Text()
             .setFontSize(fontSize)
             .setJustification(TextJustification.Center)
             .setText("00 : 00 : 00");
         const updateValue = () => {
-            const text: string = [
-                String(hours).padStart(2, "0"),
-                String(minutes).padStart(2, "0"),
-                String(seconds).padStart(2, "0"),
-            ].join(" : ");
+            const text: string = timerBreakdown.toTimeString();
             value.setText(text);
-
-            overallSeconds = seconds + minutes * 60 + hours * 3600;
-            if (this._timer.getCountdownFromSeconds() > 0) {
-                overallSeconds =
-                    this._timer.getCountdownFromSeconds() - overallSeconds;
-            }
         };
         updateValue();
 
@@ -54,15 +43,15 @@ export class EditTimerWidget {
             .addChild(addM, 1)
             .addChild(addS, 1);
         addH.onClicked.add(() => {
-            hours = (hours + 1) % 100;
+            timerBreakdown.incrHours();
             updateValue();
         });
         addM.onClicked.add(() => {
-            minutes = (minutes + 1) % 60;
+            timerBreakdown.incrMinutes();
             updateValue();
         });
         addS.onClicked.add(() => {
-            seconds = (seconds + 1) % 60;
+            timerBreakdown.incrSeconds();
             updateValue();
         });
 
@@ -75,15 +64,15 @@ export class EditTimerWidget {
             .addChild(subM, 1)
             .addChild(subS, 1);
         subH.onClicked.add(() => {
-            hours = (hours + 99) % 100;
+            timerBreakdown.decrHours();
             updateValue();
         });
         subM.onClicked.add(() => {
-            minutes = (minutes + 59) % 60;
+            timerBreakdown.decrMinutes();
             updateValue();
         });
         subS.onClicked.add(() => {
-            seconds = (seconds + 59) % 60;
+            timerBreakdown.decrSeconds();
             updateValue();
         });
 

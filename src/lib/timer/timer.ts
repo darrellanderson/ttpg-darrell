@@ -5,10 +5,85 @@ import { NamespaceId } from "../namespace-id/namespace-id";
  * Timer state, used to recreate the timer in the streamer overlay.
  */
 export type TimerExportType = {
-    countdownFromSeconds: number;
     anchorTimestamp: number;
     anchorValue: number;
+    direction: -1 | 0 | 1;
 };
+
+export class TimerBreakdown {
+    private _sign: -1 | 1;
+    private _hours: number;
+    private _minutes: number;
+    private _seconds: number;
+
+    constructor(overallSeconds: number) {
+        this._sign = overallSeconds < 0 ? -1 : 1;
+        overallSeconds = Math.abs(overallSeconds);
+        this._seconds = Math.floor(overallSeconds % 60);
+        this._minutes = Math.floor(overallSeconds / 60) % 60;
+        this._hours = Math.floor(overallSeconds / 3600);
+    }
+
+    decrHours(): this {
+        this._hours = (this._hours + 99) % 100;
+        return this;
+    }
+
+    decrMinutes(): this {
+        this._minutes = (this._minutes + 59) % 60;
+        return this;
+    }
+
+    decrSeconds(): this {
+        this._seconds = (this._seconds + 59) % 60;
+        return this;
+    }
+
+    getHours(): number {
+        return this._hours;
+    }
+
+    getMinutes(): number {
+        return this._minutes;
+    }
+
+    getSeconds(): number {
+        return this._seconds;
+    }
+
+    getOverallSeconds(): number {
+        return (
+            this._sign *
+            (this._seconds + this._minutes * 60 + this._hours * 3600)
+        );
+    }
+
+    incrHours(): this {
+        this._hours = (this._hours + 1) % 100;
+        return this;
+    }
+
+    incrMinutes(): this {
+        this._minutes = (this._minutes + 1) % 60;
+        return this;
+    }
+
+    incrSeconds(): this {
+        this._seconds = (this._seconds + 1) % 60;
+        return this;
+    }
+
+    toTimeString(): string {
+        return (
+            (this._sign < 0 ? "-" : "") +
+            [
+                this._hours.toLocaleString().padStart(2, "0"),
+                this._minutes.toLocaleString().padStart(2, "0"),
+                this._seconds.toLocaleString().padStart(2, "0"),
+            ].join(" : ")
+        );
+    }
+}
 
 /**
  * Timer, counts up or down.
@@ -21,29 +96,15 @@ export class Timer {
     // Track based on start time, per-second timeouts can drift.
     private _anchorTimestamp: number = 0;
     private _anchorValue: number = 0;
+    private _direction: -1 | 0 | 1 = 1;
     private _active: boolean = false;
 
     private _intervalHandle: NodeJS.Timeout | undefined;
 
-    static getTimeString(overallSeconds: number): string {
-        const sign: string = overallSeconds < 0 ? "-" : "";
-        overallSeconds = Math.abs(overallSeconds);
-
-        const seconds: number = Math.floor(overallSeconds % 60);
-        const minutes: number = Math.floor(overallSeconds / 60) % 60;
-        const hours: number = Math.floor(overallSeconds / 3600);
-
-        return [
-            sign + hours.toLocaleString().padStart(2, "0"),
-            minutes.toLocaleString().padStart(2, "0"),
-            seconds.toLocaleString().padStart(2, "0"),
-        ].join(":");
-    }
-
     _saveState(): void {
         const json: string = JSON.stringify({
-            cfs: this._countdownFromSeconds,
-            v: this.getSecondsFromAnchorTimestamp(),
+            v: this.getSeconds(),
+            d: this._direction,
             a: this._active,
         });
         world.setSavedData(json, this._nameSpaceId);
@@ -55,12 +116,12 @@ export class Timer {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const data: any = JSON.parse(json);
 
-            this._countdownFromSeconds = data.cfs;
-            this._anchorValue = data.v;
-
+            const value: number = data.v;
+            const direction: -1 | 0 | 1 = data.d;
             const active: boolean = data.a;
+
             if (active) {
-                this.start();
+                this.start(value, direction);
             }
         }
     }
@@ -69,29 +130,12 @@ export class Timer {
         this._nameSpaceId = nameSpaceId;
     }
 
-    getCountdownFromSeconds(): number {
-        return this._countdownFromSeconds;
-    }
-
     getExport(): TimerExportType {
         return {
-            countdownFromSeconds: this._countdownFromSeconds,
             anchorTimestamp: this._anchorTimestamp,
             anchorValue: this._anchorValue,
+            direction: this._active ? this._direction : 0,
         };
-    }
-
-    /**
-     * Get timer seconds, accounting for countdown active.
-     *
-     * @returns number
-     */
-    getSeconds(): number {
-        let seconds: number = this.getSecondsFromAnchorTimestamp();
-        if (this._countdownFromSeconds > 0) {
-            seconds = this._countdownFromSeconds - seconds;
-        }
-        return seconds;
     }
 
     /**
@@ -99,30 +143,24 @@ export class Timer {
      *
      * @returns number
      */
-    getSecondsFromAnchorTimestamp(): number {
+    getSeconds(): number {
         let seconds: number = this._anchorValue;
         if (this._active) {
             const now: number = Date.now() / 1000;
             const delta: number = now - this._anchorTimestamp;
-            seconds = seconds + delta;
+            seconds += delta * this._direction;
         }
         return seconds;
     }
 
     getTimeString(): string {
-        return Timer.getTimeString(this.getSeconds());
+        return new TimerBreakdown(this.getSeconds()).toTimeString();
     }
 
-    setCountdownFromSeconds(countdownFromSeconds: number): this {
-        this._countdownFromSeconds = countdownFromSeconds;
-        return this;
-    }
-
-    start(overrideValue?: number): this {
-        if (overrideValue !== undefined) {
-            this._anchorValue = overrideValue;
-        }
+    start(value: number, direction: -1 | 0 | 1): this {
+        this._anchorValue = value;
         this._anchorTimestamp = Date.now() / 1000;
+        this._direction = direction;
         this._active = true;
         this._saveState();
 
@@ -131,14 +169,15 @@ export class Timer {
             this._intervalHandle = undefined;
         }
         setTimeout(() => {
-            this._saveState;
+            this._saveState();
         }, 1000);
 
         return this;
     }
 
     stop(): this {
-        this._anchorValue = this.getSecondsFromAnchorTimestamp();
+        // Store currect value (keep direction).
+        this._anchorValue = this.getSeconds();
         this._anchorTimestamp = 0;
         this._active = false;
 
@@ -153,7 +192,9 @@ export class Timer {
         if (this._active) {
             this.stop();
         } else {
-            this.start();
+            const value: number = this.getSeconds();
+            const direction: -1 | 0 | 1 = this._direction;
+            this.start(value, direction);
         }
         return this;
     }
