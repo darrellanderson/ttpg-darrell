@@ -1,5 +1,6 @@
-import { world } from "@tabletop-playground/api";
+import { Text, world } from "@tabletop-playground/api";
 import { NamespaceId } from "../namespace-id/namespace-id";
+import { TriggerableMulticastDelegate } from "../event/triggerable-multicast-delegate/triggerable-multicast-delegate";
 
 /**
  * Timer state, used to recreate the timer in the streamer overlay.
@@ -89,9 +90,11 @@ export class TimerBreakdown {
  * Timer, counts up or down.
  */
 export class Timer {
-    private readonly _nameSpaceId: NamespaceId;
+    public readonly onTimerExpired: TriggerableMulticastDelegate<() => void> =
+        new TriggerableMulticastDelegate();
 
-    private _countdownFromSeconds: number = 0;
+    private readonly _nameSpaceId: NamespaceId;
+    private readonly _timerTexts: Array<Text> = [];
 
     // Track based on start time, per-second timeouts can drift.
     private _anchorTimestamp: number = 0;
@@ -130,12 +133,29 @@ export class Timer {
         this._nameSpaceId = nameSpaceId;
     }
 
-    getExport(): TimerExportType {
+    addTimerText(text: Text): this {
+        this._timerTexts.push(text);
+        return this;
+    }
+
+    delTimerText(text: Text): this {
+        const index: number = this._timerTexts.indexOf(text);
+        if (index !== -1) {
+            this._timerTexts.splice(index, 1);
+        }
+        return this;
+    }
+
+    export(): TimerExportType {
         return {
             anchorTimestamp: this._anchorTimestamp,
             anchorValue: this._anchorValue,
             direction: this._active ? this._direction : 0,
         };
+    }
+
+    getDirection(): -1 | 0 | 1 {
+        return this._direction;
     }
 
     /**
@@ -165,12 +185,30 @@ export class Timer {
         this._saveState();
 
         if (this._intervalHandle) {
-            clearTimeout(this._intervalHandle);
+            clearInterval(this._intervalHandle);
             this._intervalHandle = undefined;
         }
-        setTimeout(() => {
+
+        let lastValue: number = this.getSeconds();
+        setInterval(() => {
             this._saveState();
-        }, 1000);
+
+            const str: string = this.getTimeString();
+            for (const text of this._timerTexts) {
+                text.setText(str);
+            }
+
+            if (this._direction === -1) {
+                const newValue: number = this.getSeconds();
+
+                if (lastValue > 0 && newValue <= 0) {
+                    // Timer reached zero.
+                    this.onTimerExpired.trigger();
+                }
+
+                lastValue = newValue;
+            }
+        }, 500);
 
         return this;
     }
@@ -182,7 +220,7 @@ export class Timer {
         this._active = false;
 
         if (this._intervalHandle) {
-            clearTimeout(this._intervalHandle);
+            clearInterval(this._intervalHandle);
             this._intervalHandle = undefined;
         }
         return this;

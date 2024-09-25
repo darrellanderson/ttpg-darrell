@@ -1,6 +1,8 @@
 import {
+    Border,
     Button,
     HorizontalBox,
+    LayoutBox,
     Text,
     TextJustification,
     VerticalBox,
@@ -8,7 +10,7 @@ import {
 } from "@tabletop-playground/api";
 import { Timer, TimerBreakdown } from "./timer";
 
-export class EditTimerWidget {
+export class EditTimer {
     private readonly _timer: Timer;
     private _scale: number = 1;
 
@@ -16,7 +18,8 @@ export class EditTimerWidget {
         this._timer = timer;
     }
 
-    createWidget(): Widget {
+    createWidget(onClose: () => void): Widget {
+        this._timer.stop();
         const timerBreakdown: TimerBreakdown = new TimerBreakdown(
             this._timer.getSeconds()
         );
@@ -76,12 +79,41 @@ export class EditTimerWidget {
             updateValue();
         });
 
-        const timerPlanet = new VerticalBox()
+        const timerPanel = new VerticalBox()
             .setChildDistance(spacing)
             .addChild(addPanel)
             .addChild(value)
             .addChild(subPanel);
 
-        return timerPlanet;
+        const countUp = new Button() //
+            .setFontSize(fontSize)
+            .setText("Count Up");
+        countUp.onClicked.add(() => {
+            this._timer.start(timerBreakdown.getOverallSeconds(), 1);
+            onClose();
+        });
+        const countDown = new Button()
+            .setFontSize(fontSize)
+            .setText("Count Down");
+        countDown.onClicked.add(() => {
+            this._timer.start(timerBreakdown.getOverallSeconds(), -1);
+            onClose();
+        });
+        const startStop = new VerticalBox()
+            .setChildDistance(spacing)
+            .addChild(countUp, 1)
+            .addChild(countDown, 1);
+
+        const panel = new HorizontalBox()
+            .setChildDistance(spacing)
+            .addChild(timerPanel)
+            .addChild(startStop);
+
+        const box = new LayoutBox()
+            .setPadding(spacing, spacing, spacing, spacing)
+            .setChild(panel);
+
+        const border = new Border().setChild(box);
+        return border;
     }
 }
