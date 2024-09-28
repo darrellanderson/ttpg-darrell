@@ -54,6 +54,8 @@ export * from "./lib/spawn/spawn";
 export * from "./lib/svg/svg-sparkline/svg-sparkline";
 export * from "./lib/swap-split-combine/swap-split-combine";
 export * from "./lib/time-span/time-span";
+export * from "./lib/timer/edit-timer";
+export * from "./lib/timer/timer";
 export * from "./lib/turn-order/turn-order";
 export * from "./lib/ui/ui-visibility/ui-visibility";
 export * from "./lib/ui/window/player-window";
