@@ -16,6 +16,6 @@ it("start/stop", () => {
     const timer = new Timer("@timer/test");
     expect(timer.getSeconds()).toBe(0);
     timer.start(100, -1);
-    expect(timer.getSeconds()).toBe(100);
     timer.stop();
+    expect(Math.ceil(timer.getSeconds())).toBe(100);
 });

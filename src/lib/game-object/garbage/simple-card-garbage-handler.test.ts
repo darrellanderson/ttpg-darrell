@@ -77,7 +77,7 @@ it("recycle (no deck)", () => {
 
     const snapPoint = new MockSnapPoint({
         tags: [snapPointTag],
-        localPosition: deckPos,
+        globalPosition: deckPos,
     });
     const mat = new MockGameObject({
         snapPoints: [snapPoint],
@@ -88,13 +88,14 @@ it("recycle (no deck)", () => {
     const createCard = (): Card => {
         return new MockCard({
             cardDetails: [new MockCardDetails({ metadata: cardNsidPrefix })],
+            position: [-1, -1, -1],
         });
     };
     let card: Card;
 
     card = createCard();
     expect(card.getStackSize()).toEqual(1);
-    expect(card.getPosition().x).toEqual(0);
+    expect(card.getPosition().x).toEqual(-1);
     let success: boolean = scgh.recycle(card);
     expect(success).toBeTruthy();
     expect(card.getPosition().x).toEqual(100);

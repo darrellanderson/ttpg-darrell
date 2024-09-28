@@ -1,4 +1,4 @@
-import { Text, world } from "@tabletop-playground/api";
+import { world } from "@tabletop-playground/api";
 import { NamespaceId } from "../namespace-id/namespace-id";
 import { TriggerableMulticastDelegate } from "../event/triggerable-multicast-delegate/triggerable-multicast-delegate";
 
@@ -92,9 +92,10 @@ export class TimerBreakdown {
 export class Timer {
     public readonly onTimerExpired: TriggerableMulticastDelegate<() => void> =
         new TriggerableMulticastDelegate();
+    public readonly onTimerTick: TriggerableMulticastDelegate<() => void> =
+        new TriggerableMulticastDelegate();
 
     private readonly _nameSpaceId: NamespaceId;
-    private readonly _timerTexts: Array<Text> = [];
 
     // Track based on start time, per-second timeouts can drift.
     private _anchorTimestamp: number = 0;
@@ -131,25 +132,6 @@ export class Timer {
 
     constructor(nameSpaceId: NamespaceId) {
         this._nameSpaceId = nameSpaceId;
-    }
-
-    /**
-     * Auto-update text with timer value.
-     *
-     * @param text
-     * @returns
-     */
-    addTimerText(text: Text): this {
-        this._timerTexts.push(text);
-        return this;
-    }
-
-    delTimerText(text: Text): this {
-        const index: number = this._timerTexts.indexOf(text);
-        if (index !== -1) {
-            this._timerTexts.splice(index, 1);
-        }
-        return this;
     }
 
     export(): TimerExportType {
@@ -196,13 +178,9 @@ export class Timer {
         }
 
         let lastValue: number = this.getSeconds();
-        setInterval(() => {
+        this._intervalHandle = setInterval(() => {
             this._saveState();
-
-            const str: string = this.getTimeString();
-            for (const text of this._timerTexts) {
-                text.setText(str);
-            }
+            this.onTimerTick.trigger();
 
             if (this._direction === -1) {
                 const newValue: number = this.getSeconds();
