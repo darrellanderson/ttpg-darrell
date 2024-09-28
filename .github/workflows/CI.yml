@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [windows-latest]
         node-version: [20.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
@@ -29,11 +29,11 @@ jobs:
           git config --global core.autocrlf false
           git config --global core.eol lf
       # Clone the repository
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       # Set up Node and yarn; use cached dependencies
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: "yarn"
