@@ -133,6 +133,12 @@ export class Timer {
         this._nameSpaceId = nameSpaceId;
     }
 
+    /**
+     * Auto-update text with timer value.
+     *
+     * @param text
+     * @returns
+     */
     addTimerText(text: Text): this {
         this._timerTexts.push(text);
         return this;
