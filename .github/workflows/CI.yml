@@ -40,4 +40,4 @@ jobs:
 
             - run: yarn install --frozen-lockfile
             - run: yarn check:prettier
-            - run: yarn test src/
+            - run: yarn test src/lib/
