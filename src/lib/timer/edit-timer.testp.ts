@@ -16,7 +16,9 @@ ui.widget = editTimer.createWidget(onClose);
 world.addUI(ui);
 
 const timerText = new Text();
-timer.addTimerText(timerText);
+timer.onTimerTick.add(() => {
+    timerText.setText(timer.getTimeString());
+});
 
 const timerUi = new UIElement();
 timerUi.position = new Vector(0, 0, world.getTableHeight() + 1);
