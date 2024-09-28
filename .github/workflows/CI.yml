@@ -4,41 +4,41 @@
 name: Continuous Integration Jobs
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-  workflow_dispatch:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+    workflow_dispatch:
 
 jobs:
-  ci:
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [windows-latest]
-        node-version: [20.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+    ci:
+        strategy:
+            fail-fast: true
+            matrix:
+                os: [windows-latest]
+                node-version: [20.x]
+                # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
-    name: Unit tests on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+        name: Unit tests on ${{ matrix.os }}
+        runs-on: ${{ matrix.os }}
 
-    steps:
-      # Ensure that we don't do a CRLF conversion on Windows
-      - name: Disable CRLF conversions
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-      # Clone the repository
-      - uses: actions/checkout@v4
+        steps:
+            # Ensure that we don't do a CRLF conversion on Windows
+            - name: Disable CRLF conversions
+              run: |
+                  git config --global core.autocrlf false
+                  git config --global core.eol lf
+            # Clone the repository
+            - uses: actions/checkout@v4
 
-      # Set up Node and yarn; use cached dependencies
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: "yarn"
+            # Set up Node and yarn; use cached dependencies
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: "yarn"
 
-      - run: yarn install --frozen-lockfile
-      - run: yarn check:prettier
-      - run: yarn generate:langfile
-      - run: yarn test
+            - run: yarn install --frozen-lockfile
+            - run: yarn check:prettier
+            - run: yarn generate:langfile
+            - run: yarn test
