@@ -8,7 +8,8 @@
         "build/"
     ],
     "scripts": {
-        "test": "jest",
+        "check:prettier": "prettier --check .",
+        "test": "jest src/",
         "build": "tsc -p tsconfig-esm.json && tsc -p tsconfig-cjs.json",
         "clean": "rm -rf build",
         "prepublishOnly": "yarn run build",
