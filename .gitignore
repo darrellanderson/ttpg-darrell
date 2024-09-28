@@ -1,5 +1,5 @@
 /node_modules
-yarn.lock
+#yarn.lock # needed for github action to create env
 
 /build
 
