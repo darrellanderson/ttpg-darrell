@@ -77,11 +77,12 @@ it("recycle (no deck)", () => {
 
     const snapPoint = new MockSnapPoint({
         tags: [snapPointTag],
-        globalPosition: deckPos,
+        localPosition: [0, 0, 0],
     });
     const mat = new MockGameObject({
         snapPoints: [snapPoint],
         templateMetadata: matNsid,
+        position: deckPos,
     });
     mockWorld._reset({ gameObjects: [mat] });
 

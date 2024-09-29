@@ -19,7 +19,6 @@
     "license": "Unlicense",
     "devDependencies": {
         "@jest/globals": "^29.7.0",
-        "@tensorflow/tfjs": "^4.20.0",
         "@types/fs-extra": "^11.0.4",
         "@types/jest": "^29.5.10",
         "@types/klaw-sync": "^6.0.5",

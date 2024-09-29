@@ -2,17 +2,20 @@ import { world } from "@tabletop-playground/api";
 import { NamespaceId } from "../namespace-id/namespace-id";
 import { TriggerableMulticastDelegate } from "../event/triggerable-multicast-delegate/triggerable-multicast-delegate";
 
+export type DirectionType = -1 | 1;
+
 /**
  * Timer state, used to recreate the timer in the streamer overlay.
  */
 export type TimerExportType = {
     anchorTimestamp: number;
     anchorValue: number;
-    direction: -1 | 0 | 1;
+    direction: DirectionType;
+    active: boolean;
 };
 
 export class TimerBreakdown {
-    private _sign: -1 | 1;
+    private _sign: DirectionType;
     private _hours: number;
     private _minutes: number;
     private _seconds: number;
@@ -100,7 +103,7 @@ export class Timer {
     // Track based on start time, per-second timeouts can drift.
     private _anchorTimestamp: number = 0;
     private _anchorValue: number = 0;
-    private _direction: -1 | 0 | 1 = 1;
+    private _direction: DirectionType = 1;
     private _active: boolean = false;
 
     private _intervalHandle: NodeJS.Timeout | undefined;
@@ -121,7 +124,7 @@ export class Timer {
             const data: any = JSON.parse(json);
 
             const value: number = data.v;
-            const direction: -1 | 0 | 1 = data.d;
+            const direction: DirectionType = data.d;
             const active: boolean = data.a;
 
             if (active) {
@@ -138,11 +141,12 @@ export class Timer {
         return {
             anchorTimestamp: this._anchorTimestamp,
             anchorValue: this._anchorValue,
-            direction: this._active ? this._direction : 0,
+            direction: this._direction,
+            active: this._active,
         };
     }
 
-    getDirection(): -1 | 0 | 1 {
+    getDirection(): DirectionType {
         return this._direction;
     }
 
@@ -165,7 +169,7 @@ export class Timer {
         return new TimerBreakdown(this.getSeconds()).toTimeString();
     }
 
-    start(value: number, direction: -1 | 0 | 1): this {
+    start(value: number, direction: DirectionType): this {
         this._anchorValue = value;
         this._anchorTimestamp = Date.now() / 1000;
         this._direction = direction;
@@ -215,7 +219,7 @@ export class Timer {
             this.stop();
         } else {
             const value: number = this.getSeconds();
-            const direction: -1 | 0 | 1 = this._direction;
+            const direction: DirectionType = this._direction;
             this.start(value, direction);
         }
         return this;
