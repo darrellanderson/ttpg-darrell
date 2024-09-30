@@ -223,7 +223,11 @@ export class DiceGroup {
             if (diceParams) {
                 const phi = (i / this._diceParamsArray.length) * Math.PI * 2;
                 const r = this._diceParamsArray.length * 0.3;
-                const pos = new Vector(Math.cos(phi) * r, Math.sin(phi) * r, z);
+                const pos = new Vector(
+                    Math.cos(phi) * r,
+                    Math.sin(phi) * r,
+                    z
+                ).add(this._position);
                 const dice: Dice = DiceGroup._createDice(diceParams, pos);
                 this._diceObjIdToDiceResult[dice.getId()] = {
                     diceParams,
