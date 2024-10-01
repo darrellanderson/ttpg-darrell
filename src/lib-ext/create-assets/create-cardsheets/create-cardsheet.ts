@@ -229,8 +229,9 @@ export class CreateCardsheet extends AbstractCreateAssets {
 
         // Create templates.
         // Store results in internal _fileData.
+        let index = 0;
         for (const sheetPlan of this._sheetPlan) {
-            this._createDeckTemplate(sheetPlan);
+            this._createDeckTemplate(sheetPlan, index++);
         }
 
         return new Promise<{ [key: string]: Buffer }>((resolve, reject) => {
@@ -308,7 +309,7 @@ export class CreateCardsheet extends AbstractCreateAssets {
      *
      * @param sheetPlan
      */
-    private _createDeckTemplate(sheetPlan: SheetPlan): void {
+    private _createDeckTemplate(sheetPlan: SheetPlan, index: number): void {
         const dstFilename: string = path.join(
             this._params.rootDir ?? ".",
             "assets",
@@ -335,7 +336,7 @@ export class CreateCardsheet extends AbstractCreateAssets {
             )
             .setGuidFrom(sheetPlan.templateFilenameRelativeToAssetsTemplates)
             .setTemplateMetadata(this._params.deckMetadata ?? "")
-            .setTemplateName(this._params.templateName ?? "")
+            .setTemplateName(this._params.templateName ?? "" + `${index + 1}`)
             .setNumColsAndRows(sheetPlan.cols, sheetPlan.rows)
             .setTextures(
                 sheetPlan.faceFilenameRelativeToAssetsTextures,
