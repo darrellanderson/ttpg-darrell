@@ -231,7 +231,11 @@ export class CreateCardsheet extends AbstractCreateAssets {
         // Store results in internal _fileData.
         let index = 0;
         for (const sheetPlan of this._sheetPlan) {
-            this._createDeckTemplate(sheetPlan, index++);
+            this._createDeckTemplate(
+                sheetPlan,
+                index++,
+                this._sheetPlan.length
+            );
         }
 
         return new Promise<{ [key: string]: Buffer }>((resolve, reject) => {
@@ -309,7 +313,11 @@ export class CreateCardsheet extends AbstractCreateAssets {
      *
      * @param sheetPlan
      */
-    private _createDeckTemplate(sheetPlan: SheetPlan, index: number): void {
+    private _createDeckTemplate(
+        sheetPlan: SheetPlan,
+        index: number,
+        count: number
+    ): void {
         const dstFilename: string = path.join(
             this._params.rootDir ?? ".",
             "assets",
@@ -329,6 +337,11 @@ export class CreateCardsheet extends AbstractCreateAssets {
             backTexture = sheetPlan.backFilenameRelativeToAssetsTextures;
         }
 
+        let nameSuffix: string = "";
+        if (count > 1) {
+            nameSuffix = ` ${index + 1}/${count}`;
+        }
+
         const sheetTemplate: CardsheetTemplate = new CardsheetTemplate()
             .setCardSizeWorld(
                 this._params.cardSizeWorld.width,
@@ -336,7 +349,7 @@ export class CreateCardsheet extends AbstractCreateAssets {
             )
             .setGuidFrom(sheetPlan.templateFilenameRelativeToAssetsTemplates)
             .setTemplateMetadata(this._params.deckMetadata ?? "")
-            .setTemplateName(this._params.templateName ?? "" + `${index + 1}`)
+            .setTemplateName((this._params.templateName ?? "") + nameSuffix)
             .setNumColsAndRows(sheetPlan.cols, sheetPlan.rows)
             .setTextures(
                 sheetPlan.faceFilenameRelativeToAssetsTextures,

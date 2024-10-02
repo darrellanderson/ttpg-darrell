@@ -1,6 +1,17 @@
 import { z } from "zod";
 import { ZBaseCellSchema } from "../../../index-ext";
 
+export const CardsheetCardSchema = z
+    .object({
+        face: z.union([z.string(), ZBaseCellSchema]),
+        back: z.union([z.string(), ZBaseCellSchema]).optional(),
+        name: z.string().optional(),
+        metadata: z.string().optional(),
+        tags: z.array(z.string()).optional(),
+    })
+    .strict();
+export type CardsheetCardType = z.infer<typeof CardsheetCardSchema>;
+
 export const CreateCardsheetParamsSchema = z
     .object({
         // Directory containing 'assets', src file.
@@ -32,17 +43,7 @@ export const CreateCardsheetParamsSchema = z
         // In addition to per-card tags, add common deck tags to each card AND final deck.
         applyAllTags: z.array(z.string()).optional(),
 
-        cards: z.array(
-            z
-                .object({
-                    face: z.union([z.string(), ZBaseCellSchema]),
-                    back: z.union([z.string(), ZBaseCellSchema]).optional(),
-                    name: z.string().optional(),
-                    metadata: z.string().optional(),
-                    tags: z.array(z.string()).optional(),
-                })
-                .strict()
-        ),
+        cards: z.array(CardsheetCardSchema),
 
         back: z.union([z.string(), ZBaseCellSchema]).optional(),
     })
