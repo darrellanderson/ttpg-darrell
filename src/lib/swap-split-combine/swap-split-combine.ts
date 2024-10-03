@@ -196,6 +196,11 @@ export class SwapSplitCombine implements IGlobal {
                     dstObj.setRotation([0, 0, 180]);
                 }
                 dstObj.snapToGround();
+
+                const currentRotation = true;
+                const includeGeometry = false;
+                pos.y +=
+                    dstObj.getExtent(currentRotation, includeGeometry).y / 2;
             }
         }
     }
