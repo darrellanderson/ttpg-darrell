@@ -140,7 +140,7 @@ export class SwapSplitCombine implements IGlobal {
         player: Player
     ): void {
         for (const rule of this._rules) {
-            let count = 0;
+            const srcObjs: Array<GameObject> = [];
             for (const nsid of rule.src.nsids) {
                 let objs: Array<GameObject> | undefined = nsidToObjs[nsid];
                 if (objs) {
@@ -150,26 +150,21 @@ export class SwapSplitCombine implements IGlobal {
                     if (rule.requireFaceDown) {
                         objs = objs.filter((obj) => !Facing.isFaceUp(obj));
                     }
-                    count += objs.length ?? 0;
+                    srcObjs.push(...objs);
                 }
             }
-            if (count >= rule.src.count) {
-                this._applyRule(rule, nsidToObjs, player);
+            if (srcObjs.length >= rule.src.count) {
+                this._applyRule(rule, srcObjs, player);
+                break;
             }
         }
     }
 
     _applyRule(
         rule: SwapSplitCombineRule,
-        nsidToObjs: { [key: string]: Array<GameObject> },
+        srcObjs: Array<GameObject>,
         player: Player
     ) {
-        // Gather src objects.
-        let srcObjs: Array<GameObject> = [];
-        for (const nsid of rule.src.nsids) {
-            srcObjs.push(...(nsidToObjs[nsid] ?? []));
-        }
-
         if (rule.requireFaceUp) {
             srcObjs = srcObjs.filter((obj) => Facing.isFaceUp(obj));
         }
