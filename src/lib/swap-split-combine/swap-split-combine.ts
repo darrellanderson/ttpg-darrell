@@ -10,6 +10,7 @@ import { IGlobal } from "../global/i-global";
 import { GarbageContainer } from "../game-object/garbage/garbage-container";
 import { DeletedItemsContainer } from "../game-object/deleted-items-container/deleted-items-container";
 import { Spawn } from "../spawn/spawn";
+import { Facing } from "../facing/facing";
 
 export type SwapSplitCombineRule = {
     src: {
@@ -20,6 +21,8 @@ export type SwapSplitCombineRule = {
         nsid: string;
         count: number;
     };
+    requireFaceUp?: boolean;
+    requireFaceDown?: boolean;
     repeat: boolean;
 };
 
@@ -159,6 +162,13 @@ export class SwapSplitCombine implements IGlobal {
             srcObjs.push(...(nsidToObjs[nsid] ?? []));
         }
 
+        if (rule.requireFaceUp) {
+            srcObjs = srcObjs.filter((obj) => Facing.isFaceUp(obj));
+        }
+        if (rule.requireFaceDown) {
+            srcObjs = srcObjs.filter((obj) => !Facing.isFaceUp(obj));
+        }
+
         // Calculate how many times to apply rule, trim
         // to exact src objects to recycle.
         const applyCount = rule.repeat
@@ -182,12 +192,10 @@ export class SwapSplitCombine implements IGlobal {
                     rule.dst.nsid,
                     pos
                 );
+                if (rule.requireFaceDown) {
+                    dstObj.setRotation([0, 0, 180]);
+                }
                 dstObj.snapToGround();
-
-                const currentRotation = true;
-                const includeGeometry = false;
-                pos.y +=
-                    dstObj.getExtent(currentRotation, includeGeometry).y / 2;
             }
         }
     }
