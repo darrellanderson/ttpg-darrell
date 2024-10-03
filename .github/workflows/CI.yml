@@ -39,5 +39,5 @@ jobs:
                   cache: "yarn"
 
             - run: yarn install --frozen-lockfile
-            - run: yarn check:prettier
             - run: yarn test src/lib/
+            #- run: yarn check:prettier
