@@ -117,7 +117,7 @@ export class GarbageContainer {
     }
 
     // Expose for testing.
-    _recycle() {
+    _recycle(): void {
         const objs: Array<GameObject> = this._container.getItems();
         for (const obj of objs) {
             // Verify object.
