@@ -1,4 +1,10 @@
-import { Card, Container, GameObject, Vector } from "@tabletop-playground/api";
+import {
+    Card,
+    CardDetails,
+    Container,
+    GameObject,
+    Vector,
+} from "@tabletop-playground/api";
 import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate/triggerable-multicast-delegate";
 
 /**
@@ -60,7 +66,11 @@ export class GarbageContainer {
         for (const handler of this._garbageHandlers) {
             if (handler.canRecycle(obj)) {
                 // Name might be lost during recycle, read it early.
-                const name: string = obj.getName();
+                let name: string = obj.getName();
+                if (obj instanceof Card && obj.getStackSize() === 1) {
+                    const cardDetails: CardDetails = obj.getCardDetails();
+                    name = cardDetails.name;
+                }
                 if (handler.recycle(obj)) {
                     GarbageContainer.onRecycled.trigger(obj, name);
                     return true;
