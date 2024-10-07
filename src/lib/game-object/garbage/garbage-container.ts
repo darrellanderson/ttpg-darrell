@@ -26,7 +26,7 @@ export abstract class GarbageHandler {
  */
 export class GarbageContainer {
     public static onRecycled = new TriggerableMulticastDelegate<
-        (obj: GameObject) => void
+        (obj: GameObject, name: string) => void
     >();
     private static _garbageHandlers: Array<GarbageHandler> = [];
 
@@ -59,8 +59,10 @@ export class GarbageContainer {
     private static _tryRecycleObj(obj: GameObject): boolean {
         for (const handler of this._garbageHandlers) {
             if (handler.canRecycle(obj)) {
+                // Name might be lost during recycle, read it early.
+                const name: string = obj.getName();
                 if (handler.recycle(obj)) {
-                    GarbageContainer.onRecycled.trigger(obj);
+                    GarbageContainer.onRecycled.trigger(obj, name);
                     return true;
                 }
             }
