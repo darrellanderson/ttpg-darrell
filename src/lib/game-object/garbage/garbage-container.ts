@@ -1,11 +1,13 @@
 import {
     Card,
+    CardDetails,
     Container,
     GameObject,
     Player,
     Vector,
 } from "@tabletop-playground/api";
 import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate/triggerable-multicast-delegate";
+import { NSID } from "../../nsid/nsid";
 
 /**
  * Possibly return the given object to its designated "thrown in the garbage" location.
@@ -32,7 +34,11 @@ export abstract class GarbageHandler {
  */
 export class GarbageContainer {
     public static onRecycled = new TriggerableMulticastDelegate<
-        (obj: GameObject, player: Player | undefined) => void
+        (
+            objName: string,
+            objMetadata: string,
+            player: Player | undefined
+        ) => void
     >();
     private static _garbageHandlers: Array<GarbageHandler> = [];
 
@@ -71,8 +77,19 @@ export class GarbageContainer {
     ): boolean {
         for (const handler of this._garbageHandlers) {
             if (handler.canRecycle(obj)) {
+                // Name might be lost during recycle, read it early.
+                let objName: string = obj.getName();
+                const objMetadata: string = NSID.get(obj);
+                if (obj instanceof Card && obj.getStackSize() === 1) {
+                    const cardDetails: CardDetails = obj.getCardDetails();
+                    objName = cardDetails.name;
+                }
                 if (handler.recycle(obj)) {
-                    GarbageContainer.onRecycled.trigger(obj, player);
+                    GarbageContainer.onRecycled.trigger(
+                        objName,
+                        objMetadata,
+                        player
+                    );
                     return true;
                 }
             }

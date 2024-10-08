@@ -1,4 +1,4 @@
-import { Card, Container, GameObject } from "@tabletop-playground/api";
+import { Card, Container, GameObject, Player } from "@tabletop-playground/api";
 import {
     MockCard,
     MockCardDetails,
@@ -155,9 +155,13 @@ it("_tryRecycleDeck (none)", () => {
 });
 
 it("onRecycled", () => {
-    const recycled: Array<GameObject> = [];
-    const onRecycledHandler = (obj: GameObject) => {
-        recycled.push(obj);
+    const recycledNames: Array<string> = [];
+    const onRecycledHandler = (
+        objName: string,
+        _objMetadata: string,
+        _player: Player | undefined
+    ) => {
+        recycledNames.push(objName);
     };
 
     class RecycleAll implements GarbageHandler {
@@ -173,19 +177,23 @@ it("onRecycled", () => {
     GarbageContainer.addHandler(new RecycleAll());
     GarbageContainer.onRecycled.add(onRecycledHandler);
 
-    const obj = new MockGameObject();
+    const obj = new MockGameObject({ name: "my-obj" });
     const player = new MockPlayer();
     GarbageContainer.tryRecycle(obj, player);
-    expect(recycled).toEqual([obj]);
+    expect(recycledNames).toEqual(["my-obj"]);
 
     GarbageContainer.clearHandlers();
     GarbageContainer.onRecycled.clear();
 });
 
 it("container onInserted", () => {
-    const recycledIds: Array<string> = [];
-    const onRecycledHandler = (obj: GameObject) => {
-        recycledIds.push(obj.getId());
+    const recycledNames: Array<string> = [];
+    const onRecycledHandler = (
+        objName: string,
+        _objMetadata: string,
+        _getHoveredAndSelectedObjsplayer: Player | undefined
+    ) => {
+        recycledNames.push(objName);
     };
 
     class RecycleAll implements GarbageHandler {
@@ -204,9 +212,9 @@ it("container onInserted", () => {
     const container: MockContainer = new MockContainer();
     new GarbageContainer(container);
 
-    const obj1 = new MockGameObject({ id: "my-obj-1" });
-    const obj2 = new MockGameObject({ id: "my-obj-2" });
-    const obj3 = new MockGameObject({ id: "my-obj-2" });
+    const obj1 = new MockGameObject({ name: "my-obj-1" });
+    const obj2 = new MockGameObject({ name: "my-obj-2" });
+    const obj3 = new MockGameObject({ name: "my-obj-2" });
     const player = new MockPlayer();
 
     container._addObjectsAsPlayer(
@@ -228,7 +236,7 @@ it("container onInserted", () => {
     GarbageContainer.onRecycled.add(removeObj3);
 
     process.flushTicks();
-    expect(recycledIds).toEqual(["my-obj-1"]);
+    expect(recycledNames).toEqual(["my-obj-1"]);
 
     GarbageContainer.clearHandlers();
     GarbageContainer.onRecycled.clear();
