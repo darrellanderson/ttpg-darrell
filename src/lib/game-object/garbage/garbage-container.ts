@@ -1,4 +1,10 @@
-import { Card, Container, GameObject, Vector } from "@tabletop-playground/api";
+import {
+    Card,
+    Container,
+    GameObject,
+    Player,
+    Vector,
+} from "@tabletop-playground/api";
 import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate/triggerable-multicast-delegate";
 
 /**
@@ -26,7 +32,7 @@ export abstract class GarbageHandler {
  */
 export class GarbageContainer {
     public static onRecycled = new TriggerableMulticastDelegate<
-        (obj: GameObject) => void
+        (obj: GameObject, player: Player | undefined) => void
     >();
     private static _garbageHandlers: Array<GarbageHandler> = [];
 
@@ -48,19 +54,25 @@ export class GarbageContainer {
         this._garbageHandlers = [];
     }
 
-    public static tryRecycle(obj: GameObject): boolean {
+    public static tryRecycle(
+        obj: GameObject,
+        player: Player | undefined
+    ): boolean {
         if (obj instanceof Card && obj.getStackSize() > 1) {
-            return GarbageContainer._tryRecycleDeck(obj);
+            return GarbageContainer._tryRecycleDeck(obj, player);
         } else {
-            return GarbageContainer._tryRecycleObj(obj);
+            return GarbageContainer._tryRecycleObj(obj, player);
         }
     }
 
-    private static _tryRecycleObj(obj: GameObject): boolean {
+    private static _tryRecycleObj(
+        obj: GameObject,
+        player: Player | undefined
+    ): boolean {
         for (const handler of this._garbageHandlers) {
             if (handler.canRecycle(obj)) {
                 if (handler.recycle(obj)) {
-                    GarbageContainer.onRecycled.trigger(obj);
+                    GarbageContainer.onRecycled.trigger(obj, player);
                     return true;
                 }
             }
@@ -68,7 +80,10 @@ export class GarbageContainer {
         return false;
     }
 
-    private static _tryRecycleDeck(deck: Card): boolean {
+    private static _tryRecycleDeck(
+        deck: Card,
+        player: Player | undefined
+    ): boolean {
         let recycleCount = 0;
         const stackSize = deck.getStackSize();
 
@@ -87,7 +102,7 @@ export class GarbageContainer {
             }
             if (card) {
                 // Try to recycle, return card to same spot if fails.
-                const success = GarbageContainer._tryRecycleObj(card);
+                const success = GarbageContainer._tryRecycleObj(card, player);
                 if (success) {
                     recycleCount += 1;
                 } else if (card !== deck) {
@@ -107,15 +122,21 @@ export class GarbageContainer {
         }
         this._container = container;
 
-        container.onInserted.add(() => {
-            process.nextTick(() => {
-                this._recycle();
-            });
-        });
+        container.onInserted.add(
+            (
+                _container: Container,
+                _insertedObjects: GameObject[],
+                player: Player
+            ) => {
+                process.nextTick(() => {
+                    this._recycle(player);
+                });
+            }
+        );
     }
 
     // Expose for testing.
-    _recycle() {
+    _recycle(player: Player | undefined) {
         const objs: Array<GameObject> = this._container.getItems();
         for (const obj of objs) {
             // Verify object.
@@ -133,7 +154,7 @@ export class GarbageContainer {
             this._container.take(obj, above);
 
             // Attempt to recyle.
-            const success: boolean = GarbageContainer.tryRecycle(obj);
+            const success: boolean = GarbageContainer.tryRecycle(obj, player);
 
             // If recycle fails, return to container.
             if (!success) {

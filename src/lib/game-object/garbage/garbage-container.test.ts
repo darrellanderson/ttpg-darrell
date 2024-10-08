@@ -42,7 +42,8 @@ it("_tryRecycleObj", () => {
     const container = new MockContainer({ items: [obj1, obj2] });
     const garbageContainer = new GarbageContainer(container);
 
-    garbageContainer._recycle();
+    const player = new MockPlayer();
+    garbageContainer._recycle(player);
     expect(onlyFirstRecycler.recycled).toEqual(obj1);
     expect(container.getItems()).toEqual([obj2]);
 
@@ -74,7 +75,8 @@ it("_tryRecycleDeck (all)", () => {
     expect(deck.getContainer()).toEqual(container);
     expect(deck.getStackSize()).toEqual(3);
 
-    garbageContainer._recycle();
+    const player = new MockPlayer();
+    garbageContainer._recycle(player);
     expect(deck.getStackSize()).toEqual(1); // deck still exists
     expect(deck.getContainer()).toBeUndefined();
 
@@ -111,7 +113,8 @@ it("_tryRecycleDeck (first)", () => {
     expect(deck.getContainer()).toEqual(container);
     expect(deck.getStackSize()).toEqual(3);
 
-    garbageContainer._recycle();
+    const player = new MockPlayer();
+    garbageContainer._recycle(player);
     expect(deck.getStackSize()).toEqual(2);
     expect(deck.getContainer()).toEqual(container); // failed, returned to container
 
@@ -143,7 +146,8 @@ it("_tryRecycleDeck (none)", () => {
     expect(deck.getContainer()).toEqual(container);
     expect(deck.getStackSize()).toEqual(3);
 
-    garbageContainer._recycle();
+    const player = new MockPlayer();
+    garbageContainer._recycle(player);
     expect(deck.getStackSize()).toEqual(3);
     expect(deck.getContainer()).toEqual(container); // failed, returned to container
 
@@ -170,7 +174,8 @@ it("onRecycled", () => {
     GarbageContainer.onRecycled.add(onRecycledHandler);
 
     const obj = new MockGameObject();
-    GarbageContainer.tryRecycle(obj);
+    const player = new MockPlayer();
+    GarbageContainer.tryRecycle(obj, player);
     expect(recycled).toEqual([obj]);
 
     GarbageContainer.clearHandlers();

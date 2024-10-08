@@ -181,7 +181,8 @@ export class SwapSplitCombine implements IGlobal {
 
         // Recycle src objects.
         for (const obj of srcObjs) {
-            if (!GarbageContainer.tryRecycle(obj)) {
+            // Do not specify player to prevent reporting recycle.
+            if (!GarbageContainer.tryRecycle(obj, undefined)) {
                 DeletedItemsContainer.destroyWithoutCopying(obj);
             }
         }
