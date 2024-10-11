@@ -40,7 +40,7 @@ export class SwapSplitCombine implements IGlobal {
     private readonly _overrideCreate: Map<
         string,
         (player: Player) => GameObject | undefined
-    > = new Map<string, () => GameObject>();
+    > = new Map<string, (player: Player) => GameObject>();
     private readonly _overrideDestroy: Map<
         string,
         (obj: GameObject, player: Player) => void
@@ -72,12 +72,18 @@ export class SwapSplitCombine implements IGlobal {
         }
     }
 
-    addOverrideCreate(nsid: string, create: () => GameObject): this {
+    addOverrideCreate(
+        nsid: string,
+        create: (player: Player) => GameObject
+    ): this {
         this._overrideCreate.set(nsid, create);
         return this;
     }
 
-    addOverrideDestroy(nsid: string, destroy: (obj: GameObject) => void): this {
+    addOverrideDestroy(
+        nsid: string,
+        destroy: (obj: GameObject, player: Player) => void
+    ): this {
         this._overrideDestroy.set(nsid, destroy);
         return this;
     }
