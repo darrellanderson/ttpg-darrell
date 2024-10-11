@@ -37,6 +37,14 @@ export class SwapSplitCombine implements IGlobal {
     private readonly _playerSlotToInProgressObjIdSet: {
         [key: number]: Set<string>;
     } = {};
+    private readonly _overrideCreate: Map<
+        string,
+        (player: Player) => GameObject | undefined
+    > = new Map<string, () => GameObject>();
+    private readonly _overrideDestroy: Map<
+        string,
+        (obj: GameObject, player: Player) => void
+    > = new Map<string, (obj: GameObject, player: Player) => void>();
 
     private readonly _primaryActionHandler: (
         obj: GameObject,
@@ -62,6 +70,16 @@ export class SwapSplitCombine implements IGlobal {
                 this._nsids.add(nsid);
             }
         }
+    }
+
+    addOverrideCreate(nsid: string, create: () => GameObject): this {
+        this._overrideCreate.set(nsid, create);
+        return this;
+    }
+
+    addOverrideDestroy(nsid: string, destroy: (obj: GameObject) => void): this {
+        this._overrideDestroy.set(nsid, destroy);
+        return this;
     }
 
     /**
@@ -181,9 +199,17 @@ export class SwapSplitCombine implements IGlobal {
 
         // Recycle src objects.
         for (const obj of srcObjs) {
-            // Do not specify player to prevent reporting recycle.
-            if (!GarbageContainer.tryRecycle(obj, undefined)) {
-                DeletedItemsContainer.destroyWithoutCopying(obj);
+            const nsid = NSID.get(obj);
+            const overrideDestroy:
+                | ((obj: GameObject, player: Player) => void)
+                | undefined = this._overrideDestroy.get(nsid);
+            if (overrideDestroy) {
+                overrideDestroy(obj, player);
+            } else {
+                // Do not specify player to prevent reporting recycle.
+                if (!GarbageContainer.tryRecycle(obj, undefined)) {
+                    DeletedItemsContainer.destroyWithoutCopying(obj);
+                }
             }
         }
 
@@ -192,19 +218,27 @@ export class SwapSplitCombine implements IGlobal {
         pos.z = world.getTableHeight() + 10;
         for (let i = 0; i < applyCount; i++) {
             for (let j = 0; j < rule.dst.count; j++) {
-                const dstObj: GameObject = Spawn.spawnOrThrow(
-                    rule.dst.nsid,
-                    pos
-                );
-                if (rule.requireFaceDown) {
-                    dstObj.setRotation([0, 0, 180]);
+                let dstObj: GameObject | undefined;
+                const overrideCreate:
+                    | ((player: Player) => GameObject | undefined)
+                    | undefined = this._overrideCreate.get(rule.dst.nsid);
+                if (overrideCreate) {
+                    dstObj = overrideCreate(player);
+                } else {
+                    dstObj = Spawn.spawnOrThrow(rule.dst.nsid, pos);
                 }
-                dstObj.snapToGround();
+                if (dstObj) {
+                    if (rule.requireFaceDown) {
+                        dstObj.setRotation([0, 0, 180]);
+                    }
+                    dstObj.snapToGround();
 
-                const currentRotation = true;
-                const includeGeometry = false;
-                pos.y +=
-                    dstObj.getExtent(currentRotation, includeGeometry).y / 2;
+                    const currentRotation = true;
+                    const includeGeometry = false;
+                    pos.y +=
+                        dstObj.getExtent(currentRotation, includeGeometry).y /
+                        2;
+                }
             }
         }
     }

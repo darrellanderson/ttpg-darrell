@@ -123,7 +123,7 @@ it("toTemplate", () => {
         SnapPointsGlobal: false,
         SnapPoints: [],
         ZoomViewDirection: { X: 0, Y: 0, Z: 1 },
-        GroundAccessibility: "Zoom",
+        GroundAccessibility: "ZoomAndContext",
         Tags: [],
     });
 });
@@ -222,7 +222,7 @@ it("toTemplate (collider, snap point)", () => {
             },
         ],
         ZoomViewDirection: { X: 0, Y: 0, Z: 1 },
-        GroundAccessibility: "Zoom",
+        GroundAccessibility: "ZoomAndContext",
         Tags: [],
     });
 });
