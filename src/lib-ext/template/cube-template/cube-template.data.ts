@@ -97,6 +97,6 @@ export const CUBE_TEMPLATE = {
         Y: 0,
         Z: 1,
     },
-    GroundAccessibility: "Zoom",
+    GroundAccessibility: "ZoomAndContext",
     Tags: [],
 } as const;
