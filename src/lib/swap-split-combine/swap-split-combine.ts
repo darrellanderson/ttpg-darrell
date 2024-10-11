@@ -230,6 +230,7 @@ export class SwapSplitCombine implements IGlobal {
                     | undefined = this._overrideCreate.get(rule.dst.nsid);
                 if (overrideCreate) {
                     dstObj = overrideCreate(player);
+                    dstObj?.setPosition(pos);
                 } else {
                     dstObj = Spawn.spawnOrThrow(rule.dst.nsid, pos);
                 }
