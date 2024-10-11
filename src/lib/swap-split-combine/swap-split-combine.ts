@@ -74,7 +74,7 @@ export class SwapSplitCombine implements IGlobal {
 
     addOverrideCreate(
         nsid: string,
-        create: (player: Player) => GameObject
+        create: (player: Player) => GameObject | undefined
     ): this {
         this._overrideCreate.set(nsid, create);
         return this;
