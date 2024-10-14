@@ -200,7 +200,7 @@ export class TurnEntryWidget {
         // Click behavior.
         this._contentButton.onClicked.clear();
         this._contentButton.onClicked.add(
-            (button: ContentButton, clickingPlayer: Player) => {
+            (_button: ContentButton, clickingPlayer: Player) => {
                 new TurnClickedWidget(
                     turnOrder,
                     this._params,

@@ -122,12 +122,17 @@ export class TurnOrderWidget {
             }
         }
 
+        for (const turnWidget of this._turnEntryWidgets) {
+            turnWidget.getWidget().setVisible(false);
+        }
+
         // Update turn widgets.
         for (let i = 0; i < order.length; i++) {
             const playerSlot: number | undefined = order[i];
             const turnWidget: TurnEntryWidget | undefined =
                 this._turnEntryWidgets[i];
             if (playerSlot && turnWidget) {
+                turnWidget.getWidget().setVisible(true);
                 turnWidget.update(this._turnOrder, playerSlot);
             }
         }
