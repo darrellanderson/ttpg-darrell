@@ -60,7 +60,7 @@ export class TurnOrderWidget {
 
         const gap: number = 10;
         const paddedW: number = w + gap;
-        const paddedH: number = h + reserveSlots + 1 + gap;
+        const paddedH: number = h * reserveSlots + 1 + gap;
         const widget: Widget = new LayoutBox()
             .setPadding(0, gap, gap, 0)
             .setChild(this.getWidget());
