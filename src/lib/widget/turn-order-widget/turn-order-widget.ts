@@ -1,4 +1,5 @@
 import {
+    LayoutBox,
     Player,
     ScreenUIElement,
     VerticalBox,
@@ -57,14 +58,21 @@ export class TurnOrderWidget {
             params.reserveSlots ??
             TurnOrderWidgetDefaults.DEFAULT_RESERVE_SLOTS;
 
-        this._screenUI.anchorX = 1.1;
-        this._screenUI.anchorY = -0.1;
+        const gap: number = 10;
+        const paddedW: number = w + gap;
+        const paddedH: number = h + reserveSlots + 1 + gap;
+        const widget: Widget = new LayoutBox()
+            .setPadding(0, gap, gap, 0)
+            .setChild(this.getWidget());
+
+        this._screenUI.anchorX = 1;
+        this._screenUI.anchorY = 0;
         this._screenUI.positionX = 1;
         this._screenUI.relativePositionX = true;
         this._screenUI.relativePositionY = true;
-        this._screenUI.height = h * reserveSlots + 1;
-        this._screenUI.width = w;
-        this._screenUI.widget = this.getWidget();
+        this._screenUI.height = paddedH;
+        this._screenUI.width = paddedW;
+        this._screenUI.widget = widget;
 
         this._uiVisibility = new UiVisibility(this._screenUI);
 
