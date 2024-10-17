@@ -27,7 +27,8 @@ export class Find {
         {};
 
     closestOwnedCardHolderOwner(
-        pos: Vector | [x: number, y: number, z: number]
+        pos: Vector | [x: number, y: number, z: number],
+        nsid: string
     ): number {
         let closestOwner = -1;
         let closestDistance = Number.MAX_VALUE;
@@ -36,6 +37,10 @@ export class Find {
             const skippedContained: boolean = true;
             for (const obj of world.getAllObjects(skippedContained)) {
                 if (!(obj instanceof CardHolder)) {
+                    continue;
+                }
+                const objNsid: string = NSID.get(obj);
+                if (objNsid !== nsid) {
                     continue;
                 }
                 this._cardHolders.push(obj);

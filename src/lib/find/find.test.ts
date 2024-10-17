@@ -34,7 +34,7 @@ it("closestOwnedCardHolderOwner", () => {
     mockWorld._reset({ gameObjects: [holder1, holder2] });
 
     const find = new Find();
-    const owner = find.closestOwnedCardHolderOwner(pos);
+    const owner = find.closestOwnedCardHolderOwner(pos, "");
     expect(owner).toEqual(2);
 });
 
