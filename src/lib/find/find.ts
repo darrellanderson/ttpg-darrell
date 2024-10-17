@@ -17,6 +17,8 @@ import { NSID } from "../nsid/nsid";
  * candidate; expecting objects to be unique.
  */
 export class Find {
+    private static __cardHolderNsid: string = "";
+
     private _cardHolders: Array<CardHolder> = [];
     private readonly _nsidAndSlotToGameObject: { [key: string]: GameObject } =
         {};
@@ -26,9 +28,12 @@ export class Find {
     private readonly _playerSlotToCardHolder: { [key: number]: CardHolder } =
         {};
 
+    static setOwnedCardHolderNsid(nsid: string): void {
+        Find.__cardHolderNsid = nsid;
+    }
+
     closestOwnedCardHolderOwner(
-        pos: Vector | [x: number, y: number, z: number],
-        nsid: string
+        pos: Vector | [x: number, y: number, z: number]
     ): number {
         let closestOwner = -1;
         let closestDistance = Number.MAX_VALUE;
@@ -40,7 +45,7 @@ export class Find {
                     continue;
                 }
                 const objNsid: string = NSID.get(obj);
-                if (objNsid !== nsid) {
+                if (objNsid !== Find.__cardHolderNsid) {
                     continue;
                 }
                 this._cardHolders.push(obj);
