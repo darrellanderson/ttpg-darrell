@@ -2,8 +2,7 @@ import { locale } from "./locale";
 
 locale.inject({
     "example.helloworld": "Hello World!",
-    "example.replaced":
-        "{player} has run this script {x} {#x|time|times|times... newb}",
+    "example.replaced": "{player} has run this script {x} {#x|time|times}",
 });
 
 it("does a basic replace", () => {
@@ -12,10 +11,10 @@ it("does a basic replace", () => {
 });
 
 it("handles pluralization", () => {
-    //"example.replaced": "{player} has run this script {x} {#x|time|times|times... newb}"
+    //"example.replaced": "{player} has run this script {x} {#x|time|times}"
     expect(
         locale("example.replaced", { player: "ThatRobHuman", x: 0 })
-    ).toEqual("ThatRobHuman has run this script 0 times... newb");
+    ).toEqual("ThatRobHuman has run this script 0 times");
     expect(
         locale("example.replaced", { player: "ThatRobHuman", x: 1 })
     ).toEqual("ThatRobHuman has run this script 1 time");
@@ -54,7 +53,7 @@ describe("copilot test locale", () => {
         locale.inject({
             test: "This is a test",
             hello: "Hello, {name}!",
-            apples: "{#count|one apple|{count} apples|no apples}",
+            apples: "{#count|one apple|{count} apples}",
         });
     });
 
@@ -73,7 +72,7 @@ describe("copilot test locale", () => {
     test("handles pluralization", () => {
         expect(locale("apples", { count: 1 })).toBe("one apple");
         expect(locale("apples", { count: 2 })).toBe("2 apples");
-        expect(locale("apples", { count: 0 })).toBe("no apples");
+        expect(locale("apples", { count: 0 })).toBe("0 apples");
     });
 
     test("throws an error when the pluralization match fails", () => {

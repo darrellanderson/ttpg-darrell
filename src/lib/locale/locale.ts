@@ -26,20 +26,19 @@ export const locale = (
             return r;
         })
         .replace(PLURAL_REGEX, (match): string => {
-            const [val, singular, plural, zeroForm] = match
+            const [val, singular, plural] = match
                 .substring(2, match.length - 1)
                 .split(PLURAL_SEPERATOR);
             if (
                 val === undefined ||
                 singular === undefined ||
-                plural === undefined ||
-                zeroForm === undefined
+                plural === undefined
             ) {
                 throw new Error("match failed");
             }
             const num = Number(replacement[val]);
             if (isNaN(num) || num === 0) {
-                return zeroForm || plural;
+                return plural;
             }
             if (num > 1) {
                 return plural;
