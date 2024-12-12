@@ -148,6 +148,7 @@ it("state", () => {
     state = playerWindow._getState();
     playerWindow._applyState(state ?? "");
     playerWindow._applyState("");
+    expect(state?.length).toBeLessThan(50);
 });
 
 it("vr", () => {

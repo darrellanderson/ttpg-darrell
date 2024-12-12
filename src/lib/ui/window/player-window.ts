@@ -166,10 +166,10 @@ export class PlayerWindow {
             return undefined;
         }
         return JSON.stringify({
-            scale: this._scale,
-            target: this._target,
-            collapsed: this._collapsed,
-            attached: true, // result is undefined if detached
+            s: this._scale,
+            t: this._target === "screen" ? "s" : "w",
+            c: this._collapsed,
+            a: true, // result is undefined if detached
         });
     }
 
@@ -178,10 +178,10 @@ export class PlayerWindow {
             return;
         }
         const parsed = JSON.parse(state);
-        this._scale = parsed.scale;
-        this._target = parsed.target;
-        this._collapsed = parsed.collapsed;
-        if (parsed.attached) {
+        this._scale = Math.floor(parsed.s * 1000) / 1000;
+        this._target = parsed.t === "s" ? "screen" : "world";
+        this._collapsed = parsed.c;
+        if (parsed.a) {
             this.attach();
         }
     }
