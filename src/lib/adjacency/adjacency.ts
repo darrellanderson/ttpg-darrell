@@ -133,6 +133,26 @@ export class Adjacency {
     }
 
     /**
+     * Get all links.  Not normally used in production but
+     * helpful for debugging (e.g. visualizing the graph).
+     *
+     * @returns
+     */
+    public getAllLinks(): Array<[string, string]> {
+        const result: Array<[string, string]> = [];
+        for (const [a, linkedTagSet] of Object.entries(
+            this._tagToLinkedTagSet
+        )) {
+            for (const b of linkedTagSet) {
+                if (b !== a) {
+                    result.push([a, b]);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
      * Transit nodes can appear along a path but do not add to distance
      * (e.g. hyperlanes).
      *

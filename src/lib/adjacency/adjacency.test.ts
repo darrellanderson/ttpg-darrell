@@ -40,14 +40,20 @@ it("add/remove link", () => {
     const tag2 = "my-tag-2";
     expect(adj.hasLink(tag1, tag2)).toBeFalsy();
     expect(adj.hasLink(tag2, tag1)).toBeFalsy();
+    expect(adj.getAllLinks()).toEqual([]);
 
     adj.addLink(tag1, tag2);
     expect(adj.hasLink(tag1, tag2)).toBeTruthy();
     expect(adj.hasLink(tag2, tag1)).toBeTruthy();
+    expect(adj.getAllLinks()).toEqual([
+        ["my-tag-1", "my-tag-2"],
+        ["my-tag-2", "my-tag-1"],
+    ]);
 
     adj.removeLink(tag1, tag2);
     expect(adj.hasLink(tag1, tag2)).toBeFalsy();
     expect(adj.hasLink(tag2, tag1)).toBeFalsy();
+    expect(adj.getAllLinks()).toEqual([]);
 });
 
 it("add/remove link (reverse arg order)", () => {
