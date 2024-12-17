@@ -4,24 +4,7 @@ it("constructor", () => {
     new Adjacency();
 });
 
-it("add/remove edge", () => {
-    const adj = new Adjacency();
-    const edge: AdjacencyEdgeType = {
-        src: "my-src",
-        dst: "my-dst",
-        distance: 123,
-        isTransit: false,
-    };
-    expect(adj.hasEdge(edge)).toBeFalsy();
-
-    adj.addEdge(edge);
-    expect(adj.hasEdge(edge)).toBeTruthy();
-
-    adj.removeEdge(edge);
-    expect(adj.hasEdge(edge)).toBeFalsy();
-});
-
-it("removing a node removes the outgoing edge", () => {
+it("removing a src node removes the outgoing edge", () => {
     const adj = new Adjacency();
     const edge: AdjacencyEdgeType = {
         src: "my-src",
@@ -35,6 +18,23 @@ it("removing a node removes the outgoing edge", () => {
     expect(adj.hasEdge(edge)).toBeTruthy();
 
     adj.removeNode("my-src");
+    expect(adj.hasEdge(edge)).toBeFalsy();
+});
+
+it("removing a dst node removes the incoming edge", () => {
+    const adj = new Adjacency();
+    const edge: AdjacencyEdgeType = {
+        src: "my-src",
+        dst: "my-dst",
+        distance: 123,
+        isTransit: false,
+    };
+    expect(adj.hasEdge(edge)).toBeFalsy();
+
+    adj.addEdge(edge);
+    expect(adj.hasEdge(edge)).toBeTruthy();
+
+    adj.removeNode("my-dst");
     expect(adj.hasEdge(edge)).toBeFalsy();
 });
 

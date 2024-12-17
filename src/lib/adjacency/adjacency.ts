@@ -37,23 +37,9 @@ export class Adjacency {
             this._srcNodeToOutgoingEdges.set(edge.src, outgoingEdges);
         }
 
-        // Only add edge if new.
-        let found = false;
-        for (const existingEdge of outgoingEdges) {
-            if (
-                existingEdge.src === edge.src &&
-                existingEdge.dst === edge.dst &&
-                existingEdge.distance === edge.distance
-            ) {
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            edge = Object.freeze(edge); // make immutable
-            outgoingEdges.add(edge);
-        }
-
+        // Add immutable edge.
+        edge = Object.freeze(edge); // make immutable
+        outgoingEdges.add(edge);
         return this;
     }
 
@@ -74,31 +60,25 @@ export class Adjacency {
         return false;
     }
 
-    public removeEdge(edge: AdjacencyEdgeType): this {
-        const outgoingEdges: Set<AdjacencyEdgeType> | undefined =
-            this._srcNodeToOutgoingEdges.get(edge.src);
-        if (outgoingEdges) {
-            for (const existingEdge of outgoingEdges) {
-                if (
-                    existingEdge.src === edge.src &&
-                    existingEdge.dst === edge.dst &&
-                    existingEdge.distance === edge.distance
-                ) {
-                    outgoingEdges.delete(existingEdge);
-                    break;
-                }
-            }
-        }
-        return this;
-    }
-
     /**
-     * Remove all edges starting from the given node.
+     * Remove all edges starting OR ENDING from the given node.
      *
      * @param node
      */
     public removeNode(node: AdjacencyNodeType): this {
         this._srcNodeToOutgoingEdges.delete(node);
+
+        for (const outgoingEdges of this._srcNodeToOutgoingEdges.values()) {
+            const dele: Set<AdjacencyEdgeType> = new Set<AdjacencyEdgeType>();
+            for (const edge of outgoingEdges) {
+                if (edge.dst === node) {
+                    dele.add(edge);
+                }
+            }
+            for (const edge of dele) {
+                outgoingEdges.delete(edge);
+            }
+        }
         return this;
     }
 
