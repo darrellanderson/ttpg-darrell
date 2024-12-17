@@ -114,7 +114,7 @@ export class Adjacency {
             // Find the closest of the to-visit nodes.
             const closest: AdjacencyPathType | undefined =
                 nodeToAdjacencyPath.get(closestNode);
-            if (closest) {
+            if (closest && !explored.has(closest.node)) {
                 // Mark as explored.
                 toExplore.delete(closest.node);
                 explored.add(closest.node);
