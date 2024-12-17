@@ -1,182 +1,105 @@
 import { Heap } from "../heap/heap";
 
-export type AdjacencyResult = {
-    node: string;
-    distance: number;
-    path: Array<string>;
-};
+/**
+ * Opaque node id.  Could be a hex coordinate, a wormhole class, etc.
+ */
+export type AdjacencyNodeType = string;
 
 /**
- * Nodes have tags, links connect tags.
- * Tansit nodes are on a path, but do not add to distance ("hyperlane").
- * Transit nodes are not "reachable" and will not appear as destinations,
- * but they can appear in paths to reach other nodes.
- *
- * If two nodes share a tag they are NOT connected UNLESS there is a link
- * from tag back to itself.
- *
- * A link may connect to multiple nodes that share the tag.
+ * Edge between two nodes.
+ * Paths cannot end with a transit node; they must connect two non-transit nodes.
  */
+export type AdjacencyEdgeType = {
+    src: AdjacencyNodeType;
+    dst: AdjacencyNodeType;
+    distance: number;
+    isTransit: boolean;
+};
+
+export type AdjacencyPathType = {
+    node: AdjacencyNodeType; // final node in path
+    distance: number;
+    path: ReadonlyArray<AdjacencyEdgeType>;
+};
+
 export class Adjacency {
-    private readonly _nodeToTagSet: { [key: string]: Set<string> } = {};
-    private readonly _tagToNodeSet: { [key: string]: Set<string> } = {};
-    private readonly _tagToLinkedTagSet: { [key: string]: Set<string> } = {};
-    private readonly _transitNodes: Set<string> = new Set<string>();
+    private readonly _srcNodeToOutgoingEdges: Map<
+        AdjacencyNodeType,
+        Set<AdjacencyEdgeType>
+    > = new Map();
 
-    /**
-     * Add a node tag.  Node tags may name the node, a specific edge, or a
-     * possibly-many-neighbors "hub tag" such as a wormhole.
-     *
-     * @param node
-     * @param tags
-     * @returns
-     */
-    public addNodeTags(node: string, tags: Array<string>): this {
-        let tagSet: Set<string> | undefined;
-        let nodeSet: Set<string> | undefined;
-        tagSet = this._nodeToTagSet[node];
-        if (!tagSet) {
-            tagSet = new Set<string>();
-            this._nodeToTagSet[node] = tagSet;
+    public addEdge(edge: AdjacencyEdgeType): this {
+        // Create the src->edge set if missing.
+        let outgoingEdges: Set<AdjacencyEdgeType> | undefined =
+            this._srcNodeToOutgoingEdges.get(edge.src);
+        if (!outgoingEdges) {
+            outgoingEdges = new Set<AdjacencyEdgeType>();
+            this._srcNodeToOutgoingEdges.set(edge.src, outgoingEdges);
         }
-        for (const tag of tags) {
-            tagSet.add(tag);
-            nodeSet = this._tagToNodeSet[tag];
-            if (!nodeSet) {
-                nodeSet = new Set<string>();
-                this._tagToNodeSet[tag] = nodeSet;
-            }
-            nodeSet.add(node);
-        }
-        return this;
-    }
 
-    public removeNodeTags(node: string, tags: Array<string>): this {
-        const tagSet: Set<string> | undefined = this._nodeToTagSet[node];
-        for (const tag of tags) {
-            if (tagSet) {
-                tagSet.delete(tag);
-            }
-            const nodeSet: Set<string> | undefined = this._tagToNodeSet[tag];
-            if (nodeSet) {
-                nodeSet.delete(node);
+        // Only add edge if new.
+        let found = false;
+        for (const existingEdge of outgoingEdges) {
+            if (
+                existingEdge.src === edge.src &&
+                existingEdge.dst === edge.dst &&
+                existingEdge.distance === edge.distance
+            ) {
+                found = true;
+                break;
             }
         }
-        return this;
-    }
-
-    public hasNodeTag(node: string, tag: string): boolean {
-        const tagSet: Set<string> | undefined = this._nodeToTagSet[node];
-        return tagSet?.has(tag) ?? false;
-    }
-
-    public _hasTagNode(tag: string, node: string): boolean {
-        const nodeSet: Set<string> | undefined = this._tagToNodeSet[tag];
-        return nodeSet?.has(node) ?? false;
-    }
-
-    /**
-     * Add a link.  A node with one tag is connected to a node with the other.
-     *
-     * @param tag1
-     * @param tag2
-     * @returns
-     */
-    public addLink(tag1: string, tag2: string): this {
-        let linkedTagSet: Set<string> | undefined;
-
-        // 1 -> 1, 1 -> 2.
-        linkedTagSet = this._tagToLinkedTagSet[tag1];
-        if (!linkedTagSet) {
-            linkedTagSet = new Set<string>();
-            this._tagToLinkedTagSet[tag1] = linkedTagSet;
-        }
-        linkedTagSet.add(tag1);
-        linkedTagSet.add(tag2);
-
-        // 2 -> 1, 2 -> 2.
-        linkedTagSet = this._tagToLinkedTagSet[tag2];
-        if (!linkedTagSet) {
-            linkedTagSet = new Set<string>();
-            this._tagToLinkedTagSet[tag2] = linkedTagSet;
-        }
-        linkedTagSet.add(tag1);
-        linkedTagSet.add(tag2);
-
-        return this;
-    }
-
-    public removeLink(tag1: string, tag2: string): this {
-        let linkedTagSet: Set<string> | undefined;
-
-        // 1 -> 1, 1 -> 2.
-        linkedTagSet = this._tagToLinkedTagSet[tag1];
-        if (linkedTagSet) {
-            linkedTagSet.delete(tag1);
-            linkedTagSet.delete(tag2);
-        }
-
-        // 2 -> 1, 2 -> 2.
-        linkedTagSet = this._tagToLinkedTagSet[tag2];
-        if (linkedTagSet) {
-            linkedTagSet.delete(tag1);
-            linkedTagSet.delete(tag2);
+        if (!found) {
+            edge = Object.freeze(edge); // make immutable
+            outgoingEdges.add(edge);
         }
 
         return this;
     }
 
-    public hasLink(tag1: string, tag2: string): boolean {
-        const linkedTagSet: Set<string> | undefined =
-            this._tagToLinkedTagSet[tag1];
-        return linkedTagSet?.has(tag2) ?? false;
-    }
-
-    /**
-     * Transit nodes can appear along a path but do not add to distance
-     * (e.g. hyperlanes).
-     *
-     * @param node
-     * @returns
-     */
-    public addTransitNode(node: string): this {
-        this._transitNodes.add(node);
-        return this;
-    }
-
-    public removeTransitNode(node: string): this {
-        this._transitNodes.delete(node);
-        return this;
-    }
-
-    public hasTransitNode(node: string): boolean {
-        return this._transitNodes.has(node);
-    }
-
-    _getAdjacentNodeSet(node: string): Set<string> {
-        const tagSet: Set<string> | undefined = this._nodeToTagSet[node];
-        const adjNodeSet: Set<string> = new Set<string>();
-
-        if (tagSet) {
-            for (const tag of tagSet) {
-                const linkedTagSet: Set<string> | undefined =
-                    this._tagToLinkedTagSet[tag];
-                if (linkedTagSet) {
-                    for (const linkedTag of linkedTagSet) {
-                        const nodeSet: Set<string> | undefined =
-                            this._tagToNodeSet[linkedTag];
-                        if (nodeSet) {
-                            for (const linkedNode of nodeSet) {
-                                if (linkedNode !== node) {
-                                    adjNodeSet.add(linkedNode);
-                                }
-                            }
-                        }
-                    }
+    public hasEdge(edge: AdjacencyEdgeType): boolean {
+        const outgoingEdges: Set<AdjacencyEdgeType> | undefined =
+            this._srcNodeToOutgoingEdges.get(edge.src);
+        if (outgoingEdges) {
+            for (const existingEdge of outgoingEdges) {
+                if (
+                    existingEdge.src === edge.src &&
+                    existingEdge.dst === edge.dst &&
+                    existingEdge.distance === edge.distance
+                ) {
+                    return true;
                 }
             }
         }
-        return adjNodeSet;
+        return false;
+    }
+
+    public removeEdge(edge: AdjacencyEdgeType): this {
+        const outgoingEdges: Set<AdjacencyEdgeType> | undefined =
+            this._srcNodeToOutgoingEdges.get(edge.src);
+        if (outgoingEdges) {
+            for (const existingEdge of outgoingEdges) {
+                if (
+                    existingEdge.src === edge.src &&
+                    existingEdge.dst === edge.dst &&
+                    existingEdge.distance === edge.distance
+                ) {
+                    outgoingEdges.delete(existingEdge);
+                    break;
+                }
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Remove all edges starting from the given node.
+     *
+     * @param node
+     */
+    public removeNode(node: AdjacencyNodeType): this {
+        this._srcNodeToOutgoingEdges.delete(node);
+        return this;
     }
 
     /**
@@ -186,61 +109,82 @@ export class Adjacency {
      * @param maxDistance
      * @returns
      */
-    public get(origin: string, maxDistance: number): Array<AdjacencyResult> {
-        const originAdjacencyResult: AdjacencyResult = {
-            node: origin,
-            distance: 0,
-            path: [origin],
-        };
-        const nodeToAdjacencyResult: { [key: string]: AdjacencyResult } = {
-            [origin]: originAdjacencyResult,
-        };
-        const toVisit: Set<AdjacencyResult> = new Set<AdjacencyResult>([
-            originAdjacencyResult,
-        ]);
-        const visited: Set<string> = new Set<string>();
+    public get(
+        origin: AdjacencyNodeType,
+        maxDistance: number
+    ): ReadonlyArray<AdjacencyPathType> {
+        const nodeToAdjacencyPath: Map<AdjacencyNodeType, AdjacencyPathType> =
+            new Map<AdjacencyNodeType, AdjacencyPathType>();
+        const toExplore: Set<AdjacencyNodeType> = new Set<AdjacencyNodeType>();
+        const explored: Set<AdjacencyNodeType> = new Set<string>();
 
+        // Start with the origin.
+        toExplore.add(origin); // start from the origin
         const heap: Heap<string> = new Heap<string>().add(origin, 0);
 
-        let closestNode: string | undefined;
-        while (toVisit.size > 0 && (closestNode = heap.removeMin())) {
-            // Find the closest of the to-visit nodes.
-            const closest: AdjacencyResult | undefined =
-                nodeToAdjacencyResult[closestNode];
-            if (closest) {
-                toVisit.delete(closest);
-                visited.add(closest.node);
+        nodeToAdjacencyPath.set(origin, {
+            node: origin,
+            distance: 0,
+            path: [],
+        });
 
-                const adjNodeSet: Set<string> = this._getAdjacentNodeSet(
-                    closest.node
-                );
-                for (const adjNode of adjNodeSet) {
-                    if (!visited.has(adjNode)) {
-                        // Add to result.
-                        const isTransit = this._transitNodes.has(adjNode);
-                        const extraDistance = isTransit ? 0 : 1;
-                        const distance = closest.distance + extraDistance;
-                        if (distance <= maxDistance) {
-                            const adjResult: AdjacencyResult = {
-                                node: adjNode,
-                                distance,
-                                path: [...closest.path, adjNode],
-                            };
-                            nodeToAdjacencyResult[adjNode] = adjResult;
-                            toVisit.add(adjResult);
-                            heap.add(adjNode, distance);
+        let closestNode: string | undefined;
+        while (toExplore.size > 0 && (closestNode = heap.removeMin())) {
+            // Find the closest of the to-visit nodes.
+            const closest: AdjacencyPathType | undefined =
+                nodeToAdjacencyPath.get(closestNode);
+            if (closest) {
+                // Mark as explored.
+                toExplore.delete(closest.node);
+                explored.add(closest.node);
+
+                // Walk the outgoing edge destinations.
+                const outgoingEdges: Set<AdjacencyEdgeType> | undefined =
+                    this._srcNodeToOutgoingEdges.get(closest.node);
+                if (outgoingEdges) {
+                    for (const outgoingEdge of outgoingEdges) {
+                        const dst: AdjacencyNodeType = outgoingEdge.dst;
+                        if (!explored.has(dst)) {
+                            const distance: number =
+                                closest.distance + outgoingEdge.distance;
+                            const path: Array<AdjacencyEdgeType> = [
+                                ...closest.path,
+                                outgoingEdge,
+                            ];
+
+                            if (distance <= maxDistance) {
+                                // This dst is new and within range, add it to to-explore list.
+                                toExplore.add(dst);
+                                heap.add(dst, distance);
+
+                                // Also add to the adjacency paths, even if ends with a transit.
+                                nodeToAdjacencyPath.set(dst, {
+                                    node: dst,
+                                    distance,
+                                    path,
+                                });
+                            }
                         }
                     }
                 }
             }
         }
-        let result = Object.values(nodeToAdjacencyResult);
 
-        // Remove transit nodes.
-        result = result.filter((entry) => !this._transitNodes.has(entry.node));
+        // Get paths not ending with a transit node and make immutable.
+        const result: Array<AdjacencyPathType> = [
+            ...nodeToAdjacencyPath.values(),
+        ]
+            .filter((adjacencyPathType: AdjacencyPathType): boolean => {
+                const lastEdge: AdjacencyEdgeType | undefined =
+                    adjacencyPathType.path[adjacencyPathType.path.length - 1];
+                return lastEdge !== undefined && !lastEdge.isTransit;
+            })
+            .map((adjacencyPathType: AdjacencyPathType): AdjacencyPathType => {
+                return Object.freeze(adjacencyPathType);
+            });
 
         // Sort by distance.
-        result = result.sort((a, b) => {
+        result.sort((a, b) => {
             if (a.distance < b.distance) {
                 return -1;
             } else if (a.distance > b.distance) {
