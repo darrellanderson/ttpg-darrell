@@ -1,41 +1,41 @@
-import { Adjacency, AdjacencyEdgeType, AdjacencyPathType } from "./adjacency";
+import { Adjacency, AdjacencyLinkType, AdjacencyPathType } from "./adjacency";
 
 it("constructor", () => {
     new Adjacency();
 });
 
-it("add/remove edge", () => {
+it("removing a src node removes the outgoing edge", () => {
     const adj = new Adjacency();
-    const edge: AdjacencyEdgeType = {
+    const edge: AdjacencyLinkType = {
         src: "my-src",
         dst: "my-dst",
         distance: 123,
         isTransit: false,
     };
-    expect(adj.hasEdge(edge)).toBeFalsy();
+    expect(adj.hasLink(edge)).toBeFalsy();
 
-    adj.addEdge(edge);
-    expect(adj.hasEdge(edge)).toBeTruthy();
-
-    adj.removeEdge(edge);
-    expect(adj.hasEdge(edge)).toBeFalsy();
-});
-
-it("removing a node removes the outgoing edge", () => {
-    const adj = new Adjacency();
-    const edge: AdjacencyEdgeType = {
-        src: "my-src",
-        dst: "my-dst",
-        distance: 123,
-        isTransit: false,
-    };
-    expect(adj.hasEdge(edge)).toBeFalsy();
-
-    adj.addEdge(edge);
-    expect(adj.hasEdge(edge)).toBeTruthy();
+    adj.addLink(edge);
+    expect(adj.hasLink(edge)).toBeTruthy();
 
     adj.removeNode("my-src");
-    expect(adj.hasEdge(edge)).toBeFalsy();
+    expect(adj.hasLink(edge)).toBeFalsy();
+});
+
+it("removing a dst node removes the incoming edge", () => {
+    const adj = new Adjacency();
+    const edge: AdjacencyLinkType = {
+        src: "my-src",
+        dst: "my-dst",
+        distance: 123,
+        isTransit: false,
+    };
+    expect(adj.hasLink(edge)).toBeFalsy();
+
+    adj.addLink(edge);
+    expect(adj.hasLink(edge)).toBeTruthy();
+
+    adj.removeNode("my-dst");
+    expect(adj.hasLink(edge)).toBeFalsy();
 });
 
 it("get", () => {
@@ -43,20 +43,20 @@ it("get", () => {
     // 01 -- -- -- -- 51
     const adj = new Adjacency()
         // Top row
-        .addEdge({ src: "00", dst: "10", distance: 1, isTransit: false })
-        .addEdge({ src: "10", dst: "20", distance: 1, isTransit: false })
-        .addEdge({ src: "20", dst: "30", distance: 1, isTransit: false })
-        .addEdge({ src: "30", dst: "40", distance: 1, isTransit: false })
-        .addEdge({ src: "40", dst: "50", distance: 1, isTransit: false })
+        .addLink({ src: "00", dst: "10", distance: 1, isTransit: false })
+        .addLink({ src: "10", dst: "20", distance: 1, isTransit: false })
+        .addLink({ src: "20", dst: "30", distance: 1, isTransit: false })
+        .addLink({ src: "30", dst: "40", distance: 1, isTransit: false })
+        .addLink({ src: "40", dst: "50", distance: 1, isTransit: false })
         // Bottom row, transit interior edges
-        .addEdge({ src: "01", dst: "11", distance: 0.5, isTransit: true })
-        .addEdge({ src: "11", dst: "21", distance: 0, isTransit: true })
-        .addEdge({ src: "21", dst: "31", distance: 0, isTransit: true })
-        .addEdge({ src: "31", dst: "41", distance: 0, isTransit: true })
-        .addEdge({ src: "41", dst: "51", distance: 0.5, isTransit: false })
+        .addLink({ src: "01", dst: "11", distance: 0.5, isTransit: true })
+        .addLink({ src: "11", dst: "21", distance: 0, isTransit: true })
+        .addLink({ src: "21", dst: "31", distance: 0, isTransit: true })
+        .addLink({ src: "31", dst: "41", distance: 0, isTransit: true })
+        .addLink({ src: "41", dst: "51", distance: 0.5, isTransit: false })
         // Top to bottom at edges.
-        .addEdge({ src: "00", dst: "01", distance: 1, isTransit: false })
-        .addEdge({ src: "50", dst: "51", distance: 1, isTransit: false });
+        .addLink({ src: "00", dst: "01", distance: 1, isTransit: false })
+        .addLink({ src: "50", dst: "51", distance: 1, isTransit: false });
 
     const adjList: ReadonlyArray<AdjacencyPathType> = adj.get("00", 100);
 

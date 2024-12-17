@@ -6,10 +6,10 @@ import { Heap } from "../heap/heap";
 export type AdjacencyNodeType = string;
 
 /**
- * Edge between two nodes.
+ * Directed link between two nodes.
  * Paths cannot end with a transit node; they must connect two non-transit nodes.
  */
-export type AdjacencyEdgeType = {
+export type AdjacencyLinkType = {
     src: AdjacencyNodeType;
     dst: AdjacencyNodeType;
     distance: number;
@@ -19,53 +19,40 @@ export type AdjacencyEdgeType = {
 export type AdjacencyPathType = {
     node: AdjacencyNodeType; // final node in path
     distance: number;
-    path: ReadonlyArray<AdjacencyEdgeType>;
+    path: ReadonlyArray<AdjacencyLinkType>;
 };
 
 export class Adjacency {
-    private readonly _srcNodeToOutgoingEdges: Map<
+    private readonly _srcNodeOutgoingLinks: Map<
         AdjacencyNodeType,
-        Set<AdjacencyEdgeType>
+        Set<AdjacencyLinkType>
     > = new Map();
 
-    public addEdge(edge: AdjacencyEdgeType): this {
-        // Create the src->edge set if missing.
-        let outgoingEdges: Set<AdjacencyEdgeType> | undefined =
-            this._srcNodeToOutgoingEdges.get(edge.src);
-        if (!outgoingEdges) {
-            outgoingEdges = new Set<AdjacencyEdgeType>();
-            this._srcNodeToOutgoingEdges.set(edge.src, outgoingEdges);
+    public addLink(link: AdjacencyLinkType): this {
+        // Create the src->link set if missing.
+        let outgoingLinks: Set<AdjacencyLinkType> | undefined =
+            this._srcNodeOutgoingLinks.get(link.src);
+        if (!outgoingLinks) {
+            outgoingLinks = new Set<AdjacencyLinkType>();
+            this._srcNodeOutgoingLinks.set(link.src, outgoingLinks);
         }
 
-        // Only add edge if new.
-        let found = false;
-        for (const existingEdge of outgoingEdges) {
-            if (
-                existingEdge.src === edge.src &&
-                existingEdge.dst === edge.dst &&
-                existingEdge.distance === edge.distance
-            ) {
-                found = true;
-                break;
-            }
-        }
-        if (!found) {
-            edge = Object.freeze(edge); // make immutable
-            outgoingEdges.add(edge);
-        }
-
+        // Add immutable link.
+        link = Object.freeze(link); // make immutable
+        outgoingLinks.add(link);
         return this;
     }
 
-    public hasEdge(edge: AdjacencyEdgeType): boolean {
-        const outgoingEdges: Set<AdjacencyEdgeType> | undefined =
-            this._srcNodeToOutgoingEdges.get(edge.src);
-        if (outgoingEdges) {
-            for (const existingEdge of outgoingEdges) {
+    public hasLink(link: AdjacencyLinkType): boolean {
+        const outgoingLinks: Set<AdjacencyLinkType> | undefined =
+            this._srcNodeOutgoingLinks.get(link.src);
+        if (outgoingLinks) {
+            for (const outgoingLink of outgoingLinks) {
                 if (
-                    existingEdge.src === edge.src &&
-                    existingEdge.dst === edge.dst &&
-                    existingEdge.distance === edge.distance
+                    outgoingLink.src === link.src &&
+                    outgoingLink.dst === link.dst &&
+                    outgoingLink.distance === link.distance &&
+                    outgoingLink.isTransit === link.isTransit
                 ) {
                     return true;
                 }
@@ -74,31 +61,25 @@ export class Adjacency {
         return false;
     }
 
-    public removeEdge(edge: AdjacencyEdgeType): this {
-        const outgoingEdges: Set<AdjacencyEdgeType> | undefined =
-            this._srcNodeToOutgoingEdges.get(edge.src);
-        if (outgoingEdges) {
-            for (const existingEdge of outgoingEdges) {
-                if (
-                    existingEdge.src === edge.src &&
-                    existingEdge.dst === edge.dst &&
-                    existingEdge.distance === edge.distance
-                ) {
-                    outgoingEdges.delete(existingEdge);
-                    break;
-                }
-            }
-        }
-        return this;
-    }
-
     /**
-     * Remove all edges starting from the given node.
+     * Remove all links starting OR ENDING from the given node.
      *
      * @param node
      */
     public removeNode(node: AdjacencyNodeType): this {
-        this._srcNodeToOutgoingEdges.delete(node);
+        this._srcNodeOutgoingLinks.delete(node);
+
+        for (const outgoingLinks of this._srcNodeOutgoingLinks.values()) {
+            const dele: Set<AdjacencyLinkType> = new Set<AdjacencyLinkType>();
+            for (const link of outgoingLinks) {
+                if (link.dst === node) {
+                    dele.add(link);
+                }
+            }
+            for (const link of dele) {
+                outgoingLinks.delete(link);
+            }
+        }
         return this;
     }
 
@@ -138,18 +119,18 @@ export class Adjacency {
                 toExplore.delete(closest.node);
                 explored.add(closest.node);
 
-                // Walk the outgoing edge destinations.
-                const outgoingEdges: Set<AdjacencyEdgeType> | undefined =
-                    this._srcNodeToOutgoingEdges.get(closest.node);
-                if (outgoingEdges) {
-                    for (const outgoingEdge of outgoingEdges) {
-                        const dst: AdjacencyNodeType = outgoingEdge.dst;
+                // Walk the outgoing link destinations.
+                const outgoingLinks: Set<AdjacencyLinkType> | undefined =
+                    this._srcNodeOutgoingLinks.get(closest.node);
+                if (outgoingLinks) {
+                    for (const outgoingLink of outgoingLinks) {
+                        const dst: AdjacencyNodeType = outgoingLink.dst;
                         if (!explored.has(dst)) {
                             const distance: number =
-                                closest.distance + outgoingEdge.distance;
-                            const path: Array<AdjacencyEdgeType> = [
+                                closest.distance + outgoingLink.distance;
+                            const path: Array<AdjacencyLinkType> = [
                                 ...closest.path,
-                                outgoingEdge,
+                                outgoingLink,
                             ];
 
                             if (distance <= maxDistance) {
@@ -175,9 +156,9 @@ export class Adjacency {
             ...nodeToAdjacencyPath.values(),
         ]
             .filter((adjacencyPathType: AdjacencyPathType): boolean => {
-                const lastEdge: AdjacencyEdgeType | undefined =
+                const lastLink: AdjacencyLinkType | undefined =
                     adjacencyPathType.path[adjacencyPathType.path.length - 1];
-                return lastEdge !== undefined && !lastEdge.isTransit;
+                return lastLink !== undefined && !lastLink.isTransit;
             })
             .map((adjacencyPathType: AdjacencyPathType): AdjacencyPathType => {
                 return Object.freeze(adjacencyPathType);
