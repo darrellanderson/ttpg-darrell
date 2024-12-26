@@ -56,7 +56,7 @@ it("parseSourceMappings", () => {
     const encoded =
         ";;;AAAA,kDAAiD;AACjD,+CAA8C;AAgB9C,MAAa,YAAa,SAAQ,6BAAc;IAM5C;;;;";
     const lineMapping = new ErrorHandler().parseSourceMappings(encoded);
-    expect(lineMapping).toEqual([-1, -1, -1, 0, 1, 17, 23, -1, -1, -1, -1]);
+    expect(lineMapping).toEqual([0, 0, 0, 0, 1, 17, 23, 0, 0, 0, 0]);
 });
 
 it("parseSourceMappings (segments)", () => {
@@ -65,7 +65,31 @@ it("parseSourceMappings (segments)", () => {
     expect(lineMapping).toEqual([-12]);
 });
 
+it("_parseSextets", () => {
+    const sextets: Array<number> = new ErrorHandler()._parseSextets("A/XCF");
+    expect(sextets).toEqual([0, 63, 23, 2, 5]);
+});
+
+it("_splitVlqs", () => {
+    const vlqs: Array<Array<number>> = new ErrorHandler()._splitVlqs([
+        0b100000, 0b101000, 0b100000, 0b100010, 0b110000, 0b100000, 0b000100,
+        0b010000, 0b100011, 0b000101,
+    ]);
+    expect(vlqs).toEqual([
+        [0b100000, 0b101000, 0b100000, 0b100010, 0b110000, 0b100000, 0b000100],
+        [0b010000],
+        [0b100011, 0b000101],
+    ]);
+});
+
 it("parseSourceMappingSegment", () => {
+    const errorHandler = new ErrorHandler();
+    const decoded: Array<number> =
+        errorHandler.parseSourceMappingSegment("wkpykpCQjF");
+    expect(decoded).toEqual([1227133512, 8, -81]);
+});
+
+it("parseSourceMappingSegment (more)", () => {
     const errorHandler = new ErrorHandler();
     let decoded: Array<number>;
 
@@ -148,11 +172,11 @@ it("getLineMapping (map file)", () => {
     const errorHandler = new ErrorHandler(); // same instance for cache
     let lineMapping: Array<number> | undefined =
         errorHandler.getLineMapping(jsFile);
-    expect(lineMapping).toEqual([-1, -1, -1, 0, 1, 17, 23, -1, -1, -1, -1]);
+    expect(lineMapping).toEqual([0, 0, 0, 0, 1, 17, 23, 0, 0, 0, 0]);
 
     // Read it a second time (fetched from cache).
     lineMapping = errorHandler.getLineMapping(jsFile);
-    expect(lineMapping).toEqual([-1, -1, -1, 0, 1, 17, 23, -1, -1, -1, -1]);
+    expect(lineMapping).toEqual([0, 0, 0, 0, 1, 17, 23, 0, 0, 0, 0]);
 });
 
 it("getLineMapping (corrupt map file)", () => {
