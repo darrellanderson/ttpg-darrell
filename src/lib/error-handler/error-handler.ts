@@ -17,6 +17,14 @@ export type ErrorLocation = {
     tsLine?: number;
 };
 
+// Adapted from https://www.lucidchart.com/techblog/2019/08/22/decode-encoding-base64-vlqs-source-maps/
+const BIT_MASK = {
+    LEAST_FOUR_BITS: 0b1111,
+    LEAST_FIVE_BITS: 0b11111,
+    CONTINUATION_BIT: 0b100000,
+    SIGN_BIT: 0b1,
+};
+
 /**
  * Report stack traces with filenames relative to the Script directory,
  * use source mappings to report both js and transpiled ts line numbers.
@@ -37,7 +45,7 @@ export class ErrorHandler implements IGlobal {
     } = {};
 
     constructor() {
-        const base64Alphabet =
+        const base64Alphabet: string =
             "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         this._reverseBase64Alphabet = new Map(
             base64Alphabet.split("").map((c: string, i: number) => [c, i])
@@ -64,7 +72,8 @@ export class ErrorHandler implements IGlobal {
     rewriteError(error: string): string {
         const rewrite: Array<string> = [];
         for (const errorLine of error.split("\n")) {
-            const errorLocation = this.parseErrorLocation(errorLine);
+            const errorLocation: ErrorLocation | undefined =
+                this.parseErrorLocation(errorLine);
             if (errorLocation) {
                 // Report JavaScript line number, and TypeScript if mapping exists.
                 let line: string = `  at ${errorLocation.method} ${errorLocation.file}:${errorLocation.jsLine}`;
@@ -91,8 +100,8 @@ export class ErrorHandler implements IGlobal {
         // Two flavors:
         // "at file://.../Scripts/.../file.js:#:#"
         // "at x (file://.../Scripts/.../file.js:#:#)"
-        const re1 = /at file:\/\/.*Scripts\/(.*\.js):([0-9]*):([0-9]*)/;
-        const re2 =
+        const re1: RegExp = /at file:\/\/.*Scripts\/(.*\.js):([0-9]*):([0-9]*)/;
+        const re2: RegExp =
             /at (.*) \(file:\/\/.*Scripts\/(.*\.js):([0-9]*):([0-9]*)\)/;
         let m: RegExpMatchArray | null;
         let method: string | undefined;
@@ -222,6 +231,7 @@ export class ErrorHandler implements IGlobal {
     }
 
     parseSourceMappings(mappingsEncoded: string): Array<number> {
+        console.log("xxx");
         const lineMapping: Array<number> = [];
         let lastTsLine: number = 0;
         const mappings: Array<string> = mappingsEncoded.split(";"); // one entry per line
@@ -229,9 +239,13 @@ export class ErrorHandler implements IGlobal {
             const segments: Array<string> = mapping.split(",");
             const firstSegment: string | undefined = segments[0];
             if (firstSegment !== undefined) {
-                const fields = this.parseSourceMappingSegment(firstSegment);
+                const fields: Array<number> =
+                    this.parseSourceMappingSegment(firstSegment);
                 // [delta-js-col, src-index, delta-ts-line, delta-ts-col, names-index]
-                let tsLine: number = fields[2] ?? -1;
+                let tsLine: number | undefined = fields[2];
+                if (tsLine === undefined) {
+                    tsLine = 0;
+                }
                 if (tsLine > 0) {
                     tsLine += lastTsLine;
                     lastTsLine = tsLine;
@@ -242,25 +256,18 @@ export class ErrorHandler implements IGlobal {
         return lineMapping;
     }
 
-    parseSourceMappingSegment(segment: string): Array<number> {
-        // Adapted from https://www.lucidchart.com/techblog/2019/08/22/decode-encoding-base64-vlqs-source-maps/
-        const BIT_MASK = {
-            LEAST_FOUR_BITS: 0b1111,
-            LEAST_FIVE_BITS: 0b11111,
-            CONTINUATION_BIT: 0b100000,
-            SIGN_BIT: 0b1,
-        };
-
-        // Break into sextets (6-bit numbers).
-        const sextets: Array<number> = segment.split("").map((c) => {
-            const sextet = this._reverseBase64Alphabet.get(c);
+    _parseSextets(segment: string): Array<number> {
+        return segment.split("").map((c) => {
+            const sextet: number | undefined =
+                this._reverseBase64Alphabet.get(c);
             if (sextet === undefined) {
                 throw new Error(`${segment} is not a valid base64 encoded VLQ`);
             }
             return sextet;
         });
+    }
 
-        // Group continued sextets.
+    _splitVlqs(sextets: Array<number>): Array<Array<number>> {
         const vlqs: Array<Array<number>> = [];
         let vlq: Array<number> = [];
         for (const sextet of sextets) {
@@ -272,15 +279,24 @@ export class ErrorHandler implements IGlobal {
         }
         if (vlq.length > 0) {
             throw new Error(
-                `Malformed VLQ sequence "${segment}": The last VLQ never ended.`
+                `Malformed VLQ sequence [${sextets.join(", ")}]: The last VLQ never ended.`
             );
         }
+        return vlqs;
+    }
+
+    parseSourceMappingSegment(segment: string): Array<number> {
+        // Break into sextets (6-bit numbers).
+        const sextets: Array<number> = this._parseSextets(segment);
+
+        // Group continued sextets.
+        const vlqs: Array<Array<number>> = this._splitVlqs(sextets);
 
         // Decode sextet groups.
         const result: Array<number> = [];
         for (const vlq of vlqs) {
-            let x = 0;
-            let isNegative = false;
+            let x: number = 0;
+            let isNegative: boolean = false;
             vlq.reverse().forEach((sextet: number, index: number) => {
                 if (index === vlq.length - 1) {
                     isNegative = (sextet & BIT_MASK.SIGN_BIT) === 1;
