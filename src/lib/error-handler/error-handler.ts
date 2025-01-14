@@ -201,7 +201,7 @@ export class ErrorHandler implements IGlobal {
         let map;
         try {
             map = JSON.parse(json);
-        } catch (e) {
+        } catch (_e) {
             console.log(
                 `ErrorHandler.getLineMapping: JSON.parse failed for "${jsFile}"`
             );
