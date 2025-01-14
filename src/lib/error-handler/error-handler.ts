@@ -231,7 +231,6 @@ export class ErrorHandler implements IGlobal {
     }
 
     parseSourceMappings(mappingsEncoded: string): Array<number> {
-        console.log("xxx");
         const lineMapping: Array<number> = [];
         let lastTsLine: number = 0;
         const mappings: Array<string> = mappingsEncoded.split(";"); // one entry per line
