@@ -10,7 +10,7 @@ import { NSID } from "../../nsid/nsid";
 import { Broadcast } from "../../broadcast/broadcast";
 
 export class ReportRemaining implements IGlobal {
-    public static readonly _actionName: string = "* Report remaining";
+    public static readonly _actionName: string = "*Report remaining";
     private readonly _cardNsidPrefix: string;
 
     private readonly _customActionHandler = (
