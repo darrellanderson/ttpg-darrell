@@ -7,7 +7,7 @@ import { IGlobal } from "../../global/i-global";
  * any "take seat" buttons).
  */
 export class LeaveSeat implements IGlobal {
-    public static readonly CUSTOM_ACTION_NAME = "*Leave seat";
+    public static readonly CUSTOM_ACTION_NAME = "*Leave Seat";
     private static readonly _customActionHandler = (
         player: Player,
         identifier: string
