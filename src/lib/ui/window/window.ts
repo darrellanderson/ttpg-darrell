@@ -23,6 +23,20 @@ export class Window {
         () => void
     >();
 
+    private readonly _customActionName: string;
+    private readonly _customActionHandler = (
+        clickingPlayer: Player,
+        identifier: string
+    ): void => {
+        if (identifier === this._customActionName) {
+            for (const playerWindow of this._playerWindows) {
+                if (playerWindow.getPlayerSlot() === clickingPlayer.getSlot()) {
+                    playerWindow.toggle();
+                }
+            }
+        }
+    };
+
     _getState(): string | undefined {
         const playerSlotToState: { [key: number]: string } = {};
         let hasState: boolean = false;
@@ -69,6 +83,7 @@ export class Window {
         persistenceKey?: NamespaceId
     ) {
         this._windowName = params.title;
+        this._customActionName = `*Toggle ${this._windowName}`;
 
         // Create (unattached) per-player windows.
         this._playerWindows = playerSlots.map(
@@ -125,6 +140,12 @@ export class Window {
         return this;
     }
 
+    destroy(): void {
+        this.detach();
+        world.removeCustomAction(this._customActionName);
+        globalEvents.onCustomAction.remove(this._customActionHandler);
+    }
+
     addGlobalContextMenuToggle(): this {
         if (!this._windowName) {
             throw new Error("must have a window name");
@@ -132,20 +153,7 @@ export class Window {
         const actionName: string = `*Toggle ${this._windowName}`;
         world.addCustomAction(actionName, "show/hide the window");
 
-        globalEvents.onCustomAction.add(
-            (clickingPlayer: Player, identifier: string): void => {
-                if (identifier === actionName) {
-                    for (const playerWindow of this._playerWindows) {
-                        if (
-                            playerWindow.getPlayerSlot() ===
-                            clickingPlayer.getSlot()
-                        ) {
-                            playerWindow.toggle();
-                        }
-                    }
-                }
-            }
-        );
+        globalEvents.onCustomAction.add(this._customActionHandler);
 
         return this;
     }

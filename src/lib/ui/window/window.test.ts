@@ -49,6 +49,7 @@ it("attach/detach", () => {
     window.detach();
     expect(window._getState()).toBeUndefined();
     expect(onAllClosedCount).toEqual(1);
+    window.destroy();
 });
 
 it("getState/applyState", () => {
