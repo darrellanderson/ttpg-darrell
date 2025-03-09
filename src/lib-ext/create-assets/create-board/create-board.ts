@@ -83,9 +83,9 @@ export class CreateBoard extends AbstractCreateAssets {
         if (this._params.preshrink) {
             // If either value is zero, size appropriately.
             const maxDimension: number = Math.max(width, height);
-            const scale: number = this._params.preshrink / maxDimension;
-            width = Math.floor(width * scale);
-            height = Math.floor(height * scale);
+            const scale2: number = this._params.preshrink / maxDimension;
+            width = Math.floor(width * scale2);
+            height = Math.floor(height * scale2);
 
             const size: { width: number; height: number } =
                 CubeModel.getInsetForUVs(width, height);

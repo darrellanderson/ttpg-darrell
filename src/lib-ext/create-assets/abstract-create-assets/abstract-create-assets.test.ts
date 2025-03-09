@@ -70,9 +70,11 @@ it("writeFiles", async () => {
 it("writeFiles (reject)", async () => {
     class MyRejectCreateAssets extends AbstractCreateAssets {
         toFileData(): Promise<{ [key: string]: Buffer }> {
-            return new Promise<{ [key: string]: Buffer }>((resolve, reject) => {
-                reject("my-reject");
-            });
+            return new Promise<{ [key: string]: Buffer }>(
+                (_resolve, reject) => {
+                    reject("my-reject");
+                }
+            );
         }
     }
     let err = "";

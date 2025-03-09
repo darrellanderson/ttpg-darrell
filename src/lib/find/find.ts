@@ -272,11 +272,12 @@ export class Find {
         const key = `${tag}@${playerSlot ?? ""}`;
 
         // Check cache.
-        const snapPoint: SnapPoint | undefined =
+        const cachedSnapPoint: SnapPoint | undefined =
             this._snapPointTagAndSlotToSnapPoint[key];
-        const parent: StaticObject | undefined = snapPoint?.getParentObject();
-        if (snapPoint && (!parent || parent.isValid())) {
-            return snapPoint;
+        const parent: StaticObject | undefined =
+            cachedSnapPoint?.getParentObject();
+        if (cachedSnapPoint && (!parent || parent.isValid())) {
+            return cachedSnapPoint;
         }
 
         // Search tables (update cache if found).

@@ -30,7 +30,7 @@ export class SpeakingParser {
                     startSeconds: startSeconds,
                     endSeconds: endSeconds,
                 });
-            } catch (e) {
+            } catch (_e) {
                 // Ignore invalid records.
             }
         }

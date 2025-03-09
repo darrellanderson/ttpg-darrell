@@ -48,7 +48,7 @@ export class EndTurnButton {
         this.update();
     };
 
-    private readonly _onEndTurnClicked = (button: Button, player: Player) => {
+    private readonly _onEndTurnClicked = (_button: Button, player: Player) => {
         // Watch out for a second click before the button visible-to changes.
         if (this._turnOrder.getCurrentTurn() !== player.getSlot()) {
             return;

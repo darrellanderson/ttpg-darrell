@@ -34,8 +34,8 @@ export class LeaveSeat implements IGlobal {
      */
     static leaveSeat(player: Player): boolean {
         const busy = new Set();
-        for (const player of world.getAllPlayers()) {
-            busy.add(player.getSlot());
+        for (const activePlayer of world.getAllPlayers()) {
+            busy.add(activePlayer.getSlot());
         }
         const skipContained = false;
         for (const obj of world.getAllObjects(skipContained)) {

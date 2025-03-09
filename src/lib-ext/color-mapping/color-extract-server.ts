@@ -227,8 +227,8 @@ async function extractColors(r: number, g: number, b: number): Promise<string> {
     const intToHex = (int: number): string => {
         return int.toString(16).toUpperCase().padStart(2, "0");
     };
-    const rgbToHex = (r: number, g: number, b: number): string => {
-        return `${intToHex(r)}${intToHex(g)}${intToHex(b)}`;
+    const rgbToHex = (r2: number, g2: number, b2: number): string => {
+        return `${intToHex(r2)}${intToHex(g2)}${intToHex(b2)}`;
     };
     return [
         rgbToHex(r, g, b),

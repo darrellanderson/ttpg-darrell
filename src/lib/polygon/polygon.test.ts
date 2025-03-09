@@ -76,7 +76,7 @@ it("inset", () => {
 
     // Make sure original unchanged.
     let points: Array<Vector> = p.getPoints();
-    expect(points.map((p: Vector): string => p.toString())).toEqual([
+    expect(points.map((p2: Vector): string => p2.toString())).toEqual([
         "(X=0,Y=0,Z=0)",
         "(X=1,Y=1,Z=0)",
         "(X=2,Y=0,Z=0)",
@@ -85,7 +85,7 @@ it("inset", () => {
     // Check inset.
     points = insetP.getPoints();
 
-    expect(points.map((p: Vector): string => p.toString())).toEqual([
+    expect(points.map((p2: Vector): string => p2.toString())).toEqual([
         "(X=0.241,Y=0.1,Z=0)",
         "(X=1,Y=0.859,Z=0)",
         "(X=1.759,Y=0.1,Z=0)",
@@ -103,7 +103,7 @@ it("inset (closed)", () => {
 
     // Make sure original unchanged.
     let points: Array<Vector> = p.getPoints();
-    expect(points.map((p: Vector): string => p.toString())).toEqual([
+    expect(points.map((p2: Vector): string => p2.toString())).toEqual([
         "(X=0,Y=0,Z=0)",
         "(X=1,Y=1,Z=0)",
         "(X=2,Y=0,Z=0)",
@@ -113,7 +113,7 @@ it("inset (closed)", () => {
     // Check inset.
     points = insetP.getPoints();
 
-    expect(points.map((p: Vector): string => p.toString())).toEqual([
+    expect(points.map((p2: Vector): string => p2.toString())).toEqual([
         "(X=0.241,Y=0.1,Z=0)",
         "(X=1,Y=0.859,Z=0)",
         "(X=1.759,Y=0.1,Z=0)",

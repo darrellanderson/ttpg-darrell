@@ -9,7 +9,7 @@ const turnOrder = TurnOrder.getInstance("@test/test").setTurnOrder(
 );
 new EndTurnButton(turnOrder, {}).attachToScreen();
 
-refObject.onPrimaryAction.add((object: GameObject, player: Player) => {
+refObject.onPrimaryAction.add((_object: GameObject, player: Player) => {
     turnOrder.nextTurn();
     console.log(
         `end-turn-button.testp advanced turn to ${turnOrder.getCurrentTurn()} [by ${player.getSlot()}]`

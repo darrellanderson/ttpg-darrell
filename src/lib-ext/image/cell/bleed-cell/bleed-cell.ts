@@ -83,8 +83,8 @@ export class BleedCell extends AbstractCell {
                     })
                     .png()
                     .toBuffer()
-                    .then((buffer: Buffer): void => {
-                        resolve(buffer);
+                    .then((buffer2: Buffer): void => {
+                        resolve(buffer2);
                     });
             });
         });
@@ -109,33 +109,33 @@ export class BleedCell extends AbstractCell {
 
         return new Promise<Buffer>((resolve): void => {
             Promise.all([inner, left, right, top, bottom]).then(
-                ([inner, left, right, top, bottom]): void => {
+                ([inner2, left2, right2, top2, bottom2]): void => {
                     image
                         .composite([
                             {
                                 left: 0,
                                 top: this._bleedTopBottom,
-                                input: left,
+                                input: left2,
                             },
                             {
                                 left: width - this._bleedLeftRight,
                                 top: this._bleedTopBottom,
-                                input: right,
+                                input: right2,
                             },
                             {
                                 left: this._bleedLeftRight,
                                 top: 0,
-                                input: top,
+                                input: top2,
                             },
                             {
                                 left: this._bleedLeftRight,
                                 top: height - this._bleedTopBottom,
-                                input: bottom,
+                                input: bottom2,
                             },
                             {
                                 left: this._bleedLeftRight,
                                 top: this._bleedTopBottom,
-                                input: inner,
+                                input: inner2,
                             },
                         ])
                         .png()

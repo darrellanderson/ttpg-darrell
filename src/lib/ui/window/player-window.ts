@@ -265,11 +265,11 @@ export class PlayerWindow {
                 this._target === "screen"
                     ? this._onClickToWorld
                     : this._onClickToScreen;
-            const button: ImageButton = new ImageButton()
+            const button2: ImageButton = new ImageButton()
                 .setImageSize(buttonSize, buttonSize)
                 .setImage(image, packageId);
-            button.onClicked.add(onClick);
-            titleBarPanel.addChild(button, 0);
+            button2.onClicked.add(onClick);
+            titleBarPanel.addChild(button2, 0);
         }
 
         if (!this._params.disableCollapse) {
@@ -279,21 +279,21 @@ export class PlayerWindow {
             const onClick = this._collapsed
                 ? this._onClickExpand
                 : this._onClickCollapse;
-            const button: ImageButton = new ImageButton()
+            const button2: ImageButton = new ImageButton()
                 .setImageSize(buttonSize, buttonSize)
                 .setImage(image, packageId);
-            button.onClicked.add(onClick);
-            titleBarPanel.addChild(button, 0);
+            button2.onClicked.add(onClick);
+            titleBarPanel.addChild(button2, 0);
         }
 
         if (!this._params.disableClose) {
             const image: string = WINDOW_BUTTON_ASSET.CLOSE;
             const onClick = this._onClickClose;
-            const button: ImageButton = new ImageButton()
+            const button2: ImageButton = new ImageButton()
                 .setImageSize(buttonSize, buttonSize)
                 .setImage(image, packageId);
-            button.onClicked.add(onClick);
-            titleBarPanel.addChild(button, 0);
+            button2.onClicked.add(onClick);
+            titleBarPanel.addChild(button2, 0);
         }
 
         if (!this._windowWidget) {

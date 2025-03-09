@@ -32,8 +32,8 @@ export class ResizeCell extends AbstractCell {
                     .resize(width, height, { fit: "fill" })
                     .png()
                     .toBuffer()
-                    .then((buffer: Buffer): void => {
-                        resolve(buffer);
+                    .then((buffer2: Buffer): void => {
+                        resolve(buffer2);
                     }, reject);
             }, reject);
         });

@@ -59,9 +59,10 @@ export class Window {
         const playerSlotToState: { [key: number]: string } = JSON.parse(state);
         for (const playerWindow of this._playerWindows) {
             const playerSlot: number = playerWindow.getPlayerSlot();
-            const state: string | undefined = playerSlotToState[playerSlot];
-            if (state) {
-                playerWindow._applyState(state);
+            const playerState: string | undefined =
+                playerSlotToState[playerSlot];
+            if (playerState) {
+                playerWindow._applyState(playerState);
             }
         }
     }
