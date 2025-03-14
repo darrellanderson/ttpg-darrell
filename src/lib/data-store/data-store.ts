@@ -132,10 +132,10 @@ export class DataStore {
         // Create chained blocks.
         const blocks: Array<DataBlock> = [];
         for (let i = 0; i < n; i++) {
-            const data: string | undefined = dataChunks[i];
-            if (data) {
+            const data2: string | undefined = dataChunks[i];
+            if (data2) {
                 const block: DataBlock = {
-                    data,
+                    data: data2,
                 };
                 if (i < dataChunks.length - 1) {
                     block.next = blockLocations[i + 1];

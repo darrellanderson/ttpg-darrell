@@ -60,8 +60,8 @@ export abstract class AbstractCreateAssets {
                 sharp(buffer)
                     .jpeg()
                     .toBuffer()
-                    .then((buffer: Buffer) => {
-                        resolve(buffer);
+                    .then((buffer2: Buffer) => {
+                        resolve(buffer2);
                     }, reject);
             } else {
                 resolve(buffer);
@@ -73,10 +73,10 @@ export abstract class AbstractCreateAssets {
         console.log(`CreateAssets: writing "${filename}"`);
         return new Promise<void>((resolve, reject) => {
             AbstractCreateAssets.encodeOutputBuffer(filename, buffer).then(
-                (buffer: Buffer): void => {
+                (buffer2: Buffer): void => {
                     const dir: string = path.dirname(filename);
                     fs.mkdir(dir, { recursive: true }).then((): void => {
-                        fs.writeFile(filename, buffer).then((): void => {
+                        fs.writeFile(filename, buffer2).then((): void => {
                             resolve();
                         }, reject);
                     }, reject);

@@ -35,9 +35,9 @@ const turnOrderWidget = new TurnOrderWidget(turnOrder, {
     wartGenerators: [
         (turnEntryWidget: TurnEntryWidget) => {
             class MyWart extends TurnEntryWart {
-                constructor(turnEntryWidget: TurnEntryWidget) {
+                constructor(turnEntryWidget2: TurnEntryWidget) {
                     super();
-                    turnEntryWidget
+                    turnEntryWidget2
                         .getCanvas()
                         .addChild(
                             new Border().setColor([1, 0, 0, 1]),

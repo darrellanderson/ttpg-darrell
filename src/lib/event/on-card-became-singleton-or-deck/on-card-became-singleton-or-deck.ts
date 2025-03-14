@@ -38,7 +38,7 @@ export class OnCardBecameSingletonOrDeck implements IGlobal {
 
     private static readonly _onInsertedHandler = (
         deck: Card,
-        insertedCard: Card,
+        _insertedCard: Card,
         position: number,
         player?: Player
     ) => {
@@ -74,8 +74,8 @@ export class OnCardBecameSingletonOrDeck implements IGlobal {
 
     static _onRemovedHandler = (
         deck: Card,
-        removedCard: Card,
-        position: number,
+        _removedCard: Card,
+        _position: number,
         player?: Player
     ) => {
         // Called after card is removed.

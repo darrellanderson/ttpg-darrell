@@ -58,7 +58,7 @@ export class TurnClickedWidget {
 
     _createSetTurnButton(): Button {
         const button = new Button().setText(locale("turn-order.set-turn"));
-        button.onClicked.add((button: Button, clickingPlayer: Player) => {
+        button.onClicked.add((_button: Button, clickingPlayer: Player) => {
             const msg: string = locale("turn-order.set-turn-by", {
                 clickingPlayer: clickingPlayer.getName(),
                 targetPlayer: this._targetPlayerName,
@@ -81,7 +81,7 @@ export class TurnClickedWidget {
         const button = new Button().setText(
             locale("turn-order.passed." + (isPassed ? "clear" : "set"))
         );
-        button.onClicked.add((button: Button, clickingPlayer: Player) => {
+        button.onClicked.add((_button: Button, clickingPlayer: Player) => {
             const msg: string = locale("turn-order.passed.toggled-by", {
                 clickingPlayer: clickingPlayer.getName(),
                 targetPlayer: this._targetPlayerName,
@@ -100,7 +100,7 @@ export class TurnClickedWidget {
         const button = new Button().setText(
             locale("turn-order.eliminated." + (isEliminated ? "clear" : "set"))
         );
-        button.onClicked.add((button: Button, clickingPlayer: Player) => {
+        button.onClicked.add((_button: Button, clickingPlayer: Player) => {
             const msg: string = locale("turn-order.eliminated.toggled-by", {
                 clickingPlayer: clickingPlayer.getName(),
                 targetPlayer: this._targetPlayerName,
@@ -140,7 +140,7 @@ export class TurnClickedWidget {
         for (const customAction of this._params.customActions ?? []) {
             const identifier = customAction.identifier ?? customAction.name;
             const button = new Button().setText(customAction.name);
-            button.onClicked.add((button: Button, player: Player) => {
+            button.onClicked.add((_button: Button, player: Player) => {
                 this.detach();
                 if (this._params.onCustomAction) {
                     this._params.onCustomAction(

@@ -54,7 +54,7 @@ export class HotSeatButton {
         this._border.setColor(currentColor);
     };
 
-    private readonly _onEndTurnClicked = (button: Button, player: Player) => {
+    private readonly _onEndTurnClicked = (_button: Button, player: Player) => {
         const currentSlot: number = this._turnOrder.getCurrentTurn();
         const playerSlot: number = player.getSlot();
 

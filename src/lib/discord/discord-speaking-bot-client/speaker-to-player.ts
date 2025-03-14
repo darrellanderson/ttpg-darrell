@@ -29,10 +29,10 @@ export class SpeakerToPlayer {
                 .map((player) => player.getName());
             const speakerNames: Array<string> = Array.from(this._speakers);
 
-            for (const speakerName of speakerNames) {
+            for (const speakerName2 of speakerNames) {
                 // Find best player match.
                 const bestPlayer: string | undefined = closest(
-                    speakerName,
+                    speakerName2,
                     playerNames
                 );
                 if (!bestPlayer) {
@@ -49,8 +49,8 @@ export class SpeakerToPlayer {
                 }
 
                 // If both directions agree add to map.
-                if (speakerName === bestSpeaker) {
-                    this._speakerToPlayer.set(speakerName, bestPlayer);
+                if (speakerName2 === bestSpeaker) {
+                    this._speakerToPlayer.set(speakerName2, bestPlayer);
                 }
             }
         }

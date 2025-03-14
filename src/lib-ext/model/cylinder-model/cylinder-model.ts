@@ -69,12 +69,12 @@ export class CylinderModel extends AbstractModel {
 
         // Faces.
         const topFaceEntries: Array<ObjVertexForFace> = topCircle.map(
-            (vertex, index): ObjVertexForFace => {
+            (_vertex, index): ObjVertexForFace => {
                 return `${index + 1}//`;
             }
         );
         const botFaceEntries: Array<ObjVertexForFace> = botCircle.map(
-            (vertex, index): ObjVertexForFace => {
+            (_vertex, index): ObjVertexForFace => {
                 return `${this._numSides + index + 1}//`;
             }
         );

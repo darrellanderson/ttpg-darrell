@@ -57,15 +57,16 @@ export class CellParser {
         let type: string = zBaseCellType.type;
 
         // Apply scale.
-        const applyScale = (jsonObject: object): void => {
-            for (let [k, v] of Object.entries(jsonObject)) {
+        const applyScale = (scaleJsonObject: object): void => {
+            for (let [k, v] of Object.entries(scaleJsonObject)) {
                 if (k.startsWith("$scale")) {
                     if (typeof v !== "number") {
                         throw new Error(`scale only applies to numbers`);
                     }
-                    const force: { [key: string]: number } = jsonObject as {
-                        [key: string]: number;
-                    };
+                    const force: { [key: string]: number } =
+                        scaleJsonObject as {
+                            [key: string]: number;
+                        };
                     delete force[k];
                     k = k.substring("$scale".length);
                     v = Math.round(v * this._scale);
@@ -110,8 +111,8 @@ export class CellParser {
         }
 
         // Apply exports.
-        const applyExports = (jsonObject: object): void => {
-            for (const [k, v] of Object.entries(jsonObject)) {
+        const applyExports = (jsonObject2: object): void => {
+            for (const [k, v] of Object.entries(jsonObject2)) {
                 if (v === "$import") {
                     const exportedValue:
                         | number
@@ -124,7 +125,7 @@ export class CellParser {
 
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     type StringToAny = { [key: string]: any };
-                    const force: StringToAny = jsonObject as StringToAny;
+                    const force: StringToAny = jsonObject2 as StringToAny;
                     force[k] = exportedValue;
                 }
                 if (k === "child" || k === "children" || k === "exports") {

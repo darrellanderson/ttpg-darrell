@@ -105,7 +105,7 @@ export class ChessClockWidget implements IWindowWidget {
             );
 
             button.onClicked.add(
-                (button: ContentButton, clickingPlayer: Player) => {
+                (_button: ContentButton, clickingPlayer: Player) => {
                     if (!clickingPlayer) {
                         throw new Error("invalid player");
                     }
@@ -159,7 +159,7 @@ export class ChessClockWidget implements IWindowWidget {
             .setChild(editButton);
         verticalBox.addChild(editButtonBox);
 
-        editButton.onClicked.add((button: Button, clickingPlayer: Player) => {
+        editButton.onClicked.add((_button: Button, clickingPlayer: Player) => {
             if (this._isEditing) {
                 this.editEnd(clickingPlayer);
                 editButton.setText("EDIT");
@@ -237,8 +237,8 @@ export class ChessClockWidget implements IWindowWidget {
             }
 
             if (seconds < 0 || seconds >= 60 || minutes < 0 || minutes > 120) {
-                const msg: string = `Invalid time format "${text}", use MM:SS. Restoring old time values.`;
-                this._chessClockData.broadcast(msg);
+                const msg2: string = `Invalid time format "${text}", use MM:SS. Restoring old time values.`;
+                this._chessClockData.broadcast(msg2);
                 return;
             }
 
