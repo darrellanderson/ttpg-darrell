@@ -444,6 +444,8 @@ export class PlayerWindow {
                 ui.rotation = new Rotator(0, 0, 0);
             }
 
+            ui.anchorX = this._params.world?.anchor.u ?? 0.5;
+            ui.anchorY = this._params.world?.anchor.v ?? 0.5;
             ui.scale = 1 / PlayerWindow.WORLD_SCALE;
             ui.width = width;
             ui.height = height;
