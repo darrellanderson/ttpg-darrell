@@ -147,6 +147,18 @@ export class Window {
         globalEvents.onCustomAction.remove(this._customActionHandler);
     }
 
+    reset(playerSlots: Array<number>): this {
+        for (const playerWindow of this._playerWindows) {
+            if (playerSlots.includes(playerWindow.getPlayerSlot())) {
+                // If open, close and re-open to recreate.
+                // If closed, open and close again (same frame so not visible).
+                playerWindow.toggle();
+                playerWindow.toggle();
+            }
+        }
+        return this;
+    }
+
     addGlobalContextMenuToggle(): this {
         if (!this._windowName) {
             throw new Error("must have a window name");

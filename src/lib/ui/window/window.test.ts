@@ -29,7 +29,7 @@ it("constructor", () => {
     new Window(params, [1, 2, 3], "@window/test"); // again, load persistent state
 });
 
-it("attach/detach", () => {
+it("attach/detach/reset", () => {
     const params: WindowParams = {
         size: { width: 1, height: 1 },
         windowWidgetGenerator: (): IWindowWidget => {
@@ -49,6 +49,7 @@ it("attach/detach", () => {
     window.detach();
     expect(window._getState()).toBeUndefined();
     expect(onAllClosedCount).toEqual(1);
+    window.reset([1, 2, 3]);
     window.destroy();
 });
 
