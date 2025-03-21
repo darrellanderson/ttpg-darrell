@@ -147,12 +147,18 @@ export class Window {
         globalEvents.onCustomAction.remove(this._customActionHandler);
     }
 
-    reset(playerSlots: Array<number>): this {
+    isAttachedForPlayer(playerSlot: number) {
         for (const playerWindow of this._playerWindows) {
-            if (playerSlots.includes(playerWindow.getPlayerSlot())) {
-                // If open, close and re-open to recreate.
-                // If closed, open and close again (same frame so not visible).
-                playerWindow.toggle();
+            if (playerWindow.getPlayerSlot() === playerSlot) {
+                return playerWindow.isAttached();
+            }
+        }
+        return false;
+    }
+
+    toggleForPlayer(playerSlot: number): this {
+        for (const playerWindow of this._playerWindows) {
+            if (playerWindow.getPlayerSlot() === playerSlot) {
                 playerWindow.toggle();
             }
         }

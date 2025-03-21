@@ -49,7 +49,7 @@ it("attach/detach/reset", () => {
     window.detach();
     expect(window._getState()).toBeUndefined();
     expect(onAllClosedCount).toEqual(1);
-    window.reset([1, 2, 3]);
+    window.toggleForPlayer(1); // per-player toggle
     window.destroy();
 });
 

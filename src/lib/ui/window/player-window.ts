@@ -478,8 +478,12 @@ export class PlayerWindow {
         return this;
     }
 
+    public isAttached(): boolean {
+        return this._screenUi !== undefined || this._worldUi !== undefined;
+    }
+
     public toggle(): this {
-        if (this._screenUi || this._worldUi) {
+        if (this.isAttached()) {
             this.detach();
         } else {
             this.attach();
