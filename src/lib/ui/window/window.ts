@@ -23,7 +23,7 @@ export class Window {
         () => void
     >();
 
-    private readonly _customActionName: string;
+    private readonly _customActionName: string | undefined;
     private readonly _customActionHandler = (
         clickingPlayer: Player,
         identifier: string
@@ -84,7 +84,9 @@ export class Window {
         persistenceKey?: NamespaceId
     ) {
         this._windowName = params.title;
-        this._customActionName = `*Toggle ${this._windowName}`;
+        this._customActionName = params.addToggleMenuItem
+            ? `*Toggle ${this._windowName}`
+            : undefined;
 
         // Create (unattached) per-player windows.
         this._playerWindows = playerSlots.map(
@@ -143,8 +145,10 @@ export class Window {
 
     destroy(): void {
         this.detach();
-        world.removeCustomAction(this._customActionName);
-        globalEvents.onCustomAction.remove(this._customActionHandler);
+        if (this._customActionName) {
+            world.removeCustomAction(this._customActionName);
+            globalEvents.onCustomAction.remove(this._customActionHandler);
+        }
     }
 
     isAttachedForPlayer(playerSlot: number) {
