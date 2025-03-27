@@ -83,6 +83,10 @@ it("attach/detach (world, anchor, pos)", () => {
             height: 10,
         },
         world: {
+            anchor: {
+                u: 1,
+                v: 1,
+            },
             playerSlotToTransform: { 0: { pos: [2, 3, 4], rot: [5, 6, 7] } },
         },
         windowWidgetGenerator: (): IWindowWidget => {
@@ -101,6 +105,10 @@ it("attach/detach (world, anchor, pos as vector/rotqtor)", () => {
             height: 10,
         },
         world: {
+            anchor: {
+                u: 1,
+                v: 1,
+            },
             playerSlotToTransform: { 0: { pos: [2, 3, 4], rot: [5, 6, 7] } },
         },
         windowWidgetGenerator: (): IWindowWidget => {

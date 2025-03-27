@@ -58,6 +58,10 @@ export type WindowParams = {
     };
 
     world?: {
+        anchor: {
+            u: number;
+            v: number;
+        };
         playerSlotToTransform: {
             [key: number]: {
                 pos: [x: number, y: number, z: number] | Vector;

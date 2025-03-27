@@ -21,7 +21,7 @@ export class BugCardHolderAssignment implements IGlobal {
     }
 
     public init(): void {
-        this._intervalHandle = setInterval(this._intervalRunnable, 1000);
+        this._intervalHandle = setInterval(this._intervalRunnable, 5000);
     }
 
     public destroy(): void {
