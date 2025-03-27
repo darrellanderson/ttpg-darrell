@@ -3935,9 +3935,9 @@ tslib@^2.4.0:
   integrity sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==
 
 ttpg-mock@^1.0.7:
-  version "1.0.57"
-  resolved "https://registry.yarnpkg.com/ttpg-mock/-/ttpg-mock-1.0.57.tgz#b6614fafa76ccd7f839a6651e3ce704c399d36c2"
-  integrity sha512-tgLoSgtKpinoniE/Of+x0gpM0VacWr6R2q3vTvQPDZHSdHl3c8oIu2cC/86HM0Z9TjDvV3yMyge2n9WPA4Wn4w==
+  version "1.0.58"
+  resolved "https://registry.yarnpkg.com/ttpg-mock/-/ttpg-mock-1.0.58.tgz#08bc732a0631991c34c4810e0d1942e4b16ac511"
+  integrity sha512-2exJQWzjLplcEDiGcPEp6T9XDtQ21wy3FOtrsOb8cqcwKZvOXOqYcRWQ+1wUbFqrHWn9kHoXmyIFaKvgSPcGAw==
   dependencies:
     "@tabletop-playground/api" "^0.41.0"
     three "^0.158.0"
