@@ -37,10 +37,33 @@ export abstract class NSID {
      * Create NSID from a metadata string or object.  A deck with multiple cards
      * gets a special "deck" NSID, consumers should call `stack` to get by card.
      *
+     * This get strips off any extra metadata (after the "|") from the string.
+     *
      * @param input
      * @returns NSID string
      */
     static get(input: StaticObject): string {
+        let metadata = NSID.getWithExtra(input);
+        const extraStartIndex = metadata.indexOf("|");
+        if (extraStartIndex > -1) {
+            // Remove extra metadata from the string.
+            metadata = metadata.substring(0, extraStartIndex);
+        }
+        return metadata;
+    }
+
+    static getExtra(input: StaticObject): string {
+        const metadata = NSID.getWithExtra(input);
+        const extraStartIndex = metadata.indexOf("|");
+        let extra = "";
+        if (extraStartIndex > -1) {
+            // Extract extra metadata from the string.
+            extra = metadata.substring(extraStartIndex + 1);
+        }
+        return extra;
+    }
+
+    static getWithExtra(input: StaticObject): string {
         let metadata = "";
         if (input instanceof Card) {
             if (input.getStackSize() === 1) {

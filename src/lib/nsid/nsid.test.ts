@@ -5,7 +5,9 @@ it("get (GameObject)", () => {
     const metadata = "my-type:my-source/my-name|my-extra";
     const obj = new MockGameObject({ templateMetadata: metadata });
     const nsid = NSID.get(obj);
-    expect(nsid).toEqual(metadata);
+    expect(nsid).toEqual("my-type:my-source/my-name");
+    const extra = NSID.getExtra(obj);
+    expect(extra).toEqual("my-extra");
 });
 
 it("get (singleton Card)", () => {
@@ -14,7 +16,9 @@ it("get (singleton Card)", () => {
         cardDetails: [new MockCardDetails({ metadata })],
     });
     const nsid = NSID.get(card);
-    expect(nsid).toEqual(metadata);
+    expect(nsid).toEqual("my-type:my-source/my-name");
+    const extra = NSID.getExtra(card);
+    expect(extra).toEqual("my-extra");
 });
 
 it("get (deck)", () => {
