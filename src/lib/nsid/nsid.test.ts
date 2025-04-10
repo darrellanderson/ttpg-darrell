@@ -2,12 +2,12 @@ import { MockCard, MockCardDetails, MockGameObject } from "ttpg-mock";
 import { DECK_NSID, NSID, ParsedNSID } from "./nsid";
 
 it("get (GameObject)", () => {
-    const metadata = "my-type:my-source/my-name|my-extra";
+    const metadata = "my-type:my-source/my-name|my-extra-1|my-extra-2";
     const obj = new MockGameObject({ templateMetadata: metadata });
     const nsid = NSID.get(obj);
     expect(nsid).toEqual("my-type:my-source/my-name");
-    const extra = NSID.getExtra(obj);
-    expect(extra).toEqual("my-extra");
+    const extras = NSID.getExtras(obj);
+    expect(extras).toEqual(["my-extra-1", "my-extra-2"]);
 });
 
 it("get (singleton Card)", () => {
@@ -17,8 +17,8 @@ it("get (singleton Card)", () => {
     });
     const nsid = NSID.get(card);
     expect(nsid).toEqual("my-type:my-source/my-name");
-    const extra = NSID.getExtra(card);
-    expect(extra).toEqual("my-extra");
+    const extras = NSID.getExtras(card);
+    expect(extras).toEqual(["my-extra"]);
 });
 
 it("get (deck)", () => {
@@ -50,13 +50,12 @@ it("getDeck (deck)", () => {
 });
 
 it("parse (with extra)", () => {
-    const metadata =
-        "type1.type2:source1.source2/name1.name2|extra1.extra1more-not-split";
+    const metadata = "type1.type2:source1.source2/name1.name2|extra1|extra2";
     const parsed: ParsedNSID | undefined = NSID.parse(metadata);
     expect(parsed).toEqual({
-        extra: "extra1.extra1more-not-split",
+        extras: ["extra1", "extra2"],
         nameParts: ["name1", "name2"],
-        nsid: "type1.type2:source1.source2/name1.name2|extra1.extra1more-not-split",
+        nsid: "type1.type2:source1.source2/name1.name2|extra1|extra2",
         sourceParts: ["source1", "source2"],
         typeParts: ["type1", "type2"],
     });

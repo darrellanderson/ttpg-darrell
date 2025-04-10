@@ -5,7 +5,7 @@ export type ParsedNSID = {
     typeParts: Array<string>;
     sourceParts: Array<string>;
     nameParts: Array<string>;
-    extra: string | undefined;
+    extras: Array<string> | undefined;
 };
 
 export const DECK_NSID = "deck:?/?";
@@ -52,7 +52,7 @@ export abstract class NSID {
         return metadata;
     }
 
-    static getExtra(input: StaticObject): string {
+    static getExtras(input: StaticObject): Array<string> {
         const metadata = NSID.getWithExtra(input);
         const extraStartIndex = metadata.indexOf("|");
         let extra = "";
@@ -60,7 +60,7 @@ export abstract class NSID {
             // Extract extra metadata from the string.
             extra = metadata.substring(extraStartIndex + 1);
         }
-        return extra;
+        return extra.split("|");
     }
 
     static getWithExtra(input: StaticObject): string {
@@ -111,7 +111,7 @@ export abstract class NSID {
             typeParts: type.split("."),
             sourceParts: source.split("."),
             nameParts: name.split("."),
-            extra: extra.length > 0 ? m[4] : undefined,
+            extras: extra.length > 0 ? m[4]?.split("|") : undefined,
         };
     }
 }
