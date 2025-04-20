@@ -119,7 +119,7 @@ export class Timer {
 
     _loadState(): void {
         const json: string = world.getSavedData(this._nameSpaceId);
-        if (json) {
+        if (json && json.length > 0) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const data: any = JSON.parse(json);
 
@@ -135,6 +135,7 @@ export class Timer {
 
     constructor(nameSpaceId: NamespaceId) {
         this._nameSpaceId = nameSpaceId;
+        this._loadState();
     }
 
     export(): TimerExportType {
