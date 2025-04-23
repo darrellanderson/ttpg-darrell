@@ -170,8 +170,11 @@ export class ErrorHandler implements IGlobal {
      */
     getMap(jsFile: string): string | undefined {
         for (const pkg of world.getAllowedPackages()) {
-            if (pkg.getScriptFiles().includes(jsFile)) {
-                const mapFile: string = jsFile + ".map";
+            const mapFile: string = jsFile + ".map";
+            if (
+                pkg.getScriptFiles().includes(jsFile) &&
+                pkg.getScriptFiles().includes(mapFile)
+            ) {
                 const map: string = world.importText(
                     mapFile,
                     pkg.getUniqueId()
@@ -179,9 +182,9 @@ export class ErrorHandler implements IGlobal {
                 if (map && map.length > 0) {
                     return map;
                 }
-                return undefined;
             }
         }
+        return undefined;
     }
 
     getLineMapping(jsFile: string): Array<number> | undefined {
