@@ -74,4 +74,5 @@ export type WindowParams = {
 
     // Show a global context menu item to show/hide per-player windows.
     addToggleMenuItem?: boolean;
+    addToggleMenuTooltip?: string;
 };

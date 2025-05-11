@@ -25,6 +25,8 @@ const params: WindowParams = {
         pos: { u: 0.5, v: 0.1 },
     },
     windowWidgetGenerator: (): IWindowWidget => new WindowWidget(),
+    addToggleMenuItem: true,
+    addToggleMenuTooltip: "Toggle Hellow Window",
 };
 
 const playerSlots: Array<number> = world

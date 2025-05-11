@@ -24,6 +24,7 @@ export class Window {
     >();
 
     private readonly _customActionName: string | undefined;
+    private readonly _customActionTooltip: string | undefined;
     private readonly _customActionHandler = (
         clickingPlayer: Player,
         identifier: string
@@ -87,6 +88,7 @@ export class Window {
         this._customActionName = params.addToggleMenuItem
             ? `*Toggle ${this._windowName}`
             : undefined;
+        this._customActionTooltip = params.addToggleMenuTooltip;
 
         // Create (unattached) per-player windows.
         this._playerWindows = playerSlots.map(
@@ -174,7 +176,11 @@ export class Window {
             throw new Error("must have a window name");
         }
         const actionName: string = `*Toggle ${this._windowName}`;
-        world.addCustomAction(actionName, "show/hide the window");
+        world.addCustomAction(
+            actionName,
+            "show/hide the window",
+            this._customActionTooltip
+        );
 
         globalEvents.onCustomAction.add(this._customActionHandler);
 
