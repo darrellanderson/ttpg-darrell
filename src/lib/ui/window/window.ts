@@ -178,8 +178,7 @@ export class Window {
         const actionName: string = `*Toggle ${this._windowName}`;
         world.addCustomAction(
             actionName,
-            "show/hide the window",
-            this._customActionTooltip
+            this._customActionTooltip ?? "show/hide the window"
         );
 
         globalEvents.onCustomAction.add(this._customActionHandler);
