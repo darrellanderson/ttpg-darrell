@@ -32,6 +32,9 @@ export class CardUtil {
             holder = this._find.findCardHolderBySlot(playerSlot, skipContained);
         }
 
+        // Make sure card is face up.
+        card.setRotation([0, 0, 180]);
+
         return holder?.insert(card, holder.getNumCards()) ?? false;
     }
 
