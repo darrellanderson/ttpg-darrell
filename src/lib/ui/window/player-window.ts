@@ -352,10 +352,15 @@ export class PlayerWindow {
                     height - titleHeight - spacerHeight - padding * 4
                 );
         }
-        const windowBox = new LayoutBox()
-            .setOverrideWidth(width)
-            .setOverrideHeight(height)
+
+        const windowWithDarkOutline = new Border()
+            .setColor([0, 0, 0, 1])
             .setChild(window);
+
+        const windowBox = new LayoutBox()
+            .setOverrideWidth(width + 8)
+            .setOverrideHeight(height + 8)
+            .setChild(windowWithDarkOutline);
 
         return windowBox;
     }
