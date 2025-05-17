@@ -3,7 +3,6 @@ import {
     Canvas,
     HorizontalBox,
     ImageButton,
-    LayoutBox,
     Player,
     PlayerPermission,
     Rotator,
@@ -353,16 +352,7 @@ export class PlayerWindow {
                 );
         }
 
-        const windowWithDarkOutline = new Border()
-            .setColor([0, 0, 0, 1])
-            .setChild(window);
-
-        const windowBox = new LayoutBox()
-            .setOverrideWidth(width + 8)
-            .setOverrideHeight(height + 8)
-            .setChild(windowWithDarkOutline);
-
-        return windowBox;
+        return window;
     }
 
     public attach(): this {
@@ -400,13 +390,15 @@ export class PlayerWindow {
 
             ui.relativeWidth = false;
             ui.relativeHeight = false;
-            ui.width = width;
-            ui.height = height;
+            ui.width = width + 4; // 4 for wrapping in a border
+            ui.height = height + 4;
 
             ui.players = new PlayerPermission().setPlayerSlots([
                 this._playerSlot,
             ]);
-            ui.widget = this._createWidget();
+            ui.widget = new Border()
+                .setColor([0, 0, 0, 1])
+                .setChild(this._createWidget());
 
             world.addScreenUI(ui);
         } else {
