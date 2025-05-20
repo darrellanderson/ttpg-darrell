@@ -12,6 +12,8 @@ export type BugSplatRemoteReporterParams = {
  * Report errors or other messages to a remote service.
  */
 export class BugSplatRemoteReporter implements IGlobal {
+    private static __isEnabled: boolean = true;
+
     // Required fields?
     private readonly _database: string;
     private readonly _appName: string;
@@ -19,6 +21,10 @@ export class BugSplatRemoteReporter implements IGlobal {
 
     // Only report on first error (in case it spams hard).
     private readonly _seen: Set<string> = new Set<string>();
+
+    static setEnabled(isEnabled: boolean): void {
+        BugSplatRemoteReporter.__isEnabled = isEnabled;
+    }
 
     constructor(params: BugSplatRemoteReporterParams) {
         this._database = params.database;
@@ -28,7 +34,9 @@ export class BugSplatRemoteReporter implements IGlobal {
 
     init() {
         ErrorHandler.onError.add((error: string, rawError?: string) => {
-            this.onError(rawError ?? error);
+            if (BugSplatRemoteReporter.__isEnabled) {
+                this.onError(rawError ?? error);
+            }
         });
     }
 
