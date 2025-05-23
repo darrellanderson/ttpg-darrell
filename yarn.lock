@@ -996,12 +996,7 @@
   dependencies:
     "@sinonjs/commons" "^3.0.0"
 
-"@tabletop-playground/api@^0.39.0":
-  version "0.39.0"
-  resolved "https://registry.yarnpkg.com/@tabletop-playground/api/-/api-0.39.0.tgz#8d9265beabe26a7be96100abe8b21548df5dc390"
-  integrity sha512-lXf0XA2EL1oNjeVnQs/JPmpymKs6HCH5HMPkugaYRMsgoLgIMo9X1oL2RoE1E1HXAnCnthCT66RAhIdgaCU6HQ==
-
-"@tabletop-playground/api@^0.41.0":
+"@tabletop-playground/api@0.41.0", "@tabletop-playground/api@^0.41.0":
   version "0.41.0"
   resolved "https://registry.yarnpkg.com/@tabletop-playground/api/-/api-0.41.0.tgz#f80a93ed9b056b6c3c6e63cf4352fc0439f0ace9"
   integrity sha512-tAG77eYQevQ+r4UN306aktb0qo3/LmNNrZQmi6451jRoUkGHCD94HTyqwT8GUoFgZhtzzmVSefV3E7CFiXU82w==
