@@ -298,7 +298,7 @@ export class PlayerWindow {
         if (!this._windowWidget) {
             throw new Error("Window widget not created");
         }
-        const spacer = new Border().setColor([0, 0, 0, 0]);
+        const spacer = new Border().setColor([0, 0, 0, 1]);
 
         const scale =
             this._scale *
