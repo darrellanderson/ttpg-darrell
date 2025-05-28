@@ -32,11 +32,13 @@ export class Find {
         Find.__ignoreCardHolderNsids.add(nsid);
     }
 
-    closestOwnedCardHolderOwner(
-        pos: Vector | [x: number, y: number, z: number]
-    ): number {
-        let closestOwner = -1;
-        let closestDistance = Number.MAX_VALUE;
+    getOwnedCardHolders(): Array<CardHolder> {
+        for (const cardHolder of this._cardHolders) {
+            if (!cardHolder.isValid()) {
+                this._cardHolders = [];
+                break;
+            }
+        }
 
         if (this._cardHolders.length === 0) {
             const skippedContained: boolean = true;
@@ -52,7 +54,16 @@ export class Find {
             }
         }
 
-        for (const cardHolder of this._cardHolders) {
+        return this._cardHolders;
+    }
+
+    closestOwnedCardHolderOwner(
+        pos: Vector | [x: number, y: number, z: number]
+    ): number {
+        let closestOwner = -1;
+        let closestDistance = Number.MAX_VALUE;
+
+        for (const cardHolder of this.getOwnedCardHolders()) {
             if (!cardHolder.isValid()) {
                 continue;
             }
