@@ -1,6 +1,6 @@
 {
     "name": "ttpg-darrell",
-    "version": "1.1.39",
+    "version": "1.1.40",
     "description": "TTPG TypeScript library",
     "main": "./build/cjs/index.js",
     "module": "./build/esm/index.js",
@@ -46,6 +46,6 @@
         "@tabletop-playground/api": "0.41.0",
         "fastest-levenshtein": "^1.0.16",
         "js-base64": "^3.7.7",
-        "zod": "^3.22.4"
+        "zod": "3.22.4"
     }
 }
