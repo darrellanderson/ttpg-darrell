@@ -45,6 +45,21 @@ it("getDeck (deck)", () => {
     });
     const nsids = NSID.getDeck(deck);
     expect(nsids.length).toEqual(2);
+    expect(nsids[0]).toEqual("my-type1:my-source1/my-name1");
+    expect(nsids[1]).toEqual("my-type2:my-source2/my-name2");
+});
+
+it("getDeckWithExtras (deck)", () => {
+    const metadata1 = "my-type1:my-source1/my-name1|my-extra1";
+    const metadata2 = "my-type2:my-source2/my-name2|my-extra2";
+    const deck = new MockCard({
+        cardDetails: [
+            new MockCardDetails({ metadata: metadata1 }),
+            new MockCardDetails({ metadata: metadata2 }),
+        ],
+    });
+    const nsids = NSID.getDeckWithExtras(deck);
+    expect(nsids.length).toEqual(2);
     expect(nsids[0]).toEqual(metadata1);
     expect(nsids[1]).toEqual(metadata2);
 });

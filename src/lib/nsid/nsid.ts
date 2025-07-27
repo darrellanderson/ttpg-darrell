@@ -87,6 +87,17 @@ export abstract class NSID {
      * @returns NSID array, per-card values
      */
     static getDeck(input: Card): Array<string> {
+        return this.getDeckWithExtras(input).map((nsid: string) => {
+            const extraStartIndex = nsid.indexOf("|");
+            if (extraStartIndex > -1) {
+                // Remove extra metadata from the string.
+                return nsid.substring(0, extraStartIndex);
+            }
+            return nsid;
+        });
+    }
+
+    static getDeckWithExtras(input: Card): Array<string> {
         return input.getAllCardDetails().map((cardDetails: CardDetails) => {
             return cardDetails.metadata;
         });
