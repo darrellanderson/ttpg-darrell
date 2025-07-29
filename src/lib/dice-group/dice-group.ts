@@ -277,7 +277,7 @@ export class DiceGroup {
 
         // Maybe reroll.
         if (
-            diceParams.reroll !== undefined &&
+            diceParams.reroll &&
             diceParams.hit !== undefined &&
             diceResult.value < diceParams.hit
         ) {
