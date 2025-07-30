@@ -13,7 +13,8 @@ import { NSID } from "../../nsid/nsid";
  */
 export abstract class AbstractRightClickCard implements IGlobal {
     private readonly _cardNsidPrefix: string;
-    private readonly _customActionName: string;
+    private readonly _customActionNames: Array<string> = [];
+    private readonly _tooltips: Map<string, string> = new Map();
     private readonly _customActionHandler: (
         object: GameObject,
         player: Player,
@@ -30,8 +31,23 @@ export abstract class AbstractRightClickCard implements IGlobal {
         ) => void
     ) {
         this._cardNsidPrefix = cardNsidPrefix;
-        this._customActionName = customActionName;
+        this._customActionNames.push(customActionName);
         this._customActionHandler = customActionHandler;
+    }
+
+    /**
+     * The first tooltip is
+     *
+     * @param tooltip
+     */
+    setTooltip(actionName: string, tooltip: string): this {
+        this._tooltips.set(actionName, tooltip);
+        return this;
+    }
+
+    addCustomActionName(customActionName: string): this {
+        this._customActionNames.push(customActionName);
+        return this;
     }
 
     init(): void {
@@ -39,8 +55,12 @@ export abstract class AbstractRightClickCard implements IGlobal {
         OnCardBecameSingletonOrDeck.onSingletonCardCreated.add((card: Card) => {
             const nsid = NSID.get(card);
             if (nsid.startsWith(this._cardNsidPrefix)) {
-                card.removeCustomAction(this._customActionName);
-                card.addCustomAction(this._customActionName);
+                for (const customActionName of this._customActionNames) {
+                    const tooltip: string | undefined =
+                        this._tooltips.get(customActionName);
+                    card.removeCustomAction(customActionName);
+                    card.addCustomAction(customActionName, tooltip);
+                }
                 card.onCustomAction.remove(this._customActionHandler);
                 card.onCustomAction.add(this._customActionHandler);
             }
@@ -48,7 +68,9 @@ export abstract class AbstractRightClickCard implements IGlobal {
         OnCardBecameSingletonOrDeck.onSingletonCardMadeDeck.add(
             (card: Card, oldNsid: string) => {
                 if (oldNsid.startsWith(this._cardNsidPrefix)) {
-                    card.removeCustomAction(this._customActionName);
+                    for (const customActionName of this._customActionNames) {
+                        card.removeCustomAction(customActionName);
+                    }
                     card.onCustomAction.remove(this._customActionHandler);
                 }
             }

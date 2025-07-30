@@ -7,13 +7,18 @@ it("constructor", () => {
     class MyClass extends AbstractRightClickCard {}
 
     const cardNsid = "my-nsid";
-    const customActionName = "* My action";
+    const customActionName = "*My Action";
     const customActionHandler: (
         object: GameObject,
         player: Player,
         identifier: string
     ) => void = () => {};
-    new MyClass(cardNsid, customActionName, customActionHandler);
+    const myClass = new MyClass(
+        cardNsid,
+        customActionName,
+        customActionHandler
+    ).addCustomActionName("*My Action 2");
+    myClass.setTooltip(customActionName, "My tooltip");
 });
 
 it("singleton yes", () => {
