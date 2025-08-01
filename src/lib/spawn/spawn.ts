@@ -61,6 +61,11 @@ export abstract class Spawn {
         const nsids: Array<string> = Spawn.getAllNsids().filter((nsid) =>
             nsid.startsWith(nsidPrefix)
         );
+        if (nsids.length === 0) {
+            throw new Error(
+                `spawnMergeDecksWithNsidPrefixOrThrow failed for prefix "${nsidPrefix}": no matching nsids`
+            );
+        }
         return Spawn.spawnMergeDecksOrThrow(nsids, position, rotation);
     }
 
