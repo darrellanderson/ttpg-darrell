@@ -57,7 +57,7 @@ it("spawnOrThrow", () => {
     jest.restoreAllMocks();
 });
 
-it("spawnMergeDecksWithNsidPrefix", () => {
+it("spawnMergeDecksWithNsidPrefixOrThrow", () => {
     mockWorld._reset({
         _templateIdToMockGameObjectParams: {
             template1: {
@@ -78,7 +78,7 @@ it("spawnMergeDecksWithNsidPrefix", () => {
     });
 
     Spawn.inject({ deck1: "template1", deck2: "template2" });
-    const deck: Card | undefined = Spawn.spawnMergeDecksWithNsidPrefix(
+    const deck: Card = Spawn.spawnMergeDecksWithNsidPrefixOrThrow(
         "deck",
         [0, 0, 0]
     );
