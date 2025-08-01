@@ -53,6 +53,17 @@ export abstract class Spawn {
         return obj;
     }
 
+    static spawnMergeDecksWithNsidPrefix(
+        nsidPrefix: string,
+        position?: Vector | [x: number, y: number, z: number],
+        rotation?: Rotator | [pitch: number, yaw: number, roll: number]
+    ): Card | undefined {
+        const nsids: Array<string> = Spawn.getAllNsids().filter((nsid) =>
+            nsid.startsWith(nsidPrefix)
+        );
+        return Spawn.spawnMergeDecks(nsids, position, rotation);
+    }
+
     static spawnMergeDecks(
         nsids: Array<string>,
         position?: Vector | [x: number, y: number, z: number],

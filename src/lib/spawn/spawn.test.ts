@@ -57,6 +57,45 @@ it("spawnOrThrow", () => {
     jest.restoreAllMocks();
 });
 
+it("spawnMergeDecksWithNsidPrefix", () => {
+    mockWorld._reset({
+        _templateIdToMockGameObjectParams: {
+            template1: {
+                _objType: "Card",
+                cardDetails: [
+                    new MockCardDetails({ metadata: "deck1card1" }),
+                    new MockCardDetails({ metadata: "deck1card2" }),
+                ],
+            } as MockCardParams,
+            template2: {
+                _objType: "Card",
+                cardDetails: [
+                    new MockCardDetails({ metadata: "deck2card1" }),
+                    new MockCardDetails({ metadata: "deck2card2" }),
+                ],
+            } as MockCardParams,
+        },
+    });
+
+    Spawn.inject({ deck1: "template1", deck2: "template2" });
+    const deck: Card | undefined = Spawn.spawnMergeDecksWithNsidPrefix(
+        "deck",
+        [0, 0, 0]
+    );
+    expect(deck).toBeDefined();
+    if (!deck) {
+        throw new Error("x");
+    }
+
+    const nsids: Array<string> = NSID.getDeck(deck);
+    expect(nsids).toEqual([
+        "deck1card1",
+        "deck1card2",
+        "deck2card1",
+        "deck2card2",
+    ]);
+});
+
 it("spawnMergeDecks", () => {
     mockWorld._reset({
         _templateIdToMockGameObjectParams: {
