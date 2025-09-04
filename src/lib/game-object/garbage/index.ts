@@ -1,6 +1,5 @@
 // created from 'create-ts-index'
 
-export * from './garbage-container-obj';
 export * from './garbage-container';
 export * from './simple-card-garbage-handler';
 export * from './simple-to-container-handler';
