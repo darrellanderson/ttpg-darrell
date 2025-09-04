@@ -24,7 +24,6 @@ export * from './layout-objects';
 export * from './locale';
 export * from './namespace-id';
 export * from './nsid';
-export * from './parse';
 export * from './perf';
 export * from './polygon';
 export * from './setup';
