@@ -4,8 +4,8 @@ import {
     CUBE_SUB_TEMPLATE,
     CUBE_TEMPLATE,
 } from "./cube-template.data";
-import { CellSnapPoint } from "../../../index-ext";
 import { AbstractTemplate } from "../abstract-template/abstract-template";
+import { CellSnapPoint } from "../../image/cell/abstract-cell/abstract-cell";
 
 // Entries are always centered, may apply an offset.
 export type CubeTemplateEntry = {

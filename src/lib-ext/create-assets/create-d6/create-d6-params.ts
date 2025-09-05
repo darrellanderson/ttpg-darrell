@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ZBaseCellSchema } from "../../../index-ext";
+import { ZBaseCellSchema } from "../../image/cell/cell-parser/cell-schema";
 
 export const CreateD6ParamsSchema = z
     .object({

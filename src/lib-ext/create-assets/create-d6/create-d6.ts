@@ -1,14 +1,12 @@
 import path from "path";
-import {
-    AbstractCell,
-    CanvasCell,
-    CellParser,
-    ImageCell,
-} from "../../../index-ext";
 import { ResizeCell } from "../../image/cell/resize-cell/resize-cell";
 import { AbstractCreateAssets } from "../abstract-create-assets/abstract-create-assets";
 import { CreateD6Params, CreateD6ParamsSchema } from "./create-d6-params";
 import { D6Template } from "../../template/d6-template/d6-template";
+import { AbstractCell } from "../../image/cell/abstract-cell/abstract-cell";
+import { CanvasCell } from "../../image/cell/canvas-cell/canvas-cell";
+import { CellParser } from "../../image/cell/cell-parser/cell-parser";
+import { ImageCell } from "../../image/cell/image-cell/image-cell";
 
 export class CreateD6 extends AbstractCreateAssets {
     private readonly _params: CreateD6Params;

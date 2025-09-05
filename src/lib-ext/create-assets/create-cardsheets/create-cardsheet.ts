@@ -1,12 +1,4 @@
 import path from "path";
-import {
-    AbstractCell,
-    CellParser,
-    CellSize,
-    GridCell,
-    ImageCell,
-    ZBaseCell,
-} from "../../../index-ext";
 import { AbstractCreateAssets } from "../abstract-create-assets/abstract-create-assets";
 import {
     CreateCardsheetParams,
@@ -17,6 +9,14 @@ import {
     CardsheetTemplate,
 } from "../../template/cardsheet-template/cardsheet-template";
 import { ResizeCell } from "../../image/cell/resize-cell/resize-cell";
+import {
+    AbstractCell,
+    CellSize,
+} from "../../image/cell/abstract-cell/abstract-cell";
+import { CellParser } from "../../image/cell/cell-parser/cell-parser";
+import { ZBaseCell } from "../../image/cell/cell-parser/cell-schema";
+import { GridCell } from "../../image/cell/grid-cell/grid-cell";
+import { ImageCell } from "../../image/cell/image-cell/image-cell";
 
 type CardSide = "face" | "back";
 
