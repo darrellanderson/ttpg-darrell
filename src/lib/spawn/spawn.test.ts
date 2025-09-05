@@ -9,6 +9,7 @@ import { Spawn } from "./spawn";
 import { Card } from "@tabletop-playground/api";
 
 it("spawn", () => {
+    const spawn: Spawn = new Spawn();
     jest.spyOn(console, "log").mockImplementation(() => {});
 
     const nsid = "my-nsid";
@@ -21,18 +22,19 @@ it("spawn", () => {
     });
 
     // Template not (yet) registered.
-    let obj = Spawn.spawn(nsid, [0, 0, 0]);
+    let obj = spawn.spawn(nsid, [0, 0, 0]);
     expect(obj).toBeUndefined();
 
     // Try again, but with known template.
-    Spawn.inject({ [nsid]: templateId });
-    obj = Spawn.spawn(nsid, [0, 0, 0]);
+    spawn.inject({ [nsid]: templateId });
+    obj = spawn.spawn(nsid, [0, 0, 0]);
     expect(obj?.getTemplateMetadata()).toEqual(metadata);
 
     jest.restoreAllMocks();
 });
 
 it("spawnOrThrow", () => {
+    const spawn: Spawn = new Spawn();
     jest.spyOn(console, "log").mockImplementation(() => {});
 
     const nsid = "my-nsid";
@@ -45,19 +47,20 @@ it("spawnOrThrow", () => {
     });
 
     // Yes.
-    Spawn.inject({ [nsid]: templateId });
-    const obj = Spawn.spawnOrThrow(nsid, [0, 0, 0]);
+    spawn.inject({ [nsid]: templateId });
+    const obj = spawn.spawnOrThrow(nsid, [0, 0, 0]);
     expect(obj?.getTemplateMetadata()).toEqual(metadata);
 
     // No.
     expect(() => {
-        Spawn.spawnOrThrow("no-such-nsid", [0, 0, 0]);
+        spawn.spawnOrThrow("no-such-nsid", [0, 0, 0]);
     }).toThrow();
 
     jest.restoreAllMocks();
 });
 
 it("spawnMergeDecksWithNsidPrefixOrThrow", () => {
+    const spawn: Spawn = new Spawn();
     mockWorld._reset({
         _templateIdToMockGameObjectParams: {
             template1: {
@@ -77,8 +80,8 @@ it("spawnMergeDecksWithNsidPrefixOrThrow", () => {
         },
     });
 
-    Spawn.inject({ deck1: "template1", deck2: "template2" });
-    const deck: Card = Spawn.spawnMergeDecksWithNsidPrefixOrThrow(
+    spawn.inject({ deck1: "template1", deck2: "template2" });
+    const deck: Card = spawn.spawnMergeDecksWithNsidPrefixOrThrow(
         "deck",
         [0, 0, 0]
     );
@@ -97,6 +100,7 @@ it("spawnMergeDecksWithNsidPrefixOrThrow", () => {
 });
 
 it("spawnMergeDecks", () => {
+    const spawn: Spawn = new Spawn();
     mockWorld._reset({
         _templateIdToMockGameObjectParams: {
             template1: {
@@ -116,8 +120,8 @@ it("spawnMergeDecks", () => {
         },
     });
 
-    Spawn.inject({ deck1: "template1", deck2: "template2" });
-    const deck: Card | undefined = Spawn.spawnMergeDecks(
+    spawn.inject({ deck1: "template1", deck2: "template2" });
+    const deck: Card | undefined = spawn.spawnMergeDecks(
         ["deck1", "deck2"],
         [0, 0, 0]
     );
@@ -136,6 +140,7 @@ it("spawnMergeDecks", () => {
 });
 
 it("spawnMergedDecksOrThrow", () => {
+    const spawn: Spawn = new Spawn();
     jest.spyOn(console, "log").mockImplementation(() => {});
 
     mockWorld._reset({
@@ -157,10 +162,10 @@ it("spawnMergedDecksOrThrow", () => {
         },
     });
 
-    Spawn.inject({ deck1: "template1", deck2: "template2" });
+    spawn.inject({ deck1: "template1", deck2: "template2" });
 
     // Yes.
-    const deck: Card = Spawn.spawnMergeDecksOrThrow(
+    const deck: Card = spawn.spawnMergeDecksOrThrow(
         ["deck1", "deck2"],
         [0, 0, 0]
     );
@@ -174,22 +179,24 @@ it("spawnMergedDecksOrThrow", () => {
 
     // No.
     expect(() => {
-        Spawn.spawnMergeDecksOrThrow(["no-such-nsid"]);
+        spawn.spawnMergeDecksOrThrow(["no-such-nsid"]);
     }).toThrow();
 
     jest.restoreAllMocks();
 });
 
 it("spawnMergeDecks (empty list)", () => {
+    const spawn: Spawn = new Spawn();
     jest.spyOn(console, "log").mockImplementation(() => {});
 
-    const result: Card | undefined = Spawn.spawnMergeDecks([]);
+    const result: Card | undefined = spawn.spawnMergeDecks([]);
     expect(result).toBeUndefined();
 
     jest.restoreAllMocks();
 });
 
 it("spawnMergeDecks (bad nsid)", () => {
+    const spawn: Spawn = new Spawn();
     jest.spyOn(console, "log").mockImplementation(() => {});
 
     mockWorld._reset({
@@ -204,9 +211,9 @@ it("spawnMergeDecks (bad nsid)", () => {
         },
     });
 
-    Spawn.inject({ deck1: "template1" });
+    spawn.inject({ deck1: "template1" });
 
-    const result: Card | undefined = Spawn.spawnMergeDecks([
+    const result: Card | undefined = spawn.spawnMergeDecks([
         "deck1",
         "unknown.nsid",
     ]);
@@ -216,6 +223,7 @@ it("spawnMergeDecks (bad nsid)", () => {
 });
 
 it("spawnMergeDecks (not a card)", () => {
+    const spawn: Spawn = new Spawn();
     jest.spyOn(console, "log").mockImplementation(() => {});
 
     mockWorld._reset({
@@ -233,15 +241,16 @@ it("spawnMergeDecks (not a card)", () => {
         },
     });
 
-    Spawn.inject({ deck1: "template1", obj1: "template2" });
+    spawn.inject({ deck1: "template1", obj1: "template2" });
 
-    const result: Card | undefined = Spawn.spawnMergeDecks(["deck1", "obj1"]);
+    const result: Card | undefined = spawn.spawnMergeDecks(["deck1", "obj1"]);
     expect(result).toBeUndefined();
 
     jest.restoreAllMocks();
 });
 
 it("spawnMergeDecks (addCards err)", () => {
+    const spawn: Spawn = new Spawn();
     jest.spyOn(console, "log").mockImplementation(() => {});
     jest.spyOn(Card.prototype, "addCards").mockImplementation(() => {
         return false;
@@ -266,60 +275,64 @@ it("spawnMergeDecks (addCards err)", () => {
         },
     });
 
-    Spawn.inject({ deck1: "template1", deck2: "template2" });
+    spawn.inject({ deck1: "template1", deck2: "template2" });
 
-    const result: Card | undefined = Spawn.spawnMergeDecks(["deck1", "deck2"]);
+    const result: Card | undefined = spawn.spawnMergeDecks(["deck1", "deck2"]);
     expect(result).toBeUndefined();
 
     jest.restoreAllMocks();
 });
 
 it("has", () => {
+    const spawn: Spawn = new Spawn();
     const nsid = "my-nsid";
     const templateId = "my-template-id";
-    Spawn.clear();
-    expect(Spawn.has(nsid)).toBeFalsy();
-    Spawn.inject({ [nsid]: templateId });
-    expect(Spawn.has(nsid)).toBeTruthy();
-    Spawn.clear();
+    spawn.clear();
+    expect(spawn.has(nsid)).toBeFalsy();
+    spawn.inject({ [nsid]: templateId });
+    expect(spawn.has(nsid)).toBeTruthy();
+    spawn.clear();
 });
 
 it("getAllNSIDs", () => {
+    const spawn: Spawn = new Spawn();
     const nsid = "my-nsid";
     const templateId = "my-template-id";
-    Spawn.clear();
-    expect(Spawn.getAllNsids()).toEqual([]);
-    Spawn.inject({ [nsid]: templateId });
-    expect(Spawn.getAllNsids()).toEqual([nsid]);
-    Spawn.clear();
+    spawn.clear();
+    expect(spawn.getAllNsids()).toEqual([]);
+    spawn.inject({ [nsid]: templateId });
+    expect(spawn.getAllNsids()).toEqual([nsid]);
+    spawn.clear();
 });
 
 it("getTemplateIdOrThrow", () => {
+    const spawn: Spawn = new Spawn();
     const nsid = "my-nsid";
     const templateId = "my-template-id";
-    Spawn.clear();
+    spawn.clear();
     expect(() => {
-        Spawn.getTemplateIdOrThrow(nsid);
+        spawn.getTemplateIdOrThrow(nsid);
     }).toThrow();
-    Spawn.inject({ [nsid]: templateId });
-    expect(Spawn.getTemplateIdOrThrow(nsid)).toEqual(templateId);
-    Spawn.clear();
+    spawn.inject({ [nsid]: templateId });
+    expect(spawn.getTemplateIdOrThrow(nsid)).toEqual(templateId);
+    spawn.clear();
 });
 
 it("validate", () => {
+    const spawn: Spawn = new Spawn();
     const nsid = "my-nsid";
     const templateId = "my-template-id";
-    Spawn.clear();
-    Spawn.inject({ [nsid]: templateId });
+    spawn.clear();
+    spawn.inject({ [nsid]: templateId });
 
     // Spawn knows about the template id, but world does not.
     expect(() => {
-        Spawn.validate();
+        spawn.validate();
     }).toThrow();
 
     // Tell world about template id.
     mockWorld._reset({
         packages: [new MockPackage({ templateIds: [templateId] })],
     });
-    Spawn.validate(); // good!
+    spawn.validate(); // good!
 });

@@ -1,6 +1,6 @@
 {
     "name": "ttpg-darrell",
-    "version": "1.1.54",
+    "version": "1.1.55",
     "description": "TTPG TypeScript library",
     "main": "./build/cjs/index.js",
     "module": "./build/esm/index.js",

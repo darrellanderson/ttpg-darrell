@@ -6,32 +6,35 @@ import { NSID } from "../nsid/nsid";
 
 it("constructor, init", () => {
     new MockGameObject(); // so init has an object to check
-    new SwapSplitCombine([]).init();
+    new SwapSplitCombine([], new Spawn()).init();
 });
 
 it("swapX", () => {
-    new SwapSplitCombine([
-        {
-            src: { nsids: ["bogus-nsid-1"], count: 1 },
-            dst: { nsid: "bogus-nsid-2", count: 1 },
-            repeat: false,
-        },
-        {
-            src: {
-                nsids: ["bogus-nsid-3", "src-nsid-1", "src-nsid-2"],
-                count: 1,
-            },
-            dst: { nsid: "dst-nsid", count: 1 },
-            repeat: false,
-        },
-    ]).init();
-
-    Spawn.inject({ "dst-nsid": "dst-template-id" });
+    const spawn: Spawn = new Spawn().inject({ "dst-nsid": "dst-template-id" });
     mockWorld._reset({
         _templateIdToMockGameObjectParams: {
             "dst-template-id": { templateMetadata: "dst-nsid" },
         },
     });
+
+    new SwapSplitCombine(
+        [
+            {
+                src: { nsids: ["bogus-nsid-1"], count: 1 },
+                dst: { nsid: "bogus-nsid-2", count: 1 },
+                repeat: false,
+            },
+            {
+                src: {
+                    nsids: ["bogus-nsid-3", "src-nsid-1", "src-nsid-2"],
+                    count: 1,
+                },
+                dst: { nsid: "dst-nsid", count: 1 },
+                repeat: false,
+            },
+        ],
+        spawn
+    ).init();
 
     const srcObj1: MockGameObject = new MockGameObject({
         templateMetadata: "src-nsid-1",
@@ -61,20 +64,23 @@ it("swapX", () => {
 });
 
 it("swap, repeat", () => {
-    new SwapSplitCombine([
-        {
-            src: { nsids: ["src-nsid"], count: 1 },
-            dst: { nsid: "dst-nsid", count: 1 },
-            repeat: true,
-        },
-    ]).init();
-
-    Spawn.inject({ "dst-nsid": "dst-template-id" });
+    const spawn: Spawn = new Spawn().inject({ "dst-nsid": "dst-template-id" });
     mockWorld._reset({
         _templateIdToMockGameObjectParams: {
             "dst-template-id": { templateMetadata: "dst-nsid" },
         },
     });
+
+    new SwapSplitCombine(
+        [
+            {
+                src: { nsids: ["src-nsid"], count: 1 },
+                dst: { nsid: "dst-nsid", count: 1 },
+                repeat: true,
+            },
+        ],
+        spawn
+    ).init();
 
     const srcObj1: MockGameObject = new MockGameObject({
         templateMetadata: "src-nsid",
@@ -101,20 +107,23 @@ it("swap, repeat", () => {
 });
 
 it("combine (different nsids)", () => {
-    new SwapSplitCombine([
-        {
-            src: { nsids: ["src-nsid-a", "src-nsid-b"], count: 3 },
-            dst: { nsid: "dst-nsid", count: 2 },
-            repeat: false,
-        },
-    ]).init();
-
-    Spawn.inject({ "dst-nsid": "dst-template-id" });
+    const spawn: Spawn = new Spawn().inject({ "dst-nsid": "dst-template-id" });
     mockWorld._reset({
         _templateIdToMockGameObjectParams: {
             "dst-template-id": { templateMetadata: "dst-nsid" },
         },
     });
+
+    new SwapSplitCombine(
+        [
+            {
+                src: { nsids: ["src-nsid-a", "src-nsid-b"], count: 3 },
+                dst: { nsid: "dst-nsid", count: 2 },
+                repeat: false,
+            },
+        ],
+        spawn
+    ).init();
 
     const srcObj1: MockGameObject = new MockGameObject({
         templateMetadata: "src-nsid-a",

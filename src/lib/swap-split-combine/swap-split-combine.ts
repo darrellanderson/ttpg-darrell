@@ -32,8 +32,10 @@ export type SwapSplitCombineRule = {
  * Useful to replace currency items with upper/lower versions.
  */
 export class SwapSplitCombine implements IGlobal {
-    private readonly _nsids: Set<string> = new Set<string>();
     private readonly _rules: Array<SwapSplitCombineRule>;
+    private readonly _spawn: Spawn;
+    private readonly _nsids: Set<string> = new Set<string>();
+
     private readonly _playerSlotToInProgressObjIdSet: {
         [key: number]: Set<string>;
     } = {};
@@ -62,8 +64,9 @@ export class SwapSplitCombine implements IGlobal {
         }
     };
 
-    constructor(rules: Array<SwapSplitCombineRule>) {
+    constructor(rules: Array<SwapSplitCombineRule>, spawn: Spawn) {
         this._rules = rules;
+        this._spawn = spawn;
 
         for (const rule of rules) {
             for (const nsid of rule.src.nsids) {
@@ -232,7 +235,7 @@ export class SwapSplitCombine implements IGlobal {
                     dstObj = overrideCreate(player);
                     dstObj?.setPosition(pos);
                 } else {
-                    dstObj = Spawn.spawnOrThrow(rule.dst.nsid, pos);
+                    dstObj = this._spawn.spawnOrThrow(rule.dst.nsid, pos);
                 }
                 if (dstObj) {
                     if (rule.requireFaceDown) {

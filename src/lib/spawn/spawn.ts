@@ -9,16 +9,15 @@ import {
 /**
  * Registry for NSID to template id.
  */
-export abstract class Spawn {
-    private static _nsidToTemplateId: { [key: string]: string } = {};
-    public static readonly CREATE_TIMESTAMP: number = Date.now(); // for checking if shared
+export class Spawn {
+    private _nsidToTemplateId: { [key: string]: string } = {};
 
-    static spawn(
+    spawn(
         nsid: string,
         position?: Vector | [x: number, y: number, z: number],
         rotation?: Rotator | [pitch: number, yaw: number, roll: number]
     ): GameObject | undefined {
-        const templateId = Spawn._nsidToTemplateId[nsid];
+        const templateId = this._nsidToTemplateId[nsid];
         if (!templateId) {
             console.log(`Spawn.spawn: unknown nsid "${nsid}"`);
             return undefined;
@@ -38,12 +37,12 @@ export abstract class Spawn {
         return obj;
     }
 
-    static spawnOrThrow(
+    spawnOrThrow(
         nsid: string,
         position?: Vector | [x: number, y: number, z: number],
         rotation?: Rotator | [pitch: number, yaw: number, roll: number]
     ): GameObject {
-        const obj: GameObject | undefined = Spawn.spawn(
+        const obj: GameObject | undefined = this.spawn(
             nsid,
             position,
             rotation
@@ -54,12 +53,12 @@ export abstract class Spawn {
         return obj;
     }
 
-    static spawnMergeDecksWithNsidPrefixOrThrow(
+    spawnMergeDecksWithNsidPrefixOrThrow(
         nsidPrefix: string,
         position?: Vector | [x: number, y: number, z: number],
         rotation?: Rotator | [pitch: number, yaw: number, roll: number]
     ): Card {
-        const nsids: Array<string> = Spawn.getAllNsids().filter((nsid) =>
+        const nsids: Array<string> = this.getAllNsids().filter((nsid) =>
             nsid.startsWith(nsidPrefix)
         );
         if (nsids.length === 0) {
@@ -67,10 +66,10 @@ export abstract class Spawn {
                 `spawnMergeDecksWithNsidPrefixOrThrow failed for prefix "${nsidPrefix}": no matching nsids`
             );
         }
-        return Spawn.spawnMergeDecksOrThrow(nsids, position, rotation);
+        return this.spawnMergeDecksOrThrow(nsids, position, rotation);
     }
 
-    static spawnMergeDecks(
+    spawnMergeDecks(
         nsids: Array<string>,
         position?: Vector | [x: number, y: number, z: number],
         rotation?: Rotator | [pitch: number, yaw: number, roll: number]
@@ -82,7 +81,7 @@ export abstract class Spawn {
 
         let deck: Card | undefined;
         for (const nsid of nsids) {
-            const obj: GameObject | undefined = Spawn.spawn(
+            const obj: GameObject | undefined = this.spawn(
                 nsid,
                 position,
                 rotation
@@ -123,12 +122,12 @@ export abstract class Spawn {
         return deck;
     }
 
-    static spawnMergeDecksOrThrow(
+    spawnMergeDecksOrThrow(
         nsids: Array<string>,
         position?: Vector | [x: number, y: number, z: number],
         rotation?: Rotator | [pitch: number, yaw: number, roll: number]
     ): Card {
-        const obj: Card | undefined = Spawn.spawnMergeDecks(
+        const obj: Card | undefined = this.spawnMergeDecks(
             nsids,
             position,
             rotation
@@ -141,26 +140,28 @@ export abstract class Spawn {
         return obj;
     }
 
-    static inject(dict: { [key: string]: string }) {
+    inject(dict: { [key: string]: string }): this {
         for (const [k, v] of Object.entries(dict)) {
-            Spawn._nsidToTemplateId[k] = v;
+            this._nsidToTemplateId[k] = v;
         }
+        return this;
     }
 
-    static has(nsid: string): boolean {
-        return Spawn._nsidToTemplateId[nsid] ? true : false;
+    has(nsid: string): boolean {
+        return this._nsidToTemplateId[nsid] ? true : false;
     }
 
-    static clear() {
-        Spawn._nsidToTemplateId = {};
+    clear(): this {
+        this._nsidToTemplateId = {};
+        return this;
     }
 
-    static getAllNsids(): Array<string> {
-        return Object.keys(Spawn._nsidToTemplateId);
+    getAllNsids(): Array<string> {
+        return Object.keys(this._nsidToTemplateId);
     }
 
-    static getTemplateIdOrThrow(nsid: string): string {
-        const templateId = Spawn._nsidToTemplateId[nsid];
+    getTemplateIdOrThrow(nsid: string): string {
+        const templateId = this._nsidToTemplateId[nsid];
         if (!templateId) {
             throw new Error(`getTemplateIdOrThrow failed for "${nsid}"`);
         }
@@ -170,7 +171,7 @@ export abstract class Spawn {
     /**
      * Make sure all registered templates exist.
      */
-    static validate() {
+    validate(): this {
         const templateIds = new Set();
         for (const pkg of world.getAllowedPackages()) {
             for (const templateId of pkg.getTemplateIds()) {
@@ -180,7 +181,7 @@ export abstract class Spawn {
 
         const missing: Array<string> = [];
         for (const [nsid, templateId] of Object.entries(
-            Spawn._nsidToTemplateId
+            this._nsidToTemplateId
         )) {
             if (!templateIds.has(templateId)) {
                 missing.push(`${templateId} ("${nsid}")`);
@@ -192,5 +193,6 @@ export abstract class Spawn {
                     missing.join("\n")
             );
         }
+        return this;
     }
 }
