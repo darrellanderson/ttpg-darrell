@@ -11,6 +11,7 @@ import {
  */
 export abstract class Spawn {
     private static _nsidToTemplateId: { [key: string]: string } = {};
+    public static readonly CREATE_TIMESTAMP: number = Date.now(); // for checking if shared
 
     static spawn(
         nsid: string,
