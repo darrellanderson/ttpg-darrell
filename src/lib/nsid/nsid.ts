@@ -64,18 +64,21 @@ export abstract class NSID {
     }
 
     static getWithExtra(input: StaticObject): string {
-        let metadata = "";
+        let metadata: string = input.getTemplateMetadata();
+
         if (input instanceof Card) {
             if (input.getStackSize() === 1) {
                 // Singleton card: use the card metadata.
-                metadata = input.getCardDetails().metadata;
+                // Image shaped tokens are also "cards", only look for
+                // per-card metadata if the card details is set.
+                const cardMetadata: string = input.getCardDetails().metadata;
+                if (cardMetadata.length > 0) {
+                    metadata = cardMetadata;
+                }
             } else {
                 // Deck: do not attempt to extract more here.
                 metadata = DECK_NSID;
             }
-        } else if (input instanceof StaticObject) {
-            // Non-card table or game object.  Use template metadata.
-            metadata = input.getTemplateMetadata();
         }
         return metadata;
     }
