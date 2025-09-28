@@ -56,7 +56,9 @@ it("add/clear", () => {
 });
 
 it("error (single)", () => {
+    let errorCount: number = 0;
     const handler = () => {
+        errorCount++;
         throw new Error("err!");
     };
 
@@ -65,17 +67,14 @@ it("error (single)", () => {
     >();
     multicastDelegate.add(handler);
 
-    let error: Error | undefined = undefined;
-    try {
-        multicastDelegate.trigger(1);
-    } catch (e) {
-        error = e as Error;
-    }
-    expect(error?.toString()).toEqual("Error: ErrorBatcher (1):");
+    multicastDelegate.trigger(1); // does not throw
+    expect(errorCount).toEqual(1);
 });
 
 it("error (double)", () => {
+    let errorCount: number = 0;
     const handler = () => {
+        errorCount++;
         throw new Error("err!");
     };
 
@@ -85,11 +84,6 @@ it("error (double)", () => {
     multicastDelegate.add(handler);
     multicastDelegate.add(handler); // again!
 
-    let error: Error | undefined = undefined;
-    try {
-        multicastDelegate.trigger(1);
-    } catch (e) {
-        error = e as Error;
-    }
-    expect(error?.toString()).toEqual("Error: ErrorBatcher (2):");
+    multicastDelegate.trigger(1);
+    expect(errorCount).toEqual(2);
 });
