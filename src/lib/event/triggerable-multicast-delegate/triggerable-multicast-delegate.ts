@@ -8,6 +8,7 @@ export class TriggerableMulticastDelegate<
     T extends (...args: Array<any>) => any,
 > {
     private readonly _listeners: Array<T> = [];
+    private _triggerDepth: number = 0;
 
     /**
      * Add a function to the trigger set.
@@ -46,12 +47,20 @@ export class TriggerableMulticastDelegate<
      * @param args
      */
     trigger(...args: Parameters<T>): void {
-        const runnables: Array<(x: void) => unknown> = [];
-        for (const fn of this._listeners) {
-            runnables.push(() => {
-                fn(...args);
-            });
+        if (this._triggerDepth > 20) {
+            throw new Error("Maximum trigger depth exceeded");
         }
-        ErrorBatcher.runMaybeThrowAtEnd(runnables);
+        this._triggerDepth++;
+        try {
+            const runnables: Array<(x: void) => unknown> = [];
+            for (const fn of this._listeners) {
+                runnables.push(() => {
+                    fn(...args);
+                });
+            }
+            ErrorBatcher.runMaybeThrowAtEnd(runnables);
+        } finally {
+            this._triggerDepth--;
+        }
     }
 }

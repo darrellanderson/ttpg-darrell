@@ -93,3 +93,18 @@ it("error (double)", () => {
     }
     expect(error?.toString()).toEqual("Error: ErrorBatcher (2):");
 });
+
+it("depth limit", () => {
+    const multicastDelegate = new TriggerableMulticastDelegate<() => void>();
+
+    let stopped: boolean = false;
+    multicastDelegate.add(() => {
+        try {
+            multicastDelegate.trigger();
+        } catch {
+            stopped = true;
+        }
+    });
+    multicastDelegate.trigger(); // stop at depth limit
+    expect(stopped).toBe(true);
+});
