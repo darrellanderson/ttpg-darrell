@@ -1,6 +1,6 @@
 {
     "name": "ttpg-darrell",
-    "version": "1.1.57",
+    "version": "1.1.58",
     "description": "TTPG TypeScript library",
     "main": "./build/cjs/index.js",
     "module": "./build/esm/index.js",
@@ -15,7 +15,7 @@
     "scripts": {
         "check:prettier": "prettier --check .",
         "test": "jest",
-        "index": "yarn cti ./src -i '*.test.ts' -i '*.testp.ts' -e lib-ext && find . -name 'index.ts.bak' -exec rm {} \\;",
+        "index": "yarn cti ./src -i '*.test.ts' -i '*.testp.ts' -e jest-util -e lib-ext && find . -name 'index.ts.bak' -exec rm {} \\;",
         "build": "tsc -p tsconfig-esm.json && tsc -p tsconfig-cjs.json",
         "clean": "rm -rf build",
         "lint": "ESLINT_USE_FLAT_CONFIG=false eslint --ext .ts --debug src",

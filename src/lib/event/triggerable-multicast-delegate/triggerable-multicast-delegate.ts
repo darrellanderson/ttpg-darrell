@@ -42,7 +42,8 @@ export class TriggerableMulticastDelegate<
     /**
      * Call every function in the trigger set.
      *
-     * Call every function even if one throws, raise gathered errors at end.
+     * Call every function even if one throws, send gathered errors at end directly to error handler;
+     * does not throw/stop processing.
      *
      * @param args
      */
@@ -59,6 +60,15 @@ export class TriggerableMulticastDelegate<
                 });
             }
             ErrorBatcher.runMaybeThrowAtEnd(runnables);
+        } catch (errorUnknownType: unknown) {
+            if (
+                errorUnknownType instanceof Error &&
+                errorUnknownType.stack &&
+                globalThis.$uncaughtException
+            ) {
+                // Stack already includes name/message.
+                globalThis.$uncaughtException(errorUnknownType.stack);
+            }
         } finally {
             this._triggerDepth--;
         }

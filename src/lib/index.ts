@@ -19,7 +19,6 @@ export * from './game-object';
 export * from './global';
 export * from './heap';
 export * from './hex';
-export * from './jest-util';
 export * from './layout-objects';
 export * from './locale';
 export * from './namespace-id';
