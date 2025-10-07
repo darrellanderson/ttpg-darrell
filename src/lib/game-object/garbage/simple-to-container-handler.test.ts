@@ -12,8 +12,8 @@ it("canRecycleObj", () => {
 
     const stch = new SimpleToContainerHandler().addRecycleObjectNsid(objNsid);
 
-    expect(stch.canRecycle(yesObj)).toBeTruthy();
-    expect(stch.canRecycle(noObj)).toBeFalsy();
+    expect(stch.canRecycle(yesObj, undefined)).toBeTruthy();
+    expect(stch.canRecycle(noObj, undefined)).toBeFalsy();
 });
 
 it("recycle", () => {
@@ -31,7 +31,7 @@ it("recycle", () => {
     mockWorld._reset({ gameObjects: [obj, container] });
 
     expect(obj.getContainer()).toBeUndefined();
-    expect(stch.recycle(obj)).toBeTruthy();
+    expect(stch.recycle(obj, undefined)).toBeTruthy();
     expect(obj.getContainer()).toEqual(container);
 
     mockWorld._reset();
@@ -50,7 +50,7 @@ it("recycle (missing container)", () => {
     mockWorld._reset({ gameObjects: [obj] });
 
     expect(obj.getContainer()).toBeUndefined();
-    expect(stch.recycle(obj)).toBeFalsy();
+    expect(stch.recycle(obj, undefined)).toBeFalsy();
 
     mockWorld._reset();
 });

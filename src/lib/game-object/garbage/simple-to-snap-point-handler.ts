@@ -1,4 +1,9 @@
-import { GameObject, Rotator, SnapPoint } from "@tabletop-playground/api";
+import {
+    GameObject,
+    Player,
+    Rotator,
+    SnapPoint,
+} from "@tabletop-playground/api";
 import { GarbageHandler } from "./garbage-container";
 import { NSID } from "../../nsid/nsid";
 import { Find } from "../../find/find";
@@ -37,12 +42,12 @@ export class SimpleToSnapPointHandler implements GarbageHandler {
 
     // --------------------------------
 
-    public canRecycle(obj: GameObject): boolean {
+    public canRecycle(obj: GameObject, _player: Player | undefined): boolean {
         const nsid = NSID.get(obj);
         return this._recycleObjectNsids.has(nsid);
     }
 
-    public recycle(obj: GameObject): boolean {
+    public recycle(obj: GameObject, _player: Player | undefined): boolean {
         const snapPoint: SnapPoint | undefined = this._find.findSnapPointByTag(
             this._snapPointTag
         );

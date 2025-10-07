@@ -1,4 +1,4 @@
-import { Container, GameObject } from "@tabletop-playground/api";
+import { Container, GameObject, Player } from "@tabletop-playground/api";
 import { GarbageHandler } from "./garbage-container";
 import { NSID } from "../../nsid/nsid";
 import { Find } from "../../find/find";
@@ -30,12 +30,12 @@ export class SimpleToContainerHandler implements GarbageHandler {
 
     // --------------------------------
 
-    public canRecycle(obj: GameObject): boolean {
+    public canRecycle(obj: GameObject, _player: Player | undefined): boolean {
         const nsid = NSID.get(obj);
         return this._recycleObjectNsids.has(nsid);
     }
 
-    public recycle(obj: GameObject): boolean {
+    public recycle(obj: GameObject, _player: Player | undefined): boolean {
         const playerSlot: number | undefined = this._requirePlayerSlot
             ? obj.getOwningPlayerSlot()
             : undefined;
