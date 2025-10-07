@@ -18,7 +18,10 @@ export abstract class GarbageHandler {
      *
      * @param obj
      */
-    public abstract canRecycle(obj: GameObject): boolean;
+    public abstract canRecycle(
+        obj: GameObject,
+        player: Player | undefined
+    ): boolean;
 
     /**
      * Recycle the object.
@@ -26,7 +29,10 @@ export abstract class GarbageHandler {
      * @param obj
      * @returns true if recycled
      */
-    public abstract recycle(obj: GameObject): boolean;
+    public abstract recycle(
+        obj: GameObject,
+        player: Player | undefined
+    ): boolean;
 }
 
 /**
@@ -76,7 +82,7 @@ export class GarbageContainer {
         player: Player | undefined
     ): boolean {
         for (const handler of this._garbageHandlers) {
-            if (handler.canRecycle(obj)) {
+            if (handler.canRecycle(obj, player)) {
                 // Name might be lost during recycle, read it early.
                 let objName: string = obj.getName();
                 const objMetadata: string = NSID.get(obj);
@@ -84,7 +90,7 @@ export class GarbageContainer {
                     const cardDetails: CardDetails = obj.getCardDetails();
                     objName = cardDetails.name;
                 }
-                if (handler.recycle(obj)) {
+                if (handler.recycle(obj, player)) {
                     GarbageContainer.onRecycled.trigger(
                         objName,
                         objMetadata,
