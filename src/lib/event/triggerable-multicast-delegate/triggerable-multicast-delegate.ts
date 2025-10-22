@@ -48,7 +48,7 @@ export class TriggerableMulticastDelegate<
      * @param args
      */
     trigger(...args: Parameters<T>): void {
-        if (this._triggerDepth > 20) {
+        if (this._triggerDepth > 3) {
             throw new Error("Maximum trigger depth exceeded");
         }
         this._triggerDepth++;
