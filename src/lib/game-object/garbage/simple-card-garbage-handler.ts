@@ -1,4 +1,4 @@
-import { GameObject, Card, SnapPoint } from "@tabletop-playground/api";
+import { GameObject, Card, SnapPoint, Player } from "@tabletop-playground/api";
 import { GarbageHandler } from "./garbage-container";
 import { NSID } from "../../nsid/nsid";
 import { Find } from "../../find/find";
@@ -37,7 +37,7 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
 
     // --------------------------------
 
-    public canRecycle(obj: GameObject): boolean {
+    public canRecycle(obj: GameObject, _player: Player | undefined): boolean {
         if (!(obj instanceof Card)) {
             return false;
         }
@@ -51,7 +51,7 @@ export class SimpleCardGarbageHandler implements GarbageHandler {
         );
     }
 
-    public recycle(obj: GameObject): boolean {
+    public recycle(obj: GameObject, _player: Player | undefined): boolean {
         // Verify card.
         if (!(obj instanceof Card)) {
             throw new Error("not a card");

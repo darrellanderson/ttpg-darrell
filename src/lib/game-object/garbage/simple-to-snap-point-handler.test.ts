@@ -12,8 +12,8 @@ it("canRecycleObj", () => {
 
     const stsph = new SimpleToSnapPointHandler().addRecycleObjectNsid(objNsid);
 
-    expect(stsph.canRecycle(yesObj)).toBeTruthy();
-    expect(stsph.canRecycle(noObj)).toBeFalsy();
+    expect(stsph.canRecycle(yesObj, undefined)).toBeTruthy();
+    expect(stsph.canRecycle(noObj, undefined)).toBeFalsy();
 });
 
 it("recycle", () => {
@@ -33,7 +33,7 @@ it("recycle", () => {
 
     mockWorld._reset({ gameObjects: [obj, mat] });
 
-    expect(stsph.recycle(obj)).toBeTruthy();
+    expect(stsph.recycle(obj, undefined)).toBeTruthy();
 });
 
 it("recycle (missing snap point)", () => {
@@ -49,7 +49,7 @@ it("recycle (missing snap point)", () => {
 
     mockWorld._reset({ gameObjects: [obj] });
 
-    expect(stsph.recycle(obj)).toBeFalsy();
+    expect(stsph.recycle(obj, undefined)).toBeFalsy();
 });
 
 it("recycle (snap point occupied)", () => {
@@ -72,5 +72,5 @@ it("recycle (snap point occupied)", () => {
 
     mockWorld._reset({ gameObjects: [obj, mat] });
 
-    expect(stsph.recycle(obj)).toBeFalsy();
+    expect(stsph.recycle(obj, undefined)).toBeFalsy();
 });

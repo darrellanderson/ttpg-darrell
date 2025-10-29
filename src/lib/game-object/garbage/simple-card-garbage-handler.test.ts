@@ -19,17 +19,17 @@ it("canRecycleObj", () => {
     const yesObject = new MockCard({
         cardDetails: [new MockCardDetails({ metadata: "my-prefix-metadata" })],
     });
-    expect(scgh.canRecycle(yesObject)).toBeTruthy();
+    expect(scgh.canRecycle(yesObject, undefined)).toBeTruthy();
 
     const noObject1 = new MockCard({
         cardDetails: [
             new MockCardDetails({ metadata: "not-my-prefix-metadata" }),
         ],
     });
-    expect(scgh.canRecycle(noObject1)).toBeFalsy();
+    expect(scgh.canRecycle(noObject1, undefined)).toBeFalsy();
 
     const noObject2 = new MockGameObject();
-    expect(scgh.canRecycle(noObject2)).toBeFalsy();
+    expect(scgh.canRecycle(noObject2, undefined)).toBeFalsy();
 });
 
 it("recycle (to deck)", () => {
@@ -59,7 +59,7 @@ it("recycle (to deck)", () => {
     });
 
     expect(deck.getStackSize()).toEqual(1);
-    const success: boolean = scgh.recycle(card);
+    const success: boolean = scgh.recycle(card, undefined);
     expect(success).toBeTruthy();
     expect(deck.getStackSize()).toEqual(2);
 });
@@ -97,7 +97,7 @@ it("recycle (no deck)", () => {
     card = createCard();
     expect(card.getStackSize()).toEqual(1);
     expect(card.getPosition().x).toEqual(-1);
-    let success: boolean = scgh.recycle(card);
+    let success: boolean = scgh.recycle(card, undefined);
     expect(success).toBeTruthy();
     expect(card.getPosition().x).toEqual(100);
     expect(card.getStackSize()).toEqual(1);
@@ -105,7 +105,7 @@ it("recycle (no deck)", () => {
     // Try again (picks up cached result).
     card = createCard();
     expect(card.getStackSize()).toEqual(1);
-    success = scgh.recycle(card);
+    success = scgh.recycle(card, undefined);
     expect(success).toBeTruthy();
     expect(card.getStackSize()).toEqual(1);
 
@@ -113,7 +113,7 @@ it("recycle (no deck)", () => {
     card = createCard();
     mat.destroy();
     expect(card.getStackSize()).toEqual(1);
-    success = scgh.recycle(card);
+    success = scgh.recycle(card, undefined);
     expect(success).toBeFalsy();
     expect(card.getStackSize()).toEqual(1);
 });
@@ -131,7 +131,7 @@ it("recycle (missing mat)", () => {
     });
 
     expect(card.getPosition().x).toEqual(0);
-    const success: boolean = scgh.recycle(card);
+    const success: boolean = scgh.recycle(card, undefined);
     expect(success).toBeFalsy();
 });
 
@@ -154,7 +154,7 @@ it("recycle (missing snap point)", () => {
     });
 
     expect(card.getPosition().x).toEqual(0);
-    const success: boolean = scgh.recycle(card);
+    const success: boolean = scgh.recycle(card, undefined);
     expect(success).toBeFalsy();
 });
 
@@ -176,19 +176,19 @@ it("reject objects", () => {
         cardNsidPrefix
     );
 
-    expect(scgh.canRecycle(obj)).toBeFalsy();
+    expect(scgh.canRecycle(obj, undefined)).toBeFalsy();
     expect(() => {
-        scgh.recycle(obj);
+        scgh.recycle(obj, undefined);
     }).toThrow();
 
-    expect(scgh.canRecycle(deck)).toBeFalsy();
+    expect(scgh.canRecycle(deck, undefined)).toBeFalsy();
     expect(() => {
-        scgh.recycle(deck);
+        scgh.recycle(deck, undefined);
     }).toThrow();
 
-    expect(scgh.canRecycle(wrongPrefix)).toBeFalsy();
+    expect(scgh.canRecycle(wrongPrefix, undefined)).toBeFalsy();
     expect(() => {
-        scgh.recycle(wrongPrefix);
+        scgh.recycle(wrongPrefix, undefined);
     }).toThrow();
 });
 
@@ -218,6 +218,6 @@ it("snapped object is not deck", () => {
         cardDetails: [new MockCardDetails({ metadata: cardNsidPrefix })],
     });
 
-    const success: boolean = scgh.recycle(card);
+    const success: boolean = scgh.recycle(card, undefined);
     expect(success).toBeTruthy(); // dropped atop notDeck
 });
