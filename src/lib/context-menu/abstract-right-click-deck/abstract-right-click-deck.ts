@@ -15,7 +15,7 @@ import { OnCardBecameSingletonOrDeck } from "../../event/on-card-became-singleto
  */
 export abstract class AbstractRightClickDeck implements IGlobal {
     private readonly _deckNsidPrefix: string;
-    private readonly _customActionName: string;
+    private readonly _customActionNames: Array<string> = [];
     private readonly _customActionHandler: (
         object: GameObject,
         player: Player,
@@ -32,8 +32,13 @@ export abstract class AbstractRightClickDeck implements IGlobal {
         ) => void
     ) {
         this._deckNsidPrefix = deckNsidPrefix;
-        this._customActionName = customActionName;
+        this._customActionNames.push(customActionName);
         this._customActionHandler = customActionHandler;
+    }
+
+    addCustomActionName(customActionName: string): this {
+        this._customActionNames.push(customActionName);
+        return this;
     }
 
     init(): void {
@@ -41,7 +46,9 @@ export abstract class AbstractRightClickDeck implements IGlobal {
         OnCardBecameSingletonOrDeck.onSingletonCardCreated.add((card: Card) => {
             const nsid = NSID.get(card);
             if (nsid.startsWith(this._deckNsidPrefix)) {
-                card.removeCustomAction(this._customActionName);
+                for (const customActionName of this._customActionNames) {
+                    card.removeCustomAction(customActionName);
+                }
                 card.onCustomAction.remove(this._customActionHandler);
             }
         });
@@ -53,8 +60,10 @@ export abstract class AbstractRightClickDeck implements IGlobal {
                         return; // at least one mismatch
                     }
                 }
-                card.removeCustomAction(this._customActionName);
-                card.addCustomAction(this._customActionName);
+                for (const customActionName of this._customActionNames) {
+                    card.removeCustomAction(customActionName);
+                    card.addCustomAction(customActionName);
+                }
                 card.onCustomAction.remove(this._customActionHandler);
                 card.onCustomAction.add(this._customActionHandler);
             }
