@@ -16,8 +16,10 @@ export class Atop {
         // worldToLocal undoes scale.
         // Compute extent is unscaled local space.
         const scale: Vector = obj.getScale();
-        this._scaledExtent.x /= scale.x;
-        this._scaledExtent.y /= scale.y;
+        if (scale.x !== 0 && scale.y !== 0) {
+            this._scaledExtent.x /= scale.x;
+            this._scaledExtent.y /= scale.y;
+        }
     }
 
     isAtop(pos: Vector): boolean {
