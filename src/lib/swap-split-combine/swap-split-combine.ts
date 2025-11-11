@@ -130,6 +130,7 @@ export class SwapSplitCombine implements IGlobal {
         });
 
         this._applyRules(nsidToObjs, player);
+        player.setSelectedObjects([]); // otherwise persists
     }
 
     _getHoveredAndSelectedObjs(

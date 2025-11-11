@@ -4,6 +4,7 @@ import {
     CardHolder,
     Color,
     Player,
+    Rotator,
     Text,
     TextJustification,
     UIElement,
@@ -141,5 +142,18 @@ export class CardHolderPlayerName {
             this._widgetSwitcher.setActiveWidget(widget);
             this._cardHolder.updateUI(this._ui);
         }
+    }
+
+    /**
+     *
+     */
+    public reverseUI(): void {
+        const pos: Vector = this._ui.position;
+        const rot: Rotator = this._ui.rotation;
+        pos.x = -pos.x;
+        rot.yaw = (rot.yaw + 180) % 360;
+        this._ui.position = pos;
+        this._ui.rotation = rot;
+        this._cardHolder.updateUI(this._ui);
     }
 }
