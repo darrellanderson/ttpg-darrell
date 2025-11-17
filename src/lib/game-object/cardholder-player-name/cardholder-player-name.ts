@@ -4,7 +4,6 @@ import {
     CardHolder,
     Color,
     Player,
-    Rotator,
     Text,
     TextJustification,
     UIElement,
@@ -96,6 +95,10 @@ export class CardHolderPlayerName {
             CardHolderPlayerName.DEFAULT_FONT_SIZE
         );
         this._updatePlayerStatus();
+
+        cardHolder.onReleased.add(() => {
+            this._setPosition();
+        });
     }
 
     public setColor(
@@ -117,11 +120,16 @@ export class CardHolderPlayerName {
         this._takeSeatButton.setFontSize(fontSize);
 
         // UI position.
-        const x = (this._cardHolder.getPosition().x >= 0 ? 1 : -1) * 30;
-        const z = Math.ceil(fontSize * 0.15);
-        this._ui.position = new Vector(x, 0, z);
-        this._cardHolder.updateUI(this._ui);
+        this._setPosition();
         return this;
+    }
+
+    private _setPosition(): void {
+        const x = (this._cardHolder.getPosition().x >= 0 ? 1 : -1) * 30;
+        const z = this._nameText.getFontSize() * 0.15;
+        const worldPos: Vector = this._cardHolder.getPosition().add([x, 0, z]);
+        this._ui.position = this._cardHolder.worldPositionToLocal(worldPos);
+        this._cardHolder.updateUI(this._ui);
     }
 
     private _updatePlayerStatus(): void {
@@ -145,15 +153,9 @@ export class CardHolderPlayerName {
     }
 
     /**
-     *
+     * Update UI position for reversed card holder.
      */
     public reverseUI(): void {
-        const pos: Vector = this._ui.position;
-        const rot: Rotator = this._ui.rotation;
-        pos.x = -pos.x;
-        rot.yaw = (rot.yaw + 180) % 360;
-        this._ui.position = pos;
-        this._ui.rotation = rot;
-        this._cardHolder.updateUI(this._ui);
+        this._setPosition();
     }
 }
