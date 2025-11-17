@@ -150,4 +150,9 @@ export class FindTracking {
         }
         return cards;
     }
+
+    findCard(nsid: string): Card | undefined {
+        const cards: Array<Card> = this.findCards(nsid);
+        return cards[0];
+    }
 }
