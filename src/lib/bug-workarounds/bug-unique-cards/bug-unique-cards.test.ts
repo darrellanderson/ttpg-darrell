@@ -39,6 +39,8 @@ it("process", () => {
     process.flushTicks();
 
     expect(deck.getStackSize()).toEqual(1);
-    expect(lastError).toEqual("BugUniqueCards: removed 1 duplicates, 1 remain");
+    expect(lastError).toEqual(
+        'BugUniqueCards: removed 1 duplicates, 1 remain [first dup: "my-1"]'
+    );
     jest.restoreAllMocks();
 });

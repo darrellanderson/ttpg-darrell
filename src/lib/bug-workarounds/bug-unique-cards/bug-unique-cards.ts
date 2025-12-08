@@ -3,6 +3,7 @@ import { IGlobal } from "../../global/i-global";
 import { CardUtil } from "../../card-util/card-util";
 import { DeletedItemsContainer } from "../../game-object/deleted-items-container/deleted-items-container";
 import { ErrorHandler } from "../../error-handler/error-handler";
+import { NSID } from "../../nsid";
 
 /**
  * Monitor all decks expecting no NSID (metadata) repeats.
@@ -51,9 +52,10 @@ export class BugUniqueCards implements IGlobal {
         );
         if (removed) {
             const removeCount: number = removed.getStackSize();
+            const removeNsids: Array<string> = NSID.getDeck(removed);
             const residueCount: number = deck.getStackSize();
             DeletedItemsContainer.destroyWithoutCopying(removed);
-            const msg: string = `BugUniqueCards: removed ${removeCount} duplicates, ${residueCount} remain`;
+            const msg: string = `BugUniqueCards: removed ${removeCount} duplicates, ${residueCount} remain [first dup: "${removeNsids[0]}"]`;
             console.log(msg);
             ErrorHandler.onError.trigger(msg);
         }
