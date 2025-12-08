@@ -2,6 +2,7 @@ import {
     Color,
     Dice,
     GameObject,
+    ObjectType,
     Player,
     Vector,
     globalEvents,
@@ -335,6 +336,9 @@ export class DiceGroup {
                 `not Dice for d${diceParams.sides} (${templateId})`
             );
         }
+
+        // Prevent dice from bumping other things.
+        dice.setObjectType(ObjectType.Penetrable);
 
         // Apply settings.
         const id: string =

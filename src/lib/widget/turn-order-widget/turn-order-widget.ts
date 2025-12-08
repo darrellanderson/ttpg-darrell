@@ -26,7 +26,7 @@ export class TurnOrderWidget {
     private readonly _screenUI: ScreenUIElement;
     private readonly _uiVisibility: UiVisibility;
     private _turnEntryWidgets: Array<TurnEntryWidget> = [];
-    private _intervalId;
+    private readonly _intervalId;
 
     private readonly _doUpdate = () => {
         this.update();
