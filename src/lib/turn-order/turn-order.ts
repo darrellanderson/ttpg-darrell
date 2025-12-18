@@ -175,6 +175,10 @@ export class TurnOrder {
      * @returns
      */
     setCurrentTurn(playerSlot: PlayerSlot): this {
+        if (this._currentTurn === playerSlot) {
+            return this; // no change, no event
+        }
+
         this._currentTurn = playerSlot;
 
         this._saveState();
@@ -191,9 +195,20 @@ export class TurnOrder {
         direction: Direction,
         currentTurn: PlayerSlot
     ): this {
-        this._order = order;
-        this._direction = direction === "reverse" ? -1 : 1;
-        this._snake = direction === "snake";
+        const directionValue: number = direction === "reverse" ? -1 : 1;
+        const isSnake: boolean = direction === "snake";
+        if (
+            order.join(",") === this._order.join(",") &&
+            directionValue === this._direction &&
+            isSnake === this._snake &&
+            currentTurn === this._currentTurn
+        ) {
+            return this; // no change, no event
+        }
+
+        this._order = [...order]; // copy
+        this._direction = directionValue;
+        this._snake = isSnake;
         this._snakeNeedsAnotherTurn = false;
         this._currentTurn = currentTurn;
 
@@ -210,8 +225,14 @@ export class TurnOrder {
     }
 
     setDirection(direction: Direction): this {
-        this._direction = direction === "reverse" ? -1 : 1;
-        this._snake = direction === "snake";
+        const directionValue: number = direction === "reverse" ? -1 : 1;
+        const isSnake: boolean = direction === "snake";
+        if (directionValue === this._direction && isSnake === this._snake) {
+            return this; // no change, no event
+        }
+
+        this._direction = directionValue;
+        this._snake = isSnake;
         this._snakeNeedsAnotherTurn = false;
 
         this._saveState();
@@ -225,8 +246,14 @@ export class TurnOrder {
 
     setAway(playerSlot: PlayerSlot, value: boolean): this {
         if (value) {
+            if (this._away.has(playerSlot)) {
+                return this; // no change, no event
+            }
             this._away.add(playerSlot);
         } else {
+            if (!this._away.has(playerSlot)) {
+                return this; // no change, no event
+            }
             this._away.delete(playerSlot);
         }
 
@@ -241,8 +268,14 @@ export class TurnOrder {
 
     setEliminated(playerSlot: PlayerSlot, value: boolean): this {
         if (value) {
+            if (this._eliminated.has(playerSlot)) {
+                return this; // no change, no event
+            }
             this._eliminated.add(playerSlot);
         } else {
+            if (!this._eliminated.has(playerSlot)) {
+                return this; // no change, no event
+            }
             this._eliminated.delete(playerSlot);
         }
 
@@ -257,8 +290,14 @@ export class TurnOrder {
 
     setPassed(playerSlot: PlayerSlot, value: boolean): this {
         if (value) {
+            if (this._passed.has(playerSlot)) {
+                return this; // no change, no event
+            }
             this._passed.add(playerSlot);
         } else {
+            if (!this._passed.has(playerSlot)) {
+                return this; // no change, no event
+            }
             this._passed.delete(playerSlot);
         }
 
