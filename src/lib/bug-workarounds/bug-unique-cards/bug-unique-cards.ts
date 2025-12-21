@@ -11,6 +11,7 @@ import { NSID } from "../../nsid";
  */
 export class BugUniqueCards implements IGlobal {
     private readonly _cardUtil = new CardUtil();
+    private _reportErrors: boolean = false;
 
     private readonly _onInsertedHandler: (
         deck: Card,
@@ -37,6 +38,11 @@ export class BugUniqueCards implements IGlobal {
         });
     }
 
+    setReportErrors(reportErrors: boolean): this {
+        this._reportErrors = reportErrors;
+        return this;
+    }
+
     _processDeck(deck: Card): void {
         const seen: Set<string> = new Set<string>();
         const removed: Card | undefined = this._cardUtil.filterCards(
@@ -57,7 +63,9 @@ export class BugUniqueCards implements IGlobal {
             DeletedItemsContainer.destroyWithoutCopying(removed);
             const msg: string = `BugUniqueCards: removed ${removeCount} duplicates, ${residueCount} remain [first dup: "${removeNsids[0]}"]`;
             console.log(msg);
-            ErrorHandler.onError.trigger(msg);
+            if (this._reportErrors) {
+                ErrorHandler.onError.trigger(msg);
+            }
         }
     }
 }

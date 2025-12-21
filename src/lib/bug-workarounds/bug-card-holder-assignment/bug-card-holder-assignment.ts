@@ -11,6 +11,7 @@ export class BugCardHolderAssignment implements IGlobal {
     private readonly _find = new Find();
     private readonly _cardHolderNsid: string;
     private _intervalHandle: unknown | undefined;
+    private _reportErrors: boolean = false;
 
     public readonly _intervalRunnable = () => {
         this._run();
@@ -31,6 +32,11 @@ export class BugCardHolderAssignment implements IGlobal {
         }
     }
 
+    setReportErrors(reportErrors: boolean): this {
+        this._reportErrors = reportErrors;
+        return this;
+    }
+
     private _run(): void {
         for (const player of world.getAllPlayers()) {
             const playerSlot: number = player.getSlot();
@@ -45,7 +51,9 @@ export class BugCardHolderAssignment implements IGlobal {
                 player.setHandHolder(cardHolder);
                 const msg: string = `BugCardHolderAssignment: re-attached for slot ${playerSlot}`;
                 console.log(msg);
-                ErrorHandler.onError.trigger(msg);
+                if (this._reportErrors) {
+                    ErrorHandler.onError.trigger(msg);
+                }
             }
         }
     }
