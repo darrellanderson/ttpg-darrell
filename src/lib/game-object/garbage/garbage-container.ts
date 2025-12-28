@@ -41,6 +41,7 @@ export abstract class GarbageHandler {
 export class GarbageContainer {
     public static onRecycled = new TriggerableMulticastDelegate<
         (
+            objId: string,
             objName: string,
             objMetadata: string,
             player: Player | undefined
@@ -83,7 +84,8 @@ export class GarbageContainer {
     ): boolean {
         for (const handler of this._garbageHandlers) {
             if (handler.canRecycle(obj, player)) {
-                // Name might be lost during recycle, read it early.
+                // Object fields might be lost during recycle, read early.
+                const objId: string = obj.getId();
                 let objName: string = obj.getName();
                 const objMetadata: string = NSID.get(obj);
                 if (obj instanceof Card && obj.getStackSize() === 1) {
@@ -92,6 +94,7 @@ export class GarbageContainer {
                 }
                 if (handler.recycle(obj, player)) {
                     GarbageContainer.onRecycled.trigger(
+                        objId,
                         objName,
                         objMetadata,
                         player

@@ -157,6 +157,7 @@ it("_tryRecycleDeck (none)", () => {
 it("onRecycled", () => {
     const recycledNames: Array<string> = [];
     const onRecycledHandler = (
+        _objId: string,
         objName: string,
         _objMetadata: string,
         _player: Player | undefined
@@ -189,6 +190,7 @@ it("onRecycled", () => {
 it("container onInserted", () => {
     const recycledNames: Array<string> = [];
     const onRecycledHandler = (
+        _objId: string,
         objName: string,
         _objMetadata: string,
         _getHoveredAndSelectedObjsplayer: Player | undefined

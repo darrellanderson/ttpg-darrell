@@ -16,7 +16,7 @@ it("process", () => {
     });
     mockWorld._reset({ gameObjects: [deck] });
 
-    new BugUniqueCards().init();
+    new BugUniqueCards().setReportErrors(true).init();
 
     let lastError: string = "";
     ErrorHandler.onError.add((error: string): void => {
