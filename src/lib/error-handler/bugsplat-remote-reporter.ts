@@ -1,4 +1,10 @@
-import { FetchOptions, FetchResponse, fetch } from "@tabletop-playground/api";
+import {
+    FetchOptions,
+    FetchResponse,
+    Player,
+    fetch,
+    world,
+} from "@tabletop-playground/api";
 import { ErrorHandler } from "./error-handler";
 import { IGlobal } from "../global/i-global";
 
@@ -66,6 +72,17 @@ export class BugSplatRemoteReporter implements IGlobal {
             appVersion: this._appVersion,
             callstack: error,
         };
+
+        const players: Array<Player> = world.getAllPlayers();
+        let hostName: string | undefined = undefined;
+        players.forEach((player: Player): void => {
+            if (player.isHost()) {
+                hostName = player.getName() + ` (#${players.length})`;
+            }
+        });
+        if (hostName) {
+            form.user = hostName;
+        }
 
         const boundary: string = "~~boundary~~";
         const headers: Record<string, string> = {
