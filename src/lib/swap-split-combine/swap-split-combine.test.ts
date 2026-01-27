@@ -63,6 +63,64 @@ it("swapX", () => {
     expect(nsids).toEqual(["src-nsid-2", "dst-nsid"]);
 });
 
+it("swapX (too few)", () => {
+    const spawn: Spawn = new Spawn().inject({ "dst-nsid": "dst-template-id" });
+    mockWorld._reset({
+        _templateIdToMockGameObjectParams: {
+            "dst-template-id": { templateMetadata: "dst-nsid" },
+        },
+    });
+
+    const swapSplitCombine: SwapSplitCombine = new SwapSplitCombine(
+        [
+            {
+                src: { nsids: ["bogus-nsid-1"], count: 1 },
+                dst: { nsid: "bogus-nsid-2", count: 1 },
+                repeat: false,
+            },
+            {
+                src: {
+                    nsids: ["bogus-nsid-3", "src-nsid-1", "src-nsid-2"],
+                    count: 1,
+                },
+                dst: { nsid: "dst-nsid", count: 1 },
+                repeat: false,
+            },
+        ],
+        spawn
+    );
+    swapSplitCombine.init();
+    swapSplitCombine.addOverrideSupplyCount("dst-nsid", (_player: Player) => {
+        return 0; // not enough to complete action
+    });
+
+    const srcObj1: MockGameObject = new MockGameObject({
+        templateMetadata: "src-nsid-1",
+        id: "srcObj1",
+    });
+    const srcObj2: GameObject = new MockGameObject({
+        templateMetadata: "src-nsid-2",
+        id: "srcObj2",
+    });
+    const player: Player = new MockPlayer({
+        selectedObjects: [srcObj2], // omit srcObj1, will add via primary action object
+    });
+
+    expect(srcObj1.isValid()).toBeTruthy();
+    expect(srcObj2.isValid()).toBeTruthy();
+
+    srcObj1._primaryActionAsPlayer(player);
+    srcObj1._primaryActionAsPlayer(player); // suppress in progres
+    process.flushTicks();
+
+    const nsids: Array<string> = world
+        .getAllObjects()
+        .map((obj) => NSID.get(obj));
+    expect(srcObj1.isValid()).toBeTruthy();
+    expect(srcObj2.isValid()).toBeTruthy();
+    expect(nsids).toEqual(["src-nsid-1", "src-nsid-2"]);
+});
+
 it("swap, repeat", () => {
     const spawn: Spawn = new Spawn().inject({ "dst-nsid": "dst-template-id" });
     mockWorld._reset({

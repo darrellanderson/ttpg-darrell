@@ -47,6 +47,10 @@ export class SwapSplitCombine implements IGlobal {
         string,
         (obj: GameObject, player: Player) => void
     > = new Map<string, (obj: GameObject, player: Player) => void>();
+    private readonly _overideSupplyCount: Map<
+        string,
+        (player: Player) => number
+    > = new Map<string, (player: Player) => number>();
 
     private readonly _primaryActionHandler: (
         obj: GameObject,
@@ -88,6 +92,14 @@ export class SwapSplitCombine implements IGlobal {
         destroy: (obj: GameObject, player: Player) => void
     ): this {
         this._overrideDestroy.set(nsid, destroy);
+        return this;
+    }
+
+    addOverrideSupplyCount(
+        nsid: string,
+        supplyCount: (player: Player) => number
+    ): this {
+        this._overideSupplyCount.set(nsid, supplyCount);
         return this;
     }
 
@@ -192,7 +204,7 @@ export class SwapSplitCombine implements IGlobal {
         rule: SwapSplitCombineRule,
         srcObjs: Array<GameObject>,
         player: Player
-    ) {
+    ): void {
         if (rule.requireFaceUp) {
             srcObjs = srcObjs.filter((obj) => Facing.isFaceUp(obj));
         }
@@ -206,6 +218,16 @@ export class SwapSplitCombine implements IGlobal {
             ? Math.floor(srcObjs.length / rule.src.count)
             : 1;
         srcObjs = srcObjs.splice(0, applyCount * rule.src.count);
+
+        // Validate we have enough supply if override is present.
+        const overrideSupplyCount = this._overideSupplyCount.get(rule.dst.nsid);
+        if (overrideSupplyCount) {
+            const supplyCount: number = overrideSupplyCount(player);
+            const requiredCount: number = applyCount * rule.dst.count;
+            if (supplyCount < requiredCount) {
+                return;
+            }
+        }
 
         // Recycle src objects.
         for (const obj of srcObjs) {
