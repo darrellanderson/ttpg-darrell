@@ -174,7 +174,11 @@ export class LayoutObjects {
                 currentRotation,
                 includeGeometry
             );
-            childSize = { w: extent.y * 2, h: extent.x * 2 };
+            const scale: Vector = child.getScale();
+            childSize = {
+                w: extent.y * 2 * scale.y,
+                h: extent.x * 2 * scale.x,
+            };
 
             // Restore UIs.
             for (const ui of uis) {
