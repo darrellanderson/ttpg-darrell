@@ -197,17 +197,19 @@ export class TurnEntryWidget {
             2
         );
 
-        // Click behavior.
-        this._contentButton.onClicked.clear();
-        this._contentButton.onClicked.add(
-            (_button: ContentButton, clickingPlayer: Player) => {
-                new TurnClickedWidget(
-                    turnOrder,
-                    this._params,
-                    playerSlot
-                ).attachToScreen(clickingPlayer);
-            }
-        );
+        // Click behavior.  (An error report showed onClick undefined, so we check just in case.)
+        if (this._contentButton && this._contentButton.onClicked) {
+            this._contentButton.onClicked.clear();
+            this._contentButton.onClicked.add(
+                (_button: ContentButton, clickingPlayer: Player) => {
+                    new TurnClickedWidget(
+                        turnOrder,
+                        this._params,
+                        playerSlot
+                    ).attachToScreen(clickingPlayer);
+                }
+            );
+        }
 
         // Warts.
         for (const wart of this._warts) {
