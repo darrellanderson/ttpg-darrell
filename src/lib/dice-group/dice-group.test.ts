@@ -9,6 +9,7 @@ import {
     DICE_GROUP_SAVED_DATA_KEY,
     DiceGroup,
     DiceGroupCleanup,
+    DiceGroupParams,
     DiceParams,
     DiceResult,
 } from "./dice-group";
@@ -323,4 +324,26 @@ it("timeoutSeconds", () => {
     jest.clearAllTimers();
     jest.restoreAllMocks();
     jest.useRealTimers();
+});
+
+it("extraRerolls", () => {
+    const callback = (diceResults: Array<DiceResult>, player: Player): void => {
+        const formatted: Array<string> = diceResults.map(
+            (result) => result.diceParams.hit + ":" + DiceGroup.format(result)
+        );
+        //console.log(formatted.join(", "));
+    };
+
+    const diceGroupParams: DiceGroupParams = {
+        diceParams: [
+            { sides: 20, hit: 19 },
+            { sides: 20, hit: 18 },
+        ],
+        player: new MockPlayer(),
+        extraRerolls: 1,
+        doFakeRoll: true,
+        callback,
+    };
+
+    DiceGroup.roll(diceGroupParams);
 });

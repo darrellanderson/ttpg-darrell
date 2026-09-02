@@ -36,6 +36,7 @@ export type DiceGroupParams = {
     callback?: (diceResults: Array<DiceResult>, player: Player) => void;
     position?: Vector | [x: number, y: number, z: number];
     doFakeRoll?: boolean;
+    extraRerolls?: number; // in addition to normal rerolls, reroll N dice (favor lower hit values)
 };
 
 export type DiceResult = {
@@ -126,6 +127,7 @@ export class DiceGroup {
 
     private readonly _diceObjIdToDiceResult: { [key: string]: DiceResult } = {};
     private readonly _activeDice: Set<Dice> = new Set<Dice>();
+    private readonly _extraRerolls: number;
 
     private _timeoutHandle: timeout_handle | undefined;
 
@@ -158,11 +160,49 @@ export class DiceGroup {
             } else {
                 this._activeDice.delete(dice);
                 if (this._activeDice.size === 0) {
+                    this._applyExtraRerolls(); // After normal rerolls, apply any extras
                     this._sendResult();
                 }
             }
         }
     };
+
+    _applyExtraRerolls(): void {
+        console.log("Applying extra rerolls");
+        if (this._extraRerolls <= 0) {
+            return;
+        }
+
+        // Sort miss (non-hit) dice in ascending hit value.
+        const diceResults: Array<DiceResult> = Object.values(
+            this._diceObjIdToDiceResult
+        )
+            .filter((diceResult) => !diceResult.hit)
+            .sort((a: DiceResult, b: DiceResult): number => {
+                const aHitValue: number =
+                    a.diceParams.hit ?? Number.MAX_SAFE_INTEGER;
+                const bHitValue: number =
+                    b.diceParams.hit ?? Number.MAX_SAFE_INTEGER;
+                return aHitValue - bHitValue;
+            });
+
+        // Keep only the dice that will be rerolled.
+        diceResults.splice(Math.min(this._extraRerolls, diceResults.length));
+
+        // "Reroll" using a synthetic roll value.
+        for (const diceResult of diceResults) {
+            const diceParams = diceResult.diceParams;
+            const faceIndex = Math.floor(Math.random() * diceParams.sides);
+
+            diceResult.rerolledValue = diceResult.value;
+            diceResult.value = faceIndex + 1;
+            diceResult.hit =
+                diceResult.value >= (diceParams.hit ?? Number.MAX_SAFE_INTEGER);
+            diceResult.crit =
+                diceResult.value >=
+                (diceParams.crit ?? Number.MAX_SAFE_INTEGER);
+        }
+    }
 
     private readonly _onTimeoutHandler = (): void => {
         this._sendResult();
@@ -185,6 +225,7 @@ export class DiceGroup {
         this._timeoutSeconds =
             params.timeoutSeconds ?? DiceGroup.DEFAULT_TIMEOUT_SECONDS;
         this._position = params.position ?? [0, 0, 0];
+        this._extraRerolls = params.extraRerolls ?? 0;
     }
 
     fakeRoll(): void {
@@ -195,6 +236,7 @@ export class DiceGroup {
             const id = "dice" + index++;
             this._diceObjIdToDiceResult[id] = diceResult;
         }
+        this._applyExtraRerolls();
         this._sendResult();
     }
 
