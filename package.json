@@ -1,26 +1,24 @@
 {
     "name": "ttpg-darrell",
-    "version": "1.1.78",
+    "version": "1.2.1",
     "description": "TTPG TypeScript library",
-    "main": "./build/cjs/index.js",
-    "module": "./build/esm/index.js",
+    "main": "dist/index.cjs",
     "files": [
-        "build/**/*.js",
-        "build/**/*.js.map",
-        "build/**/*.d.ts",
-        "!build/**/*.testp.js",
-        "!build/**/*.testp.js.map",
-        "!build/**/*.testp.d.ts"
+        "dist/index.cjs",
+        "dist/index.d.cts",
+        "dist/ext.cjs",
+        "dist/ext.d.cts"
     ],
     "scripts": {
         "check:prettier": "prettier --check .",
         "test": "jest",
         "index": "yarn cti ./src -i '*.test.ts' -i '*.testp.ts' -e jest-util -e lib-ext && find . -name 'index.ts.bak' -exec rm {} \\;",
-        "build": "tsc -p tsconfig-esm.json && tsc -p tsconfig-cjs.json",
+        "index-ext": "yarn cti ./src/lib-ext -i '*.test.ts' -i '*.testp.ts' -e jest-util -e lib && find . -name 'index.ts.bak' -exec rm {} \\;",
+        "build": "tsc -p tsconfig.json",
         "clean": "rm -rf build",
         "lint": "ESLINT_USE_FLAT_CONFIG=false eslint --ext .ts --debug src",
-        "prepublishOnly": "yarn index && yarn build",
-        "watch": "tsc -w -p tsconfig-cjs.json"
+        "prepublishOnly": "yarn index && yarn build && yarn tsdown",
+        "watch": "tsc -w -p tsconfig.json"
     },
     "author": "Darrell",
     "license": "Unlicense",
@@ -41,11 +39,12 @@
         "jimp": "^0.22.12",
         "klaw-sync": "^6.0.0",
         "monotone-chain-convex-hull": "^1.1.0",
-        "node": "^21.2.0",
+        "node": "^24.0.0",
         "prettier": "^3.1.1",
         "sharp": "^0.33.2",
         "ts-jest": "^29.1.1",
         "ts-node": "^10.9.1",
+        "tsdown": "^0.23.0",
         "ttpg-mock": "^1.0.7",
         "typescript": "^5.3.2"
     },

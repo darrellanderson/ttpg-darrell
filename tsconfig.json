@@ -1,18 +1,25 @@
 {
     "compilerOptions": {
-        "target": "ES6",
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
-        "outDir": "build/module_type_should_override_this",
-
-        "moduleResolution": "Node",
-        "types": ["@types/jest", "@types/node", "@tabletop-playground/api"],
-        "skipLibCheck": true,
-        "declaration": true,
-        "sourceMap": true,
-
+        "checkJs": true,
+        "lib": ["ES2023", "DOM"],
+        "module": "node16",
         "strict": true,
-        "noUncheckedIndexedAccess": true
+        "noUncheckedIndexedAccess": true,
+        "useUnknownInCatchVariables": false,
+        "resolveJsonModule": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "jsx": "react",
+        "jsxFactory": "jsxInTTPG",
+        "jsxFragmentFactory": "jsxFrag",
+        "rootDir": "./src",
+        "outDir": "./build",
+        "moduleResolution": "node16",
+        "isolatedModules": true,
+        "target": "ES6",
+        "sourceMap": true,
+        "declaration": true,
+        "declarationDir": "./build"
     },
     "include": ["src/**/*.ts", "src/lib-ext/image/cell/solid-cell"],
     "exclude": ["src/**/*.test.ts", "**/jest-util/**/*.ts"]
