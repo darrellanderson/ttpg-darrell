@@ -1,13 +1,10 @@
 {
     "name": "ttpg-darrell",
-    "version": "1.2.1",
+    "version": "1.2.3",
     "description": "TTPG TypeScript library",
     "main": "dist/index.cjs",
     "files": [
-        "dist/index.cjs",
-        "dist/index.d.cts",
-        "dist/ext.cjs",
-        "dist/ext.d.cts"
+        "dist"
     ],
     "scripts": {
         "check:prettier": "prettier --check .",
@@ -17,7 +14,7 @@
         "build": "tsc -p tsconfig.json",
         "clean": "rm -rf build",
         "lint": "ESLINT_USE_FLAT_CONFIG=false eslint --ext .ts --debug src",
-        "prepublishOnly": "yarn index && yarn build && yarn tsdown",
+        "prepublishOnly": "yarn index && yarn index-ext && yarn build && yarn tsdown",
         "watch": "tsc -w -p tsconfig.json"
     },
     "author": "Darrell",
