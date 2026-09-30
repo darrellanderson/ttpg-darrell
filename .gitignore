@@ -2,6 +2,7 @@
 #yarn.lock # needed for github action to create env
 
 /build
+/dist
 
 /coverage
 
