@@ -1,8 +1,21 @@
 {
     "name": "ttpg-darrell",
-    "version": "1.2.4",
+    "version": "1.2.5",
     "description": "TTPG TypeScript library",
     "main": "dist/index.cjs",
+    "types": "dist/index.d.cts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.cts",
+            "require": "./dist/index.cjs",
+            "default": "./dist/index.cjs"
+        },
+        "./ext": {
+            "types": "./dist/ext/index.d.cts",
+            "require": "./dist/ext/index.cjs",
+            "default": "./dist/ext/index.cjs"
+        }
+    },
     "files": [
         "dist"
     ],
