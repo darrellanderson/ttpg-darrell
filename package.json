@@ -1,6 +1,6 @@
 {
     "name": "ttpg-darrell",
-    "version": "1.2.5",
+    "version": "1.2.6",
     "description": "TTPG TypeScript library",
     "main": "dist/index.cjs",
     "types": "dist/index.d.cts",
@@ -22,8 +22,8 @@
     "scripts": {
         "check:prettier": "prettier --check .",
         "test": "jest",
-        "index": "yarn cti ./src -i '*.test.ts' -i '*.testp.ts' -e jest-util -e lib-ext && find . -name 'index.ts.bak' -exec rm {} \\;",
-        "index-ext": "yarn cti ./src/lib-ext -i '*.test.ts' -i '*.testp.ts' -e jest-util -e lib && find . -name 'index.ts.bak' -exec rm {} \\;",
+        "index": "yarn cti ./src -i '*.test.ts' -i '*.testp.ts' -i '*-run.ts' -i 'extract-nsid-to-template-id.ts' -e jest-util -e lib-ext && find . -name 'index.ts.bak' -exec rm {} \\;",
+        "index-ext": "yarn cti ./src/lib-ext -i '*.test.ts' -i '*.testp.ts' -i '*-run.ts' -i 'extract-nsid-to-template-id.ts' -e jest-util -e lib && find . -name 'index.ts.bak' -exec rm {} \\;",
         "build": "tsc -p tsconfig.json",
         "clean": "rm -rf build",
         "lint": "ESLINT_USE_FLAT_CONFIG=false eslint --ext .ts --debug src",

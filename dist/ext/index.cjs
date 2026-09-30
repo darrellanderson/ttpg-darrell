@@ -28,16 +28,10 @@ let path = require("path");
 path = __toESM(path);
 let sharp = require("sharp");
 sharp = __toESM(sharp);
-let fs_extra = require("fs-extra");
-fs_extra = __toESM(fs_extra);
-let yargs = require("yargs");
-yargs = __toESM(yargs);
 let crypto = require("crypto");
 crypto = __toESM(crypto);
 let monotone_chain_convex_hull = require("monotone-chain-convex-hull");
 monotone_chain_convex_hull = __toESM(monotone_chain_convex_hull);
-let klaw_sync = require("klaw-sync");
-klaw_sync = __toESM(klaw_sync);
 //#region src/lib-ext/create-assets/abstract-create-assets/abstract-create-assets.ts
 var AbstractCreateAssets = class AbstractCreateAssets {
 	static cleanByFilePrefix(dir, filenamePrefix) {
@@ -1634,24 +1628,6 @@ var CreateBoard = class CreateBoard extends AbstractCreateAssets {
 	}
 };
 //#endregion
-//#region src/lib-ext/create-assets/create-board/create-board-run.ts
-/**
-* Call with the path to a CreateBoardParams config file.
-*/
-const args$3 = yargs.options({ i: {
-	alias: "input",
-	descript: "create-board-params config file",
-	type: "string",
-	demand: true
-} }).parseSync();
-async function main$3() {
-	const paramsJson = fs_extra.readFileSync(args$3.i);
-	const createBoard = CreateBoard.fromParamsJson(paramsJson);
-	await createBoard.clean();
-	await createBoard.writeFiles();
-}
-main$3();
-//#endregion
 //#region src/lib-ext/create-assets/create-cardsheets/create-cardsheet-params.ts
 const CardsheetCardSchema = zod.z.object({
 	face: zod.z.union([zod.z.string(), ZBaseCellSchema]),
@@ -1970,24 +1946,6 @@ var CreateCardsheet = class CreateCardsheet extends AbstractCreateAssets {
 	}
 };
 //#endregion
-//#region src/lib-ext/create-assets/create-cardsheets/create-cardsheet-run.ts
-/**
-* Call with the path to a CreateBoardParams config file.
-*/
-const args$2 = yargs.options({ i: {
-	alias: "input",
-	descript: "create-board-params config file",
-	type: "string",
-	demand: true
-} }).parseSync();
-async function main$2() {
-	const paramsJson = fs_extra.readFileSync(args$2.i);
-	const createCardSheet = CreateCardsheet.fromParamsJson(paramsJson);
-	await createCardSheet.clean();
-	await createCardSheet.writeFiles();
-}
-main$2();
-//#endregion
 //#region src/lib-ext/create-assets/create-d6/create-d6-params.ts
 const CreateD6ParamsSchema = zod.z.object({
 	rootDir: zod.z.string().min(1).optional(),
@@ -2241,24 +2199,6 @@ var CreateD6 = class CreateD6 extends AbstractCreateAssets {
 		});
 	}
 };
-//#endregion
-//#region src/lib-ext/create-assets/create-d6/create-d6-run.ts
-/**
-* Call with the path to a CreateBoardParams config file.
-*/
-const args$1 = yargs.options({ i: {
-	alias: "input",
-	descript: "create-board-params config file",
-	type: "string",
-	demand: true
-} }).parseSync();
-async function main$1() {
-	const paramsJson = fs_extra.readFileSync(args$1.i);
-	const createCardSheet = CreateD6.fromParamsJson(paramsJson);
-	await createCardSheet.clean();
-	await createCardSheet.writeFiles();
-}
-main$1();
 //#endregion
 //#region src/lib-ext/model/cube-tiled-model/cube-tiled-model.data.ts
 const CUBE_MODEL_WITHOUT_TOP = `# 1x1x1 cube, UVs for top face (with gutter)
@@ -2613,105 +2553,6 @@ var HullModel = class HullModel extends AbstractModel {
 		return lines.join("\n");
 	}
 };
-//#endregion
-//#region src/lib-ext/nsid/extract-nsid-to-template-id.ts
-/**
-* Create map from template metadata ("NSID") to template id.
-*
-* ARGS:
-* -i : path to assets/Templates dir
-* -o : path to src/out.json file
-* -f : overwrite any existing output file
-*/
-const args = yargs.options({
-	i: {
-		alias: "input",
-		descript: "input directory",
-		type: "string",
-		demand: true
-	},
-	o: {
-		alias: "output",
-		descript: "output file (JSON)",
-		type: "string",
-		demand: true
-	},
-	f: {
-		alias: "force",
-		descript: "overwrite any existing output file?",
-		type: "boolean"
-	}
-}).parseSync();
-async function main() {
-	const root = path.resolve(args.i);
-	if (!fs_extra.existsSync(root) || !fs_extra.statSync(root).isDirectory) throw new Error(`missing (-i) template directory "${root}"`);
-	console.log("\n----- LOCATING TEMPLATE JSON FILES -----\n");
-	console.log(`scanning "${root}"`);
-	const jsonFilenames = (0, klaw_sync.default)(root, {
-		filter: (item) => path.extname(item.path) === ".json",
-		nodir: true,
-		traverseAll: true
-	}).map((item) => item.path);
-	const nsidToTemplateId = {};
-	for (const jsonFilename of jsonFilenames) {
-		const json = fs_extra.readJSONSync(jsonFilename);
-		const templateId = json.GUID;
-		let nsid = json.Metadata;
-		if (typeof templateId !== "string") {
-			console.log(`rejecting no GUID: "${jsonFilename}"`);
-			continue;
-		}
-		if (typeof nsid !== "string") {
-			console.log(`rejecting no metadata: "${jsonFilename}"`);
-			continue;
-		}
-		if (json.Type === "Card" && typeof json.CardMetadata === "object") {
-			var _cardNsids$;
-			const cardNsids = Object.values(json.CardMetadata);
-			if (cardNsids.length === 1 && (((_cardNsids$ = cardNsids[0]) === null || _cardNsids$ === void 0 ? void 0 : _cardNsids$.length) ?? 0) > 0) {
-				const newNsid = cardNsids[0];
-				if (nsid !== newNsid) {
-					console.log(`REPLACING SINGLETON "${nsid}" with "${newNsid}" (${jsonFilename})`);
-					nsid = newNsid;
-				}
-			} else if (cardNsids.length > 1) {
-				const getPrefix = (items) => {
-					const firstParts = (items[0] ?? "").split(".");
-					let matchingPartsCount = firstParts.length;
-					for (const item of items) {
-						const parts = item.split(".");
-						for (let i = 0; i < parts.length; i++) if (parts[i] !== firstParts[i]) {
-							matchingPartsCount = Math.min(matchingPartsCount, i);
-							break;
-						}
-					}
-					return firstParts.slice(0, matchingPartsCount).join(".");
-				};
-				const newNsid = `${getPrefix(cardNsids.map((cardNsid) => {
-					const m = cardNsid.match("([^:]+):([^/]+)/.+");
-					return (m === null || m === void 0 ? void 0 : m[1]) ?? "";
-				}))}:${getPrefix(cardNsids.map((cardNsid) => {
-					const m = cardNsid.match("([^:]+):([^/]+)/.+");
-					return (m === null || m === void 0 ? void 0 : m[2]) ?? "";
-				}))}/*`;
-				if (nsid !== newNsid) {
-					console.log(`REPLACING DECK "${nsid}" with "${newNsid}" (${jsonFilename})`);
-					nsid = newNsid;
-				}
-			}
-		}
-		if (!nsid.match("[^:]+:[^/]+/.+")) {
-			console.log(`rejecting not nsid: "${jsonFilename}" ("${nsid}")`);
-			continue;
-		}
-		console.log(`accepting "${jsonFilename}"`);
-		if (nsidToTemplateId[nsid]) throw new Error(`Duplicate NSID "${nsid}"`);
-		nsidToTemplateId[nsid] = templateId;
-	}
-	const data = JSON.stringify(nsidToTemplateId, Object.keys(nsidToTemplateId).sort(), 4) + "\n";
-	fs_extra.writeFileSync(args.o, data);
-}
-main();
 //#endregion
 //#region src/lib-ext/wavefront-obj/wavefront-obj.ts
 /**
