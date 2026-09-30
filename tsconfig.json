@@ -19,8 +19,7 @@
         "target": "ES6",
         "sourceMap": true,
         "declaration": true,
-        "declarationDir": "./build",
-        "removeComments": true
+        "declarationDir": "./build"
     },
     "include": ["src/**/*.ts", "src/lib-ext/image/cell/solid-cell"],
     "exclude": ["src/**/*.test.ts", "**/jest-util/**/*.ts"]
