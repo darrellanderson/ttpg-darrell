@@ -25,7 +25,7 @@
         "index": "yarn cti ./src -i '*.test.ts' -i '*.testp.ts' -i '*-run.ts' -i 'extract-nsid-to-template-id.ts' -e jest-util -e lib-ext && find . -name 'index.ts.bak' -exec rm {} \\;",
         "index-ext": "yarn cti ./src/lib-ext -i '*.test.ts' -i '*.testp.ts' -i '*-run.ts' -i 'extract-nsid-to-template-id.ts' -e jest-util -e lib && find . -name 'index.ts.bak' -exec rm {} \\;",
         "build": "tsc -p tsconfig.json",
-        "clean": "rm -rf build",
+        "clean": "rm -rf build && rm -rf dist",
         "lint": "ESLINT_USE_FLAT_CONFIG=false eslint --ext .ts --debug src",
         "prepublishOnly": "yarn index && yarn index-ext && yarn build && yarn tsdown",
         "watch": "tsc -w -p tsconfig.json"
