@@ -5,13 +5,6 @@ export declare abstract class AbstractCreateAssets {
     [key: string]: Buffer;
   }>;
   static cleanByFilePrefix(dir: string, filenamePrefix: string): Promise<void>;
-  /**
-   * Image buffers are PNG internally, re-encode as JPG if requested.
-   *
-   * @param filename
-   * @param buffer
-   * @returns
-   */
   static encodeOutputBuffer(filename: string, buffer: Buffer): Promise<Buffer>;
   static writeOneFile(filename: string, buffer: Buffer): Promise<void>;
   writeFiles(): Promise<void>;
@@ -458,19 +451,6 @@ export declare class ImageSplit {
 }
 //#endregion
 //#region src/lib-ext/create-assets/create-board/create-board.d.ts
-/**
- * Create assets for a (potentially large) board.
- *
- * assets/Textures:
- * - Split large board image into GPU friendly chunks.
- * - Bleed edges for UV gutters.
- *
- * assets/Models:
- * - Shared 1x1 cube with UV bleed gutters on top face.
- *
- * assets/Templates:
- * - Template with sub-meshes for each image chunk.
- */
 export declare class CreateBoard extends AbstractCreateAssets {
   private static readonly INSET_SIZE;
   private readonly _params;
@@ -1906,56 +1886,14 @@ export declare class CreateCardsheet extends AbstractCreateAssets {
   static fromParamsJson(paramsJson: Buffer): CreateCardsheet;
   constructor(params: CreateCardsheetParams);
   clean(): Promise<void>;
-  /**
-   * Create a single cell from image data (either a filename, or a ZCell schema).
-   *
-   * @param imageData
-   * @returns
-   */
   private _getCardCell;
-  /**
-   * Create (with potential resize) card cells.
-   * It is better to use cells than PNG Buffer because we can leverage
-   * GridCell to merge them into cardsheets later.
-   *
-   * @param cardSide
-   * @returns
-   */
   private _getCardCells;
-  /**
-   * Organize cards into one or more sheets (possible overflow due to size limits).
-   *
-   * @returns
-   */
   private _getSheetPlan;
   toFileData(): Promise<{
     [key: string]: Buffer;
   }>;
-  /**
-   * Generage the cardsheet image(s) for a single cardsheet, always face and
-   * optionally back if using a different image for each card back (shared
-   * back is created via a different path).
-   *
-   * If the sheet is split up, this just generates one entry.
-   *
-   * @param sheetPlan
-   * @param cardSide
-   * @returns
-   */
   private _createCardSheet;
-  /**
-   * If using a shared back (single card), create it.
-   *
-   * @returns
-   */
   private _createSharedBack;
-  /**
-   * Generate the template for a single cardsheet.
-   *
-   * If the sheet is split up, this just generates one entry.
-   *
-   * @param sheetPlan
-   */
   private _createDeckTemplate;
 }
 //#endregion
@@ -2466,13 +2404,6 @@ export type CellSnapPoint = {
   rotation?: number;
   range?: number;
 };
-/**
- * Create images from one or more cells.
- *
- * Fix size in the constructor, do not resize cells afterward!
- *
- * Cells may not be shared, they can have one one parent.
- */
 export declare abstract class AbstractCell {
   private readonly _width;
   private readonly _height;
@@ -2480,78 +2411,20 @@ export declare abstract class AbstractCell {
   private readonly _snapPoints;
   private _parent;
   private _localPosition;
-  /**
-   * Calculate the max width and height of cells.
-   *
-   * @param cells
-   * @returns
-   */
   static getMaxSize(cells: Array<AbstractCell>): CellSize;
-  /**
-   * Constructor.
-   *
-   * Require children at constructor time, getSize does not change
-   * so we can do layout now.
-   *
-   * @param children
-   */
   constructor(width: number, height: number, children?: Array<CellChild>);
   addSnapPoint(snapPoint: CellSnapPoint): this;
-  /**
-   * Get the UV [0:1] coordinates of the center of this cell
-   * with respect to the root cell size.
-   *
-   * @returns
-   */
   getCenterUV(): UVPosition;
-  /**
-   * Get children.
-   *
-   * @returns
-   */
   getChildren(): Array<AbstractCell>;
-  /**
-   * Get position relative to the direct parent cell.
-   *
-   * @returns
-   */
   getLocalPosition(): CellPosition;
-  /**
-   * Get position relative to the root cell, potentially several
-   * cells outward.
-   *
-   * @returns
-   */
   getGlobalPosition(): CellPosition;
-  /**
-   * Get all snap points, rewrite to global positions.
-   *
-   * @returns
-   */
   getSnapPoints(): Array<CellSnapPoint>;
-  /**
-   * Get (immutable) cell size.
-   *
-   * @returns
-   */
   getSize(): CellSize;
-  /**
-   * Render cell to PNG image.
-   */
   abstract toBuffer(): Promise<Buffer>;
-  /**
-   * For cell group styles, render children in order.
-   *
-   * @returns
-   */
   protected _renderChildren(): Promise<Buffer>;
 }
 //#endregion
 //#region src/lib-ext/image/cell/bleed-cell/bleed-cell.d.ts
-/**
- * Wrap a cell in a bleed-size frame, copy edge pixels from the cell
- * to the edge of the larger bleed-cell.
- */
 export declare class BleedCell extends AbstractCell {
   private readonly _innerCell;
   private readonly _bleedLeftRight;
@@ -4599,29 +4472,15 @@ export declare const ZTextCellSchema: z.ZodObject<{
 export type ZTextCell = z.infer<typeof ZTextCellSchema>;
 //#endregion
 //#region src/lib-ext/image/cell/col-cell/col-cell.d.ts
-/**
- * Layout cells in a column.
- */
 export declare class ColCell extends AbstractCell {
   constructor(children: Array<AbstractCell>, spacing?: number);
   toBuffer(): Promise<Buffer>;
 }
 //#endregion
 //#region src/lib-ext/image/cell/grid-cell/grid-cell.d.ts
-/**
- * Layout cells in a grid (potentially for cardsheets).
- */
 export declare class GridCell extends AbstractCell {
   static readonly MAX_DIMENSION = 4096;
   static getMaxCellCount(cellSize: CellSize): number;
-  /**
-   * Most GPUs reserve power-of-2 dimensions.  Compute the
-   * row/col layout with the fewest wasted pixels.
-   *
-   * @param cellCount
-   * @param cellSize
-   * @returns
-   */
   static getOptimalLayout(cellCount: number, cellSize: CellSize): {
     cols: number;
     rows: number;
@@ -4631,9 +4490,6 @@ export declare class GridCell extends AbstractCell {
 }
 //#endregion
 //#region src/lib-ext/image/cell/image-cell/image-cell.d.ts
-/**
- * Load an image from a file.
- */
 export declare class ImageCell extends AbstractCell {
   private readonly _imageFile;
   private _alpha;
@@ -4658,9 +4514,6 @@ export declare class PaddedCell extends AbstractCell {
 }
 //#endregion
 //#region src/lib-ext/image/cell/resize-cell/resize-cell.d.ts
-/**
- * Wrap another cell, resizing it to the given dimensions.
- */
 export declare class ResizeCell extends AbstractCell {
   private readonly _innerCell;
   constructor(width: number, height: number, cell: AbstractCell);
@@ -4668,9 +4521,6 @@ export declare class ResizeCell extends AbstractCell {
 }
 //#endregion
 //#region src/lib-ext/image/cell/row-cell/row-cell.d.ts
-/**
- * Layout cells in a row.
- */
 export declare class RowCell extends AbstractCell {
   constructor(children: Array<AbstractCell>, spacing?: number);
   toBuffer(): Promise<Buffer>;
@@ -4685,11 +4535,6 @@ export declare class SolidCell extends AbstractCell {
 }
 //#endregion
 //#region src/lib-ext/image/cell/text-cell/text-cell.d.ts
-/**
- * Center text in a cell.
- *
- * Supports custom fonts, which must be installed on the system.
- */
 export declare class TextCell extends AbstractCell {
   private readonly _text;
   private _font;
@@ -4713,17 +4558,7 @@ export type OffsetAndSize = {
 };
 export type ObjVertexForFace = `${number}/${number | ""}/${number | ""}`;
 export declare abstract class AbstractModel {
-  /**
-   * Given a size, calculate the inset bounds for the UV mapped space.
-   *
-   * @param width
-   * @param height
-   * @returns
-   */
   static getInsetForUVs(width: number, height: number): OffsetAndSize;
-  /**
-   * Given a size, calculate the outset bounds after applying UV gutters.
-   */
   static getOutsetForUVs(width: number, height: number): OffsetAndSize;
   static triangleStrip(vertices: Array<ObjVertexForFace>, isTop: boolean): Array<string>;
   static triangleSides(topVerticies: Array<ObjVertexForFace>, botVerticies: Array<ObjVertexForFace>): Array<string>;
@@ -4775,39 +4610,12 @@ export declare class HullModel extends AbstractModel {
   private _height;
   private _padding;
   private _pixelSize;
-  /**
-   * Given an arbitrary collection of points, create a clockwise-winging
-   * XY hull (clear Z).
-   *
-   * @param points
-   * @returns {Array<HullVector3d>} padded hull
-   */
   static __convexHull(points: Array<HullVector3d>): Array<HullVector3d>;
   constructor(points: Array<HullVector3d>, height: number);
   getHull(): Array<HullVector3d>;
-  /**
-   * Pad the hull by a given amount, creating a new hull.
-   * Apply corner segments to smooth the hull.
-   *
-   * @param padding
-   * @param cornerSegments
-   * @returns
-   */
   padHull(padding: number, cornerSegments: number): this;
-  /**
-   * Quantize hull, "pixelating" then creating a hull from pixel corners.
-   * This can significantly reduce the number of edges in the hull,
-   * especially for curves.  Hull will grow by a portion of pixel size.
-   */
   quantizeHull(pixelSize: number): this;
   cleanHull(): this;
-  /**
-   * Generate the side normals for each point, the next point should be split
-   * and have the pervious point's normal followed by that point's normal.
-   *
-   * @param hull
-   * @returns
-   */
   static _getSideNormals(hull: Array<HullVector3d>): Array<HullVector3d>;
   static _toObjLineine(type: "v" | "vn", vertex: HullVector3d): string;
   toModel(): string;
@@ -4824,22 +4632,9 @@ export declare abstract class AbstractTemplate {
   private _scriptName;
   private _tags;
   constructor();
-  /**
-   * Create a deterministic GUID from this string.
-   * Suggest using the template file path for uniqueness.
-   *
-   * @param guidFrom
-   * @returns
-   */
   setGuidFrom(guidFrom: string): this;
   setTags(tags: Array<string>): this;
   setTemplateMetadata(templateMetadata: string): this;
-  /**
-   * Template name appears in the object library.
-   *
-   * @param name
-   * @returns
-   */
   setTemplateName(templateName: string): this;
   setScriptName(scriptName: string): this;
   copyAndFillBasicFields(template: TemplateType): TemplateType;
@@ -5191,9 +4986,6 @@ export type WavefrontFaceEntry = {
   uvIndexOneBased: number;
 };
 export type WavefrontFace = Array<WavefrontFaceEntry>;
-/**
- * Parse and generate Wavefront OBJ files.
- */
 export declare class WavefrontObj {
   private readonly _vertices;
   private readonly _normals;

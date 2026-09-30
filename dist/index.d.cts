@@ -1,13 +1,6 @@
 import { Button, Canvas, Card, CardHolder, Color, Container, Dice, FetchOptions, FetchResponse, GameObject, MultistateObject, Player, PlayerPermission, Rotator, ScreenUIElement, SnapPoint, StaticObject, UIElement, Vector, Widget } from "@tabletop-playground/api";
 //#region src/lib/adjacency/adjacency.d.ts
-/**
- * Opaque node id.  Could be a hex coordinate, a wormhole class, etc.
- */
 export type AdjacencyNodeType = string;
-/**
- * Directed link between two nodes.
- * Paths cannot end with a transit node; they must connect two non-transit nodes.
- */
 export type AdjacencyLinkType = {
   src: AdjacencyNodeType;
   dst: AdjacencyNodeType;
@@ -23,27 +16,11 @@ export declare class Adjacency {
   private readonly _srcNodeOutgoingLinks;
   addLink(link: AdjacencyLinkType): this;
   hasLink(link: AdjacencyLinkType): boolean;
-  /**
-   * Remove all links starting OR ENDING from the given node.
-   *
-   * @param node
-   */
   removeNode(node: AdjacencyNodeType): this;
-  /**
-   * Compute shortest paths to all nodes within maxDistance.
-   *
-   * @param origin
-   * @param maxDistance
-   * @returns
-   */
   get(origin: AdjacencyNodeType, maxDistance: number): ReadonlyArray<AdjacencyPathType>;
 }
 //#endregion
 //#region src/lib/atop/atop.d.ts
-/**
- * Is a position within an object's XY space? (account for scale and rotaton)
- * Becomes invalid if object size/scale changes.
- */
 export declare class Atop {
   private readonly _obj;
   private readonly _scaledExtent;
@@ -52,41 +29,12 @@ export declare class Atop {
 }
 //#endregion
 //#region src/lib/broadcast/broadcast.d.ts
-/**
- * Send messages to one or all players.
- */
 export declare class Broadcast {
   static get ERROR(): Color;
   static lastMessage: string;
-  /**
-   * Sends a message to all players, appears on screen and in chat.
-   *
-   * @param {string} message - The message to send.
-   * @param {Color | [number, number, number, number]} [color] - The color of the message.
-   */
   static broadcastAll(message: string, color?: Color | [r: number, g: number, b: number, a: number]): void;
-  /**
-   * Sends a message to one player, appears on screen and in chat.
-   *
-   * @param {Player} player - The player to send the message to.
-   * @param {string} message - The message to send.
-   * @param {Color | [number, number, number, number]} [color] - The color of the message.
-   */
   static broadcastOne(player: Player, message: string, color?: Color | [r: number, g: number, b: number, a: number]): void;
-  /**
-   * Sends a chat message to all players.
-   *
-   * @param {string} message - The message to send.
-   * @param {Color | [number, number, number, number]} [color] - The color of the message.
-   */
   static chatAll(message: string, color?: Color | [r: number, g: number, b: number, a: number]): void;
-  /**
-   * Sends a chat message to one player.
-   *
-   * @param {Player} player - The player to send the message to.
-   * @param {string} message - The message to send.
-   * @param {Color | [number, number, number, number]} [color] - The color of the message.
-   */
   static chatOne(player: Player, message: string, color?: Color | [r: number, g: number, b: number, a: number]): void;
 }
 //#endregion
@@ -96,10 +44,6 @@ export interface IGlobal {
 }
 //#endregion
 //#region src/lib/bug-workarounds/bug-card-holder-assignment/bug-card-holder-assignment.d.ts
-/**
- * Monitor card holder, expect it to be the primary holder for
- * the owning player slot player.
- */
 export declare class BugCardHolderAssignment implements IGlobal {
   private readonly _find;
   private readonly _cardHolderNsid;
@@ -115,10 +59,6 @@ export declare class BugCardHolderAssignment implements IGlobal {
 //#endregion
 //#region src/lib/bug-workarounds/bug-force-transform-updates/bug-force-transform-updates.d.ts
 export declare const DELTA: number;
-/**
- * Object transforms aren't getting replicated reliably.
- * When an object stops moving, force a few transform updates.
- */
 export declare class BugForceTransformUpdates implements IGlobal {
   private readonly _idToRemainingPokeCount;
   readonly _maybeStartPoking: (obj: GameObject) => void;
@@ -128,10 +68,6 @@ export declare class BugForceTransformUpdates implements IGlobal {
 }
 //#endregion
 //#region src/lib/bug-workarounds/bug-unique-cards/bug-unique-cards.d.ts
-/**
- * Monitor all decks expecting no NSID (metadata) repeats.
- * Prune extra cards if found.
- */
 export declare class BugUniqueCards implements IGlobal {
   private readonly _cardUtil;
   private _reportErrors;
@@ -144,46 +80,10 @@ export declare class BugUniqueCards implements IGlobal {
 //#region src/lib/card-util/card-util.d.ts
 export declare class CardUtil {
   private readonly _find;
-  /**
-   * Deal card to the player's card holder.
-   * (Card.deal may fail if holder is not attached to player.)
-   *
-   * @param card
-   * @param playerSlot
-   * @returns
-   */
   dealToHolder(card: Card, playerSlot: number): boolean;
-  /**
-   * Find the card anywhere on the table / in-deck / in-holder.
-   * Remove from deck or holder, if applicable.
-   *
-   * @param nsid
-   * @returns
-   */
   fetchCard(nsid: string): Card | undefined;
-  /**
-   * Extract filter-approved cards into a new deck.  Leave any remaining
-   * cards in the old deck (may potentially become empty).
-   *
-   * @param deck
-   * @param filter
-   * @returns - new deck with filtered cards
-   */
   filterCards(deck: Card, filter: (nsid: string) => boolean): Card | undefined;
-  /**
-   * Is this card a singleton (not a deck), not held by a player, etc.
-   *
-   * @param obj
-   * @param allowFaceDown
-   * @returns
-   */
   isLooseCard(obj: GameObject, allowFaceDown?: boolean, rejectSnapPointTags?: Array<string>): boolean;
-  /**
-   * Split a deck into an array of single-card objects.
-   *
-   * @param deck
-   * @returns
-   */
   separateDeck(deck: Card): Array<Card>;
 }
 //#endregion
@@ -197,11 +97,6 @@ export declare const WINDOW_BUTTON_ASSET: {
   readonly TO_SCREEN: "ui/window/to-screen.png";
   readonly TO_WORLD: "ui/window/to-world.png";
 };
-/**
- * Wrapper around a widget, created before attaching to a window and
- * destroyed after detaching.  The IWindowWidget is not reused, will
- * create a new one if needed.
- */
 export interface IWindowWidget {
   create(params: WindowWidgetParams): Widget;
   destroy(): void;
@@ -280,20 +175,7 @@ export declare class ChessClockData {
   connectDiscordSpeaking(discordToken: string): void;
   disconnectDiscordSpeaking(): void;
   getActivePlayerSlot(): number;
-  /**
-   * Override the current turn player.
-   *
-   * @param playerSlot
-   * @returns
-   */
   overrideActivePlayerSlot(playerSlot: number): this;
-  /**
-   * Turn change, set current player and tell speaking
-   * where to refund talk-over time.
-   *
-   * @param playerSlot
-   * @returns
-   */
   setCurrentTurn(playerSlot: number): this;
   getPlayerCount(): number;
   setPlayerCount(playerCount: number): this;
@@ -392,41 +274,18 @@ export declare class ColorLib {
 }
 //#endregion
 //#region src/lib/context-menu/abstract-right-click-card/abstract-right-click-card.d.ts
-/**
- * Add a context menu item ONLY when the singleton card exists.
- * Remove it if the card becomes a deck.
- *
- * NOTE: the handler is a standard onCustomAction handler -- you need to verify
- * the identifier before processing!  This is to match other onCustomAction
- * handling rather than create a new signature.
- */
 export declare abstract class AbstractRightClickCard implements IGlobal {
   private readonly _cardNsidPrefix;
   private readonly _customActionNames;
   private readonly _tooltips;
   private readonly _customActionHandler;
   constructor(cardNsidPrefix: string, customActionName: string, customActionHandler: (object: GameObject, player: Player, identifier: string) => void);
-  /**
-   * The first tooltip is
-   *
-   * @param tooltip
-   */
   setTooltip(actionName: string, tooltip: string): this;
   addCustomActionName(customActionName: string): this;
   init(): void;
 }
 //#endregion
 //#region src/lib/context-menu/abstract-right-click-deck/abstract-right-click-deck.d.ts
-/**
- * Add context menu item on a deck ONLY when all cards match the given prefix.
- * Remove it if the deck becomes a singleton card.
- *
- * NOTE: does not remove the handler if a mismatch card is added to the deck later!
- *
- * NOTE: the handler is a standard onCustomAction handler -- you need to verify
- * the identifier before processing!  This is to match other onCustomAction
- * handling rather than create a new signature.
- */
 export declare abstract class AbstractRightClickDeck implements IGlobal {
   private readonly _deckNsidPrefix;
   private readonly _customActionNames;
@@ -437,21 +296,10 @@ export declare abstract class AbstractRightClickDeck implements IGlobal {
 }
 //#endregion
 //#region src/lib/context-menu/leave-seat/leave-seat.d.ts
-/**
- * Global content menu item to leave seat.  Move to an unused slot, NOT the
- * spectator slot (spectators cannot interact, preventing them from clicking
- * any "take seat" buttons).
- */
 export declare class LeaveSeat implements IGlobal {
   static readonly CUSTOM_ACTION_NAME = "*Leave Seat";
   private static readonly _customActionHandler;
   init(): void;
-  /**
-   * Move player to an "unused" slot, meaning no existing player NOR any
-   * object's owning player slot.
-   *
-   * @param player
-   */
   static leaveSeat(player: Player): boolean;
 }
 //#endregion
@@ -466,114 +314,24 @@ export declare class ReportRemaining implements IGlobal {
 }
 //#endregion
 //#region src/lib/data-store/data-store.d.ts
-/**
- * Store arbitrarily large opaque data.
- *
- * Creates a container, stored data gets broken up into chunks and spread
- * across objects inside that container.  If data exceeds the single object
- * limits it chains to a new object.
- *
- * Different data keys can store inside a shared object, creating more
- * objects only when the existing set fills.
- *
- * This does suffer from internal fragmentation; storing many very small
- * data entries wastes space.
- */
 export declare class DataStore {
   private readonly _root;
-  /**
-   * constructor
-   *
-   * @param dataStoreId - each store MUST have a different id
-   */
   constructor(dataStoreId: NamespaceId);
-  /**
-   * Remove data.
-   *
-   * @param dataId
-   * @returns
-   */
   delete(dataId: NamespaceId): void;
-  /**
-   * Add or replace data.
-   *
-   * @param dataId
-   * @param data
-   * @returns
-   */
   set(dataId: NamespaceId, data: string): void;
-  /**
-   * Get data.
-   *
-   * @param dataId
-   * @returns
-   */
   get(dataId: NamespaceId): string | undefined;
-  /**
-   * Get the first data block location for the data entry.
-   *
-   * @param dataId
-   * @returns
-   */
   private _getRootEntry;
-  /**
-   * Read all blocks starting with the given location.
-   *
-   * @param blockLocation
-   * @param processor
-   */
   private _getChain;
-  /**
-   * Reserve a block (index within a store file).
-   * If store has no more free slots remove it from root available list.
-   *
-   * @returns
-   */
   private _allocBlock;
-  /**
-   * Release a block (index within a store file).
-   * If the store is no longer in use delete it.
-   *
-   * @param blockLocation
-   */
   private _releaseBlock;
-  /**
-   * Add store to available with-capacity list (store has more room).
-   *
-   * @param obj
-   */
   private _addStoreToAvailable;
-  /**
-   * Remove store from available with-capcity list (store is full).
-   *
-   * @param obj
-   */
   private _removeStoreFromAvailable;
-  /**
-   * Get a store from the list of stores with free slots.
-   *
-   * @returns
-   */
   private _getStore;
-  /**
-   * Create a new store, add to the list of stores with free slots.
-   *
-   * @returns
-   */
   private _allocStore;
-  /**
-   * Remove a store from the list of stores with free slots, then
-   * delete the store object.
-   *
-   * @param obj
-   */
   private _releaseStore;
 }
 //#endregion
 //#region src/lib/dice-group/dice-group.d.ts
-/**
- * Setup for a single die.
- */
 export type DiceParams = {
   sides: 4 | 6 | 8 | 10 | 12 | 20;
   id?: string;
@@ -585,9 +343,6 @@ export type DiceParams = {
   critCount?: number;
   reroll?: boolean;
 };
-/**
- * Setup for a group of dice.
- */
 export type DiceGroupParams = {
   diceParams: Array<DiceParams>;
   player: Player;
@@ -607,34 +362,13 @@ export type DiceResult = {
   rerolledValue?: number;
 };
 export declare const DICE_GROUP_SAVED_DATA_KEY = "__DiceGroup_DiceId__";
-/**
- * Remove any lingering DiceGroup dice.
- */
 export declare class DiceGroupCleanup implements IGlobal {
   init(): void;
 }
-/**
- * Roll a collection of dice, listen to onRolled for overall result.
- * Can only be used once, create a new one for new rolls.
- *
- * Intended use: roll + format
- */
 export declare class DiceGroup {
   static readonly DEFAULT_TIMEOUT_SECONDS = 3;
   static readonly DEFAULT_DELETE_AFTER_SECONDS = 5;
-  /**
-   * Create and roll dice group.
-   * Do via static to prevent attempting to reuse the single-use instance.
-   *
-   * @param params
-   */
   static roll(params: DiceGroupParams): void;
-  /**
-   * Format a dice result for display.
-   *
-   * @param diceResult
-   * @returns
-   */
   static format(diceResult: DiceResult): string;
   private readonly _diceParamsArray;
   private readonly _player;
@@ -659,36 +393,12 @@ export declare class DiceGroup {
 }
 //#endregion
 //#region src/lib/event/triggerable-multicast-delegate/triggerable-multicast-delegate.d.ts
-/**
- * Lookalike for TTPG's MulticastDelegate, but with a trigger method.
- */
 export declare class TriggerableMulticastDelegate<T extends (...args: Array<any>) => any> {
   private readonly _listeners;
   private _triggerDepth;
-  /**
-   * Add a function to the trigger set.
-   *
-   * @param fn
-   */
   add(fn: T): void;
-  /**
-   * Remove a function from the trigger set.
-   *
-   * @param fn
-   */
   remove(fn: T): void;
-  /**
-   * Clear the trigger set.
-   */
   clear(): void;
-  /**
-   * Call every function in the trigger set.
-   *
-   * Call every function even if one throws, send gathered errors at end directly to error handler;
-   * does not throw/stop processing.
-   *
-   * @param args
-   */
   trigger(...args: Parameters<T>): void;
 }
 //#endregion
@@ -732,59 +442,16 @@ export declare class TimeSpanRecord {
   readonly start: number;
   readonly end: number;
   constructor(start: number, end: number);
-  /**
-   * Create an identical copy with different start and end values.
-   *
-   * @param start
-   * @param end
-   * @returns
-   */
   clone(start: number, end: number): TimeSpanRecord;
   toString(): string;
 }
-/**
- * Collect non-overlapping time spans.
- * Split will break spans into two at the given time.
- */
 export declare class TimeSpans<T extends TimeSpanRecord> {
   private readonly _spans;
-  /**
-   * Add a new record.
-   *
-   * @param timeSpanRecord
-   * @returns
-   */
   add(timeSpanRecord: T): this;
   getSpans(): Array<T>;
-  /**
-   * Remove spans ending before the given time.
-   *
-   * @param time
-   * @returns
-   */
   evictOld(time: number): this;
-  /**
-   * "Rewrite" the end time of the last span.
-   * Used to mark the end of a time span that previously had no end.
-   *
-   * @param time
-   * @returns
-   */
   clampLast(time: number): this;
-  /**
-   * Split any span that contains the given time into two at that time.
-   *
-   * @param time
-   * @returns
-   */
   split(time: number): this;
-  /**
-   * Get all spans that fully overlap the given time span.
-   *
-   * @param start
-   * @param end
-   * @returns
-   */
   overlaps(start: number, end: number): Array<T>;
 }
 //#endregion
@@ -796,10 +463,6 @@ export declare class SpeakingAssignRecord extends TimeSpanRecord {
   clone(start: number, end: number): TimeSpanRecord;
   toString(): string;
 }
-/**
- * Spans get assigned a default user (the current turn, may be undefined).
- * Speaking events carve up and add speakers to spans.
- */
 export declare class SpeakingAssign {
   private readonly _spans;
   constructor();
@@ -819,47 +482,18 @@ export type SpeakingRecord = {
   endSeconds: number;
 };
 export declare class SpeakingParser {
-  /**
-   * Extract speaking records from summary.
-   * Lines are "timestamp userId duration", userId does not have spaces.
-   *
-   * @param summary
-   * @returns
-   */
   parse(summary: string): Array<SpeakingRecord>;
 }
 //#endregion
 //#region src/lib/discord/discord-web-hook/discord-web-hook.d.ts
-/**
- * Create, read, and delete discord messages using a webhook.
- * Only needs the "fetch" API, suitable for use in Tabletop Playground.
- */
 export declare class DiscordWebHook {
   private readonly URL;
   private _id;
   private _token;
   setId(id: string): this;
   setToken(token: string): this;
-  /**
-   * Post a message to the webhook channel.
-   *
-   * @param message
-   * @returns messsageId
-   */
   put(message: string): Promise<string>;
-  /**
-   * Read the content of a webhook-posted message.
-   *
-   * @param messageId
-   * @returns message content
-   */
   get(messageId: string): Promise<string>;
-  /**
-   * Delete a message posted by the webhook.
-   *
-   * @param messageId
-   * @returns void
-   */
   dele(messageId: string): Promise<void>;
 }
 //#endregion
@@ -869,9 +503,6 @@ export type BugSplatRemoteReporterParams = {
   appName: string;
   appVersion: string;
 };
-/**
- * Report errors or other messages to a remote service.
- */
 export declare class BugSplatRemoteReporter implements IGlobal {
   private static __isEnabled;
   private readonly _database;
@@ -889,12 +520,6 @@ export declare class BugSplatRemoteReporter implements IGlobal {
 //#endregion
 //#region src/lib/error-handler/error-batcher.d.ts
 export declare abstract class ErrorBatcher {
-  /**
-   * Get error as string including stack trace (not just name/message).
-   *
-   * @param error
-   * @returns {string}
-   */
   static errorToString(error: Error): string;
   static runMaybeThrowAtEnd(runnables: Array<(x: void) => unknown>): void;
   static runGatherErrors(runnables: Array<(x: void) => unknown>): Array<Error>;
@@ -908,14 +533,6 @@ export type ErrorLocation = {
   jsColumn: number;
   tsLine?: number;
 };
-/**
- * Report stack traces with filenames relative to the Script directory,
- * use source mappings to report both js and transpiled ts line numbers.
- *
- * Add `"sourceMap": true` to the compilerOptions of your tsconfig.json.
- *
- * Install the error handler via `new ErrorHandler().init()`.
- */
 export declare class ErrorHandler implements IGlobal {
   static readonly onError: TriggerableMulticastDelegate<(error: string, rawError?: string) => void>;
   private readonly _reverseBase64Alphabet;
@@ -924,19 +541,7 @@ export declare class ErrorHandler implements IGlobal {
   init(): void;
   reportError(error: string): void;
   rewriteError(error: string): string;
-  /**
-   * Parse error location from a single line of a stack trace.
-   *
-   * @param stackTraceLine
-   * @returns error location
-   */
   parseErrorLocation(stackTraceLine: string): ErrorLocation | undefined;
-  /**
-   * Get the "{x}.js.map" file contents as a string.
-   *
-   * @param jsFile
-   * @returns
-   */
   getMap(jsFile: string): string | undefined;
   getLineMapping(jsFile: string): Array<number> | undefined;
   parseSourceMappings(mappingsEncoded: string): Array<number>;
@@ -952,9 +557,6 @@ export declare class OnCardBecameSingletonOrDeck implements IGlobal {
   private static readonly _onInsertedHandler;
   static _onRemovedHandler: (deck: Card, _removedCard: Card, _position: number, player?: Player) => void;
   static _onCreatedHandler: (obj: GameObject) => void;
-  /**
-   * Remove and (re)install handlers.  Safe to call multiple times.
-   */
   init(): void;
   static _reset(): void;
 }
@@ -975,14 +577,6 @@ export declare class Facing {
 }
 //#endregion
 //#region src/lib/find/find-tracking.d.ts
-/**
- * Find, but only for pre-tracked nsids.
- *
- * Monitors object (and card singleton) creation and destruction to keep an
- * up-to-date set.
- *
- * Unlike find this can track multiple objects with the same nsid.
- */
 export declare class FindTracking {
   private readonly _trackNsids;
   private readonly _nsidToObjIds;
@@ -990,10 +584,6 @@ export declare class FindTracking {
   private readonly _onObjectDestroyed;
   private readonly _onSingletonCardCreated;
   private readonly _onSingletonCardMadeDeck;
-  /**
-   * Rebuild the entire tracking map from scratch.
-   * Similar cost to reseeding a single nsid (full scan anyhow).
-   */
   _seedNsidToObjIds(): void;
   constructor();
   destroy(): void;
@@ -1005,10 +595,6 @@ export declare class FindTracking {
 }
 //#endregion
 //#region src/lib/find/find.d.ts
-/**
- * Find things in the game world.  Generally speaking finds the first matching
- * candidate; expecting objects to be unique.
- */
 export declare class Find {
   private static __ignoreCardHolderNsids;
   private _cardHolders;
@@ -1030,10 +616,6 @@ export declare class Find {
 }
 //#endregion
 //#region src/lib/game-object/cardholder-player-name/cardholder-player-name.d.ts
-/**
- * Display player name above-and-behind the card holder.
- * Show a "take seat" button when no player in slot.
- */
 export declare class CardHolderPlayerName {
   static readonly DEFAULT_FONT_SIZE = 30;
   private readonly _cardHolder;
@@ -1048,72 +630,31 @@ export declare class CardHolderPlayerName {
   setFontSizeAndPosition(fontSize: number): this;
   private _setPosition;
   private _updatePlayerStatus;
-  /**
-   * Update UI position for reversed card holder.
-   */
   reverseUI(): void;
 }
 //#endregion
 //#region src/lib/game-object/deleted-items-container/deleted-items-container.d.ts
-/**
- * Add the obj version of this to a container to make a copy of deleted objects.
- */
 export declare class DeletedItemsContainer {
   static IGNORE_TAG: string;
   private static readonly _ignoreNSIDs;
   private readonly _container;
   private readonly _oneTimeSkipObjIds;
-  /**
-   * Destroy the object without adding to a deleted items container.
-   *
-   * @param obj
-   */
   static destroyWithoutCopying(obj: GameObject): void;
-  /**
-   * Never copy these deleted items.
-   *
-   * @param nsids
-   */
   static ignoreNSIDs(nsids: Array<string>): void;
   constructor(container: Container);
   _onObjectDestroyed(obj: GameObject): void;
 }
 //#endregion
 //#region src/lib/game-object/garbage/garbage-container.d.ts
-/**
- * Possibly return the given object to its designated "thrown in the garbage" location.
- */
 export declare abstract class GarbageHandler {
-  /**
-   * Can recycle this object?
-   *
-   * @param obj
-   */
   abstract canRecycle(obj: GameObject, player: Player | undefined): boolean;
-  /**
-   * Recycle the object.
-   *
-   * @param obj
-   * @returns true if recycled
-   */
   abstract recycle(obj: GameObject, player: Player | undefined): boolean;
 }
-/**
- * Attempt to recycle deposited objects, break up decks into individual cards.
- */
 export declare class GarbageContainer {
   static onRecycled: TriggerableMulticastDelegate<(objId: string, objName: string, objMetadata: string, player: Player | undefined) => void>;
   private static _garbageHandlers;
   private readonly _container;
-  /**
-   * Register a new recycler.
-   *
-   * @param garbageHandler
-   */
   static addHandler(garbageHandler: GarbageHandler): void;
-  /**
-   * Clear all recycle handlers (for tests).
-   */
   static clearHandlers(): void;
   static tryRecycle(obj: GameObject, player: Player | undefined): boolean;
   private static _tryRecycleObj;
@@ -1123,11 +664,6 @@ export declare class GarbageContainer {
 }
 //#endregion
 //#region src/lib/game-object/garbage/simple-card-garbage-handler.d.ts
-/**
- * Recycle cards to a specific snap point on a mat.
- * Add to any deck already there, or start a new deck.
- * Optionally shuffle after discard.
- */
 export declare class SimpleCardGarbageHandler implements GarbageHandler {
   private readonly _find;
   private _cardNsidPrefix;
@@ -1143,9 +679,6 @@ export declare class SimpleCardGarbageHandler implements GarbageHandler {
 }
 //#endregion
 //#region src/lib/game-object/garbage/simple-to-container-handler.d.ts
-/**
- * Recycle object(s) to a container, optionally matching owning slot.
- */
 export declare class SimpleToContainerHandler implements GarbageHandler {
   private readonly _recycleObjectNsids;
   private readonly _find;
@@ -1159,11 +692,6 @@ export declare class SimpleToContainerHandler implements GarbageHandler {
 }
 //#endregion
 //#region src/lib/game-object/garbage/simple-to-snap-point-handler.d.ts
-/**
- * Recycle an object to a specific snap point with the matching tag.
- * Requires snap point not already occupied.
- * Expects snap point is unique; does not look beyond first match.
- */
 export declare class SimpleToSnapPointHandler implements GarbageHandler {
   private readonly _recycleObjectNsids;
   private readonly _find;
@@ -1178,54 +706,16 @@ export declare class SimpleToSnapPointHandler implements GarbageHandler {
 //#endregion
 //#region src/lib/global/global-init.d.ts
 export declare abstract class GlobalInit {
-  /**
-   * Run all the init functions (even if one throws).
-   * Batch together all errors for one throw at the end.
-   *
-   * @param abstractGlobals
-   */
   static runGlobalInit(abstractGlobals: Array<IGlobal>): void;
 }
 //#endregion
 //#region src/lib/heap/heap.d.ts
-/**
- * Collection of template type objects with associated number values.
- * Efficient add, peek/remove min.
- * @template T
- */
 export declare class Heap<T> {
   private readonly _heap;
-  /**
-   * Get the size of the heap.
-   * @returns {number} The size of the heap.
-   */
   size(): number;
-  /**
-   * Peek at the minimum item in the heap without removing it.
-   * @returns {T | undefined} The minimum item or undefined if the heap is empty.
-   */
   peekMin(): T | undefined;
-  /**
-   * Swap two items in the heap.
-   * @private
-   * @param {number} a - The index of the first item.
-   * @param {number} b - The index of the second item.
-   * @throws {Error} If either index is out of bounds.
-   */
   private _swap;
-  /**
-   * Add an item to the heap.
-   * @param {T} item - The item to add.
-   * @param {number} value - The value associated with the item.
-   * @returns {Heap} The heap instance.
-   * @throws {Error} If the item cannot be added.
-   */
   add(item: T, value: number): this;
-  /**
-   * Remove the minimum item from the heap.
-   * @returns {T | undefined} The removed item or undefined if the heap is empty.
-   * @throws {Error} If the item cannot be removed.
-   */
   removeMin(): T | undefined;
 }
 //#endregion
@@ -1244,45 +734,16 @@ export type HexLayoutType = {
 };
 export declare const HEX_LAYOUT_FLAT: HexLayoutType;
 export declare const HEX_LAYOUT_POINTY: HexLayoutType;
-/**
- * Heavily distilled hex math based on RedBlobGames excellent hex docs.
- * "Hex" values are strings for easy use as keys and comparison.
- */
 export declare class Hex {
   private readonly _hexLayoutType;
   private readonly _halfSize;
   private readonly _tableHeight;
-  /**
-   * Get adjacent hexes.
-   * First is "above", winding counterclockwise.
-   *
-   * @param {string} hex - Hex as "<q,r,s>" string
-   * @return {Array} list of hex strings
-   */
   static neighbors(hex: HexType): Array<HexType>;
-  /**
-   * Hex is a static-only class, do not instantiate it.
-   */
   constructor(layout: HexLayoutType, halfSize: number);
   static _maybeHexFromString(hex: HexType): [q: number, r: number, s: number] | undefined;
   static _hexFromString(hex: HexType): [q: number, r: number, s: number];
   static _hexToString(q: number, r: number, s: number): HexType;
-  /**
-   * Get hex at position.
-   *
-   * @param {Vector} pos - Cartesian position on XY surface
-   * @param {number} pos.x
-   * @param {number} pos.y
-   * @param {number} pos.z
-   * @returns {string} hex as "<q,r,s>" string
-   */
   fromPosition(pos: Vector): HexType;
-  /**
-   * Get position from hex.
-   *
-   * @param {string} hex - Hex as "<q,r,s>" string
-   * @returns {Vector} position
-   */
   toPosition(hex: HexType): Vector;
   fromCartesian(cartesian: {
     left: number;
@@ -1292,13 +753,6 @@ export declare class Hex {
     left: number;
     top: number;
   };
-  /**
-   * Get positions of hex corners.
-   * First at "top right", winding counterclockwise.
-   *
-   * @param {string} hex - Hex as "<q,r,s>" string
-   * @return {Array} list of position Vectors
-   */
   corners(hex: HexType): Array<Vector>;
 }
 //#endregion
@@ -1307,9 +761,6 @@ export type LayoutObjectsSize = {
   w: number;
   h: number;
 };
-/**
- * Position objects, intended for initial table setup.
- */
 export declare class LayoutObjects {
   private _children;
   private _horizontalAlignment;
@@ -1330,17 +781,7 @@ export declare class LayoutObjects {
   add(item: GameObject | LayoutObjects): this;
   addAfterLayout(f: () => void): this;
   flip(flipH: boolean, flipV: boolean): this;
-  /**
-   * Get size of self, applying any overrides.
-   *
-   * @returns {LayoutObjectsSize}
-   */
   calculateSize(): LayoutObjectsSize;
-  /**
-   * Get size from laying out children (ignore override on self).
-   *
-   * @returns {LayoutObjectsSize}
-   */
   calculateChildrenSize(): LayoutObjectsSize;
   static _calculateChildSize(child: GameObject | LayoutObjects): LayoutObjectsSize;
   doLayoutAtPoint(center: Vector, yaw: number): this;
@@ -1382,54 +823,12 @@ export type ParsedNSID = {
   extras: Array<string> | undefined;
 };
 export declare const DECK_NSID = "deck:?/?";
-/**
- * Object metadata field uses a simple "type:source/name|extra" string.
- *
- * Each component is a dot (".") delimited series of strings.
- *
- * TYPE delineates the hierarchy to the specific object type.  Entries should
- * start generic and get more specific, for instance "card.action" is a card
- * from the action deck.  The TYPE field should be sufficient to locate where
- * the item belongs, in some cases augment with owning player slot.
- *
- * SOURCE is the produce/release with the item.  For instance, "base" could
- * mean the base game, or use an official expansion name.  Recommend homebrew
- * always start with "homebrew.{x}" where {x} is the identifier (to avoid
- * confusion with canon content sources).
- *
- * NAME is the item name.  It may include dot-delimited discriminators for
- * different versions of the same item (e.g. "direct_hit.1" vs "direct_hit.2").
- *
- * EXTRA should be avoided, there may be rare cases wanting fruther metadata.
- *
- * @see https://github.com/TI4-Online/TI4-TTPG/wiki/NSID-Namespace
- */
 export declare abstract class NSID {
-  /**
-   * Create NSID from a metadata string or object.  A deck with multiple cards
-   * gets a special "deck" NSID, consumers should call `stack` to get by card.
-   *
-   * This get strips off any extra metadata (after the "|") from the string.
-   *
-   * @param input
-   * @returns NSID string
-   */
   static get(input: StaticObject): string;
   static getExtras(input: StaticObject): Array<string>;
   static getWithExtra(input: StaticObject): string;
-  /**
-   * Get NSIDs for each card in a deck.
-   *
-   * @param input deck
-   * @returns NSID array, per-card values
-   */
   static getDeck(input: Card): Array<string>;
   static getDeckWithExtras(input: Card): Array<string>;
-  /**
-   * Parse this NSID into components (and sub-components, if dot delimited).
-   *
-   * @returns parsed
-   */
   static parse(nsid: string): ParsedNSID | undefined;
 }
 //#endregion
@@ -1441,9 +840,6 @@ export type PerfReport = {
   stdDev: number;
   fps: number;
 };
-/**
- * Singleton class for frames per second performance tracking.
- */
 export declare class Perf implements IGlobal {
   private static _instance;
   private readonly _windowFrameSecs;
@@ -1452,29 +848,12 @@ export declare class Perf implements IGlobal {
   private _nextWindowFpsIndex;
   private _lastFpsUpdateSecond;
   private _onTickHandler;
-  /**
-   * Returns the singleton instance of the Perf class.
-   * @returns {Perf} The singleton instance.
-   */
   static getInstance(): Perf;
   constructor(windowSize?: number);
   init(): void;
   destroy(): void;
-  /**
-   * Returns a performance report based on the current data.
-   * @returns {PerfReport} The performance report.
-   */
   getReport(): PerfReport;
-  /**
-   * Returns a string representation of the current performance report.
-   * @returns {string} The string representation of the performance report.
-   */
   getReportStr(): string;
-  /**
-   * Get per-second FPS for the last minute, in time order.
-   *
-   * @returns
-   */
   getFpsHistory(): Array<number>;
 }
 //#endregion
@@ -1489,50 +868,15 @@ export type PolygonLineSegment = {
   a: Vector;
   b: Vector;
 };
-/**
- * Manage a polygon in the XY plane.
- */
 export declare class Polygon {
   private readonly _polygon;
   private _boundingBox;
-  /**
-   * Join two-point segments sharing the tail of one with the head of another.
-   * Useful for "faction borders" connecting a set of line segments.
-   *
-   * @param segments
-   * @returns
-   */
   static conjoin(segments: Array<PolygonLineSegment>): Array<Polygon>;
   constructor(points: Array<Vector>);
-  /**
-   * Briefly draw the polygon assuming world space coordinates.
-   */
   drawDebug(): void;
-  /**
-   * Get polygon vertices.
-   *
-   * @returns {Array.<Vector>} List of vertices.
-   */
   getPoints(): Array<Vector>;
-  /**
-   * Get polygon bounding box.
-   *
-   * @returns {Object} Dictionary from { left, top, right, bottom } to numbers.
-   */
   getBoundingBox(): PolygonBoundingBox;
-  /**
-   * Is the point within the polygon's XY frame?
-   *
-   * @param {Vector} point
-   * @returns {boolean} True if point inside polygon
-   */
   contains(point: Vector): boolean;
-  /**
-   * Create a new polygon with an inset version of this one.
-   *
-   * @param {number} amount
-   * @returns {Polygon} Inset polygon
-   */
   inset(amount: number): Polygon;
 }
 //#endregion
@@ -1542,9 +886,6 @@ export type AbstractSetupParams = {
   primaryColor?: Color;
   secondaryColor?: Color;
 };
-/**
- * Store owner information.
- */
 export declare abstract class AbstractSetup {
   private readonly _playerSlot;
   private readonly _primaryColor;
@@ -1556,10 +897,6 @@ export declare abstract class AbstractSetup {
 }
 //#endregion
 //#region src/lib/shuffle/shuffle.d.ts
-/**
- * Shuffle an array of objects.  Original is not modified,
- * returns shuffled.
- */
 export declare class Shuffle<T> {
   shuffle(items: Array<T>): Array<T>;
   choice(items: Array<T>): T | undefined;
@@ -1567,9 +904,6 @@ export declare class Shuffle<T> {
 }
 //#endregion
 //#region src/lib/spawn/spawn.d.ts
-/**
- * Registry for NSID to template id.
- */
 export declare class Spawn {
   private _nsidToTemplateId;
   spawn(nsid: string, position?: Vector | [x: number, y: number, z: number], rotation?: Rotator | [pitch: number, yaw: number, roll: number]): GameObject | undefined;
@@ -1584,9 +918,6 @@ export declare class Spawn {
   clear(): this;
   getAllNsids(): Array<string>;
   getTemplateIdOrThrow(nsid: string): string;
-  /**
-   * Make sure all registered templates exist.
-   */
   validate(): this;
 }
 //#endregion
@@ -1594,12 +925,6 @@ export declare class Spawn {
 export declare class SvgSparkline {
   static WIDTH: number;
   static HEIGHT: number;
-  /**
-   * Create a sparkline from non-negative numbers.
-   *
-   * @param values
-   * @returns
-   */
   static svg(values: Array<number>): string;
   static url(values: Array<number>): string;
 }
@@ -1618,11 +943,6 @@ export type SwapSplitCombineRule = {
   requireFaceDown?: boolean;
   repeat: boolean;
 };
-/**
- * Replace one or more objects with others.  Applies the first matching rule.
- *
- * Useful to replace currency items with upper/lower versions.
- */
 export declare class SwapSplitCombine implements IGlobal {
   private readonly _rules;
   private readonly _spawn;
@@ -1637,20 +957,11 @@ export declare class SwapSplitCombine implements IGlobal {
   addOverrideCreate(nsid: string, create: (player: Player) => GameObject | undefined): this;
   addOverrideDestroy(nsid: string, destroy: (obj: GameObject, player: Player) => void): this;
   addOverrideSupplyCount(nsid: string, supplyCount: (player: Player) => number): this;
-  /**
-   * Add "r" handler to relevant objects.
-   */
   init(): void;
   _go(rObj: GameObject, player: Player): void;
   _getHoveredAndSelectedObjs(rObj: GameObject, player: Player): {
     [key: string]: Array<GameObject>;
   };
-  /**
-   * Apply the first matching rule.
-   *
-   * @param nsidToObjs
-   * @param player
-   */
   _applyRules(nsidToObjs: {
     [key: string]: Array<GameObject>;
   }, player: Player): void;
@@ -1659,9 +970,6 @@ export declare class SwapSplitCombine implements IGlobal {
 //#endregion
 //#region src/lib/timer/timer.d.ts
 export type DirectionType = -1 | 1;
-/**
- * Timer state, used to recreate the timer in the streamer overlay.
- */
 export type TimerExportType = {
   anchorTimestamp: number;
   anchorValue: number;
@@ -1686,9 +994,6 @@ export declare class TimerBreakdown {
   incrSeconds(): this;
   toTimeString(): string;
 }
-/**
- * Timer, counts up or down.
- */
 export declare class Timer {
   readonly onTimerExpired: TriggerableMulticastDelegate<() => void>;
   readonly onTimerTick: TriggerableMulticastDelegate<() => void>;
@@ -1703,11 +1008,6 @@ export declare class Timer {
   constructor(nameSpaceId: NamespaceId);
   export(): TimerExportType;
   getDirection(): DirectionType;
-  /**
-   * Get absolute seconds, does not account for countdown.
-   *
-   * @returns number
-   */
   getSeconds(): number;
   getTimeString(): string;
   start(value: number, direction: DirectionType): this;
@@ -1726,10 +1026,6 @@ export declare class EditTimer {
 //#region src/lib/turn-order/turn-order.d.ts
 export type Direction = "forward" | "reverse" | "snake";
 export type PlayerSlot = number;
-/**
- * Specify turn order with direction (forward, reverse, snake).
- * Provides a central, persistent state for passed and eliminiated players.
- */
 export declare class TurnOrder {
   static readonly onTurnStateChanged: TriggerableMulticastDelegate<(turnOrder: TurnOrder) => void>;
   private static readonly _idToTurnOrder;
@@ -1743,27 +1039,12 @@ export declare class TurnOrder {
   private _snake;
   private _snakeNeedsAnotherTurn;
   static getInstance(savedDataKey: NamespaceId): TurnOrder;
-  /**
-   * Constructor.  Does NOT register with shared instance memory; ALWAYS
-   * use getInstance if you want to find/create a shared instance.
-   *
-   * @param savedDataKey
-   */
   constructor(savedDataKey: NamespaceId);
   getId(): NamespaceId;
   _saveState(): void;
   _restoreState(): void;
   nextTurn(): PlayerSlot;
   getCurrentTurn(): PlayerSlot;
-  /**
-   * Set current turn.
-   *
-   * Do not require it be in the current turn order: perhaps the caller is
-   * about to chnage the order to match, or has some other wacky use in mind.
-   *
-   * @param playerSlot
-   * @returns
-   */
   setCurrentTurn(playerSlot: PlayerSlot): this;
   getTurnOrder(): Array<PlayerSlot>;
   setTurnOrder(order: Array<PlayerSlot>, direction: Direction, currentTurn: PlayerSlot): this;
@@ -1778,9 +1059,6 @@ export declare class TurnOrder {
 }
 //#endregion
 //#region src/lib/ui/ui-visibility/ui-visibility.d.ts
-/**
- * Set or toggle per-player visibility.
- */
 export declare class UiVisibility {
   private readonly _ui;
   private readonly _obj;
@@ -1796,10 +1074,6 @@ export declare class UiVisibility {
 }
 //#endregion
 //#region src/lib/ui/window/player-window.d.ts
-/**
- * Window shown to a single player.  Player can grow/shrink, collapse, or warp
- * between screen space and world space (VR players only get world).
- */
 export declare class PlayerWindow {
   private static readonly WORLD_SCALE_DELTA;
   private static readonly TITLE_HEIGHT;
@@ -1837,16 +1111,9 @@ export declare class PlayerWindow {
 }
 //#endregion
 //#region src/lib/ui/window/window.d.ts
-/**
- * UI, normally presented in screen space with the option to warp to world
- * (starts in world for VR players).  Optionally allow collapse, close.
- */
 export declare class Window {
   private readonly _windowName;
   private readonly _playerWindows;
-  /**
-   * Called when window state changes (zoom-in, zoom-out, close, etc).
-   */
   readonly onStateChanged: TriggerableMulticastDelegate<() => void>;
   readonly onAllClosed: TriggerableMulticastDelegate<() => void>;
   private readonly _customActionName;
@@ -1854,17 +1121,6 @@ export declare class Window {
   private readonly _customActionHandler;
   _getState(): string | undefined;
   _applyState(state: string): void;
-  /**
-   * Constructor.
-   *
-   * If persistenceKey is provided, the window top-level state will be saved
-   * and restored.  Window contents state is NOT persisted, caller should
-   * listen for state changes and persist as needed.
-   *
-   * @param params
-   * @param playerSlots : which players should see this window
-   * @param persistenceKey : optional, save window state
-   */
   constructor(params: WindowParams, playerSlots: Array<number>, persistenceKey?: NamespaceId);
   attach(): this;
   detach(): this;
@@ -1879,27 +1135,10 @@ export type WeightedChoiceOption<T> = {
   weight: number;
   value: T;
 };
-/**
- * Class representing a weighted choice utility.
- * @class
- */
 export declare class WeightedChoice<T> {
   private readonly _options;
   private readonly _totalWeight;
-  /**
-   * Constructs a new WeightedChoice instance.
-   *
-   * @param {Array<WeightedChoiceOption<T>>} options - The options to choose from.
-   * @throws {Error} If any option weight is negative.
-   */
   constructor(options: Array<WeightedChoiceOption<T>>);
-  /**
-   * Returns a randomly chosen option, with the likelihood of each option
-   * being chosen proportional to its weight.
-   *
-   * @returns {T} The chosen option.
-   * @throws {Error} If the method somehow fails to choose an option.
-   */
   choice(): T;
 }
 //#endregion
@@ -1915,13 +1154,6 @@ export declare class WhisperReporter implements IGlobal {
 }
 //#endregion
 //#region src/lib/widget/confirm-button/confirm-button.d.ts
-/**
- * Two-stage button with a confirmation message requiring
- * an additional click.
- *
- * MUTATES THE GIVEN BUTTON, rewriting the button text to
- * the confirm message.
- */
 export declare class ConfirmButton {
   private static readonly CONFIRM_TIMEOUT_MSECS;
   private readonly _wrappedButton;
@@ -1930,68 +1162,21 @@ export declare class ConfirmButton {
   private _confirmMessage;
   private _confirmFontSize;
   private _confirmTimeoutHandle;
-  /**
-   * Convert the given button into a two-stage button.
-   *
-   * @param wrapButton
-   */
   constructor(wrapButton: Button);
   setConfirmFontSize(size: number): this;
   setConfirmMessage(message: string): this;
-  /**
-   * Overall widget for the two-stage button.
-   *
-   * @returns {Widget}
-   */
   getWidget(): Widget;
 }
 //#endregion
 //#region src/lib/widget/d6widget/d6widget.d.ts
-/**
- * Show a single D6 face as a square widget.
- *
- * Do not extend a widget class, the class shell can be lost when retrieving
- * via getChild, etc.  Use an explicit getWidget method for the widget.
- */
 export declare class D6Widget {
   private readonly _imageWidget;
   private readonly _canvas;
   private readonly _layoutBox;
-  /**
-   * Constructor.
-   */
   constructor();
-  /**
-   * Set the widget / single-face image size.
-   *
-   * @param size
-   * @returns self, for chaining
-   */
   setSize(size: number): this;
-  /**
-   * Set the 3x3 dice face sheet:
-   *
-   * [ - 1 - ]
-   * [ 2 3 6 ]
-   * [ 5 4 - ]
-   *
-   * @param textureName
-   * @param texturePackageId
-   * @returns self, for chaining
-   */
   setDiceImage(textureName: string, texturePackageId?: string): this;
-  /**
-   * Set which face is visible in the widget.
-   *
-   * @param index
-   * @returns self, for chaining
-   */
   setFace(index: number): this;
-  /**
-   * Get a widget suitable for UI.
-   *
-   * @returns Widget
-   */
   getWidget(): Widget;
 }
 //#endregion
@@ -2002,10 +1187,6 @@ export type EndTurnButtonParams = {
   soundPackageId?: string;
   volume?: number;
 };
-/**
- * Display an "end turn" button on the current-active-player's screen.
- * Optionally play a sound when it becomes a player's turn.
- */
 export declare class EndTurnButton {
   static readonly WIDTH = 180;
   static readonly HEIGHT = 60;
@@ -2039,10 +1220,6 @@ export declare const EndTurnLocaleData: {
 export type HotSeatButtonParams = {
   scale?: number;
 };
-/**
- * "End turn" button that sets no active player (hiding card holders, etc),
- * and becomes "Start turn" for the next player to seat them.
- */
 export declare class HotSeatButton {
   static readonly WIDTH = 180;
   static readonly HEIGHT = 60;
@@ -2094,9 +1271,6 @@ export declare class PerfWidget {
 }
 //#endregion
 //#region src/lib/widget/turn-order-widget/turn-entry-widget.d.ts
-/**
- * A single widget in the TurnOrderWidget's vertical stack.
- */
 export declare class TurnEntryWidget {
   private readonly _params;
   private readonly _nameWidth;
@@ -2123,18 +1297,8 @@ export declare class TurnEntryWidget {
 //#endregion
 //#region src/lib/widget/turn-order-widget/turn-entry-wart.d.ts
 export type TurnEntryWartGenerator = (widget: TurnEntryWidget, params: TurnOrderWidgetParams) => TurnEntryWart;
-/**
- * Augment a TurnEntryWidget.  May update its own widgets independently of
- * changes to turn order (e.g. change score value when score changes).
- */
 export declare abstract class TurnEntryWart {
-  /**
-   * TurnEntryWidget retired, remove any event handlers, etc.
-   */
   abstract destroy(): void;
-  /**
-   * Update the turn entry widget.
-   */
   abstract update(playerSlot: number, fgColor: Color, bgColor: Color): void;
 }
 //#endregion
@@ -2172,9 +1336,6 @@ export type TurnOrderWidgetParams = {
 };
 //#endregion
 //#region src/lib/widget/turn-order-widget/turn-clicked-widget.d.ts
-/**
- * "Popup" with options when clicking on a TurnEntryWidget.
- */
 export declare class TurnClickedWidget {
   private readonly _turnOrder;
   private readonly _params;
@@ -2198,9 +1359,6 @@ export declare const TurnOrderLocaleData: {
 };
 //#endregion
 //#region src/lib/widget/turn-order-widget/turn-order-widget.d.ts
-/**
- * Display turn order, update when turn order changes.
- */
 export declare class TurnOrderWidget {
   private readonly _params;
   private readonly _turnOrder;
