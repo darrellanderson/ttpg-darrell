@@ -282,6 +282,7 @@ export declare const CreateBoardParamsSchema: z.ZodObject<{
   }>;
 }, "strict", z.ZodTypeAny, {
   assetFilename: string;
+  templateName: string;
   srcImage: {
     type: string;
     scale?: {
@@ -302,7 +303,6 @@ export declare const CreateBoardParamsSchema: z.ZodObject<{
   } & {
     [k: string]: unknown;
   };
-  templateName: string;
   topDownWorldSize: {
     depth: number;
     width?: number | undefined;
@@ -356,6 +356,7 @@ export declare const CreateBoardParamsSchema: z.ZodObject<{
   templateMetadata?: string | undefined;
 }, {
   assetFilename: string;
+  templateName: string;
   srcImage: {
     type: string;
     scale?: {
@@ -376,7 +377,6 @@ export declare const CreateBoardParamsSchema: z.ZodObject<{
   } & {
     [k: string]: unknown;
   };
-  templateName: string;
   topDownWorldSize: {
     depth: number;
     width?: number | undefined;
@@ -2250,11 +2250,11 @@ export declare const CreateD6ParamsSchema: z.ZodObject<{
   }>, "many">;
 }, "strict", z.ZodTypeAny, {
   assetFilename: string;
-  templateName: string;
   faceSizePixel: {
     width: number;
     height: number;
   };
+  templateName: string;
   faces: {
     image: (string | z.objectOutputType<{
       type: z.ZodString;
@@ -2339,11 +2339,11 @@ export declare const CreateD6ParamsSchema: z.ZodObject<{
   templateMetadata?: string | undefined;
 }, {
   assetFilename: string;
-  templateName: string;
   faceSizePixel: {
     width: number;
     height: number;
   };
+  templateName: string;
   faces: {
     image: (string | z.objectInputType<{
       type: z.ZodString;
@@ -2971,9 +2971,9 @@ export declare const ZBufferCellSchema: z.ZodObject<{
   height: z.ZodNumber;
   bufferData: z.ZodString;
 }, "strict", z.ZodTypeAny, {
-  type: "BufferCell";
   width: number;
   height: number;
+  type: "BufferCell";
   bufferData: string;
   scale?: {
     pixel: number;
@@ -2991,9 +2991,9 @@ export declare const ZBufferCellSchema: z.ZodObject<{
     createCountToPrev?: number | undefined;
   }[] | undefined;
 }, {
-  type: "BufferCell";
   width: number;
   height: number;
+  type: "BufferCell";
   bufferData: string;
   scale?: {
     pixel: number;
@@ -3214,9 +3214,9 @@ export declare const ZCanvasCellSchema: z.ZodObject<{
     };
   }>, "many">;
 }, "strict", z.ZodTypeAny, {
-  type: "CanvasCell";
   width: number;
   height: number;
+  type: "CanvasCell";
   children: {
     left: number;
     top: number;
@@ -3257,9 +3257,9 @@ export declare const ZCanvasCellSchema: z.ZodObject<{
     createCountToPrev?: number | undefined;
   }[] | undefined;
 }, {
-  type: "CanvasCell";
   width: number;
   height: number;
+  type: "CanvasCell";
   children: {
     left: number;
     top: number;
@@ -3877,9 +3877,9 @@ export declare const ZImageCellSchema: z.ZodObject<{
   tint: z.ZodOptional<z.ZodString>;
   invert: z.ZodOptional<z.ZodBoolean>;
 }, "strict", z.ZodTypeAny, {
-  type: "ImageCell";
   width: number;
   height: number;
+  type: "ImageCell";
   imageFile: string;
   scale?: {
     pixel: number;
@@ -3901,9 +3901,9 @@ export declare const ZImageCellSchema: z.ZodObject<{
   tint?: string | undefined;
   invert?: boolean | undefined;
 }, {
-  type: "ImageCell";
   width: number;
   height: number;
+  type: "ImageCell";
   imageFile: string;
   scale?: {
     pixel: number;
@@ -4462,9 +4462,9 @@ export declare const ZSolidCellSchema: z.ZodObject<{
   height: z.ZodNumber;
   color: z.ZodString;
 }, "strict", z.ZodTypeAny, {
-  type: "SolidCell";
   width: number;
   height: number;
+  type: "SolidCell";
   color: string;
   scale?: {
     pixel: number;
@@ -4482,9 +4482,9 @@ export declare const ZSolidCellSchema: z.ZodObject<{
     createCountToPrev?: number | undefined;
   }[] | undefined;
 }, {
-  type: "SolidCell";
   width: number;
   height: number;
+  type: "SolidCell";
   color: string;
   scale?: {
     pixel: number;
@@ -4548,9 +4548,9 @@ export declare const ZTextCellSchema: z.ZodObject<{
   fontSize: z.ZodOptional<z.ZodNumber>;
   fontStyle: z.ZodOptional<z.ZodString>;
 }, "strict", z.ZodTypeAny, {
-  type: "TextCell";
   width: number;
   height: number;
+  type: "TextCell";
   text: string;
   scale?: {
     pixel: number;
@@ -4572,9 +4572,9 @@ export declare const ZTextCellSchema: z.ZodObject<{
   fontSize?: number | undefined;
   fontStyle?: string | undefined;
 }, {
-  type: "TextCell";
   width: number;
   height: number;
+  type: "TextCell";
   text: string;
   scale?: {
     pixel: number;
