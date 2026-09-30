@@ -6,4 +6,12 @@ export default defineConfig({
     format: {
         cjs: { target: ["node16"] },
     },
+    outputOptions: {
+        comments: false,
+    },
+    outExtensions({ format }) {
+        return { js: `.js`, dts: `.d.ts` };
+    },
+    minify: false,
+    treeshake: false,
 });
