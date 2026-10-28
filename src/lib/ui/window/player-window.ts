@@ -22,6 +22,7 @@ import {
 } from "./window-params";
 import { TriggerableMulticastDelegate } from "../../event/triggerable-multicast-delegate/triggerable-multicast-delegate";
 import { ThrottleClickHandler } from "../../event/throttle-click-handler/throttle-click-handler";
+import { UiScrub } from "../ui-scrub/ui-scrub";
 
 const packageId = refPackageId;
 
@@ -406,9 +407,7 @@ export class PlayerWindow {
             this._worldUi = ui;
 
             const rawPos:
-                | [x: number, y: number, z: number]
-                | Vector
-                | undefined =
+                [x: number, y: number, z: number] | Vector | undefined =
                 this._params.world?.playerSlotToTransform[this._playerSlot]
                     ?.pos;
 
@@ -461,10 +460,12 @@ export class PlayerWindow {
     public detach(): this {
         if (this._screenUi) {
             world.removeScreenUIElement(this._screenUi);
+            new UiScrub(this._screenUi.widget);
             this._screenUi = undefined;
         }
         if (this._worldUi) {
             world.removeUIElement(this._worldUi);
+            new UiScrub(this._worldUi.widget);
             this._worldUi = undefined;
         }
         if (this._windowWidget) {
